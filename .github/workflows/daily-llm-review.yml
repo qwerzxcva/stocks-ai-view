@@ -1,0 +1,81 @@
+# LLM 辅助复盘 (每日 16:15 CST)
+# 两种模式: --llm ghc (GitHub Models 免费额度, GPT-4o-mini/Llama) / --llm none (确定性规则)
+name: daily-llm-review
+on:
+  schedule:
+    - cron: '15 8 * * 1-5'   # 16:15 CST 收盘后
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Setup ghc (GitHub Models CLI)
+        run: |
+          set -e
+          curl -fsSL https://github.com/github/ghc-cli/releases/download/v0.35.3/ghc_0.35.3_linux_amd64.tar.gz \
+            | tar -xz -C /tmp
+          sudo mv /tmp/ghc /usr/local/bin/
+          ghc --version
+      - name: Run hot_impact
+        run: python3 scripts/hot_impact.py --out-dir data
+      - name: LLM 复盘 (GPT-4o-mini via GitHub Models)
+        run: |
+          set -e
+          # ghc model run --model gpt-4o-mini --size medium --prompt ...
+          python3 << 'PYEOF'
+          import os, json, subprocess
+          data=json.load(open('data/latest.json'))
+          try:
+              hi=json.load(open('data/hot_impact.json'))
+          except FileNotFoundError:
+              hi={"reports":[]}
+          ctx=json.dumps({"market":data["market"],"phase":data.get("phase"),
+                          "themes":[t["name"] for t in data.get("themes",[])][:10],
+                          "hot_impact":[{"theme":r["theme"],
+                                         "stocks":[{"code":s["code"],"name":s["name"],"signal":s["signal"],
+                                                   "ret_5d":s["ret_5d"],"pos20":s["pos20"]}
+                                                    for s in r["stocks"]]}
+                                        for r in hi.get("reports",[])[:6]],
+                          "funds_top5":[(f["code"],f["name"],f.get("ret_1y"))
+                                        for f in data.get("fund_rank",[])[:5]]},
+                         ensure_ascii=False)
+          prompt=f"""你是A股复盘分析师。基于以下当日数据(JSON), 写一份300字内的复盘:
+          1) 市场情绪与主线判断
+          2) 热点推演中哪些信号最值得关注 (按信号强度排序)
+          3) 明日情景推演 (进攻/防守两种)
+          直接输出markdown, 不要免责声明。
+          数据:
+          {ctx}
+          """
+          r=subprocess.run(["ghc","model","run","--model","gpt-4o-mini","--size","medium",
+                            "--prompt",prompt], capture_output=True, text=True, timeout=180)
+          if r.returncode != 0:
+              print("llm err:", r.stderr[:200], flush=True)
+              exit(0)
+          md=f"# 每日LLM复盘 {__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}\n\n"+r.stdout
+          os.makedirs("review", exist_ok=True)
+          open(f"review/{__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}.md","w").write(md)
+          print("llm review done", flush=True)
+          PYEOF
+      - name: Commit & push
+        run: |
+          git config user.name "ai-bot"
+          git config user.email "ai-bot@users.noreply.github.com"
+          git add -A
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet HEAD && echo "no changes" || {
+            git commit -m "review: $ts (TSP v4 + ghc-gpt-4o-mini)" && \
+            git -c http.version=HTTP/1.1 push origin main
+          }

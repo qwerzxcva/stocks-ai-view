@@ -124,6 +124,14 @@ tr:hover td{background:var(--panel2)}
     </div>
   </div>
 
+  <!-- 全宽: 热点→股票走势推演 -->
+  <div class="col-12 sec">
+    <div class="card">
+      <h2>热点 → 股票走势推演 <span class="badge" style="margin-left:6px">规则引擎: 动量 / 过热 / 超跌 / 蓄势</span></h2>
+      <div id="hotImpact" style="overflow-x:auto">暂无推演数据 (由 GitHub Actions 每日 16:00 CST 生成)</div>
+    </div>
+  </div>
+
   <!-- 全宽: 东财基金排行 (KOL 抱团代理指标) -->
   <div class="col-12 sec">
     <div class="card">
@@ -241,6 +249,32 @@ function renderZt(zts){
   document.getElementById('ztBody').innerHTML=(zts||[]).slice(0,30).map(z=>`<tr><td>${z.code}</td><td>${z.name}</td><td>${fmt(z.price)}</td><td class="up">+${z.chg_pct}%</td><td>${z.lianban>=2?'<b class="up">'+z.lianban+'板</b>':'首板'}</td><td>${fmtTime(z.zt_time)}</td></tr>`).join('')||'<tr><td colspan="6" class="fl">暂无数据</td></tr>'
 }
 
+function renderHotImpact(d){
+  const box=document.getElementById('hotImpact');
+  // 数据优先从 latest.json.hot_impact, 否则 fetch 独立文件
+  if(d&&d.reports&&d.reports.length){
+    box.innerHTML=d.reports.map(r=>`
+      <div style="margin:10px 0">
+        <div style="font-weight:700;color:var(--accent);font-size:12px;margin-bottom:6px">${r.theme} <span class="fl">(热度 ${Math.round(r.heat*100)}% · ${r.news_count}条)</span></div>
+        <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>5日</th><th>20日位置</th><th>信号</th><th>预期区间</th><th>依据</th></tr></thead><tbody>
+        ${r.stocks.map(s=>`<tr>
+          <td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="badge up">涨停</span>':''}</td>
+          <td>${fmt(s.price)}</td>
+          <td class="${cls(s.ret_5d)}">${sign(s.ret_5d)}%</td>
+          <td>${Math.round(s.pos20*100)}%</td>
+          <td><span class="badge ${s.signal==='动量延续'?'up':s.signal==='追高警惕'?'amber':s.signal==='超跌修复'?'dn':'fl'}">${s.signal}</span></td>
+          <td>${s.expect}</td>
+          <td class="fl" style="max-width:280px">${s.why}</td></tr>`).join('')}
+        </tbody></table>
+      </div>`).join('');
+  } else {
+    fetch('data/hot_impact.json?t='+Date.now(),{cache:'no-store'})
+      .then(r=>r.ok?r.json():null)
+      .then(j=>{ if(j&&j.reports)renderHotImpact(j); })
+      .catch(()=>{});
+  }
+}
+
 function renderNews(ns){
   document.getElementById('newsList').innerHTML=(ns||[]).slice(0,30).map(n=>{
     const themes=(n.theme||[]).slice(0,2).map(t=>`<span class="fl" style="margin-left:4px">#${t}</span>`).join('');
@@ -262,6 +296,7 @@ async function render(){
   renderPicks(d.picks);
   renderZt(d.limit_up_pool);
   renderNews(d.news_recent);
+  renderHotImpact(d.hot_impact||{});
   // 基金排行 (若 latest.json 有 fund_rank 字段)
   if(d.fund_rank)renderFundRank(d.fund_rank);
 }
