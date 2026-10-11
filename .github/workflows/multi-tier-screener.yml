@@ -1,0 +1,43 @@
+# 多轮审核选股工作流 (每日 16:15 CST)
+# 轮次 1: 新闻主题+抖音热榜+涨停池 → 候选池
+# 轮次 2: 腾讯K线 + RSI/MACD/MA20偏离/量比/连板 → 打分排序
+# 轮次 3: GitHub Models (ghc) deepseek-v4.1-flash 综合判断
+name: multi-tier-screener-daily
+on:
+  schedule:
+    - cron: '15 8 * * 1-5'   # 16:15 CST
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  screener:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Setup ghc
+        run: |
+          curl -fsSL https://github.com/github/ghc-cli/releases/download/v0.35.3/ghc_0.35.3_linux_amd64.tar.gz | tar -xz -C /tmp
+          sudo mv /tmp/ghc /usr/local/bin/
+      - name: Run multi-tier screener
+        run: |
+          set -e
+          python3 scripts/multi_screener.py --out-dir . --rounds 3 --top 30 --llm ghc
+      - name: Commit & push
+        run: |
+          git config user.name "screener-bot"
+          git config user.email "41888888888+stocks-ai-bot@users.noreply.github.com"
+          git add -A
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet HEAD && echo "no changes" || {
+            git commit -m "screener: $ts (multi-tier v3 rounds)" && \
+            git -c http.version=HTTP/1.1 push origin main
+          }
