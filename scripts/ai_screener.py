@@ -202,6 +202,22 @@ def fetch_news(limit=120):
             add(it.get("ctime", ""), t, "cls")
     except Exception as e:
         print(f"[news-cls] {e}", file=sys.stderr)
+    # 抖音热榜 (免登录公开端点)
+    try:
+        url = ("https://www.douyin.com/aweme/v1/web/hot/search/list/"
+               "?device_platform=webapp&aid=6383&channel=channel_pc_web"
+               "&source=9&hot_board_content=hot_board_default&hot_board_duration=7200")
+        body = urllib.request.urlopen(urllib.request.Request(url, headers={**UA, "Referer": "https://www.douyin.com/hot"}),
+                                      timeout=15).read()
+        d = json.loads(body.decode("utf-8", "replace"))
+        for w in (d.get("data") or {}).get("word_list") or []:
+            word = str(w.get("word", "")).strip()
+            if not word or word in seen or len(word) < 4:
+                continue
+            seen.add(word)
+            add("", f"[抖音热榜] {word}", "douyin-hot")
+    except Exception as e:
+        print(f"[news-douyin] {e}", file=sys.stderr)
     return news
 
 
