@@ -1,6 +1,6 @@
 {
-  "ts": "2026-10-11T23:52:53.412158+08:00",
-  "date": "20261011",
+  "ts": "2026-10-12T00:36:14.817783+08:00",
+  "date": "20261012",
   "market": {
     "indices": [
       {
@@ -8,7 +8,6 @@
         "name": "上证指数",
         "price": 3813.79,
         "prev": 3811.9,
-        "open": 3804.09,
         "chg_pct": 0.05
       },
       {
@@ -16,7 +15,6 @@
         "name": "深证成指",
         "price": 12641.86,
         "prev": 12620.9,
-        "open": 12557.02,
         "chg_pct": 0.17
       },
       {
@@ -24,7 +22,6 @@
         "name": "沪深300",
         "price": 4317.25,
         "prev": 4310.28,
-        "open": 4297.25,
         "chg_pct": 0.16
       },
       {
@@ -32,7 +29,6 @@
         "name": "科创50",
         "price": 1457.27,
         "prev": 1456.32,
-        "open": 1441.72,
         "chg_pct": 0.07
       },
       {
@@ -40,7 +36,6 @@
         "name": "创业板指",
         "price": 3043.33,
         "prev": 3036.66,
-        "open": 3021.33,
         "chg_pct": 0.22
       },
       {
@@ -48,166 +43,326 @@
         "name": "北证50",
         "price": 1037.31,
         "prev": 1012.1,
-        "open": 1006.4,
         "chg_pct": 2.49
       }
     ],
     "limit_up": 69,
     "limit_down": 0,
     "broken": 14,
-    "zt_rate": 83.1
+    "zt_rate": 83.1,
+    "yesterday_zt": 69
   },
-  "themes": [],
-  "concepts_affected": [],
+  "phase": {
+    "score": 81.7,
+    "stage": "修复",
+    "desc": "常规波动, 无显著方向",
+    "seal_rate": 83.1,
+    "max_boards": 9,
+    "ge2": 12,
+    "first_board": 57,
+    "promo_rate": 0.174,
+    "components": {
+      "speculation": 86.5,
+      "profit": 100.0,
+      "resilience": 51.0
+    }
+  },
+  "themes": [
+    {
+      "name": "人工智能",
+      "news_count": 3,
+      "pos": 0,
+      "neg": 1,
+      "sample": [
+        "【特朗普政府要求AI公司在发生安全事件后立即上报】当地时间10月9日，央视记者获",
+        "凯蒂·贝利（Katie Bailey）被任命为白宫立法事务办公室负责人。该办公室",
+        "美国超级智能专项工作组副主席库波尔：必须让AI模型提供商承担安全相关责任。"
+      ]
+    },
+    {
+      "name": "低空经济",
+      "news_count": 2,
+      "pos": 0,
+      "neg": 1,
+      "sample": [
+        "乌克兰首都基辅已启动警报，以警示无人机袭击。",
+        "欧盟委员会：欧盟还将为无人机和导弹提供额外资金，以加强乌克兰的防御能力并保卫其领"
+      ]
+    },
+    {
+      "name": "军工",
+      "news_count": 2,
+      "pos": 0,
+      "neg": 1,
+      "sample": [
+        "俄罗斯国防部：袭击了尼古拉耶夫的一个后勤中心，以及一艘正驶往乔尔诺莫尔斯克港的军",
+        "欧盟委员会：欧盟还将为无人机和导弹提供额外资金，以加强乌克兰的防御能力并保卫其领"
+      ]
+    },
+    {
+      "name": "财政政策",
+      "news_count": 1,
+      "pos": 1,
+      "neg": 0,
+      "sample": [
+        "【多地推进重大项目建设发力稳投资】四季度是重大项目建设冲刺季。10月份以来，多地"
+      ]
+    },
+    {
+      "name": "房地产",
+      "news_count": 1,
+      "pos": 1,
+      "neg": 0,
+      "sample": [
+        "【“金九”期间重点城市楼市延续高活跃度】随着政策红利不断落地、住房消费需求持续释"
+      ]
+    },
+    {
+      "name": "消费",
+      "news_count": 1,
+      "pos": 1,
+      "neg": 0,
+      "sample": [
+        "【“金九”期间重点城市楼市延续高活跃度】随着政策红利不断落地、住房消费需求持续释"
+      ]
+    },
+    {
+      "name": "贵金属",
+      "news_count": 1,
+      "pos": 1,
+      "neg": 0,
+      "sample": [
+        "暗盘白银突破55美元/盎司，日内涨幅0.0%。"
+      ]
+    },
+    {
+      "name": "贸易",
+      "news_count": 1,
+      "pos": 0,
+      "neg": 0,
+      "sample": [
+        "伊朗外长指责以色列总理内塔尼亚胡为了逃脱法律制裁，不惜牺牲更多美国人的生命和资源"
+      ]
+    }
+  ],
+  "mainlines": [
+    {
+      "name": "贵金属",
+      "score": 100.0,
+      "note": "降级: 概念接口不可达, 按涨停主题聚类占比",
+      "themes": [
+        "贵金属"
+      ],
+      "up_count": 1,
+      "leading_name": "西部黄金"
+    }
+  ],
+  "ladder": {
+    "height": 9,
+    "tiers": [
+      {
+        "boards": 9,
+        "count": 1,
+        "codes": [
+          "600825"
+        ]
+      },
+      {
+        "boards": 5,
+        "count": 2,
+        "codes": [
+          "002242",
+          "600241"
+        ]
+      },
+      {
+        "boards": 4,
+        "count": 1,
+        "codes": [
+          "002058"
+        ]
+      },
+      {
+        "boards": 2,
+        "count": 8,
+        "codes": [
+          "300530",
+          "001336",
+          "002805",
+          "002733",
+          "600812",
+          "001300",
+          "600400",
+          "600408"
+        ]
+      },
+      {
+        "boards": 1,
+        "count": 57,
+        "codes": [
+          "600127",
+          "600843",
+          "603155",
+          "300821",
+          "600478",
+          "605399",
+          "600207",
+          "605136",
+          "601811",
+          "002692"
+        ]
+      }
+    ]
+  },
   "limit_up_pool": [
     {
       "code": "002058",
       "name": "紫竹高科",
-      "price": 24440.0,
-      "chg_pct": 9.990999221801758,
+      "price": 24.44,
+      "chg_pct": 9.99,
       "lianban": 4,
       "zt_time": "92500"
     },
     {
       "code": "600241",
       "name": "时代万恒",
-      "price": 11760.0,
-      "chg_pct": 10.009354591369629,
+      "price": 11.76,
+      "chg_pct": 10.01,
       "lianban": 5,
       "zt_time": "92500"
     },
     {
       "code": "600825",
       "name": "新华传媒",
-      "price": 12530.0,
-      "chg_pct": 10.008779525756836,
+      "price": 12.53,
+      "chg_pct": 10.01,
       "lianban": 9,
       "zt_time": "92500"
     },
     {
       "code": "001300",
       "name": "三柏硕",
-      "price": 14860.0,
-      "chg_pct": 9.992597579956055,
+      "price": 14.86,
+      "chg_pct": 9.99,
       "lianban": 2,
       "zt_time": "93018"
     },
     {
       "code": "002242",
       "name": "九阳股份",
-      "price": 15130.0,
-      "chg_pct": 10.03636360168457,
+      "price": 15.13,
+      "chg_pct": 10.04,
       "lianban": 5,
       "zt_time": "93027"
     },
     {
       "code": "600812",
       "name": "华北制药",
-      "price": 6030.0,
-      "chg_pct": 10.03649616241455,
+      "price": 6.03,
+      "chg_pct": 10.04,
       "lianban": 2,
       "zt_time": "93058"
     },
     {
       "code": "002733",
       "name": "雄韬股份",
-      "price": 20780.0,
-      "chg_pct": 10.005293846130371,
+      "price": 20.78,
+      "chg_pct": 10.01,
       "lianban": 2,
       "zt_time": "93103"
     },
     {
       "code": "002692",
       "name": "远程股份",
-      "price": 4760.0,
-      "chg_pct": 9.930715560913086,
+      "price": 4.76,
+      "chg_pct": 9.93,
       "lianban": 1,
       "zt_time": "93148"
     },
     {
       "code": "601811",
       "name": "新华文轩",
-      "price": 20910.0,
-      "chg_pct": 9.994739532470703,
+      "price": 20.91,
+      "chg_pct": 9.99,
       "lianban": 1,
       "zt_time": "93159"
     },
     {
       "code": "605136",
       "name": "丽人丽妆",
-      "price": 9440.0,
-      "chg_pct": 10.023309707641602,
+      "price": 9.44,
+      "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "93316"
     },
     {
       "code": "600207",
       "name": "安彩高科",
-      "price": 5600.0,
-      "chg_pct": 10.019646644592285,
+      "price": 5.6,
+      "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "93500"
     },
     {
       "code": "605399",
       "name": "晨光新材",
-      "price": 13060.0,
-      "chg_pct": 10.025274276733398,
+      "price": 13.06,
+      "chg_pct": 10.03,
       "lianban": 1,
       "zt_time": "93522"
     },
     {
       "code": "002805",
       "name": "丰元股份",
-      "price": 19440.0,
-      "chg_pct": 10.016977310180664,
+      "price": 19.44,
+      "chg_pct": 10.02,
       "lianban": 2,
       "zt_time": "93621"
     },
     {
       "code": "001336",
       "name": "楚环科技",
-      "price": 22720.0,
-      "chg_pct": 10.024212837219238,
+      "price": 22.72,
+      "chg_pct": 10.02,
       "lianban": 2,
       "zt_time": "93730"
     },
     {
       "code": "600478",
       "name": "科力远",
-      "price": 5100.0,
-      "chg_pct": 9.913793563842773,
+      "price": 5.1,
+      "chg_pct": 9.91,
       "lianban": 1,
       "zt_time": "93749"
     },
     {
       "code": "300821",
       "name": "东岳硅材",
-      "price": 17150.0,
-      "chg_pct": 20.013996124267578,
+      "price": 17.15,
+      "chg_pct": 20.01,
       "lianban": 1,
       "zt_time": "93839"
     },
     {
       "code": "603155",
       "name": "新亚强",
-      "price": 15430.0,
-      "chg_pct": 9.978616714477539,
+      "price": 15.43,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "94018"
     },
     {
       "code": "600843",
       "name": "上工申贝",
-      "price": 8180.0,
-      "chg_pct": 9.946236610412598,
+      "price": 8.18,
+      "chg_pct": 9.95,
       "lianban": 1,
       "zt_time": "94159"
     },
     {
       "code": "600127",
       "name": "金健米业",
-      "price": 15180.0,
+      "price": 15.18,
       "chg_pct": 10.0,
       "lianban": 1,
       "zt_time": "95039"
@@ -215,248 +370,248 @@
     {
       "code": "300530",
       "name": "领湃科技",
-      "price": 28900.0,
-      "chg_pct": 20.016611099243164,
+      "price": 28.9,
+      "chg_pct": 20.02,
       "lianban": 2,
       "zt_time": "95427"
     },
     {
       "code": "600629",
       "name": "华建集团",
-      "price": 18020.0,
-      "chg_pct": 10.01220989227295,
+      "price": 18.02,
+      "chg_pct": 10.01,
       "lianban": 1,
       "zt_time": "101122"
     },
     {
       "code": "601086",
       "name": "国芳集团",
-      "price": 14940.0,
-      "chg_pct": 10.014727592468262,
+      "price": 14.94,
+      "chg_pct": 10.01,
       "lianban": 1,
       "zt_time": "101607"
     },
     {
       "code": "600371",
       "name": "万向德农",
-      "price": 14970.0,
-      "chg_pct": 9.99265193939209,
+      "price": 14.97,
+      "chg_pct": 9.99,
       "lianban": 1,
       "zt_time": "102045"
     },
     {
       "code": "603101",
       "name": "汇嘉时代",
-      "price": 7990.0,
-      "chg_pct": 10.055096626281738,
+      "price": 7.99,
+      "chg_pct": 10.06,
       "lianban": 1,
       "zt_time": "103634"
     },
     {
       "code": "002675",
       "name": "东诚药业",
-      "price": 13890.0,
-      "chg_pct": 9.97624683380127,
+      "price": 13.89,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "103645"
     },
     {
       "code": "600408",
       "name": "安泰集团",
-      "price": 3780.0,
-      "chg_pct": 9.883721351623535,
+      "price": 3.78,
+      "chg_pct": 9.88,
       "lianban": 2,
       "zt_time": "104317"
     },
     {
       "code": "300981",
       "name": "中红医疗",
-      "price": 23360.0,
-      "chg_pct": 19.979455947875977,
+      "price": 23.36,
+      "chg_pct": 19.98,
       "lianban": 1,
       "zt_time": "104700"
     },
     {
       "code": "000546",
       "name": "金圆股份",
-      "price": 4770.0,
-      "chg_pct": 9.90783405303955,
+      "price": 4.77,
+      "chg_pct": 9.91,
       "lianban": 1,
       "zt_time": "105048"
     },
     {
       "code": "002480",
       "name": "新筑股份",
-      "price": 6000.0,
-      "chg_pct": 10.091742515563965,
+      "price": 6.0,
+      "chg_pct": 10.09,
       "lianban": 1,
       "zt_time": "111745"
     },
     {
       "code": "300369",
       "name": "绿盟科技",
-      "price": 10430.0,
-      "chg_pct": 20.02301597595215,
+      "price": 10.43,
+      "chg_pct": 20.02,
       "lianban": 1,
       "zt_time": "130509"
     },
     {
       "code": "600865",
       "name": "百大集团",
-      "price": 11510.0,
-      "chg_pct": 10.038241386413574,
+      "price": 11.51,
+      "chg_pct": 10.04,
       "lianban": 1,
       "zt_time": "130527"
     },
     {
       "code": "600882",
       "name": "妙可蓝多",
-      "price": 21130.0,
-      "chg_pct": 9.994794845581055,
+      "price": 21.13,
+      "chg_pct": 9.99,
       "lianban": 1,
       "zt_time": "130603"
     },
     {
       "code": "002212",
       "name": "天融信",
-      "price": 7560.0,
-      "chg_pct": 10.043667793273926,
+      "price": 7.56,
+      "chg_pct": 10.04,
       "lianban": 1,
       "zt_time": "130806"
     },
     {
       "code": "605188",
       "name": "国光连锁",
-      "price": 13840.0,
-      "chg_pct": 10.015897750854492,
+      "price": 13.84,
+      "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "131016"
     },
     {
       "code": "603067",
       "name": "振华股份",
-      "price": 42310.0,
-      "chg_pct": 10.010400772094727,
+      "price": 42.31,
+      "chg_pct": 10.01,
       "lianban": 1,
       "zt_time": "131112"
     },
     {
       "code": "601069",
       "name": "西部黄金",
-      "price": 26550.0,
-      "chg_pct": 9.983429908752441,
+      "price": 26.55,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "131414"
     },
     {
       "code": "600354",
       "name": "敦煌种业",
-      "price": 9990.0,
-      "chg_pct": 10.022026062011719,
+      "price": 9.99,
+      "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "131537"
     },
     {
       "code": "000420",
       "name": "吉林化纤",
-      "price": 3810.0,
-      "chg_pct": 10.115607261657715,
+      "price": 3.81,
+      "chg_pct": 10.12,
       "lianban": 1,
       "zt_time": "131539"
     },
     {
       "code": "600621",
       "name": "华鑫股份",
-      "price": 14480.0,
-      "chg_pct": 10.030394554138184,
+      "price": 14.48,
+      "chg_pct": 10.03,
       "lianban": 1,
       "zt_time": "131602"
     },
     {
       "code": "601519",
       "name": "大智慧",
-      "price": 9170.0,
-      "chg_pct": 9.952038764953613,
+      "price": 9.17,
+      "chg_pct": 9.95,
       "lianban": 1,
       "zt_time": "132015"
     },
     {
       "code": "002912",
       "name": "中新赛克",
-      "price": 28550.0,
-      "chg_pct": 10.019268035888672,
+      "price": 28.55,
+      "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "132548"
     },
     {
       "code": "605177",
       "name": "东亚药业",
-      "price": 28290.0,
-      "chg_pct": 9.992223739624023,
+      "price": 28.29,
+      "chg_pct": 9.99,
       "lianban": 1,
       "zt_time": "133032"
     },
     {
       "code": "002811",
       "name": "郑中设计",
-      "price": 18400.0,
-      "chg_pct": 9.982068061828613,
+      "price": 18.4,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "133806"
     },
     {
       "code": "601566",
       "name": "九牧王",
-      "price": 10140.0,
-      "chg_pct": 9.978307723999023,
+      "price": 10.14,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "133813"
     },
     {
       "code": "605287",
       "name": "德才股份",
-      "price": 40180.0,
-      "chg_pct": 9.99178695678711,
+      "price": 40.18,
+      "chg_pct": 9.99,
       "lianban": 1,
       "zt_time": "133925"
     },
     {
       "code": "605577",
       "name": "龙版传媒",
-      "price": 16200.0,
-      "chg_pct": 9.979633331298828,
+      "price": 16.2,
+      "chg_pct": 9.98,
       "lianban": 1,
       "zt_time": "134440"
     },
     {
       "code": "601595",
       "name": "上海电影",
-      "price": 24740.0,
-      "chg_pct": 10.004446983337402,
+      "price": 24.74,
+      "chg_pct": 10.0,
       "lianban": 1,
       "zt_time": "135226"
     },
     {
       "code": "601929",
       "name": "吉视传媒",
-      "price": 2500.0,
-      "chg_pct": 10.132158279418945,
+      "price": 2.5,
+      "chg_pct": 10.13,
       "lianban": 1,
       "zt_time": "135625"
     },
     {
       "code": "603096",
       "name": "新经典",
-      "price": 17330.0,
-      "chg_pct": 10.031745910644531,
+      "price": 17.33,
+      "chg_pct": 10.03,
       "lianban": 1,
       "zt_time": "140035"
     },
     {
       "code": "000710",
       "name": "贝瑞基因",
-      "price": 11300.0,
-      "chg_pct": 10.02921199798584,
+      "price": 11.3,
+      "chg_pct": 10.03,
       "lianban": 1,
       "zt_time": "140212"
     }
@@ -464,340 +619,714 @@
   "limit_down_pool": [],
   "picks": [
     {
-      "code": "600241",
-      "name": "时代万恒",
-      "price": 11760.0,
-      "chg_pct": 10.01,
-      "lianban": 5,
-      "zt_time": "92500",
-      "theme_hit": false,
-      "zt_score": 1.0,
-      "is_theme": false
-    },
-    {
       "code": "600825",
       "name": "新华传媒",
-      "price": 12530.0,
+      "price": 12.53,
       "chg_pct": 10.01,
       "lianban": 9,
       "zt_time": "92500",
       "theme_hit": false,
-      "zt_score": 1.0,
-      "is_theme": false
+      "rps5": 97,
+      "rps20": 100,
+      "score": 82.5
     },
     {
       "code": "002242",
       "name": "九阳股份",
-      "price": 15130.0,
+      "price": 15.13,
       "chg_pct": 10.04,
       "lianban": 5,
       "zt_time": "93027",
       "theme_hit": false,
-      "zt_score": 1.0,
-      "is_theme": false
+      "rps5": 95,
+      "rps20": 95,
+      "score": 81.4
+    },
+    {
+      "code": "600241",
+      "name": "时代万恒",
+      "price": 11.76,
+      "chg_pct": 10.01,
+      "lianban": 5,
+      "zt_time": "92500",
+      "theme_hit": false,
+      "rps5": 90,
+      "rps20": 92,
+      "score": 80.0
     },
     {
       "code": "002058",
       "name": "紫竹高科",
-      "price": 24440.0,
+      "price": 24.44,
       "chg_pct": 9.99,
       "lianban": 4,
       "zt_time": "92500",
       "theme_hit": false,
-      "zt_score": 0.9197299766540528,
-      "is_theme": false
-    },
-    {
-      "code": "600812",
-      "name": "华北制药",
-      "price": 6030.0,
-      "chg_pct": 10.04,
-      "lianban": 2,
-      "zt_time": "93058",
-      "theme_hit": false,
-      "zt_score": 0.76,
-      "is_theme": false
-    },
-    {
-      "code": "002733",
-      "name": "雄韬股份",
-      "price": 20780.0,
-      "chg_pct": 10.01,
-      "lianban": 2,
-      "zt_time": "93103",
-      "theme_hit": false,
-      "zt_score": 0.76,
-      "is_theme": false
-    },
-    {
-      "code": "002805",
-      "name": "丰元股份",
-      "price": 19440.0,
-      "chg_pct": 10.02,
-      "lianban": 2,
-      "zt_time": "93621",
-      "theme_hit": false,
-      "zt_score": 0.76,
-      "is_theme": false
-    },
-    {
-      "code": "001336",
-      "name": "楚环科技",
-      "price": 22720.0,
-      "chg_pct": 10.02,
-      "lianban": 2,
-      "zt_time": "93730",
-      "theme_hit": false,
-      "zt_score": 0.76,
-      "is_theme": false
+      "rps5": 92,
+      "rps20": 90,
+      "score": 75.8
     },
     {
       "code": "300530",
       "name": "领湃科技",
-      "price": 28900.0,
+      "price": 28.9,
       "chg_pct": 20.02,
       "lianban": 2,
       "zt_time": "95427",
       "theme_hit": false,
-      "zt_score": 0.76,
-      "is_theme": false
+      "rps5": 100,
+      "rps20": 85,
+      "score": 51.4
+    },
+    {
+      "code": "600812",
+      "name": "华北制药",
+      "price": 6.03,
+      "chg_pct": 10.04,
+      "lianban": 2,
+      "zt_time": "93058",
+      "theme_hit": false,
+      "rps5": 77,
+      "rps20": 79,
+      "score": 46.7
     },
     {
       "code": "001300",
       "name": "三柏硕",
-      "price": 14860.0,
+      "price": 14.86,
       "chg_pct": 9.99,
       "lianban": 2,
       "zt_time": "93018",
       "theme_hit": false,
-      "zt_score": 0.7597779273986817,
-      "is_theme": false
+      "rps5": 74,
+      "rps20": 67,
+      "score": 44.7
     },
     {
-      "code": "600400",
-      "name": "红豆股份",
-      "price": 3980.0,
-      "chg_pct": 9.94,
+      "code": "001336",
+      "name": "楚环科技",
+      "price": 22.72,
+      "chg_pct": 10.02,
       "lianban": 2,
-      "zt_time": "144612",
+      "zt_time": "93730",
       "theme_hit": false,
-      "zt_score": 0.7583425235748291,
-      "is_theme": false
+      "rps5": 72,
+      "rps20": 69,
+      "score": 44.3
     },
     {
       "code": "600408",
       "name": "安泰集团",
-      "price": 3780.0,
+      "price": 3.78,
       "chg_pct": 9.88,
       "lianban": 2,
       "zt_time": "104317",
       "theme_hit": false,
-      "zt_score": 0.756511640548706,
-      "is_theme": false
+      "rps5": 82,
+      "rps20": 74,
+      "score": 44.3
     },
     {
-      "code": "605136",
-      "name": "丽人丽妆",
-      "price": 9440.0,
-      "chg_pct": 10.02,
-      "lianban": 1,
-      "zt_time": "93316",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "600207",
-      "name": "安彩高科",
-      "price": 5600.0,
-      "chg_pct": 10.02,
-      "lianban": 1,
-      "zt_time": "93500",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "605399",
-      "name": "晨光新材",
-      "price": 13060.0,
-      "chg_pct": 10.03,
-      "lianban": 1,
-      "zt_time": "93522",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "300821",
-      "name": "东岳硅材",
-      "price": 17150.0,
-      "chg_pct": 20.01,
-      "lianban": 1,
-      "zt_time": "93839",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "600127",
-      "name": "金健米业",
-      "price": 15180.0,
-      "chg_pct": 10.0,
-      "lianban": 1,
-      "zt_time": "95039",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "600629",
-      "name": "华建集团",
-      "price": 18020.0,
+      "code": "002733",
+      "name": "雄韬股份",
+      "price": 20.78,
       "chg_pct": 10.01,
-      "lianban": 1,
-      "zt_time": "101122",
+      "lianban": 2,
+      "zt_time": "93103",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 79,
+      "rps20": 49,
+      "score": 43.5
     },
     {
-      "code": "601086",
-      "name": "国芳集团",
-      "price": 14940.0,
-      "chg_pct": 10.01,
-      "lianban": 1,
-      "zt_time": "101607",
+      "code": "002805",
+      "name": "丰元股份",
+      "price": 19.44,
+      "chg_pct": 10.02,
+      "lianban": 2,
+      "zt_time": "93621",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "603101",
-      "name": "汇嘉时代",
-      "price": 7990.0,
-      "chg_pct": 10.06,
-      "lianban": 1,
-      "zt_time": "103634",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 87,
+      "rps20": 36,
+      "score": 43.4
     },
     {
       "code": "300981",
       "name": "中红医疗",
-      "price": 23360.0,
+      "price": 23.36,
       "chg_pct": 19.98,
       "lianban": 1,
       "zt_time": "104700",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 85,
+      "rps20": 87,
+      "score": 41.9
     },
     {
-      "code": "002480",
-      "name": "新筑股份",
-      "price": 6000.0,
-      "chg_pct": 10.09,
+      "code": "601811",
+      "name": "新华文轩",
+      "price": 20.91,
+      "chg_pct": 9.99,
       "lianban": 1,
-      "zt_time": "111745",
+      "zt_time": "93159",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 59,
+      "rps20": 97,
+      "score": 40.9
+    },
+    {
+      "code": "300821",
+      "name": "东岳硅材",
+      "price": 17.15,
+      "chg_pct": 20.01,
+      "lianban": 1,
+      "zt_time": "93839",
+      "theme_hit": false,
+      "rps5": 67,
+      "rps20": 56,
+      "score": 37.3
+    },
+    {
+      "code": "600478",
+      "name": "科力远",
+      "price": 5.1,
+      "chg_pct": 9.91,
+      "lianban": 1,
+      "zt_time": "93749",
+      "theme_hit": false,
+      "rps5": 69,
+      "rps20": 26,
+      "score": 34.1
+    },
+    {
+      "code": "601069",
+      "name": "西部黄金",
+      "price": 26.55,
+      "chg_pct": 9.98,
+      "lianban": 1,
+      "zt_time": "131414",
+      "theme_hit": true,
+      "rps5": 46,
+      "rps20": 0,
+      "score": 34.0
+    },
+    {
+      "code": "002692",
+      "name": "远程股份",
+      "price": 4.76,
+      "chg_pct": 9.93,
+      "lianban": 1,
+      "zt_time": "93148",
+      "theme_hit": false,
+      "rps5": 56,
+      "rps20": 41,
+      "score": 33.6
+    },
+    {
+      "code": "605399",
+      "name": "晨光新材",
+      "price": 13.06,
+      "chg_pct": 10.03,
+      "lianban": 1,
+      "zt_time": "93522",
+      "theme_hit": false,
+      "rps5": 41,
+      "rps20": 62,
+      "score": 32.9
     },
     {
       "code": "300369",
       "name": "绿盟科技",
-      "price": 10430.0,
+      "price": 10.43,
       "chg_pct": 20.02,
       "lianban": 1,
       "zt_time": "130509",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 64,
+      "rps20": 82,
+      "score": 30.7
     },
     {
-      "code": "600865",
-      "name": "百大集团",
-      "price": 11510.0,
-      "chg_pct": 10.04,
+      "code": "603155",
+      "name": "新亚强",
+      "price": 15.43,
+      "chg_pct": 9.98,
       "lianban": 1,
-      "zt_time": "130527",
+      "zt_time": "94018",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 26,
+      "rps20": 54,
+      "score": 28.7
     },
     {
-      "code": "002212",
-      "name": "天融信",
-      "price": 7560.0,
-      "chg_pct": 10.04,
-      "lianban": 1,
-      "zt_time": "130806",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "605188",
-      "name": "国光连锁",
-      "price": 13840.0,
-      "chg_pct": 10.02,
-      "lianban": 1,
-      "zt_time": "131016",
-      "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
-    },
-    {
-      "code": "603067",
-      "name": "振华股份",
-      "price": 42310.0,
+      "code": "600629",
+      "name": "华建集团",
+      "price": 18.02,
       "chg_pct": 10.01,
       "lianban": 1,
-      "zt_time": "131112",
+      "zt_time": "101122",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 62,
+      "rps20": 5,
+      "score": 28.3
+    },
+    {
+      "code": "600207",
+      "name": "安彩高科",
+      "price": 5.6,
+      "chg_pct": 10.02,
+      "lianban": 1,
+      "zt_time": "93500",
+      "theme_hit": false,
+      "rps5": 5,
+      "rps20": 77,
+      "score": 27.5
+    },
+    {
+      "code": "000546",
+      "name": "金圆股份",
+      "price": 4.77,
+      "chg_pct": 9.91,
+      "lianban": 1,
+      "zt_time": "105048",
+      "theme_hit": false,
+      "rps5": 51,
+      "rps20": 18,
+      "score": 26.8
+    },
+    {
+      "code": "600127",
+      "name": "金健米业",
+      "price": 15.18,
+      "chg_pct": 10.0,
+      "lianban": 1,
+      "zt_time": "95039",
+      "theme_hit": false,
+      "rps5": 3,
+      "rps20": 72,
+      "score": 26.0
+    },
+    {
+      "code": "605136",
+      "name": "丽人丽妆",
+      "price": 9.44,
+      "chg_pct": 10.02,
+      "lianban": 1,
+      "zt_time": "93316",
+      "theme_hit": false,
+      "rps5": 23,
+      "rps20": 28,
+      "score": 25.3
+    },
+    {
+      "code": "002675",
+      "name": "东诚药业",
+      "price": 13.89,
+      "chg_pct": 9.98,
+      "lianban": 1,
+      "zt_time": "103645",
+      "theme_hit": false,
+      "rps5": 33,
+      "rps20": 31,
+      "score": 25.1
+    },
+    {
+      "code": "600843",
+      "name": "上工申贝",
+      "price": 8.18,
+      "chg_pct": 9.95,
+      "lianban": 1,
+      "zt_time": "94159",
+      "theme_hit": false,
+      "rps5": 10,
+      "rps20": 46,
+      "score": 24.7
     },
     {
       "code": "600354",
       "name": "敦煌种业",
-      "price": 9990.0,
+      "price": 9.99,
       "chg_pct": 10.02,
       "lianban": 1,
       "zt_time": "131537",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 49,
+      "rps20": 59,
+      "score": 24.6
     },
     {
-      "code": "000420",
-      "name": "吉林化纤",
-      "price": 3810.0,
-      "chg_pct": 10.12,
+      "code": "002912",
+      "name": "中新赛克",
+      "price": 28.55,
+      "chg_pct": 10.02,
       "lianban": 1,
-      "zt_time": "131539",
+      "zt_time": "132548",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 50,
+      "rps20": 50,
+      "score": 23.5
     },
     {
-      "code": "600621",
-      "name": "华鑫股份",
-      "price": 14480.0,
-      "chg_pct": 10.03,
+      "code": "603101",
+      "name": "汇嘉时代",
+      "price": 7.99,
+      "chg_pct": 10.06,
       "lianban": 1,
-      "zt_time": "131602",
+      "zt_time": "103634",
       "theme_hit": false,
-      "zt_score": 0.6799999999999999,
-      "is_theme": false
+      "rps5": 31,
+      "rps20": 21,
+      "score": 23.4
     }
   ],
-  "news_recent": [],
+  "news_recent": [
+    {
+      "ts": "2026-10-12 00:32:55",
+      "title": "【胡塞称沙特24小时内空袭也门124次】当地时间10月11日晚，也门胡塞武装发表声明称，过去24小时内，沙特对也门首都萨那以及塔伊兹省、马里卜省、焦夫省、哈杰省、荷台达省和萨达等地发动了124次空袭。自9月3日新一轮局势升级以来，沙特对也门",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:31:32",
+      "title": "乌克兰首都基辅已启动警报，以警示无人机袭击。",
+      "theme": [
+        "低空经济"
+      ],
+      "sentiment": "neg",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:27:19",
+      "title": "一名北约官员称，俄罗斯9月伤亡人数达5万人。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:24:00",
+      "title": "俄罗斯国防部：袭击了尼古拉耶夫的一个后勤中心，以及一艘正驶往乔尔诺莫尔斯克港的军用运输船。",
+      "theme": [
+        "军工"
+      ],
+      "sentiment": "neg",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:19:00",
+      "title": "欧盟委员会：冯德莱恩主席将讨论乌克兰来年的融资需求。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:18:55",
+      "title": "沙特民航局表示，周日利雅得哈立德国王机场遇袭事件已造成人员受伤。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:18:52",
+      "title": "欧盟委员会：冯德莱恩主席完全支持乌克兰总统泽连斯基提出的与俄罗斯停火的呼吁。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:18:45",
+      "title": "欧盟委员会：欧盟还将为无人机和导弹提供额外资金，以加强乌克兰的防御能力并保卫其领空。",
+      "theme": [
+        "低空经济",
+        "军工"
+      ],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:15:07",
+      "title": "法国总统候选人梅朗雄：特朗普是我们的对手，仅此而已。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-12 00:09:38",
+      "title": "【胡塞武装承认袭击利雅得机场】当地时间10月11日，也门胡塞武装发言人在社交媒体平台发布视频声明，称在过去24小时内针对沙特境内目标发起四轮打击，其中包括袭击沙特首都利雅得的哈立德国王国际机场。（CCTV国际时讯）",
+      "theme": [],
+      "sentiment": "neg",
+      "src": "sina",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:08:01",
+      "title": "标普：支出计划必须与收入限制相平衡，英国税负过高可能抑制GDP增长。",
+      "theme": [],
+      "sentiment": "pos",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:09:02",
+      "title": "标普：确认埃及评级为B/B，展望稳定。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:09:11",
+      "title": "美联储柯林斯未就货币政策及经济前景置评。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:09:28",
+      "title": "标普就埃及表示：冲突若进一步加剧并导致能源价格在更长时间内维持高位，可能加大通胀压力。",
+      "theme": [],
+      "sentiment": "neg",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:09:40",
+      "title": "中国地震台网正式测定：10月10日04时04分在新疆阿克苏地区库车市（北纬41.21度，东经83.71度）发生3.4级地震，震源深度19千米。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:11:37",
+      "title": "俄罗斯副总理诺瓦克：俄罗斯立即开始解除柴油出口限制。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:11:42",
+      "title": "标普：尽管冲突仍在持续，我们预计海湾阿拉伯国家合作委员会成员国仍将持续为埃及提供资金支持。",
+      "theme": [],
+      "sentiment": "neg",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:12:08",
+      "title": "俄罗斯副总理诺瓦克：俄罗斯准备最早在10月向美国市场及其所有合作伙伴供应额外数量的柴油。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:12:28",
+      "title": "俄罗斯副总理诺瓦克：随着炼油厂在维护后恢复运营，11月和12月的出口量预计将进一步增加。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 04:12:37",
+      "title": "俄罗斯副总理诺瓦克：俄罗斯国内市场也将获得充足的柴油供应。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:04:41",
+      "title": "【多地推进重大项目建设发力稳投资】四季度是重大项目建设冲刺季。10月份以来，多地积极部署重大项目建设相关工作。从本轮部署看，各地新落户或新开工的重大项目所涉领域众多。陕西巨丰投资资讯有限责任公司高级投资顾问丁臻宇表示，多地重大项目广泛涵盖第",
+      "theme": [
+        "财政政策"
+      ],
+      "sentiment": "pos",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:05:25",
+      "title": "巴拿马总统感谢中美洲经济一体化银行提供 “及时援助”。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:07:49",
+      "title": "【“金九”期间重点城市楼市延续高活跃度】随着政策红利不断落地、住房消费需求持续释放，9月房地产市场延续回暖态势，重点城市二手房成交放量，“金九”表现亮眼。中指研究院数据显示，9月，二手房活跃度继续高位运行，重点20城二手房成交11.9万套，",
+      "theme": [
+        "房地产",
+        "消费"
+      ],
+      "sentiment": "pos",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:08:49",
+      "title": "星链： 对于巴拿马地震受影响的人群，Starlink 将为受灾地区的现有客户和新客户提供免费服务，直至11月10日。我们正在与紧急响应机构协调，以帮助恢复受灾最严重的社区的连接。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:15:14",
+      "title": "【第三季度21家上市银行获511家机构调研】今年第三季度，证券公司、基金公司、保险公司、保险资管公司以及外资等各类机构密集对上市银行进行调研。Wind数据显示，第三季度，共有21家上市银行获511家机构调研。调研内容显示，信贷投放、净息差、",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:16:20",
+      "title": "【特朗普政府要求AI公司在发生安全事件后立即上报】当地时间10月9日，央视记者获悉，在人工智能公司Anthropic发生多起未经授权使用美国政府系统的安全事件后，特朗普政府宣布实施新的强制性AI安全事件报告要求。消息称，Anthropic公",
+      "theme": [
+        "人工智能"
+      ],
+      "sentiment": "neg",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:16:46",
+      "title": "暗盘白银突破55美元/盎司，日内涨幅0.0%。",
+      "theme": [
+        "贵金属"
+      ],
+      "sentiment": "pos",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:17:11",
+      "title": "【巴西一小型飞机坠毁 致3人死亡】总台记者获悉，当地时间10月9日，一架小型飞机在巴西瓦莱-杜阿苏地区机场附近坠毁，机上3名军事警察死亡。据悉，失事飞机是一架双发飞机。该飞机从巴西东南部一机场起飞，目的地是瓦莱-杜阿苏地区。目前，坠机原因仍",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:17:32",
+      "title": "【经济日报：保护主义撑不起欧洲竞争力】经济日报刊文指出，据媒体报道，10月5日，德国和法国向欧委会提交非正式文件，要求欧盟强化使用贸易防御措施，并推出多项保护主义新工具。此举既不利于中欧合作，也解决不了欧洲发展难题，最终只会反噬自身经济。德",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 08:18:28",
+      "title": "特朗普： 请假装我在（中期选举）选票上，好吗？",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:08:41",
+      "title": "伊朗外长指责以色列总理内塔尼亚胡为了逃脱法律制裁，不惜牺牲更多美国人的生命和资源。",
+      "theme": [
+        "贸易"
+      ],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:11:59",
+      "title": "美国特使威特科夫与库什纳或于未来两周内访问莫斯科。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:21:23",
+      "title": "凯蒂·贝利（Katie Bailey）被任命为白宫立法事务办公室负责人。该办公室主要负责白宫与国会之间的联络工作。",
+      "theme": [
+        "人工智能"
+      ],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:21:41",
+      "title": "【飓风登陆美国东南沿海 逾70万户断电】飓风“伊萨亚斯”登陆美国东南沿海，带来狂风和强降雨。10日凌晨，佛罗里达州和亚拉巴马州超过72.6万用户电力供应中断。二级飓风“伊萨亚斯”9日在佛州西北部德斯廷市附近登陆，最高持续风速达每小时165公",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:22:09",
+      "title": "沙特利雅得机场目击者称，今日早些时候发生爆炸后，多人受伤。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:23:11",
+      "title": "【波兰校园安全大检查 76人被拘留】波兰近日先后发生三起校园持刀伤人事件，造成一人死亡、十余人受伤。为防范更多校园袭击，波兰警方截至10日已对近5万所学校开展安全检查，正在处理231起涉嫌违法案件并拘留76人。（新华社）",
+      "theme": [],
+      "sentiment": "neg",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:27:55",
+      "title": "纽约原油暗盘跌破91美元，日内跌超0.8%。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:30:55",
+      "title": "布伦特原油暗盘跌破102美元，日内跌超1.1%。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:31:15",
+      "title": "美国超级智能专项工作组副主席库波尔：必须让AI模型提供商承担安全相关责任。",
+      "theme": [
+        "人工智能"
+      ],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    },
+    {
+      "ts": "2026-10-10 23:31:30",
+      "title": "美国超级智能专项工作组副主席库波尔：让人工智能减速或暂停是“最糟糕的做法”。",
+      "theme": [],
+      "sentiment": "neu",
+      "src": "data-news",
+      "digest": ""
+    }
+  ],
   "meta": {
     "source": "tencent+eastmoney+sina",
-    "algo": "tsp-signal-v2",
-    "zero_cred": true
+    "algo": "tsp-signal-v3",
+    "zero_cred": true,
+    "ref": "shy3130/tick-stock-panel"
   }
 }
