@@ -79,6 +79,62 @@ def prefixed(code):
     return "bj" + c
 
 
+# ─── 东财基金排行 (混合基金近1年收益, KOL 抱团方向代理指标, 纯 HTTP 免登录) ──
+def fetch_fund_rank(days=90, top=50, retries=2):
+    now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
+    sd = (now - datetime.timedelta(days=days)).strftime("%Y-%m-%d")
+    ed = now.strftime("%Y-%m-%d")
+    url = (f"https://fund.eastmoney.com/data/rankhandler.aspx"
+           f"?op=ph&dt=kf&ft=hh&rs=&gs=0&sc=1nzf&st=desc&sd={sd}&ed={ed}"
+           f"&qdii=&tabType=new&pi=1&pn={top}&dx=")
+    for _ in range(retries):
+        try:
+            body = urllib.request.urlopen(
+                urllib.request.Request(url, headers={**UA, "Referer": "https://fund.eastmoney.com/"}),
+                timeout=12).read().decode("utf-8", "replace")
+            m = re.search(r"datas:\s*(\[.*?\])", body, re.DOTALL)
+            if not m:
+                return []
+            rows = json.loads(m.group(1))
+            date_re = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+            out = []
+            for raw in rows:
+                p = str(raw).split(",")
+                if len(p) < 10:
+                    continue
+                code = p[0].strip()
+                if not code or code == "---":
+                    continue
+                anchor = -1
+                for i in range(3, min(9, len(p))):
+                    if date_re.match(p[i].strip()):
+                        anchor = i
+                        break
+                if anchor < 0:
+                    continue
+
+                def f(off):
+                    j = anchor + off
+                    if j >= len(p):
+                        return 0.0
+                    try:
+                        return float(p[j].strip() or 0)
+                    except ValueError:
+                        return 0.0
+
+                out.append({"code": code, "name": p[1].strip(),
+                            "nav": round(f(1), 4),
+                            "daily_chg_pct": round(f(3), 2),
+                            "ret_1m": round(f(5), 2), "ret_3m": round(f(6), 2),
+                            "ret_6m": round(f(7), 2), "ret_1y": round(f(8), 2),
+                            "ret_since": round(f(12), 2),
+                            "setup_date": p[anchor + 13].strip() if anchor + 13 < len(p) else ""})
+            return out
+        except Exception as e:
+            print(f"[fund-rank] retry: {e}", file=sys.stderr)
+    return []
+
+
 # ─── 指数行情 (腾讯, 多重试) ────────────────────────────────────────────────
 def fetch_indices(retries=3):
     url = f"https://qt.gtimg.cn/q={','.join(IDX_CODES)}"
@@ -376,6 +432,7 @@ def main():
     news = fetch_news(args.limit)
     if len(news) < 30:
         news += fetch_remote_news(days=args.days)
+    fund_rank = fetch_fund_rank(top=50)
 
     # 主题热度 (新闻命中 + 正负向)
     theme_news = {}
@@ -456,6 +513,7 @@ def main():
             for t in hot_themes
         ],
         "mainlines": mainlines[:15],
+        "fund_rank": fund_rank[:50],
         "ladder": ladder,
         "limit_up_pool": zt[:50],
         "limit_down_pool": dt[:30],
@@ -474,7 +532,7 @@ def main():
         print(out)
     print(f"=== summary ===", file=sys.stderr)
     print(f"indices={len(indices)} zt={len(zt)} dt={len(dt)} zb={len(zb)} yzt={len(yzt)} "
-          f"concepts={len(concepts)} news={len(news)} picks={len(picks)} rps={len(rps)} "
+          f"concepts={len(concepts)} news={len(news)} picks={len(picks)} rps={len(rps)} fundrank={len(fund_rank)} "
           f"phase={phase['stage']}({phase['score']})", file=sys.stderr)
 
 
