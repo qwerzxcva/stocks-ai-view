@@ -1,0 +1,33 @@
+# AI 实时选股分析网站
+# GitHub Pages 部署: Settings → Pages → Source: main branch / / (root)
+# Actions cron: 交易日 09:35 / 11:35 / 14:05 / 15:25 CST (UTC 01:35/03:35/06:05/07:25 周一至周五)
+name: ai-data-update
+on:
+  schedule:
+    - cron: '35 1,3,5,7 * * 1-5'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Run AI screener
+        run: python3 scripts/ai_screener.py --out data/latest.json
+      - name: Commit & push
+        run: |
+          git config user.name "stocks-ai-bot"
+          git config user.email "41888888888+stocks-ai-bot@users.noreply.github.com"
+          git add -A
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet HEAD && echo "no changes" || {
+            git commit -m "ai-data $ts" && \
+            git -c http.version=HTTP/1.1 push origin main
+          }
