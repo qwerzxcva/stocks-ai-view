@@ -158,6 +158,17 @@ def round2_score(codes, limit=40):
             ret_5 = round((c / closes[-6] - 1) * 100, 2) if len(closes) >= 6 else None
             ret_20 = round((c / closes[-21] - 1) * 100, 2) if len(closes) >= 21 else None
             zt_info = zt_map.get(raw, {})
+            # 推演信号 (与 hot_impact.derive_signal 同口径): 动量/过热/超跌/蓄势
+            r5_ = ret_5 or 0
+            pos_ = pos
+            if pos > 0.95 and r5_ > 15:
+                sig = "追高警惕"
+            elif r5_ > 0 and dev20 < 10 and pos_ < 0.8:
+                sig = "动量延续"
+            elif (ret_20 or 0) < -5 and c < ma20:
+                sig = "超跌修复"
+            else:
+                sig = "横盘蓄势"
             score = (0.25 * min(r / 100, 1) +
                      0.20 * (1 - abs(dev20) / 20) +
                      0.15 * min(abs(ret_5 or 0) / 15, 1) if ret_5 else 0 +
@@ -170,7 +181,7 @@ def round2_score(codes, limit=40):
                 "rsi": r, "dif": dif, "dea": dea,
                 "vol_ratio": round(vol_ratio, 2), "pos20": round(pos, 2),
                 "lianban": zt_info.get("lianban", 1),
-                "score": round(max(0, min(1, score)), 3),
+                "signal": sig, "score": round(max(0, min(1, score)), 3),
             })
             time.sleep(0.08)
         except Exception:
