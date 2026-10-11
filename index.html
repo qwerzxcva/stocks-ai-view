@@ -10,298 +10,249 @@
   --tx:#d8dee9;--tx2:#7a8699;--up:#ff4d4f;--dn:#35d07f;--accent:#8b5cf6;--amber:#f5b940;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg);color:var(--tx);font:13px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;padding:12px 16px 32px}
+body{background:var(--bg);color:var(--tx);font:12px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+/* ─── top bar ─── */
+.hdr{display:flex;align-items:center;gap:10px;padding:6px 14px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;font-size:11px}
+.logo{font-size:15px;font-weight:800;letter-spacing:.3px}
+.logo .tsp{background:linear-gradient(90deg,#8b5cf6,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.b{display:inline-block;padding:1px 7px;border-radius:10px;background:var(--panel2);border:1px solid var(--border);color:var(--tx2);font-size:10px}
+.b.stage{color:#0b0e14;background:var(--accent);border-color:var(--accent);font-weight:700}
+.upd{margin-left:auto;color:var(--tx2)}
+/* ─── main grid (fixed height) ─── */
+.main{flex:1;display:grid;grid-template-columns:320px 1fr 280px;grid-template-rows:auto 1fr;gap:1px;background:var(--border);overflow:hidden}
+@media(max-width:1100px){.main{grid-template-columns:1fr;grid-template-rows:auto auto auto}}
+/* ─── common card ─── */
+.card{background:var(--panel);overflow:hidden;display:flex;flex-direction:column}
+.card-hd{padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;font-size:11px}
+.card-hd::before{content:"";width:3px;height:12px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.card-bd{flex:1;overflow-y:auto;font-size:11px}
+/* ─── col 1: index + phase ─── */
+.c1{grid-row:1/3}
+.idx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 8px;flex-shrink:0}
+.idx-item{text-align:center;padding:4px;background:var(--panel2);border-radius:6px}
+.idx-item .n{color:var(--tx2);font-size:9px}
+.idx-item .v{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.phase-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);flex-shrink:0}
+.gauge{width:120px;height:10px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.gauge i{display:block;height:100%;background:linear-gradient(90deg,var(--dn),var(--accent),var(--up));transition:width .3s}
+.phase-info{font-size:10px;color:var(--tx2)}
+.phase-info b{color:var(--tx);font-size:12px}
+.minis{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 8px;flex-shrink:0}
+.mini{text-align:center;padding:5px;background:var(--panel2);border-radius:5px}
+.mini .v{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.mini .n{color:var(--tx2);font-size:9px}
+/* picks table */
 table{width:100%;border-collapse:collapse}
-th{color:var(--tx2);font-size:11px;text-align:left;padding:5px 7px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap}
-td{padding:5px 7px;border-bottom:1px solid var(--border);font-size:12px;font-variant-numeric:tabular-nums}
+th{color:var(--tx2);font-size:10px;text-align:left;padding:3px 7px;background:var(--panel2);border-bottom:1px solid var(--border);font-weight:600;position:sticky;top:0;z-index:1}
+td{padding:3px 7px;border-bottom:1px solid var(--border)}
 tr:hover td{background:var(--panel2)}
-.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--tx2)}
-.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px}
-.badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;background:rgba(139,92,246,.15);color:var(--accent)}
+.badge{display:inline-block;font-size:9px;padding:0 5px;border-radius:3px;font-weight:600}
 .badge.amber{background:rgba(245,185,64,.15);color:var(--amber)}
 .badge.up{background:rgba(255,77,79,.15);color:var(--up)}
 .badge.dn{background:rgba(53,208,127,.15);color:var(--dn)}
-/* header */
-.hdr{display:flex;align-items:center;gap:10px;padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:12px;flex-wrap:wrap}
-.logo{font-size:17px;font-weight:800;letter-spacing:.3px}
-.logo .tsp{background:linear-gradient(90deg,#8b5cf6,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent}
-.badge2{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--panel2);border:1px solid var(--border);color:var(--tx2)}
-.badge2.stage{color:#0b0e14;background:var(--accent);border-color:var(--accent);font-weight:700}
-.upd{margin-left:auto;color:var(--tx2);font-size:11px}
-/* grid */
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
-.col-12{grid-column:span 12}.col-8{grid-column:span 8}.col-6{grid-column:span 6}.col-4{grid-column:span 4}
-@media(max-width:900px){.col-8,.col-6,.col-4{grid-column:span 12}}
-/* kpi */
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px}
-.kpi{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
-.kpi .n{color:var(--tx2);font-size:10px}
-.kpi .v{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums;margin:2px 0}
-.kpi .c{font-size:10px;font-weight:600}
-/* sections */
-.sec{margin-bottom:12px}
-.sec h2{font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.sec h2::before{content:"";width:3px;height:12px;background:var(--accent);border-radius:2px}
-/* theme chips */
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:flex;align-items:center;gap:4px;background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:3px 9px;font-size:11px}
-.chip b{color:var(--accent);font-size:11px}
-/* ladder */
-.tiers{display:flex;gap:6px;flex-wrap:wrap}
-.tier{background:var(--panel2);border:1px solid var(--border);border-radius:6px;padding:6px 8px;min-width:90px}
-.tier .h{font-size:10px;color:var(--tx2);margin-bottom:2px}
-.tier .h b{color:var(--amber);font-size:13px}
-.tier .codes{display:flex;flex-wrap:wrap;gap:3px}
-.tier .codes span{background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:0 5px;font-size:10px}
-/* mainline */
-.ml-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
-.ml-item .name{width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
-.ml-item .bar{flex:1;height:8px;background:var(--panel2);border-radius:4px;overflow:hidden}
-.ml-item .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#3b82f6);border-radius:4px}
-.ml-item .sc{width:40px;text-align:right;font-size:11px;color:var(--tx2)}
-/* news */
-.news-item{padding:4px 0;border-bottom:1px solid var(--border);font-size:12px}
+.badge.fl{background:rgba(122,134,153,.15);color:var(--tx2)}
+.hot{color:var(--accent);font-weight:600}
+/* ─── col 2: ladder + fund rank + hot impact ─── */
+.ladder-row{display:flex;gap:4px;padding:6px 8px;flex-wrap:wrap;flex-shrink:0}
+.tier{background:var(--panel2);border-radius:5px;padding:4px 8px;font-size:10px}
+.tier .h b{color:var(--amber);font-size:12px}
+/* ─── col 3: themes + news ─── */
+.chips{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;flex-shrink:0}
+.chip{display:flex;align-items:center;gap:3px;background:var(--panel2);border-radius:10px;padding:2px 7px;font-size:10px}
+.chip b{color:var(--accent)}
+.news-item{display:flex;align-items:center;gap:6px;padding:3px 8px;border-bottom:1px solid var(--border)}
 .news-item:last-child{border-bottom:0}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
 .dot.pos{background:var(--up)}.dot.neg{background:var(--dn)}.dot.neu{background:#5a6577}
-.news-item .src{float:right;color:var(--tx2);font-size:10px}
-/* gauge mini */
-.gauge-wrap{position:relative;width:120px;height:90px;margin:0 auto}
-#stageLabel{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-size:22px;font-weight:800;color:var(--accent)}
-/* fund rank */
-.fund-row td{font-size:12px}
+.news-item .t{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.news-item .src{color:var(--tx2);font-size:9px;flex-shrink:0}
+/* ─── bottom ticker bar ─── */
+.ticker{background:var(--panel);border-top:1px solid var(--border);padding:4px 14px;display:flex;align-items:center;gap:10px;font-size:10px;color:var(--tx2);flex-shrink:0;overflow:hidden;white-space:nowrap}
+.ticker .label{color:var(--accent);font-weight:700;flex-shrink:0}
+.ticker .scroll{flex:1;overflow:hidden;position:relative;height:16px}
+.ticker .scroll span{position:absolute;white-space:nowrap;animation:scroll-left 30s linear infinite}
+@keyframes scroll-left{from{left:100%}to{left:-200%}}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--tx2)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.ftr{color:var(--tx2);font-size:9px;text-align:center;padding:2px;flex-shrink:0;background:var(--panel);border-top:1px solid var(--border)}
 </style>
 </head>
 <body>
 <header class="hdr">
   <div class="logo">A股 AI 量化工作台 <span class="tsp">TSP v4</span></div>
-  <span class="badge2" id="algoBadge">tsp-signal-v4</span>
-  <span class="badge2 stage" id="stageBadge" style="display:none"></span>
+  <span class="b" id="algoBadge">tsp-signal-v4</span>
+  <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">⏳ 加载中…</span>
 </header>
 
-<div class="kpis" id="kpis"></div>
-
-<div class="grid">
-  <!-- 左列: 情绪周期 + 主线 + 梯队 -->
-  <div class="col-4 sec">
-    <div class="card">
-      <h2>市场情绪周期</h2>
-      <div class="gauge-wrap"><div id="gauge" style="width:100%;height:100%"></div><div id="stageLabel"></div></div>
-      <div id="phaseMinis" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px"></div>
-      <p id="phaseDesc" class="fl" style="font-size:10px;margin-top:8px"></p>
-    </div>
-  </div>
-
-  <!-- 右列: 主线 + 热点主题 + 梯队 -->
-  <div class="col-8 sec">
-    <div class="grid" style="margin:0">
-      <div class="col-6 card" style="margin-bottom:0">
-        <h2>今日主线 (近1年涨幅 TOP 基金 KOL 抱团方向)</h2>
-        <div id="mainlines"></div>
-      </div>
-      <div class="col-6 card" style="margin-bottom:0">
-        <h2>热点主题</h2>
-        <div class="chips" id="themes"></div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:10px">
-      <h2>连板梯队 <span id="ladderH" class="badge amber"></span></h2>
-      <div class="tiers" id="ladder"></div>
-    </div>
-  </div>
-
-  <!-- 全宽: AI 推荐标的 -->
-  <div class="col-12 sec">
-    <div class="card">
-      <h2>AI 推荐标的 (连板 + 封板时间 + 热点 + RPS 综合评分) <span class="badge fl" style="margin-left:8px">涨停池 top 60 + RPS5/RPS20</span></h2>
-      <div style="overflow-x:auto">
+<div class="main">
+  <!-- col 1 -->
+  <div class="card c1">
+    <div class="card-hd">AI 推荐标的 (3 轮审核 · 综合分)</div>
+    <div class="card-bd">
       <table>
-        <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>首封</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>综合分</th></tr></thead>
+        <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>综合分</th></tr></thead>
         <tbody id="pickBody"></tbody>
       </table>
-      </div>
     </div>
   </div>
 
-  <!-- 全宽: 热点→股票走势推演 -->
-  <div class="col-12 sec">
-    <div class="card">
-      <h2>热点 → 股票走势推演 <span class="badge" style="margin-left:6px">规则引擎: 动量 / 过热 / 超跌 / 蓄势</span></h2>
-      <div id="hotImpact" style="overflow-x:auto">暂无推演数据 (由 GitHub Actions 每日 16:00 CST 生成)</div>
-    </div>
+  <!-- col 2 -->
+  <div class="card">
+    <div class="card-hd">热点 → 走势推演 <span class="badge amber" style="margin-left:4px">规则引擎: 动量/过热/超跌/蓄势</span></div>
+    <div class="card-bd" id="hotImpact">—</div>
   </div>
 
-  <!-- 全宽: 东财基金排行 (KOL 抱团代理指标) -->
-  <div class="col-12 sec">
-    <div class="card">
-      <h2>东财混合基金排行 — 近1年收益率 TOP 50 <span class="badge amber" style="margin-left:6px">KOL 加仓方向代理指标</span></h2>
-      <div style="overflow-x:auto">
-      <table>
-        <thead><tr><th>代码</th><th>名称</th><th>最新净值</th><th>日涨跌%</th><th>1月</th><th>3月</th><th>6月</th><th>1年</th><th>成立来</th><th>成立日期</th></tr></thead>
-        <tbody id="fundBody"></tbody>
-      </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- 全宽: 涨停池 + 新闻 -->
-  <div class="grid" style="margin:0">
-    <div class="col-7 sec">
-      <div class="card">
-        <h2>涨停池 TOP 30</h2>
-        <div style="overflow-x:auto">
-        <table>
-          <thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨幅%</th><th>连板</th><th>首封时间</th></tr></thead>
-          <tbody id="ztBody"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
-    <div class="col-5 sec">
-      <div class="card">
-        <h2>7×24 热点资讯流</h2>
-        <div id="newsList" style="max-height:320px;overflow-y:auto"></div>
-      </div>
-    </div>
+  <!-- col 3 -->
+  <div class="card">
+    <div class="card-hd">主题 & 资讯流</div>
+    <div class="chips" id="themes"></div>
+    <div class="card-hd" style="margin-top:4px">7×24 热点流 <span class="badge fl" style="margin-left:auto;font-size:9px" id="newsCount"></span></div>
+    <div class="card-bd" id="newsList" style="max-height:140px"></div>
   </div>
 </div>
 
-<footer style="color:var(--tx2);font-size:10px;text-align:center;margin-top:16px;line-height:1.8">
-  数据来源: 腾讯行情 · 东财涨跌停池 · 新浪7x24 · 抖音热榜 · 东财基金排行 · 零凭据 &nbsp;|&nbsp; 算法借鉴 shy3130/tick-stock-panel<br>
-  本页面仅供学习研究，不构成投资建议。股市有风险，入市需谨慎。
+<div class="ticker">
+  <span class="label">🔥 热榜</span>
+  <div class="scroll"><span id="tickerScroll"></span></div>
+  <span class="badge fl" id="tickerMeta"></span>
+</div>
+
+<footer class="ftr">
+  数据来源: 腾讯行情 · 东财涨跌停池 · 东财基金排行 · 新浪7x24 · 抖音热榜 · 零凭据 · TSP v4 · 多轮审核 + 自反思闭环
+  &nbsp;|&nbsp; 仅供学习研究，不构成投资建议
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <script>
-const UP='var(--up)',DN='var(--dn)',GRAY='var(--tx2)';
+const UP='#ff4d4f',DN='#35d07f',GR='#7a8699';
 async function fetchLatest(){try{const r=await fetch('data/latest.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);return await r.json();}catch(e){console.error(e);return null;}}
 function fmt(n){return n==null?'—':Number(n).toFixed(2)}
-function cls(p){return p==null?GRAY:p>=0?'up':'dn'}
+function cls(p){return p==null?GR:p>=0?'up':'dn'}
 function sign(p){return p==null?'':(p>=0?'+':'')+p.toFixed(2)}
 function fmtTime(ms){const s=String(ms||'');if(/^\\d{6}$/.test(s))return s.slice(0,2)+':'+s.slice(2,4);if(/^\\d{5}$/.test(s))return '0'+s.slice(0,1)+':'+s.slice(1,3);if(/^\\d{4}$/.test(s))return s.slice(0,2)+':'+s.slice(2,4);return s}
 
 function renderKpis(m){
   const box=document.getElementById('kpis');
   if(!m.indices||!m.indices.length){box.innerHTML='';return}
-  box.innerHTML=m.indices.map(i=>`<div class="kpi"><div class="n">${i.name}</div><div class="v ${cls(i.chg_pct)}">${fmt(i.price)}</div><div class="c ${cls(i.chg_pct)}">${sign(i.chg_pct)}%</div></div>`).join('')
-  +`<div class="kpi"><div class="n">涨停</div><div class="v up">${m.limit_up}</div><div class="c fl">家</div></div>`
-  +`<div class="kpi"><div class="n">跌停</div><div class="v dn">${m.limit_down}</div><div class="c fl">家</div></div>`
-  +`<div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${m.broken}</div><div class="c fl">家</div></div>`
-  +`<div class="kpi"><div class="n">封板率</div><div class="v">${m.zt_rate}</div><div class="c fl">%</div></div>`
+  box.innerHTML=m.indices.map(i=>`<div class="idx-item"><div class="n">${i.name}</div><div class="v ${cls(i.chg_pct)}">${fmt(i.price)}</div><div class="c ${cls(i.chg_pct)}">${sign(i.chg_pct)}%</div></div>`).join('');
 }
 
 function renderPhase(ph){
   if(!ph)return;
   document.getElementById('stageBadge').style.display='';
   document.getElementById('stageBadge').textContent='情绪: '+ph.stage;
-  document.getElementById('phaseDesc').textContent=ph.desc+' · 温度计 '+ph.score+' 分';
-  document.getElementById('stageLabel').textContent=ph.stage;
+  document.getElementById('phaseDesc').textContent=ph.desc+' · '+ph.score+'分';
+  document.getElementById('gaugeI').style.width=(ph.score||0)+'%';
   const p=ph.components||{};
   document.getElementById('phaseMinis').innerHTML=[
     ['首板',ph.first_board,'家'],['高度',ph.max_boards,'板'],['晋级',ph.ge2,'只'],
     ['封板率',(ph.seal_rate||0).toFixed(1),'%'],['投机分',p.speculation??'—','/100'],['赚钱效应',p.profit??'—','/100']
-  ].map(x=>`<div style="background:var(--panel2);border-radius:6px;padding:6px;text-align:center"><div style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums">${x[1]}</div><div style="font-size:9px;color:var(--tx2)">${x[0]}${x[2]?'('+x[2]+')':''}</div></div>`).join('');
-  // gauge (simplified bar instead of echarts for compactness)
-  const g=document.getElementById('gauge');
-  g.innerHTML=`<div style="height:8px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:30px"><div style="height:100%;width:${ph.score}%;background:linear-gradient(90deg,var(--dn),var(--accent),var(--up))"></div></div>`
-}
-
-function renderMainlines(mls){
-  const box=document.getElementById('mainlines');
-  if(!mls||!mls.length){box.innerHTML='<span class="fl" style="font-size:11px">概念接口暂不可用(WAF)，使用涨停池主题聚类降级展示</span>';return}
-  const max=Math.max(...mls.map(m=>m.score||0),1);
-  box.innerHTML=mls.slice(0,8).map(m=>`<div class="ml-item"><span class="name" title="${m.name}">${m.name}</span><div class="bar"><i style="width:${(m.score/max*100).toFixed(1)}%"></i></div><span class="sc">${m.score}</span></div>`).join('')
-}
-
-function renderThemes(ts){
-  document.getElementById('themes').innerHTML=(ts||[]).slice(0,14).map(t=>`<div class="chip"><b>${t.name}</b><span class="fl">${t.news_count}条</span>${t.pos?`<span class="up">+${t.pos}</span>`:''}${t.neg?`<span class="dn">-${t.neg}</span>`:''}</div>`).join('')||'<span class="fl">暂无</span>'
-}
-
-function renderLadder(lad){
-  document.getElementById('ladderH').textContent=lad&&lad.height?'高 '+lad.height+'板':'';
-  document.getElementById('ladder').innerHTML=(lad&&lad.tiers?lad.tiers:[]).map(t=>`<div class="tier"><div class="h"><b>${t.boards}</b>板·${t.count}家</div><div class="codes">${(t.codes||[]).slice(0,5).map(c=>`<span>${c}</span>`).join('')}${t.count>5?`<span>…</span>`:''}</div></div>`).join('')||'暂无'
+  ].map(x=>`<div class="mini"><div class="v">${x[1]}</div><div class="n">${x[0]}${x[2]?'('+x[2]+')':''}</div></div>`).join('');
 }
 
 function renderPicks(picks){
-  document.getElementById('pickBody').innerHTML=(picks||[]).slice(0,20).map(p=>{
-    const score=p.score!=null?p.score:p.zt_score;
-    return `<tr><td>${p.code}</td><td><b>${p.name}</b></td><td>${fmt(p.price)}</td><td class="up">${p.lianban>=2?'<b>'+p.lianban+'板</b>':'首板'}</td><td>${fmtTime(p.zt_time)}</td><td>${p.rps5??'—'}</td><td>${p.rps20??'—'}</td><td>${p.theme_hit?'<span class="badge">热点</span>':'<span class="fl">—</span>'}</td><td style="font-weight:700;color:${score>=0.6?'var(--up)':score>=0.3?'var(--amber)':'var(--tx2)'}">${score!=null?score.toFixed(3):'—'}</td></tr>`
-  }).join('')||'<tr><td colspan="9" class="fl">暂无数据</td></tr>'
-}
-
-function renderFundRank(fr){
-  if(!fr||!fr.rows||!fr.rows.length){document.getElementById('fundBody').innerHTML='<tr><td colspan="10" class="fl">暂无基金排行数据</td></tr>';return}
-  document.getElementById('fundBody').innerHTML=fr.rows.slice(0,50).map(r=>`<tr class="fund-row">
-    <td>${r.code}</td><td>${r.name}</td>
-    <td>${fmt(r.nav)}</td>
-    <td class="${cls(r.daily_chg_pct)}">${sign(r.daily_chg_pct)}%</td>
-    <td class="${cls(r.ret_1m)}">${sign(r.ret_1m)}%</td>
-    <td class="${cls(r.ret_3m)}">${sign(r.ret_3m)}%</td>
-    <td class="${cls(r.ret_6m)}">${sign(r.ret_6m)}%</td>
-    <td class="up" style="font-weight:700">${sign(r.ret_1y)}%</td>
-    <td>${fmt(r.ret_since)}%</td>
-    <td class="fl">${r.setup_date||'—'}</td>
-  </tr>`).join('')
-}
-
-function renderZt(zts){
-  document.getElementById('ztBody').innerHTML=(zts||[]).slice(0,30).map(z=>`<tr><td>${z.code}</td><td>${z.name}</td><td>${fmt(z.price)}</td><td class="up">+${z.chg_pct}%</td><td>${z.lianban>=2?'<b class="up">'+z.lianban+'板</b>':'首板'}</td><td>${fmtTime(z.zt_time)}</td></tr>`).join('')||'<tr><td colspan="6" class="fl">暂无数据</td></tr>'
+  document.getElementById('pickBody').innerHTML=(picks||[]).slice(0,20).map(p=>`<tr>
+    <td>${p.code}</td><td><b>${p.name}</b></td><td>${fmt(p.price)}</td>
+    <td>${p.lianban>=2?'<span class="badge up">'+p.lianban+'板</span>':'首板'}</td>
+    <td>${p.rps5??'—'}</td><td>${p.rps20??'—'}</td>
+    <td>${p.theme_hit?'<span class="hot">★</span>':'<span class="fl">—</span>'}</td>
+    <td style="font-weight:700;color:${p.score>=0.6?'var(--up)':p.score>=0.3?'var(--amber)':'var(--tx2)'}">${p.score.toFixed(3)}</td>
+  </tr>`).join('')||'<tr><td colspan="8" class="fl" style="text-align:center">暂无数据</td></tr>';
 }
 
 function renderHotImpact(d){
   const box=document.getElementById('hotImpact');
-  // 数据优先从 latest.json.hot_impact, 否则 fetch 独立文件
-  if(d&&d.reports&&d.reports.length){
-    box.innerHTML=d.reports.map(r=>`
-      <div style="margin:10px 0">
-        <div style="font-weight:700;color:var(--accent);font-size:12px;margin-bottom:6px">${r.theme} <span class="fl">(热度 ${Math.round(r.heat*100)}% · ${r.news_count}条)</span></div>
-        <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>5日</th><th>20日位置</th><th>信号</th><th>预期区间</th><th>依据</th></tr></thead><tbody>
-        ${r.stocks.map(s=>`<tr>
-          <td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="badge up">涨停</span>':''}</td>
-          <td>${fmt(s.price)}</td>
-          <td class="${cls(s.ret_5d)}">${sign(s.ret_5d)}%</td>
-          <td>${Math.round(s.pos20*100)}%</td>
-          <td><span class="badge ${s.signal==='动量延续'?'up':s.signal==='追高警惕'?'amber':s.signal==='超跌修复'?'dn':'fl'}">${s.signal}</span></td>
-          <td>${s.expect}</td>
-          <td class="fl" style="max-width:280px">${s.why}</td></tr>`).join('')}
-        </tbody></table>
-      </div>`).join('');
-  } else {
-    fetch('data/hot_impact.json?t='+Date.now(),{cache:'no-store'})
-      .then(r=>r.ok?r.json():null)
-      .then(j=>{ if(j&&j.reports)renderHotImpact(j); })
-      .catch(()=>{});
-  }
+  if(!d||!d.reports||!d.reports.length){box.innerHTML='<div class="fl" style="padding:8px">暂无推演数据 (GitHub Actions 每日 16:00 CST 自动生成)</div>';return}
+  box.innerHTML=d.reports.map(r=>`
+    <div style="padding:6px 8px;border-bottom:1px solid var(--border)">
+      <div style="font-weight:700;color:var(--accent);font-size:11px;margin-bottom:4px">
+        ${r.theme} <span class="fl" style="font-weight:400;font-size:10px">(热度 ${Math.round(r.heat*100)}% · ${r.news_count}条)</span>
+      </div>
+      <table><thead><tr><th>代码</th><th>名称</th><th>5日</th><th>20日位</th><th>信号</th><th>预期</th><th>依据</th></tr></thead><tbody>
+      ${r.stocks.slice(0,6).map(s=>`<tr>
+        <td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="badge up">涨停</span>':''}</td>
+        <td class="${cls(s.ret_5d)}">${sign(s.ret_5d)}%</td>
+        <td>${Math.round(s.pos20*100)}%</td>
+        <td><span class="badge ${s.signal==='动量延续'?'up':s.signal==='追高警惕'?'dn':'fl'}">${s.signal}</span></td>
+        <td>${s.expect}</td>
+        <td class="fl" style="max-width:140px;overflow:hidden;text-overflow:ellipsis">${s.why}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`).join('');
+}
+
+function renderFundRank(fr){
+  if(!fr||!fr.rows||!fr.rows.length)return;
+  // append to hotImpact as second section
+  const box=document.getElementById('hotImpact');
+  box.innerHTML += `<div style="padding:6px 8px;border-top:1px solid var(--border)">
+    <div style="font-weight:700;color:var(--amber);font-size:11px;margin-bottom:4px">东财混合基金排行 (近1年收益 TOP10 · KOL抱团代理)</div>
+    <table><thead><tr><th>代码</th><th>名称</th><th>净值</th><th>日涨跌</th><th>1月</th><th>3月</th><th>6月</th><th>1年</th></tr></thead><tbody>
+    ${fr.rows.slice(0,10).map(r=>`<tr class="fund-row">
+      <td>${r.code}</td><td>${r.name}</td>
+      <td>${fmt(r.nav)}</td>
+      <td class="${cls(r.daily_chg_pct)}">${sign(r.daily_chg_pct)}%</td>
+      <td class="${cls(r.ret_1m)}">${sign(r.ret_1m)}%</td>
+      <td class="${cls(r.ret_3m)}">${sign(r.ret_3m)}%</td>
+      <td class="${cls(r.ret_6m)}">${sign(r.ret_6m)}%</td>
+      <td class="up" style="font-weight:700">${sign(r.ret_1y)}%</td>
+    </tr>`).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+function renderThemes(ts){
+  document.getElementById('themes').innerHTML=(ts||[]).slice(0,14).map(t=>`<div class="chip"><b>${t.name}</b><span class="fl">${t.news_count}条</span>${t.pos?`<span class="up">+${t.pos}</span>`:''}${t.neg?`<span class="dn">-${t.neg}</span>`:''}</div>`).join('')||'<span class="fl">暂无</span>';
 }
 
 function renderNews(ns){
-  document.getElementById('newsList').innerHTML=(ns||[]).slice(0,30).map(n=>{
-    const themes=(n.theme||[]).slice(0,2).map(t=>`<span class="fl" style="margin-left:4px">#${t}</span>`).join('');
-    return `<div class="news-item"><span class="dot ${n.sentiment||'neu'}"></span><span class="fl">${(n.ts||'').slice(5,16)}</span>${n.title}${themes}<span class="src">${n.src||''}</span></div>`
-  }).join('')||'<span class="fl">暂无新闻</span>'
+  document.getElementById('newsCount').textContent=(ns||[]).length+'条';
+  document.getElementById('newsList').innerHTML=(ns||[]).slice(0,30).map(n=>`<div class="news-item">
+    <span class="dot ${n.sentiment||'neu'}"></span>
+    <span class="t">${(n.ts||'').slice(5,16)} ${n.title}</span>
+    <span class="src">${n.src||''}</span>
+  </div>`).join('')||'<span class="fl" style="padding:6px 8px">暂无新闻</span>';
+}
+
+function renderTicker(d){
+  const items=[];
+  // 涨停池 TOP 10
+  (d.limit_up_pool||[]).slice(0,10).forEach(z=>items.push(`${z.name}(${z.code}) ${z.chg_pct}%`));
+  // 基金 TOP 5
+  (d.fund_rank||[]).slice(0,5).forEach(f=>items.push(`📈 ${f.name} ${f.ret_1y}%`));
+  document.getElementById('tickerScroll').textContent=items.join('    ⏸    ');
+  document.getElementById('tickerMeta').textContent=`涨停${d.market?.limit_up} 跌停${d.market?.limit_down} 炸板${d.market?.broken}`;
+}
+
+async function fetchHotImpact(){
+  try{
+    const r=await fetch('data/hot_impact.json?t='+Date.now(),{cache:'no-store'});
+    if(r.ok) return await r.json();
+  }catch(e){}
+  return null;
 }
 
 async function render(){
   const d=await fetchLatest();
-  if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败，60s 后重试';return}
+  if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
   const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
-  document.getElementById('updTime').textContent='✅ 更新 '+ts+' · 涨停 '+d.market.limit_up+' / 跌停 '+d.market.limit_down+' / 炸板 '+d.market.broken;
+  document.getElementById('updTime').textContent='✅ '+ts+' · 涨停'+d.market.limit_up+'/跌停'+d.market.limit_down+'/炸板'+d.market.broken;
   document.getElementById('algoBadge').textContent=(d.meta||{}).algo||'tsp';
-  renderKpis(d.market);
   renderPhase(d.phase);
-  renderMainlines(d.mainlines);
-  renderThemes(d.themes);
-  renderLadder(d.ladder);
   renderPicks(d.picks);
-  renderZt(d.limit_up_pool);
+  renderThemes(d.themes);
   renderNews(d.news_recent);
-  renderHotImpact(d.hot_impact||{});
-  // 基金排行 (若 latest.json 有 fund_rank 字段)
-  if(d.fund_rank)renderFundRank(d.fund_rank);
+  renderTicker(d);
+  // hot impact (async)
+  const hi=await fetchHotImpact();
+  if(hi&&hi.reports)renderHotImpact(hi);
+  else renderHotImpact({reports:[],note:'hot_impact.json 暂无 (待 GitHub Actions 16:00 CST 生成)'});
+  renderFundRank(d.fund_rank);
 }
 render();
-setInterval(render,60000);
+setInterval(render,90000);
 </script>
 </body>
 </html>
