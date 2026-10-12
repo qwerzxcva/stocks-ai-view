@@ -80,6 +80,12 @@ jobs:
         run: |
           python3 scripts/build_lowpool.py --out data/lowpool.json
 
+      # 2b) 强势股/龙虎榜/大宗交易 → 独立 enrich.json
+      #     (不写进 latest.json, 避免被远端 local realtime sync 每10分钟冲掉)
+      - name: Build enrich.json (强势股+龙虎榜+大宗)
+        run: |
+          python3 scripts/build_enrich.py || true
+
       # 3) 周期深析 (指数全史统计, 每周重算一次; 缓存复用其余天)
       - name: Cycle deep analysis
         run: |

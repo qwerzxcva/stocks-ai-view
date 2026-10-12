@@ -48,6 +48,10 @@ jobs:
       - name: Run hot_impact
         run: python3 scripts/hot_impact.py --out-dir data
 
+      # 强势股/龙虎榜/大宗交易 → 独立 enrich.json (盘中同步刷新)
+      - name: Build enrich.json
+        run: python3 scripts/build_enrich.py || true
+
       - name: Verify output
         run: |
           python3 - <<'PY'
@@ -72,8 +76,8 @@ jobs:
         run: |
           git config user.name "hot-bot"
           git config user.email "741059079@qq.com"
-          git add -A data/hot_impact.json data/hot_impact.md
+          git add -A data/hot_impact.json data/hot_impact.md data/enrich.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
-            git commit -m "hot-impact: $ts (实时热点推演)" && \
+            git commit -m "hot-impact: $ts (实时热点推演 + 强势股/龙虎榜/大宗)" && \
             git -c http.version=HTTP/1.1 push origin main; }

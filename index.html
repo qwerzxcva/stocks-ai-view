@@ -989,9 +989,17 @@ async function render(){
   renderTicker(d);
   if(hi)renderHotImpactData(hi);
   if(d.commentary)renderCommentary(d.commentary);
-  renderThsStrong(d.ths_strong, d.enrich_meta);
-  renderLhb(d.lhb, d.enrich_meta);
-  renderBlocktrade(d.blocktrade, d.enrich_meta);
+  // 强势股/龙虎榜/大宗交易: 优先读独立的 enrich.json
+  // (远端 local realtime sync 每10分钟覆盖 latest.json, 会冲掉这三块;
+  //  独立文件不受影响, 缺失时才回退 latest.json 内的旧数据)
+  const en=await fetchJSON('data/enrich.json');
+  const ths=(en&&en.ths_strong&&en.ths_strong.length)?en.ths_strong:(d.ths_strong||[]);
+  const lhb=(en&&en.lhb&&en.lhb.length)?en.lhb:(d.lhb||[]);
+  const bt=(en&&en.blocktrade&&en.blocktrade.length)?en.blocktrade:(d.blocktrade||[]);
+  const em=(en&&en.enrich_meta)?en.enrich_meta:d.enrich_meta;
+  renderThsStrong(ths, em);
+  renderLhb(lhb, em);
+  renderBlocktrade(bt, em);
   renderVolChart(d.index_kline);
   renderPools(d);
   _failCount=0;
