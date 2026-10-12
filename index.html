@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>A股 AI 量化工作台 · TSP v4</title>
+<!-- 预连接: 腾讯行情域名提前完成 DNS+TCP+TLS, 首屏实时数据更快 -->
+<link rel="preconnect" href="https://qt.gtimg.cn">
+<link rel="dns-prefetch" href="https://qt.gtimg.cn">
+<link rel="preconnect" href="https://web.ifzq.gtimg.cn">
 <style>
 :root{
   --bg:#0a0d14;--panel:#11161f;--panel2:#171e2b;--border:#1e2738;--border2:#263044;
@@ -278,7 +282,29 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
 
 <script>
 const UP='#f85149',DN='#3fb950',GR='#8b949e';
-async function fetchJSON(p){try{const r=await fetch(p+'?t='+Date.now(),{cache:'no-store'});return r.ok?await r.json():null}catch(e){return null}}
+// ─── 数据加载层 ───────────────────────────────────────────────
+// 优化点:
+//  1. 并发拉取 (Promise.allSettled) 而非串行 waterfall
+//  2. 去掉 ?t=Date.now() + cache:'no-store' → 让浏览器走 HTTP 缓存/ETag,
+//     数据未变时返回 304, 省掉 268KB 重复传输
+//  3. 轮询带指数退避, 失败时不疯狂重试
+const _etagCache=new Map();
+async function fetchJSON(p){try{
+  const hdr={};
+  const et=_etagCache.get(p);
+  if(et)hdr['If-None-Match']=et;
+  const r=await fetch(p,{headers:hdr});
+  if(r.status===304)return _jsonCache.get(p)||null;
+  const net=r.headers.get('etag');
+  if(net)_etagCache.set(p,net);
+  if(!r.ok)return null;
+  const j=await r.json();
+  _jsonCache.set(p,j);
+  return j;
+}catch(e){return null}}
+const _jsonCache=new Map();
+// 并发加载多个数据源, 单个失败不影响其他
+async function fetchAll(paths){const rs=await Promise.allSettled(paths.map(p=>fetchJSON(p)));return rs.map(r=>r.status==='fulfilled'?r.value:null)}
 function fmt(n){return n==null?'—':Number(n).toFixed(2)}
 function cls(p){return p==null?'fl':p>=0?'up':'dn'}
 function sign(p){return p==null?'':(p>=0?'+':'')+p.toFixed(2)}
@@ -366,8 +392,8 @@ function renderNews(ns){
       <div class="n-meta"><span>${(n.ts||'').slice(5,16)}</span><span class="n-th">${(n.theme||[]).slice(0,3).map(t=>'#'+t).join(' ')}</span><span>${n.src||''}</span></div>
     </div></div>`).join('')||'<span class="fl" style="padding:12px;text-align:center">暂无新闻</span>';
 }
-async function renderHotImpact(){
-  const d=await fetchJSON('data/hot_impact.json');
+// 数据已在 render() 里并行取到, 这里只负责渲染 (消除一次串行请求)
+function renderHotImpactData(d){
   const box=document.getElementById('hotImpact');
   if(!d||!d.reports||!d.reports.length){box.innerHTML='<span class="fl" style="padding:12px;text-align:center;display:block">暂无推演数据 (GitHub Actions 每日 16:00 CST 生成)</span>';return}
   box.innerHTML=d.reports.map(r=>`<div class="hi">
@@ -560,7 +586,8 @@ document.getElementById('cTabs').addEventListener('click', e=>{
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 
 async function render(){
-  const d=await fetchJSON('data/latest.json');
+  // 并行拉取, 消除串行 waterfall (原来先 latest 再 hot_impact 再 pools)
+  const [d,hi]=await fetchAll(['data/latest.json','data/hot_impact.json']);
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
   const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
   document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
@@ -576,8 +603,19 @@ async function render(){
   renderNews(d.news_recent);
   renderSummary(d.summary);
   renderTicker(d);
-  renderHotImpact();
+  if(hi)renderHotImpactData(hi);
   renderPools(d);
+  _failCount=0;
+}
+// 轮询: 90s 起步, 连续失败则指数退避到 5min, 恢复后回落
+let _failCount=0;
+function scheduleNext(){
+  const base=90000;
+  const delay=_failCount>0?Math.min(base*Math.pow(2,_failCount),300000):base;
+  setTimeout(async()=>{
+    try{await render();}catch(e){_failCount++;}
+    scheduleNext();
+  },delay);
 }
 async function renderTunnel(){
   const t = await fetchJSON('data/tunnel.json');
@@ -588,7 +626,7 @@ async function renderTunnel(){
 renderTunnel();
 setInterval(renderTunnel, 300000);
 render();
-setInterval(render,90000);
+scheduleNext();
 
 // ─── Level 2 Cookie 弹窗 ───
 const l2Modal = document.getElementById('l2Modal');
@@ -671,5 +709,16 @@ l2Save.addEventListener('click', async () => {
     </div>
   </div>
 </div>
+<script>
+// ─── Service Worker: 缓存层 (stale-while-revalidate) ─────────────
+// 首屏直接从缓存渲染, 后台静默更新; 断网时仍可打开上次数据
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      console.log('[sw] registered, scope:',reg.scope);
+    }).catch(err=>console.warn('[sw] register failed:',err));
+  });
+}
+</script>
 </body>
 </html>

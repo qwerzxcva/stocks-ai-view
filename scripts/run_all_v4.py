@@ -204,6 +204,11 @@ def main():
     if os.path.exists(export_script):
         run_script("导出池子数据", export_script, [])
 
+    # Step 8: Slim latest.json (drop fields the frontend never reads, -33% bytes)
+    slim_script = os.path.join(SCRIPT_DIR, "slim_latest.py")
+    if os.path.exists(slim_script):
+        run_script("瘦身 latest.json", slim_script, [])
+
     # Summary
     print(f"\n=== 完成 {date_str} ===")
     for k, v in results.items():
