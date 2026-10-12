@@ -158,7 +158,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">⏳ 加载中…</span>
   <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
-  <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
+  <input id="symSearch" placeholder="🔍 搜股票/ETF (代码或名称)" autocomplete="off" style="margin-left:8px;padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
+  <div id="symResults" style="display:none;position:absolute;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;margin-top:2px;width:280px;font-size:11px"></div>
+<span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
 <div class="main">
@@ -946,6 +948,58 @@ if('serviceWorker' in navigator){
     }).catch(err=>console.warn('[sw] register failed:',err));
   });
 }
+</script>
+
+<div id="symDetail" style="display:none;position:fixed;z-index:100;top:15%;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px;width:340px;font-size:11px;box-shadow:0 4px 24px rgba(0,0,0,.4)"></div>
+<script>
+(function(){
+  let IDX=null;
+  const inp=document.getElementById('symSearch'), box=document.getElementById('symResults'), det=document.getElementById('symDetail');
+  if(!inp) return;
+  inp.addEventListener('input', async ()=>{
+    const q=inp.value.trim().toLowerCase();
+    if(!q){box.style.display='none';return;}
+    if(!IDX){ try{IDX=await fetch('data/search_index.json?t='+Date.now()).then(r=>r.json());}catch(e){return;} }
+    const hits=[];
+    for(const s in IDX){
+      const v=IDX[s];
+      if(s.includes(q)||v.n.toLowerCase().includes(q)){ hits.push([s,v]); if(hits.length>=20) break; }
+    }
+    if(!hits.length){box.style.display='none';return;}
+    box.innerHTML=hits.map(([s,v])=>'<div class="sr" data-s="'+s+'" style="padding:4px 8px;cursor:pointer;display:flex;justify-content:space-between;border-bottom:1px solid var(--bd)">'+
+      '<span><b>'+v.n+'</b> <span style="color:var(--tx3)">'+s+(v.t==='etf'?' ·ETF':'')+'</span></span>'+
+      '<span style="color:'+(v.chg>=0?'var(--up)':'var(--dn)')+'">'+v.p+' '+(v.chg>0?'+':'')+v.chg+'%</span></div>').join('');
+    box.style.display='block';
+    box.querySelectorAll('.sr').forEach(el=>el.onclick=()=>showDetail(el.dataset.s));
+  });
+  document.addEventListener('click', e=>{ if(box && !box.contains(e.target) && e.target!==inp) box.style.display='none'; });
+  async function showDetail(sym){
+    const v=IDX&&IDX[sym]; if(!v) return;
+    det.style.display='block';
+    det.innerHTML='<b style="font-size:13px">'+v.n+' ('+sym+')</b> '+(v.t==='etf'?'<span style="color:var(--accent)">ETF</span>':'')+
+      ' <span onclick="document.getElementById(\'symDetail\').style.display=\'none\'" style="float:right;cursor:pointer;color:var(--tx3)">✕</span>'+
+      '<br>现价 '+v.p+' ('+(v.chg>0?'+':'')+v.chg+'%)<br><span style="color:var(--tx3)">复权日K加载中…</span>';
+    try{
+      const j=await fetch('https://raw.githubusercontent.com/qwerzxcva/t8-fq/main/json/'+sym+'.json?t='+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json();});
+      const d=j.slice(-30);
+      let mn=1e9, mx=-1e9;
+      d.forEach(r=>{mn=Math.min(mn,r[3]);mx=Math.max(mx,r[2]);});
+      let bars='';
+      for(let k=0;k<d.length;k++){
+        const h=Math.max(40*(d[k][2]-mn)/(mx-mn||1),1), b=40*(d[k][3]-mn)/(mx-mn||1);
+        const up=k>0?d[k][2]>=d[k-1][2]:d[k][2]>=d[k][1];
+        bars+='<div style="display:inline-block;width:7px;height:42px;position:relative;vertical-align:bottom">'+
+          '<div style="position:absolute;bottom:'+b+'px;height:'+Math.max(h-b,1)+'px;width:7px;background:'+(up?'var(--up)':'var(--dn)')+'"></div></div>';
+      }
+      det.innerHTML='<b style="font-size:13px">'+v.n+' ('+sym+')</b> '+(v.t==='etf'?'<span style="color:var(--accent)">ETF</span>':'')+
+        ' <span onclick="document.getElementById(\'symDetail\').style.display=\'none\'" style="float:right;cursor:pointer;color:var(--tx3)">✕</span>'+
+        '<br>现价 '+v.p+' ('+(v.chg>0?'+':'')+v.chg+'%) · 前复权全史 '+j.length+' 日 (1999起含分红除权)'+
+        '<div style="margin-top:6px">'+bars+'</div><span style="color:var(--tx3)">近30日 qfq 走势 · '+d[0][0]+' ~ '+d[d.length-1][0]+' · 数据源: 腾讯 · 非投资建议</span>';
+    }catch(e){
+      det.innerHTML+='<br><span style="color:var(--tx3)">复权数据尚未回补此票 (采集进行中)</span>';
+    }
+  }
+})();
 </script>
 </body>
 </html>
