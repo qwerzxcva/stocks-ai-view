@@ -112,7 +112,7 @@ def main():
                                    "expl", "seats", "d1", "d2", "d5"])
     if isinstance(d.get("blocktrade"), list):
         d["blocktrade"] = slim(d["blocktrade"],
-                               ["code", "name", "price", "premium", "vol", "amt"])
+                               ["code", "name", "price", "premium", "vol", "amt", "deals"])
     if isinstance(d.get("ths_strong"), list):
         d["ths_strong"] = slim(d["ths_strong"], ["code", "name", "reason", "price",
                                                  "chg_pct", "turnover", "mktcap",
