@@ -164,6 +164,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
 <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
+<div id="mktBreadth" style="display:none;margin:6px 0 10px;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;font-size:11px">
+  <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:4px" id="breadthBar"></div>
+  <div id="breadthTxt" style="color:var(--tx3)"></div>
+</div>
 <div class="main">
   <!-- LEFT: 情绪+梯队+主线 -->
   <div class="col">
@@ -202,7 +206,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="3">热点推演</button>
       <button class="c-tab" data-c="4">基金排行</button>
       <button class="c-tab" data-c="5">腾讯数据</button>
-      <button class="c-tab" data-c="6">周期深析</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">未涨停 · 五因子评分 · 实时现价</span></div>
@@ -282,10 +285,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div class="hd">腾讯自选股数据 <span class="sub">行业资金 · 筹码 · 技术指标 · 日历</span></div>
       <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)" id="txBody"></div>
     </div>
-    <div class="card c-card" data-ci="6" style="display:none">
-      <div class="hd">周期深析 <span class="sub" id="cdSub">历年K线 · 轮动规律 · 五维打分</span></div>
-      <div id="cycleDeep" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
-    </div>
   </div>
   <!-- RIGHT: 主题 + 24h资讯流 -->
   <div class="col">
@@ -355,6 +354,17 @@ function renderKpis(m){
   <div class="kpi"><div class="n">跌停</div><div class="v dn">${m.limit_down}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${m.broken}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">封板率</div><div class="v">${m.zt_rate}</div><div class="c fl">%</div></div>`;
+  // 市场宽度热力条 (market.advance/decline/turnover)
+  const up=m.advance, dn=m.decline, tv=(m.turnover&&m.turnover.total_yi)||null;
+  if(up&&dn){
+    const tot=up+dn, upP=(up/tot*100).toFixed(1);
+    const bar=document.getElementById('breadthBar'), txt=document.getElementById('breadthTxt'), box=document.getElementById('mktBreadth');
+    if(bar&&txt&&box){
+      box.style.display='';
+      bar.innerHTML=`<div style="width:${upP}%;background:var(--up)"></div><div style="flex:1;background:var(--dn)"></div>`;
+      txt.innerHTML=`上涨 <b style="color:var(--up)">${up}</b> / 下跌 <b style="color:var(--dn)">${dn}</b> · 上涨占比 ${upP}% · 两市成交 ${tv?tv+'亿':'—'}`;
+    }
+  }
 }
 function renderPhase(ph){
   if(!ph)return;
@@ -786,77 +796,6 @@ async function renderPools(d){
   } else { document.getElementById('multiBody').innerHTML='<div class="no-data">暂无综合扫描数据</div>'; }
 }
 
-
-/* ─── 周期深析 (cycle_deep.json) ─── */
-let cdRendered = false;
-function renderCycleDeep(d){
-  const box=document.getElementById('cycleDeep');
-  if(!d||!d.status){box.innerHTML='<div class="no-data">暂无周期深析数据</div>';return}
-  const s=d.status, y=d.yearly||{}, se=d.season||{}, st=d.streak||{};
-  let h='';
-  // 1. 五维打分
-  h+='<div style="font-size:10px;color:var(--tx3);margin-bottom:4px">五维周期位置 · '+s.index+' · '+s.date+' · 收盘 '+s.close+'</div>';
-  h+='<table class="pool-table"><thead><tr><th>维度</th><th>当前</th><th>历史统计</th><th>倾向</th></tr></thead><tbody>';
-  s.dims.forEach(function(x){
-    const b=x.bias>0?'<span class="up">偏多</span>':(x.bias<0?'<span class="dn">偏空</span>':'<span class="fl">中性</span>');
-    h+='<tr><td>'+x.dim+'</td><td>'+x.now+'</td><td class="fl" style="font-size:10px">'+x.exp+'</td><td>'+b+'</td></tr>';
-  });
-  h+='</tbody></table>';
-  const cc=s.composite>=2?'var(--up)':(s.composite<=-2?'var(--dn)':'var(--amber)');
-  h+='<div style="margin:6px 0;padding:6px 10px;background:var(--panel2);border-radius:6px;font-size:11px">综合得分 <b style="color:'+cc+';font-size:14px">'+(s.composite>0?'+':'')+s.composite+'</b> → <b style="color:'+cc+'">'+s.bias+'</b></div>';
-
-  // 2. 历年年度收益
-  const yt=y.year_total||{};
-  const years=Object.keys(yt).sort();
-  if(years.length){
-    h+='<div style="font-size:10px;color:var(--tx3);margin:10px 0 4px">历年年度收益 ('+years[0]+'~'+years[years.length-1]+', 共'+years.length+'年)</div>';
-    h+='<table class="pool-table"><thead><tr><th>年份</th><th>年度收益</th><th></th></tr></thead><tbody>';
-    years.slice(-20).forEach(function(k){
-      const v=yt[k], w=Math.min(Math.abs(v)/2,40);
-      const bar='<span style="display:inline-block;height:8px;width:'+w+'px;background:'+(v>=0?'var(--up)':'var(--dn)')+'"></span>';
-      h+='<tr><td>'+k+'</td><td class="'+(v>=0?'up':'dn')+'">'+(v>=0?'+':'')+v+'%</td><td>'+bar+'</td></tr>';
-    });
-    h+='</tbody></table>';
-  }
-
-  // 3. 月度季节性 (热力图)
-  const mo=se.month||{};
-  if(Object.keys(mo).length){
-    h+='<div style="font-size:10px;color:var(--tx3);margin:10px 0 4px">月度季节性 (全史等权)</div>';
-    h+='<table class="pool-table"><thead><tr><th>月</th><th>平均</th><th>胜率</th><th>样本</th></tr></thead><tbody>';
-    for(let i=1;i<=12;i++){
-      const m=mo[String(i)];
-      if(!m)continue;
-      const cl=m.avg>=0?'up':'dn';
-      h+='<tr><td>'+i+'月</td><td class="'+cl+'">'+(m.avg>=0?'+':'')+m.avg+'%</td><td>'+m.win+'%</td><td class="fl">'+m.n+'</td></tr>';
-    }
-    h+='</tbody></table>';
-  }
-
-  // 4. 连段续跌概率
-  if(Object.keys(st).length){
-    h+='<div style="font-size:10px;color:var(--tx3);margin:10px 0 4px">连段延续概率 (样本≥8)</div><div class="chips">';
-    Object.keys(st).sort().forEach(function(k){
-      const v=st[k];
-      const kind=k.slice(0,2)==='up'?'涨':'跌', n=k.slice(2);
-      const col=kind==='跌'?(v.cont_prob>50?'dn':'up'):(v.cont_prob>50?'up':'dn');
-      h+='<span class="chip">连'+kind+n+'日→续'+kind+' <b class="'+col+'">'+v.cont_prob+'%</b> (n='+v.n+')</span>';
-    });
-    h+='</div>';
-  }
-
-  // 5. 元数据
-  if(d.meta){
-    h+='<div class="fl" style="padding:8px 0 2px;font-size:9px;line-height:1.5">数据源: '+d.meta.source+'<br>'+
-       '样本: '+d.meta.n_days+' 个交易日 · '+d.meta.span[0]+' ~ '+d.meta.span[1]+'<br>'+
-       '口径: '+d.meta.dims+'；'+d.meta.composite_rules+'<br>'+
-       '限制: '+d.meta.caveat+'</div>';
-  }
-  box.innerHTML=h;
-  const sub=document.getElementById('cdSub');
-  if(sub)sub.textContent=s.index+' '+s.date+' → '+s.bias+' ('+(s.composite>0?'+':'')+s.composite+')';
-}
-
 /* ─── Tencent (westock) tab ─── */
 let txRendered = false;
 function renderTencent(d){
@@ -886,7 +825,6 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   b.classList.add('active');
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
   if(b.dataset.c==='5' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
-  if(b.dataset.c==='6' && window._lastD && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -931,8 +869,6 @@ async function render(){
   renderTicker(d);
   if(hi)renderHotImpactData(hi);
   if(d.commentary)renderCommentary(d.commentary);
-  const cd=await fetchJSON('data/cycle_deep.json');
-  window._cdData=cd; if(cd)renderCycleDeep(cd);
   renderThsStrong(d.ths_strong);
   renderLhb(d.lhb);
   renderBlocktrade(d.blocktrade);
