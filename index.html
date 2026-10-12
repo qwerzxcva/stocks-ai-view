@@ -513,19 +513,45 @@ function renderNews(ns){
 // 数据已在 render() 里并行取到, 这里只负责渲染 (消除一次串行请求)
 function renderHotImpactData(d){
   const box=document.getElementById('hotImpact');
-  if(!d||!d.reports||!d.reports.length){box.innerHTML='<span class="fl" style="padding:12px;text-align:center;display:block">暂无推演数据 (GitHub Actions 每日 16:00 CST 生成)</span>';return}
-  box.innerHTML=d.reports.map(r=>`<div class="hi">
-    <div class="hi-head">${r.theme}<span class="sub">热度 ${Math.round(r.heat*100)}% · ${r.news_count}条新闻</span></div>
-    <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>5日</th><th>20日位</th><th>信号</th><th>预期</th><th>依据</th></tr></thead><tbody>
+  if(!d||!d.reports||!d.reports.length){
+    box.innerHTML='<div class="no-data">暂无推演数据</div>'+
+      '<div class="fl" style="padding:8px 12px;font-size:9px;line-height:1.5">'+
+      '数据源: 同花顺强势股题材归因 + 新浪新闻 + 腾讯日K<br>'+
+      '更新频率: 交易日盘中每30分钟 (GitHub Actions hot-impact-realtime)<br>'+
+      '若为空说明本轮热点源或K线源异常, 会保留上次有效数据</div>';
+    return;
+  }
+  // 数据年龄提示 (>2小时标黄)
+  let ageHtml='';
+  if(d.ts){
+    try{
+      const t=new Date(d.ts), ageMin=(Date.now()-t.getTime())/60000;
+      const ts=t.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
+      const col=ageMin<120?'var(--dn)':'var(--amber)';
+      ageHtml='<div class="fl" style="padding:4px 12px;font-size:9px;line-height:1.5">'+
+        '生成时间 <span style="color:'+col+'">'+ts+'</span> ('+
+        (ageMin<60?Math.round(ageMin)+'分钟前':(ageMin/60).toFixed(1)+'小时前')+')'+
+        (d.meta&&d.meta.source?' · 数据源: '+d.meta.source:'')+
+        (d.meta&&d.meta.themes_source?' · 主题: '+d.meta.themes_source:'')+'</div>';
+    }catch(e){}
+  }
+  box.innerHTML=ageHtml+d.reports.map(r=>`<div class="hi">
+    <div class="hi-head">${r.theme}<span class="sub">热度 ${Math.round(r.heat*100)}% · ${r.news_count}条关联</span></div>
+    <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>5日</th><th>10日</th><th>20日位</th><th>信号</th><th>预期</th><th>依据</th></tr></thead><tbody>
     ${r.stocks.slice(0,8).map(s=>`<tr>
       <td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="bdg up">涨停</span>':''}</td>
       <td>${fmt(s.price)}</td><td class="${cls(s.ret_5d)}">${sign(s.ret_5d)}%</td>
+      <td class="${cls(s.ret_10d)}">${sign(s.ret_10d)}%</td>
       <td>${Math.round(s.pos20*100)}%</td>
-      <td><span class="bdg ${s.signal==='动量延续'?'up':s.signal==='追高警惕'?'dn':'fl'}">${s.signal}</span></td>
+      <td><span class="bdg ${s.signal==='动量延续'?'up':s.signal==='追高警惕'?'dn':s.signal==='超跌修复'?'fl':'fl'}">${s.signal}</span></td>
       <td>${s.expect}</td>
-      <td class="fl" style="max-width:160px;overflow:hidden;text-overflow:ellipsis" title="${s.why}">${s.why}</td>
+      <td class="fl" style="max-width:150px;overflow:hidden;text-overflow:ellipsis" title="${s.why}">${s.why}</td>
     </tr>`).join('')}
-    </tbody></table></div>`).join('');
+    </tbody></table></div>`).join('')+
+    (d.meta?'<div class="fl" style="padding:6px 12px;font-size:9px;line-height:1.5">'+
+      '信号口径: '+(d.meta.signal_rules||'—')+'<br>'+
+      'K线: '+(d.meta.kline_source||'—')+' · 频率: '+(d.meta.freq||'—')+'<br>'+
+      (d.meta.caveat||'')+'</div>':'');
 }
 
 // ─── 盘面解读 (commentary) ───────────────────────────────────────────

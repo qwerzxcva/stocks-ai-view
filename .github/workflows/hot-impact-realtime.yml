@@ -1,0 +1,79 @@
+# 热点推演 — 交易日盘中多次更新
+# 原 daily-llm-review 的 cron 是 15 8 * * 1-5 (每天只在 16:15 跑一次),
+# 导致 hot_impact.json 一天只更新一次且与盘中热点脱节。
+# 本工作流在交易时段每 30 分钟跑一次 (CST 09:40~15:10),
+# 热点源用同花顺强势股题材归因 (实时) + 新闻词频。
+name: hot-impact-realtime
+on:
+  schedule:
+    # CST 09:40 / 10:10 / 10:40 / 11:10 / 11:40
+    #      13:10 / 13:40 / 14:10 / 14:40 / 15:10
+    - cron: '40,10 1,2,3,4,5,6,7 * * 1-5'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  derive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # K线仓 (find_related 需要 universe.csv; 大仓 sparse-checkout 只取 bulk)
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kline-repo
+          sparse-checkout: |
+            data/bulk/universe.csv
+          sparse-checkout-cone-mode: false
+
+      - name: Link universe.csv
+        run: |
+          mkdir -p ../stocks-data-kline/data/bulk
+          cp kline-repo/data/bulk/universe.csv ../stocks-data-kline/data/bulk/ 2>/dev/null || true
+          ls -la ../stocks-data-kline/data/bulk/universe.csv
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run hot_impact
+        run: python3 scripts/hot_impact.py --out-dir data
+
+      - name: Verify output
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          try:
+              d = json.load(open('data/hot_impact.json', encoding='utf-8'))
+          except Exception as e:
+              print("hot_impact.json 读取失败:", e); sys.exit(1)
+          reps = d.get('reports') or []
+          n = sum(len(r.get('stocks') or []) for r in reps)
+          print(f"主题 {len(reps)} 个 · 推演股票 {n} 只 · ts={d.get('ts')}")
+          if n == 0:
+              print("WARN: 无推演股票 (热点源或K线源异常), 保留上次数据")
+          # 元数据必须带来源与时间 (用户要求标注)
+          meta = d.get('meta') or {}
+          for k in ('source', 'ts', 'freq'):
+              if k not in meta:
+                  print(f"WARN: meta 缺 {k}")
+          PY
+
+      - name: Commit & push
+        run: |
+          git config user.name "hot-bot"
+          git config user.email "741059079@qq.com"
+          git add -A data/hot_impact.json data/hot_impact.md
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet --cached HEAD && echo "no changes" || {
+            git commit -m "hot-impact: $ts (实时热点推演)" && \
+            git -c http.version=HTTP/1.1 push origin main; }

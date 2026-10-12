@@ -122,10 +122,17 @@ def main():
     now = datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
     date_str = now.strftime("%Y%m%d")
 
-    zt = fetch_pool("ZT", date_str)
+    # fetch_pool 返回 {"count": N, "pool": [...]} (count 以东财 data.tc 为准,
+    # pool 明细可能为空)。这里要的是明细列表, 必须取 ["pool"]。
+    # 旧写法 zt = fetch_pool(...) 直接遍历会遍历 dict 的键 → TypeError,
+    # 这是 hot_impact 自 2026-10-12 01:58 后一直没成功生成的原因。
+    zt = fetch_pool("ZT", date_str)["pool"]
     zt_names = [(z["name"], z["code"].zfill(6)) for z in zt]
 
-    # 主题热度 (新闻命中数 + 抖音热榜辅助)
+    # 主题热度: 新闻命中数 + 同花顺强势股题材归因 (实时)
+    # 旧逻辑只用新闻词频, 一天一更且与盘中热点脱节。
+    # 新逻辑叠加同花顺强势股池的 reason 题材归因 (盘中实时),
+    # 并用 heat_algo 做来源去重 + 时间衰减。
     news = fetch_news(120)
     if len(news) < 30:
         news += fetch_remote_news(days=3)
@@ -133,12 +140,40 @@ def main():
     for n in news:
         for t in n["theme"]:
             theme_count[t] = theme_count.get(t, 0) + 1
+
+    # 同花顺强势股题材 (实时, 零鉴权)
+    date_dash = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+    ths_items = []
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from collect_market_extras import fetch_ths_strong_stocks
+        ths = fetch_ths_strong_stocks(date_dash)
+        for s in ths:
+            kws = [k.strip() for k in str(s.get("reason", "")).replace("+", " ").split()
+                   if len(k.strip()) >= 2]
+            ths_items.append({"title": s.get("reason", ""), "source": "ths",
+                              "ts": now.isoformat(), "codes": [s.get("code")],
+                              "themes": kws})
+            # 题材计数: 每只强势股给其题材 +1 (与新闻词频合并)
+            for kw in kws:
+                theme_count[kw] = theme_count.get(kw, 0) + 1
+        print(f"[hot-impact] 同花顺强势股 {len(ths)} 只, 题材词 {len(ths_items)} 条", flush=True)
+    except Exception as e:
+        print(f"[hot-impact] 同花顺源不可用, 仅用新闻词频: {e}", file=sys.stderr)
+
     top_themes = sorted(theme_count, key=theme_count.get, reverse=True)[:args.top_themes]
     max_c = max(theme_count.values(), default=1)
 
-    # 全市场名称映射
+    # 全市场名称映射 (universe.csv 实际在 stocks-data-kline/data/bulk/ 下)
     uni_path = args.kline_universe or os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "..", "..", "stocks-data-kline", "meta", "universe.csv")
+        os.path.dirname(os.path.abspath(__file__)), "..", "..", "stocks-data-kline",
+        "data", "bulk", "universe.csv")
+    if not os.path.exists(uni_path):
+        # 兼容旧路径
+        alt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..",
+                            "stocks-data-kline", "meta", "universe.csv")
+        if os.path.exists(alt):
+            uni_path = alt
     universe = load_universe(uni_path)
     if not universe:
         print("[hot-impact] universe 缺失, 仅用涨停池推演", file=sys.stderr)
@@ -166,7 +201,22 @@ def main():
     out = {"ts": now.isoformat(), "date": date_str,
            "note": "热点→走势推演: 规则引擎(动量/过热/超跌/蓄势), 预期区间仅供研究参考",
            "reports": reports,
-           "meta": {"algo": "tsp-derive-v4", "source": "tencent-kline+zt-pool+news", "zero_cred": True}}
+           "meta": {"algo": "tsp-derive-v4", "source": "tencent-kline+zt-pool+news+ths",
+                 "zero_cred": True,
+                 "ts": now.isoformat(),
+                 "freq": "交易日多次 (盘中实时热点 + 日K推演)",
+                 "themes_source": "新闻命中数 + 同花顺强势股题材归因",
+                 "kline_source": "腾讯 fqkline 前复权日K 30根",
+                 "fields": {
+                     "ret_1d/5d/10d/20d": "近1/5/10/20日收盘收益 %",
+                     "dev20_pct": "相对MA20偏离度 %",
+                     "pos20": "20日区间位置 (0=最低 1=最高)",
+                 },
+                 "signal_rules": "动量延续:5日涨>0且距MA20<10%; "
+                                 "追高警惕:距20日高<3%且5日涨>15%; "
+                                 "超跌修复:10日跌>5%且收盘<MA20; 其余横盘蓄势",
+                 "caveat": "预期区间由 0.5×5日动量+0.3×热点强度+0.2×涨停热度 归一化估计, "
+                           "规则引擎非模型预测, 仅供研究, 不构成投资建议"}}
 
     out_dir = args.out_dir or "/tmp/hot_impact"
     os.makedirs(out_dir, exist_ok=True)
