@@ -179,6 +179,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div class="bd"><div class="ladder" id="ladder"></div></div>
     </div>
     <div class="card">
+      <div class="hd">☁️ 云端推演 <span class="sub" id="cloudTs">GitHub Actions 统计引擎</span></div>
+      <div class="bd" id="cloudBox" style="font-size:11px">加载中…</div>
+    </div>
+    <div class="card">
       <div class="hd">今日主线 <span class="sub">资金×涨幅×成交额×新闻</span></div>
       <div class="bd" id="mainlines" style="max-height:140px;overflow-y:auto"></div>
     </div>
@@ -336,6 +340,25 @@ function renderPhase(ph){
     ['首板',ph.first_board],['高度',ph.max_boards],['晋级',ph.ge2],
     ['封板率',(ph.seal_rate||0).toFixed(1)+'%'],['投机分',p.speculation??'—'],['赚钱效应',p.profit??'—']
   ].map(x=>`<div class="mi"><div class="v">${x[1]}</div><div class="n">${x[0]}</div></div>`).join('');
+}
+async function renderCloud(){
+  try{
+    const c = await fetch('data/cloud_analysis.json?t='+Date.now()).then(r=>r.json());
+    const f = c.index_forecast||{}; const el=document.getElementById('cloudBox');
+    if(!el) return;
+    document.getElementById('cloudTs').textContent = (c.ts||'').replace('T',' ').slice(5,16) + ' · 统计外推·非投资建议';
+    const col = f.bias==='偏多'?'var(--up)':(f.bias==='偏空'?'var(--dn)':'var(--tx)');
+    let s = `<div style="margin-bottom:6px">明日展望: <b style="color:${col};font-size:13px">${f.bias||'—'}</b> (综合${f.composite??'—'}) · ${f.as_of}收 ${f.close}</div>`;
+    if(f.next_weekday_stat) s += `<div>下一交易日历史: 日均<b>${f.next_weekday_stat.avg>0?'+':''}${f.next_weekday_stat.avg}%</b> 胜率${f.next_weekday_stat.win}% (n=${f.next_weekday_stat.n})</div>`;
+    if(f.streak) s += `<div>当前${f.streak} → 续势概率 <b>${f.streak_continue_prob??'—'}%</b> · 20日动量 ${f.mom20}%</div>`;
+    const th = c.theme_heat||[];
+    if(th.length) s += `<div style="margin-top:5px">涨停题材热度: ${th.slice(0,5).map(x=>`<span style="color:var(--accent)">${x[0]}×${x[1]}</span>`).join(' · ')}</div>`;
+    const st = c.sector_top||[];
+    if(st.length) s += `<div style="margin-top:5px">行业资金Top3: ${st.slice(0,3).map(x=>`${x.name}(${x.chg}%)`).join(' · ')}</div>`;
+    const gp = c.global_pulse||[];
+    if(gp.length) s += `<div style="margin-top:5px;color:var(--tx3)">隔夜: ${gp.slice(0,4).map(x=>`${x.name} ${x.pct>0?'+':''}${x.pct}%`).join(' · ')}</div>`;
+    el.innerHTML = s;
+  }catch(e){ const el=document.getElementById('cloudBox'); if(el) el.textContent='云端推演暂不可用'; }
 }
 function renderCycleV2(cv){
   if(!cv||!cv.dims) return;
@@ -635,6 +658,7 @@ async function render(){
   renderKpis(d.market);
   renderPhase(d.phase);
   renderCycleV2(d.cycle_v2);
+  renderCloud();
   renderLadder(d.ladder);
   renderMainlines(d.mainlines);
   renderThemes(d.themes,document.getElementById('themes'),'themesCount');
