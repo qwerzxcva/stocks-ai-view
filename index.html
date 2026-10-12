@@ -158,7 +158,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">⏳ 加载中…</span>
   <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
-  <a id="mirrorLink" href="https://dufuwuxin.github.io/d4-pages-mirror/" target="_blank" rel="noopener" style="margin-left:6px;padding:2px 10px;border-radius:12px;background:var(--panel2);border:1px solid var(--border2);color:var(--blue);font-size:10px;font-weight:700;text-decoration:none">🶺 镜像站</a>
   <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
@@ -341,9 +340,19 @@ function renderPhase(ph){
     ['封板率',(ph.seal_rate||0).toFixed(1)+'%'],['投机分',p.speculation??'—'],['赚钱效应',p.profit??'—']
   ].map(x=>`<div class="mi"><div class="v">${x[1]}</div><div class="n">${x[0]}</div></div>`).join('');
 }
+function renderWinRate(ps){
+  if(!ps||!ps.overall||!ps.overall.n) return;
+  const box=document.getElementById('cloudBox'); if(!box) return;
+  const w=document.createElement('div');
+  w.style.cssText='margin-top:8px;padding-top:6px;border-top:1px dashed var(--border2)';
+  const kinds=(ps.by_kind||[]).map(k=>`${k.kind}: ${k.n}笔 胜率<b>${k.win_rate}%</b> 均${k.avg_ret>0?'+':''}${k.avg_ret}% (盈${k.tp}/亏${k.sl})`).join('<br>');
+  w.innerHTML=`<b>🎯 推荐对账</b> (T+1纪律: +2%止盈/-2%止损)<br>累计 ${ps.overall.n} 笔 · 胜率 <b style="color:${ps.overall.win_rate>=50?'var(--up)':'var(--dn)'}">${ps.overall.win_rate}%</b><br><span style="font-size:10px;color:var(--tx3)">${kinds}</span>`;
+  box.parentNode.appendChild(w);
+}
 async function renderCloud(){
   try{
     const c = await fetch('data/cloud_analysis.json?t='+Date.now()).then(r=>r.json());
+    renderWinRate(await fetch('data/latest.json?t='+Date.now()).then(r=>r.json()).then(d=>d.pick_stats).catch(()=>null));
     const f = c.index_forecast||{}; const el=document.getElementById('cloudBox');
     if(!el) return;
     document.getElementById('cloudTs').textContent = (c.ts||'').replace('T',' ').slice(5,16) + ' · 统计外推·非投资建议';
