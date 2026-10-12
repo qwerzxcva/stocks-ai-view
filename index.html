@@ -337,6 +337,17 @@ function renderPhase(ph){
     ['封板率',(ph.seal_rate||0).toFixed(1)+'%'],['投机分',p.speculation??'—'],['赚钱效应',p.profit??'—']
   ].map(x=>`<div class="mi"><div class="v">${x[1]}</div><div class="n">${x[0]}</div></div>`).join('');
 }
+function renderCycleV2(cv){
+  if(!cv||!cv.dims) return;
+  const el=document.getElementById('phaseMinis');
+  if(!el) return;
+  const bias={1:'多',0:'中','-1':'空'};
+  const extra=cv.dims.map(x=>`<div class="mi"><div class="v" style="font-size:11px;color:${x.bias>0?'var(--up)':(x.bias<0?'var(--dn)':'var(--tx3)')}">${bias[x.bias]||'中'}</div><div class="n">${x.dim}${x.exp?(' '+x.exp):''}</div></div>`);
+  const bar=document.createElement('div');
+  bar.style.cssText='width:100%;font-size:10px;color:var(--tx2);margin-top:4px';
+  bar.innerHTML=`周期v2: <b style="color:${cv.composite>=2?'var(--up)':(cv.composite<=-2?'var(--dn)':'var(--tx)')}">${cv.bias}(${cv.composite})</b> · 35年统计 · ${cv.index}`;
+  el.parentNode.appendChild(bar);
+}
 function renderLadder(lad){
   document.getElementById('ladderH').textContent=lad&&lad.height?'最高 '+lad.height+' 板':'';
   document.getElementById('ladder').innerHTML=(lad&&lad.tiers?lad.tiers:[]).map(t=>`<div class="tier"><b class="b">${t.boards}</b>板·${t.count}家 ${(t.codes||[]).slice(0,3).join(' ')}</div>`).join('')||'<span class="fl">暂无</span>';
