@@ -1,5 +1,5 @@
 name: cloud-analysis
-# 云端自动分析/推演/预测 — 纯统计引擎, 无AI. 每30分+开盘时段加密
+# 云端自动分析/推演/预测 — 纯统计引擎, 无AI. 每30分
 on:
   schedule:
     - cron: "*/30 * * * *"
@@ -16,11 +16,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
-      - name: Run cloud analysis engine
+      - name: Fetch engine
         run: |
-          curl -sL https://raw.githubusercontent.com/jiegengxiangjianxue1/stockdb/main/scripts/cloud_analysis.py -o cloud_analysis.py || \
-          curl -sL https://raw.githubusercontent.com/qwerzxcva/t7/main/scripts/cloud_analysis.py -o cloud_analysis.py
-          python3 cloud_analysis.py --out data/cloud_analysis.json
+          curl -sfL https://raw.githubusercontent.com/qwerzxcva/t7/main/scripts/cloud_analysis.py -o cloud_analysis.py
+          head -1 cloud_analysis.py | grep -q '#!' || (echo BAD ENGINE && exit 1)
+      - name: Run cloud analysis engine
+        run: python3 cloud_analysis.py --out data/cloud_analysis.json
       - name: Commit results
         run: |
           git config user.name "cloud-bot"
