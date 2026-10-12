@@ -157,6 +157,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span class="b" id="algoBadge">tsp-signal-v4</span>
   <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">⏳ 加载中…</span>
+  <span id="rtStatus" title="浏览器直连腾讯行情, 60s 刷新" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">实时 --:--</span>
   <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
   <input id="symSearch" placeholder="🔍 搜股票/ETF (代码或名称)" autocomplete="off" style="margin-left:8px;padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
   <div id="symResults" style="display:none;position:absolute;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;margin-top:2px;width:280px;font-size:11px"></div>
@@ -664,20 +665,25 @@ async function renderPools(d){
 
   // ---- Cycle pool ----
   const cd = pools.cycle;
-  const ph={decline:'衰退',recession:'萧条',recovery:'复苏',acceleration:'加速',consolidation:'震荡',bottoming:'筑底'};
+  const ph={decline:'衰退',recession:'萧条',recovery:'复苏',acceleration:'加速',consolidation:'震荡',bottoming:'筑底',
+            uptrend:'上行',downtrend:'下行',neutral:'中性'};
   if(cd&&cd.macro_signals){
     const mp=cd.market_phase;
     document.getElementById('cycleKpis').innerHTML=`
-      <div class="pool-kpi-item"><div class="v" style="color:${mp==='decline'||mp==='recession'?'var(--dn)':'var(--up)'}">${ph[mp]||mp}</div><div class="n">市场周期</div></div>
-      <div class="pool-kpi-item"><div class="v">${Object.keys(cd.macro_signals||{}).length}</div><div class="n">指数跟踪</div></div>`;
-    document.getElementById('cycleBody').innerHTML=`<table class="pool-table"><thead><tr><th>指数</th><th>名称</th><th>阶段</th><th>评分</th><th>RSI</th><th>量比</th><th>波动率</th></tr></thead><tbody>
+      <div class="pool-kpi-item"><div class="v" style="color:${mp==='decline'||mp==='downtrend'?'var(--dn)':'var(--up)'}">${ph[mp]||mp}</div><div class="n">市场周期</div></div>
+      <div class="pool-kpi-item"><div class="v">${Object.keys(cd.macro_signals||{}).length}</div><div class="n">指数跟踪</div></div>
+      <div class="pool-kpi-item"><div class="v">${cd.market_score??'—'}</div><div class="n">市场评分</div></div>`;
+    document.getElementById('cycleBody').innerHTML=`<table class="pool-table"><thead><tr><th>名称</th><th>阶段</th><th>评分</th><th>收盘</th><th>MA5/MA20</th><th>RSI</th><th>量比</th></tr></thead><tbody>
       ${Object.values(cd.macro_signals||{}).map(s=>`<tr>
-        <td>${s.code}</td><td>${s.name||''}</td>
-        <td><span class="pool-badge ${s.phase==='decline'?'pb-t1':s.phase==='recovery'||s.phase==='acceleration'?'pb-t2':'pb-ph'}">${ph[s.phase]||s.phase}</span></td>
+        <td>${s.name||''}</td>
+        <td><span class="pool-badge ${s.phase==='downtrend'||s.phase==='decline'?'pb-t1':s.phase==='recovery'?'pb-t2':'pb-ph'}">${ph[s.phase]||s.phase}</span></td>
         <td class="${s.score>=0?'up':'dn'}">${s.score}</td>
-        <td>${s.rsi??'—'}</td><td>${s.vr??'—'}x</td><td class="fl">${s.vol_regime||'—'}</td>
+        <td>${s.close??'—'}</td>
+        <td class="fl" style="font-size:10px">${s.ma5??'—'}/${s.ma20??'—'}</td>
+        <td>${s.rsi??'—'}</td><td>${s.vr??'—'}x</td>
       </tr>`).join('')}
-    </tbody></table>`;
+    </tbody></table>`+
+    (cd.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">数据源: ${cd.meta.source} · ${cd.meta.window||''} · 更新 ${(cd.meta.ts||'').replace('T',' ').slice(0,16)}<br>口径: ${cd.meta.phase_rules||''}<br>${cd.meta.caveat||''}</div>`:'');
   } else { document.getElementById('cycleBody').innerHTML='<div class="no-data">暂无周期数据</div>'; }
 
   // ---- Sector pool ----
@@ -685,18 +691,18 @@ async function renderPools(d){
   if(sd&&sd.tier1){
     document.getElementById('sectorKpis').innerHTML=`
       <div class="pool-kpi-item"><div class="v up">${sd.tier1_count}</div><div class="n">强势板块</div></div>
-      <div class="pool-kpi-item"><div class="v">${sd.tier2_count}</div><div class="n">中性板块</div></div>
+      <div class="pool-kpi-item"><div class="v">${sd.tier2_count}</div><div class="n">活跃板块</div></div>
       <div class="pool-kpi-item"><div class="v dn">${sd.tier_down_count||0}</div><div class="n">弱势板块</div></div>`;
-    document.getElementById('sectorBody').innerHTML=`<table class="pool-table"><thead><tr><th>板块</th><th>得分</th><th>涨跌%</th><th>涨停</th><th>主力流入亿</th><th>信号</th></tr></thead><tbody>
+    document.getElementById('sectorBody').innerHTML=`<table class="pool-table"><thead><tr><th>板块</th><th>当日%</th><th>5日%</th><th>20日%</th><th>领涨股</th></tr></thead><tbody>
       ${(sd.tier1||[]).slice(0,15).map(s=>`<tr>
         <td>${s.sector}</td>
-        <td class="up" style="font-weight:700">${s.score}</td>
-        <td class="${(s.avg_chg_1d||0)>=0?'up':'dn'}">${(s.avg_chg_1d||0).toFixed(2)}%</td>
-        <td>${s.zt_count||0}</td>
-        <td class="${(s.total_main_net||0)>=0?'up':'dn'}">${(s.total_main_net/1e9).toFixed(1)}</td>
-        <td class="fl" style="max-width:120px;font-size:10px">${(s.signals||[]).slice(0,3).join(' ')}</td>
+        <td class="${(s.avg_chg_1d||0)>=0?'up':'dn'}" style="font-weight:700">${(s.avg_chg_1d||0).toFixed(2)}%</td>
+        <td class="${(s.chg_5d||0)>=0?'up':'dn'}">${s.chg_5d!=null?s.chg_5d.toFixed(2)+'%':'—'}</td>
+        <td class="${(s.chg_20d||0)>=0?'up':'dn'}">${s.chg_20d!=null?s.chg_20d.toFixed(2)+'%':'—'}</td>
+        <td class="fl" style="font-size:10px">${s.leader||'—'}${s.leader_pct!=null?' ('+s.leader_pct.toFixed(1)+'%)':''}</td>
       </tr>`).join('')}
-    </tbody></table>`;
+    </tbody></table>`+
+    (sd.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">数据源: ${sd.meta.source} · 共 ${sd.total_sectors} 个板块 · 更新 ${(sd.meta.ts||'').replace('T',' ').slice(0,16)}<br>分级口径: ${sd.meta.grading||''}<br>${sd.meta.caveat||''}</div>`:'');
   } else { document.getElementById('sectorBody').innerHTML='<div class="no-data">暂无板块池数据</div>'; }
 
   // ---- Low position pool ----
@@ -706,15 +712,17 @@ async function renderPools(d){
       <div class="pool-kpi-item"><div class="v up">${ld.strong_buy}</div><div class="n">强烈买入</div></div>
       <div class="pool-kpi-item"><div class="v">${(ld.watch_count??(Array.isArray(ld.watch)?ld.watch.length:0))}</div><div class="n">关注</div></div>
       <div class="pool-kpi-item"><div class="v">${ld.total_filtered||0}</div><div class="n">候选总数</div></div>`;
-    document.getElementById('lowBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>现价</th><th>涨%</th><th>位置%</th><th>核心信号</th></tr></thead><tbody>
+    document.getElementById('lowBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨%</th><th>位置%</th><th>RSI</th><th>核心信号</th></tr></thead><tbody>
       ${(ld.strong||[]).slice(0,20).map(s=>`<tr>
-        <td>${s.code}</td><td>${(s.name||'').slice(0,6)}</td><td class="fl">${(s.industry||'').slice(0,6)}</td>
+        <td>${s.code}</td><td>${(s.name||'').slice(0,6)}</td>
         <td>${(s.price||0).toFixed(2)}</td>
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
-        <td class="fl">${s.price_pct??'—'}</td>
-        <td class="fl" style="max-width:150px;font-size:10px">${(s.signals||[]).slice(0,2).join('; ')}</td>
+        <td class="fl">${s.price_pct??'—'}%</td>
+        <td>${s.rsi??'—'}</td>
+        <td class="fl" style="max-width:150px;font-size:10px">${(s.signals||[]).slice(0,3).join('; ')}</td>
       </tr>`).join('')}
-    </tbody></table>`;
+    </tbody></table>`+
+    (ld.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">数据源: ${ld.meta.source} · K线覆盖 ${ld.kline_coverage||'?'}/5343 · 更新 ${(ld.meta.ts||'').replace('T',' ').slice(0,16)}<br>打分口径: ${ld.meta.scoring||''}<br>${ld.meta.caveat||''}</div>`:'');
   } else if(ld){
     document.getElementById('lowKpis').innerHTML=`
       <div class="pool-kpi-item"><div class="v">${ld.total_filtered||0}</div><div class="n">候选总数</div></div>
@@ -808,9 +816,26 @@ document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 
 async function render(){
   // 并行拉取, 消除串行 waterfall (原来先 latest 再 hot_impact 再 pools)
-  const [d,hi]=await fetchAll(['data/latest.json','data/hot_impact.json']);
+  // 池子用独立文件优先: rebuild_pools.py 重建的版本带 source/ts/口径 元数据,
+  // 且不受远端 local realtime sync 覆盖 latest.json 的影响
+  const [d,hi,cyc,sec,low]=await fetchAll([
+    'data/latest.json','data/hot_impact.json',
+    'data/cycle.json','data/sector_pool.json','data/lowpool.json'
+  ]);
   window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="5"].active')) renderTencent(d);
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
+  // 用独立池子文件覆盖 latest.json 里的 pools (若独立文件有效)
+  if(d && typeof d==='object'){
+    d.pools = d.pools || {};
+    if(cyc && cyc.macro_signals) d.pools.cycle = cyc;
+    if(sec && sec.tier1 !== undefined) d.pools.sector_pool = sec;
+    if(low && low.strong !== undefined) d.pools.lowpool = low;
+    // index_kline 也优先用独立文件
+    const ik = await fetchJSON('data/index_kline.json');
+    if(ik && ik.indices && ik.indices.sh000001){
+      d.index_kline = ik.indices.sh000001;
+    }
+  }
   const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
   document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
   document.getElementById('algoBadge').textContent=(d.meta||{}).algo||'tsp';
@@ -1001,5 +1026,6 @@ if('serviceWorker' in navigator){
   }
 })();
 </script>
+<script src="realtime.js" defer></script>
 </body>
 </html>
