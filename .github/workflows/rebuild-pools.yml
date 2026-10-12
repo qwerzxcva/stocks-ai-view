@@ -1,0 +1,107 @@
+# 池子数据自动重建 (板块池/周期池/低位池)
+# 交易日 15:40 / 09:40 / 11:40 CST 运行 (UTC 01:40/03:40/07:40)
+# 数据源: 腾讯证券 (零鉴权), 不依赖东财 (容器/GH runner 内东财常被 WAF 拦)
+name: rebuild-pools
+on:
+  schedule:
+    - cron: '40 1,3,5,7 * * 1-5'   # CST 09:40 / 11:40 / 15:40 / 17:40
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      # K线仓 (低位池需要历史K线; 大仓用 sparse-checkout 只取 bulk 目录)
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kline-repo
+          sparse-checkout: |
+            data/bulk
+          sparse-checkout-cone-mode: false
+
+      - name: Prepare bulk dir
+        run: |
+          mkdir -p data-kline/bulk
+          cp -n kline-repo/data/bulk/* data-kline/bulk/ 2>/dev/null || true
+          ls data-kline/bulk/ | head -5
+          echo "bulk files: $(ls data-kline/bulk/ | wc -l)"
+
+      - name: Checkout live repo (snapshot)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-live
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: live-repo
+          sparse-checkout: |
+            data/market
+          sparse-checkout-cone-mode: false
+
+      - name: Prepare snapshot dir
+        run: |
+          mkdir -p data-live/market
+          cp -n live-repo/data/market/snapshot_*.json data-live/market/ 2>/dev/null || true
+          ls -la data-live/market/ | tail -3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 1) 板块池 + 周期池 (腾讯 mktHs + 指数日K)
+      - name: Rebuild sector_pool + cycle
+        run: |
+          python3 scripts/rebuild_pools.py --out-dir data
+
+      # 2) 低位池 (依赖 bulk K线 + 快照)
+      - name: Rebuild lowpool
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/data-kline/bulk
+          STOCKS_LIVE_MARKET: ${{ github.workspace }}/data-live/market
+        run: |
+          python3 scripts/build_lowpool.py --out data/lowpool.json
+
+      # 3) 市场增量数据 (跌停数修正/涨跌家数/两融/龙虎榜等同花顺东财)
+      #    用 --merge 就地合并, 保留远端系统的其他模块
+      - name: Merge market extras
+        run: |
+          if [ -f data/latest.json ]; then
+            python3 scripts/collect_market_extras.py --merge data/latest.json || true
+          fi
+
+      # 4) 数据瘦身
+      - name: Slim latest.json
+        run: |
+          [ -f scripts/slim_latest.py ] && python3 scripts/slim_latest.py || true
+
+      - name: Verify outputs
+        run: |
+          for f in sector_pool.json cycle.json lowpool.json; do
+            if [ -f "data/$f" ]; then
+              size=$(wc -c < "data/$f")
+              echo "  data/$f = ${size}B"
+              python3 -c "import json;json.load(open('data/$f'));print('    JSON valid')" || exit 1
+            else
+              echo "  data/$f MISSING"
+            fi
+          done
+
+      - name: Commit & push
+        run: |
+          git config user.name "pool-bot"
+          git config user.email "741059079@qq.com"
+          git add -A data/
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet --cached HEAD && echo "no changes" || {
+            git commit -m "pools: rebuild $ts (板块池+周期池+低位池+市场增量)" && \
+            git -c http.version=HTTP/1.1 push origin main; }

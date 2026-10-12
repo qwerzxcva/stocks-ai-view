@@ -21,8 +21,11 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
-BULK = "/root/workspace/stocks-data-kline/data/bulk"
-SNAP_DIR = "/root/workspace/stocks-data-live/data/market"
+# 路径可用环境变量覆盖, 便于在 GitHub Actions / 其他机器上运行
+#   STOCKS_KLINE_BULK  K线 bulk 目录 (默认本机路径)
+#   STOCKS_LIVE_MARKET  快照目录
+BULK = os.environ.get("STOCKS_KLINE_BULK") or "/root/workspace/stocks-data-kline/data/bulk"
+SNAP_DIR = os.environ.get("STOCKS_LIVE_MARKET") or "/root/workspace/stocks-data-live/data/market"
 
 
 def load_klines():
