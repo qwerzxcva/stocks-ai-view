@@ -4,7 +4,7 @@
 //   - data/*.json: network-first, 失败回退缓存 (数据新鲜优先)
 //     * 例外: index_kline.json / search_index.json 等大文件走 stale-while-revalidate
 //   - 跨域请求 (腾讯行情等): 不走 SW, 由 realtime.js 直连
-const CACHE = 'stocks-ai-view-v2';
+const CACHE = 'stocks-ai-view-v3';   // v3: hot_impact 移出 SWR 列表改 network-first
 const SHELL = ['./', './index.html', './realtime.js', './sw.js',
                './data/latest.json'];
 
@@ -45,7 +45,10 @@ self.addEventListener('fetch', e => {
   const isShell = /\.(js|css)$/.test(path) || path.endsWith('.html');
 
   // 大块/低频 JSON: stale-while-revalidate (秒开 + 后台更新)
-  const swrJson = /(index_kline|search_index|multi_v4|lowpool|cycle|sector_pool|hotspot_infer|hot_impact)\.json$/.test(path);
+  // 注意: hot_impact.json 不在此列 —— 它是盘中30分钟更新的高频数据,
+  // 必须 network-first, 否则会先返回 24 小时前的旧缓存 (曾因此出现
+  // 热点推演 tab 显示旧数据的问题)。
+  const swrJson = /(index_kline|search_index|multi_v4|lowpool|cycle|sector_pool|hotspot_infer)\.json$/.test(path);
 
   if (isJson && !swrJson) {
     // latest.json 等高频数据: network-first

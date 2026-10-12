@@ -337,11 +337,14 @@ const UP='#f85149',DN='#3fb950',GR='#8b949e';
 //  3. 轮询带指数退避, 失败时不疯狂重试
 const _etagCache=new Map();
 async function fetchJSON(p){try{
+  // 高频数据 (hot_impact 盘中30分钟更新) 不用 If-None-Match,
+  // 避免 ETag 304 命中时拿到会话内的旧缓存; SW 也已把它改为 network-first。
+  const HOT = /(hot_impact|latest)\.json$/.test(p);
   const hdr={};
   const et=_etagCache.get(p);
-  if(et)hdr['If-None-Match']=et;
+  if(et && !HOT)hdr['If-None-Match']=et;
   const r=await fetch(p,{headers:hdr});
-  if(r.status===304)return _jsonCache.get(p)||null;
+  if(r.status===304)return _jsonCache.get(p)||null;   // 仅非 HOT 路径可能触发
   const net=r.headers.get('etag');
   if(net)_etagCache.set(p,net);
   if(!r.ok)return null;
