@@ -608,44 +608,81 @@ function renderCommentary(c){
 }
 
 // ─── 同花顺强势股 ───────────────────────────────────────────────────
-function renderThsStrong(list){
+// ─── 同花顺强势股 (含现价/涨跌/综合分) ──────────────────────────
+function renderThsStrong(list, meta){
   const k=document.getElementById('strongKpis'),b=document.getElementById('strongBody');
   if(!list||!list.length){b.innerHTML='<div class="no-data">暂无强势股数据 (同花顺源)</div>';return}
+  const hasPrice=list.some(s=>s.price!=null);
+  const ztCount=list.filter(s=>s.in_zt).length;
   k.innerHTML=[
     `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">强势股数</div></div>`,
-    `<div class="pool-kpi-item"><div class="v">${new Set(list.map(s=>s.reason.split('+')[0])).size}</div><div class="n">题材数</div></div>`,
+    `<div class="pool-kpi-item"><div class="v up">${ztCount}</div><div class="n">其中涨停</div></div>`,
+    `<div class="pool-kpi-item"><div class="v">${new Set(list.map(s=>String(s.reason||'').split('+')[0])).size}</div><div class="n">题材数</div></div>`,
   ].join('');
-  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>题材归因</th></tr></thead><tbody>'+
-    list.map(s=>`<tr><td>${s.code}</td><td>${s.name}</td>
-      <td class="fl" style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${s.reason}">${s.reason}</td></tr>`).join('')+
-    '</tbody></table>';
+  const head=hasPrice
+    ?'<tr><th>代码</th><th>名称</th><th>现价</th><th>涨%</th><th>换手%</th><th>PE</th><th>综合分</th><th>题材归因</th></tr>'
+    :'<tr><th>代码</th><th>名称</th><th>题材归因</th></tr>';
+  b.innerHTML='<table class="pool-table"><thead>'+head+'</thead><tbody>'+
+    list.map(s=>{
+      if(!hasPrice)return `<tr><td>${s.code}</td><td>${s.name}</td><td class="fl" title="${s.reason}">${s.reason}</td></tr>`;
+      const sc=s.score>=70?'var(--up)':s.score>=50?'var(--amber)':'var(--tx2)';
+      return `<tr><td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="bdg up">涨停</span>':''}</td>
+        <td>${(s.price??0).toFixed(2)}</td>
+        <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
+        <td class="fl">${(s.turnover||0).toFixed(2)}</td>
+        <td class="fl">${s.pe!=null?s.pe.toFixed(1):'—'}</td>
+        <td style="font-weight:700;color:${sc}">${s.score??'—'}</td>
+        <td class="fl" style="max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${s.reason}">${s.reason}</td></tr>`;
+    }).join('')+'</tbody></table>'+
+    `<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">`+
+    `现价/涨跌/换手/PE: 腾讯行情实时 · 题材: 同花顺强势股池<br>`+
+    `综合分 = 动量30 + 换手20 + 市值15 + 估值15 + 题材20 (满分100), 按综合分降序</div>`;
 }
 
-// ─── 龙虎榜 ────────────────────────────────────────────────────────
-function renderLhb(list){
+// ─── 龙虎榜 (席位合并 + 回退标注) ─────────────────────────────────
+function renderLhb(list, meta){
   const k=document.getElementById('lhbKpis'),b=document.getElementById('lhbBody');
-  if(!list||!list.length){b.innerHTML='<div class="no-data">今日暂无龙虎榜数据</div>';return}
+  if(!list||!list.length){
+    b.innerHTML='<div class="no-data">暂无龙虎榜数据</div>'+
+      '<div class="fl" style="padding:8px 12px;font-size:9px;line-height:1.5">'+
+      '数据源: 东方财富 datacenter RPT_DAILYBILLBOARD_DETAILS<br>'+
+      '当日无数据时会自动回退到最近有数据的交易日</div>';
+    return;
+  }
   const totalAmt=list.reduce((s,x)=>s+(x.deal_amt||0),0);
   k.innerHTML=[
-    `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">上榜条数</div></div>`,
+    `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">上榜股票</div></div>`,
     `<div class="pool-kpi-item"><div class="v">${(totalAmt/1e8).toFixed(1)}亿</div><div class="n">龙虎榜成交</div></div>`,
+    `<div class="pool-kpi-item"><div class="v">${list.filter(x=>(x.chg||0)>0).length}</div><div class="n">收涨</div></div>`,
   ].join('');
-  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>收盘</th><th>涨跌</th><th>龙虎榜成交</th><th>席位解读</th></tr></thead><tbody>'+
+  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>收盘</th><th>涨跌</th><th>龙虎榜成交</th><th>席位</th><th>次日</th><th>席位解读</th></tr></thead><tbody>'+
     list.map(x=>`<tr>
       <td>${x.code}</td><td>${(x.name||'').slice(0,6)}</td>
-      <td>${fmt(x.close)}</td>
-      <td class="${x.chg>=0?'up':'dn'}">${sign(x.chg)}%</td>
+      <td>${x.close!=null?Number(x.close).toFixed(2):'—'}</td>
+      <td class="${x.chg>=0?'up':'dn'}">${(x.chg||0).toFixed(2)}%</td>
       <td>${x.deal_amt?(x.deal_amt/1e8).toFixed(2)+'亿':'—'}</td>
-      <td class="fl" style="max-width:180px;font-size:10px">${x.expl||'—'}</td></tr>`).join('')+
-    '</tbody></table>';
+      <td class="fl">${x.seats||1}</td>
+      <td class="${(x.d1||0)>=0?'up':'dn'}">${x.d1!=null?(x.d1*100).toFixed(1)+'%':'—'}</td>
+      <td class="fl" style="max-width:170px;font-size:10px">${x.expl||'—'}</td></tr>`).join('')+
+    '</tbody></table>'+
+    (meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">`+
+      `数据源: 东方财富 datacenter · 数据日期 <b style="color:${meta.lhb_fallback?'var(--amber)':'var(--dn)'}">${meta.lhb_date||'—'}${meta.lhb_fallback?' (回退, 当日暂无数据)':''}</b><br>`+
+      `已按股票合并多个营业部席位 (东财按席位分条), 成交额为该股龙虎榜合计<br>`+
+      `「次日」= 上榜后次日涨跌幅, 可用于观察席位效应</div>`:'');
 }
 
-// ─── 大宗交易 ──────────────────────────────────────────────────────
-function renderBlocktrade(list){
+// ─── 大宗交易 (溢价率 + 回退标注) ─────────────────────────────────
+function renderBlocktrade(list, meta){
   const k=document.getElementById('blockKpis'),b=document.getElementById('blockBody');
-  if(!list||!list.length){b.innerHTML='<div class="no-data">今日暂无大宗交易</div>';return}
+  if(!list||!list.length){
+    b.innerHTML='<div class="no-data">暂无大宗交易</div>'+
+      '<div class="fl" style="padding:8px 12px;font-size:9px;line-height:1.5">'+
+      '数据源: 东方财富 datacenter RPT_DATA_BLOCKTRADE<br>'+
+      '当日无数据时会自动回退到最近有数据的交易日</div>';
+    return;
+  }
   const totalAmt=list.reduce((s,x)=>s+(x.amt||0),0);
-  const disc=list.filter(x=>x.premium<0).length;
+  const disc=list.filter(x=>(x.premium||0)<0).length;
   k.innerHTML=[
     `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">笔数</div></div>`,
     `<div class="pool-kpi-item"><div class="v">${(totalAmt/1e8).toFixed(2)}亿</div><div class="n">成交额</div></div>`,
@@ -654,10 +691,13 @@ function renderBlocktrade(list){
   b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>成交价</th><th>溢价率</th><th>成交额</th></tr></thead><tbody>'+
     list.map(x=>`<tr>
       <td>${x.code}</td><td>${(x.name||'').slice(0,6)}</td>
-      <td>${fmt(x.price)}</td>
+      <td>${x.price!=null?Number(x.price).toFixed(2):'—'}</td>
       <td class="${x.premium>=0?'up':'dn'}">${x.premium!=null?(x.premium*100).toFixed(2)+'%':'—'}</td>
       <td>${x.amt?(x.amt/1e8).toFixed(2)+'亿':'—'}</td></tr>`).join('')+
-    '</tbody></table>';
+    '</tbody></table>'+
+    (meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">`+
+      `数据源: 东方财富 datacenter · 数据日期 <b style="color:${meta.blocktrade_fallback?'var(--amber)':'var(--dn)'}">${meta.blocktrade_date||'—'}${meta.blocktrade_fallback?' (回退, 当日暂无数据)':''}</b><br>`+
+      `溢价率 = (成交价-收盘价)/收盘价; 折价成交通常表示卖方急于变现, 溢价表示买方看好</div>`:'');
 }
 
 // ─── 成交量历史线图 (纯 SVG, 零依赖) ─────────────────────────────────
@@ -933,9 +973,9 @@ async function render(){
   renderTicker(d);
   if(hi)renderHotImpactData(hi);
   if(d.commentary)renderCommentary(d.commentary);
-  renderThsStrong(d.ths_strong);
-  renderLhb(d.lhb);
-  renderBlocktrade(d.blocktrade);
+  renderThsStrong(d.ths_strong, d.enrich_meta);
+  renderLhb(d.lhb, d.enrich_meta);
+  renderBlocktrade(d.blocktrade, d.enrich_meta);
   renderVolChart(d.index_kline);
   renderPools(d);
   _failCount=0;

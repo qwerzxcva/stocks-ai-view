@@ -414,8 +414,27 @@ def collect_all(date_str=None, indices=None, phase=None):
     margin = fetch_margin(30)
     idx_kline = fetch_index_kline("sh000001", 120)
     ths_strong = fetch_ths_strong_stocks(date_dash)
-    lhb = fetch_lhb(date_dash)
-    blocktrade = fetch_blocktrade(date_dash)
+    # 龙虎榜/大宗交易: 用带回退的版本 (当日无数据时回退到最近交易日,
+    # 并在 meta 标注实际数据日期), 避免凌晨/节假日整块为空
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from enrich_quotes import (fetch_with_fallback, _parse_lhb, _parse_blocktrade,
+                                   enrich_strong)
+        lhb, lhb_date, lhb_fb = fetch_with_fallback("RPT_DAILYBILLBOARD_DETAILS",
+                                                    _parse_lhb, 5)
+        blocktrade, bt_date, bt_fb = fetch_with_fallback("RPT_DATA_BLOCKTRADE",
+                                                         _parse_blocktrade, 5)
+        # 强势股补现价/涨跌/综合分 (同花顺接口本身不返回价格)
+        ths_strong = enrich_strong(ths_strong)
+        print(f"[enrich] 强势股 {len(ths_strong)} 只(含价格) | "
+              f"龙虎榜 {len(lhb)} 条({lhb_date}{'回退' if lhb_fb else ''}) | "
+              f"大宗 {len(blocktrade)} 笔({bt_date}{'回退' if bt_fb else ''})", flush=True)
+        enrich_meta = {"lhb_date": lhb_date, "lhb_fallback": lhb_fb,
+                       "blocktrade_date": bt_date, "blocktrade_fallback": bt_fb}
+    except Exception as e:
+        print(f"[enrich] 增强失败, 用原始数据: {e}", file=sys.stderr)
+        lhb, blocktrade, enrich_meta = fetch_lhb(date_dash), fetch_blocktrade(date_dash), {}
+
     tx_rank = fetch_tx_sector_ranking(20)
 
     if indices is None:
@@ -438,6 +457,7 @@ def collect_all(date_str=None, indices=None, phase=None):
         "ths_strong": ths_strong[:40],
         "lhb": lhb[:20],
         "blocktrade": blocktrade[:20],
+        "enrich_meta": enrich_meta,
         "margin": margin,
         "index_kline": idx_kline,
         "westock": {"sector_ranking": {"date": date_str, "data": tx_rank}},

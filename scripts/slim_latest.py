@@ -108,11 +108,21 @@ def main():
     if isinstance(d.get("margin"), list):
         d["margin"] = slim(d["margin"], ["date", "rzye", "rqye", "rzrqye", "rzmre", "rzche"])
     if isinstance(d.get("lhb"), list):
-        d["lhb"] = slim(d["lhb"], ["code", "name", "close", "chg", "deal_amt", "expl"])
+        d["lhb"] = slim(d["lhb"], ["code", "name", "close", "chg", "deal_amt",
+                                   "expl", "seats", "d1", "d2", "d5"])
     if isinstance(d.get("blocktrade"), list):
-        d["blocktrade"] = slim(d["blocktrade"], ["code", "name", "price", "premium", "vol", "amt"])
+        d["blocktrade"] = slim(d["blocktrade"],
+                               ["code", "name", "price", "premium", "vol", "amt"])
     if isinstance(d.get("ths_strong"), list):
-        d["ths_strong"] = slim(d["ths_strong"], ["code", "name", "reason"])
+        d["ths_strong"] = slim(d["ths_strong"], ["code", "name", "reason", "price",
+                                                 "chg_pct", "turnover", "mktcap",
+                                                 "pe", "pb", "score", "in_zt",
+                                                 "quote_time"])
+    if isinstance(d.get("enrich_meta"), dict):
+        em = d["enrich_meta"]
+        d["enrich_meta"] = {k: em[k] for k in ["lhb_date", "lhb_fallback",
+                                               "blocktrade_date", "blocktrade_fallback"]
+                            if k in em}
     ws = d.get("westock")
     if isinstance(ws, dict) and isinstance(ws.get("sector_ranking"), dict):
         sr = ws["sector_ranking"].get("data")
