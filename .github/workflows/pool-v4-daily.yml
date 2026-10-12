@@ -1,0 +1,43 @@
+# TSP v4 多池选股每日更新
+# 交易日 09:35 / 11:35 / 14:05 / 15:25 CST 运行（UTC 01:35/03:35/06:05/07:25）
+# 依次跑：热点分析 → 周期池 → 板块池 → 低位池 → 热点推演 → 综合扫描
+name: pool-v4-daily
+on:
+  schedule:
+    - cron: '35 1,3,5,7 * * 1-5'  # 09:35 / 11:35 / 14:05 / 15:25 CST
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  run-pools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install numpy+pandas
+        run: pip install numpy pandas -q
+      - name: Run all pools v4
+        run: |
+          set -e
+          # Determine date: use last trading day if weekend/holiday, else today
+          python3 scripts/run_all_v4.py "${DATE:-$(date +%Y-%m-%d)}"
+        env:
+          DATE: ""
+      - name: Verify data files
+        run: python3 scripts/verify_data.py
+      - name: Commit & push
+        run: |
+          git config user.name "stocks-bot-v4"
+          git config user.email "41888888888+stocks-bot@users.noreply.github.com"
+          git add -A
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet HEAD && echo "no changes" || \
+            { git commit -m "pools-v4: $ts (cycle+sector+low+hotspot+multi)" && \
+              git -c http.version=HTTP/1.1 push origin main; }
