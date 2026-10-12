@@ -1,0 +1,30 @@
+name: cloud-analysis
+# 云端自动分析/推演/预测 — 纯统计引擎, 无AI. 每30分+开盘时段加密
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: cloud-analysis
+  cancel-in-progress: true
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - name: Run cloud analysis engine
+        run: |
+          curl -sL https://raw.githubusercontent.com/jiegengxiangjianxue1/stockdb/main/scripts/cloud_analysis.py -o cloud_analysis.py || \
+          curl -sL https://raw.githubusercontent.com/qwerzxcva/t7/main/scripts/cloud_analysis.py -o cloud_analysis.py
+          python3 cloud_analysis.py --out data/cloud_analysis.json
+      - name: Commit results
+        run: |
+          git config user.name "cloud-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/cloud_analysis.json
+          git commit -m "cloud analysis $(date -u +%FT%TZ)" || echo "no change"
+          git push
