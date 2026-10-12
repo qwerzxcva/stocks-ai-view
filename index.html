@@ -195,6 +195,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="card">
       <div class="hd">☁️ 云端推演 <span class="sub" id="cloudTs">GitHub Actions 统计引擎</span></div>
       <div class="bd" id="cloudBox" style="font-size:11px">加载中…</div>
+      <div id="klineSim" style="display:none;font-size:11px;padding:6px 12px;border-top:1px dashed var(--bd)"></div>
+      <div id="globalKline" style="display:none;font-size:11px;padding:6px 12px;border-top:1px dashed var(--bd)"></div>
     </div>
     <div class="card">
       <div class="hd">今日主线 <span class="sub">资金×涨幅×成交额×新闻</span></div>
@@ -411,8 +413,16 @@ function renderWinRate(ps){
 }
 async function renderCloud(){
   try{
+    const _lat = await fetch('data/latest.json?t='+Date.now()).then(r=>r.json()).catch(()=>null);
+    renderWinRate((_lat||{}).pick_stats||null);
+    const _ks = (_lat||{}).kline_sim; const _ksEl=document.getElementById('klineSim');
+    if(_ksEl){ _ksEl.style.display = _ks?'':'none';
+      if(_ks&&_ks.stats) _ksEl.innerHTML = `<b>🎲 次日K线模拟</b> (同状态历史${_ks.samples}样本, 连${_ks.state.streak}${_ks.state.dir==='up'?'阳':'阴'}): 收涨概率 <b class="up">${_ks.stats.p_up}%</b> · 冲高+1% <b>${_ks.stats.p_high1pct}%</b> · 破位-1% <b class="dn">${_ks.stats.p_low1pct}%</b> · 收益区间(80%) ${_ks.stats.ret_p10_pct}% ~ +${_ks.stats.ret_p90_pct}%`; }
+    const _gk = (_lat||{}).global_kline;
+    const _gkEl=document.getElementById('globalKline');
+    if(_gkEl){ _gkEl.style.display = _gk?'':'none';
+      if(_gk&&_gk.symbols) _gkEl.innerHTML = '<b>🌍 全球K线动量</b> ' + Object.entries(_gk.symbols).map(([s,v])=>{const m=v.last&&v.last.chg_pct; const col=m==null?'':(m>=0?'class="up"':'class="dn"'); return `<span ${col} style="margin-right:6px">${s} ${m==null?'':(m>0?'+':'')+m+'%'}</span>`;}).join(''); }
     const c = await fetch('data/cloud_analysis.json?t='+Date.now()).then(r=>r.json());
-    renderWinRate(await fetch('data/latest.json?t='+Date.now()).then(r=>r.json()).then(d=>d.pick_stats).catch(()=>null));
     const f = c.index_forecast||{}; const el=document.getElementById('cloudBox');
     if(!el) return;
     document.getElementById('cloudTs').textContent = (c.ts||'').replace('T',' ').slice(5,16) + ' · 统计外推·非投资建议';
