@@ -525,13 +525,17 @@ function renderCommentary(c){
     h+='<div class="mi"><div class="v" style="font-size:12px">'+kpi[j][1]+'</div><div class="n">'+kpi[j][0]+'</div></div>';
   }
   h+='</div>';
-  // 4. 热点题材
+  // 4. 热点题材 (AIHOT 聚簇+热度算法)
   if(c.hotspots&&c.hotspots.length){
-    h+='<div style="margin:8px 0 4px;font-size:10px;color:var(--tx3)">资金聚焦题材</div><div class="chips">';
+    h+='<div style="margin:8px 0 4px;font-size:10px;color:var(--tx3)">资金聚焦题材'+
+       (c.hotspots_algo?' <span style="color:var(--tx3);font-size:9px">· '+c.hotspots_algo+'</span>':'')+'</div><div class="chips">';
     for(var k=0;k<c.hotspots.length;k++){
-      h+='<span class="chip">'+c.hotspots[k].theme+' <b>'+c.hotspots[k].count+'</b></span>';
+      var hp=c.hotspots[k];
+      h+='<span class="chip" title="热度 '+hp.heat+' · '+hp.count+'事件 · '+hp.n_sources+'个来源'+(hp.codes&&hp.codes.length?' · 标的 '+hp.codes.join(','):'')+'">'+
+         hp.theme+' <b>'+hp.heat+'</b><span style="color:var(--tx3);font-weight:400"> ('+hp.count+'事件)</span></span>';
     }
     h+='</div>';
+    if(c.hotspots_caveat)h+='<div class="fl" style="font-size:9px;margin-top:3px">'+c.hotspots_caveat+'</div>';
   }
   // 5. 风险提示
   if(c.risks&&c.risks.length){

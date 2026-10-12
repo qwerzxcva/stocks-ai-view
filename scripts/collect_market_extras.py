@@ -339,17 +339,49 @@ def build_commentary(zt_n, dt_n, zb_n, indices, zdfenbu, turnover, phase,
         else:
             c["summary"].append(f"两融融资余额 {c['margin_trend']['rzye_yi']} 亿, 环比 {rz_chg}%, 基本持稳")
 
-    theme_count = {}
-    for s in ths_strong:
-        for kw in str(s.get("reason", "")).replace("+", " ").split():
-            kw = kw.strip()
-            if len(kw) >= 2:
-                theme_count[kw] = theme_count.get(kw, 0) + 1
-    c["hotspots"] = [{"theme": k, "count": v}
-                     for k, v in sorted(theme_count.items(), key=lambda x: -x[1])[:8] if v >= 2]
+    # ---- 6. 热点题材 (AIHOT 聚簇+热度算法, 替代原简单词频) ----
+    # 旧逻辑: theme_count[kw] += 1 → 同一家源重复抓取会多算, 无时间衰减,
+    #         一家媒体发十篇和十家媒体各发一篇无法区分。
+    # 新逻辑: heat_algo.cluster_items + event_heat (独立来源只算一次,
+    #         24h减半, 48h窗口, 同源多篇仅小幅加成)
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from heat_algo import cluster_items, theme_heat
+        items = [{"title": s.get("reason", ""), "source": "ths",
+                  "ts": datetime.now(CST).isoformat(),
+                  "codes": [s.get("code")], "themes": []}
+                 for s in ths_strong if s.get("reason")]
+        # 同花顺 reason 字段本身就是题材归因 (如 "钠电材料+硅碳负极+AI算力服务器"),
+        # 拆成 themes 供 theme_heat 汇总
+        for it, s in zip(items, [x for x in ths_strong if x.get("reason")]):
+            it["themes"] = [kw.strip() for kw in str(s.get("reason", "")).replace("+", " ").split()
+                            if len(kw.strip()) >= 2]
+        events = cluster_items(items)
+        th = theme_heat(events)
+        c["hotspots"] = [
+            {"theme": t, "count": d["events"], "heat": d["heat"],
+             "n_sources": len(d["sources"]), "codes": sorted(d["codes"])[:5]}
+            for t, d in sorted(th.items(), key=lambda x: -x[1]["heat"])[:8]
+            if d["events"] >= 1
+        ]
+        c["hotspots_algo"] = "AIHOT聚簇+热度 (独立来源只算一次, 24h减半)"
+        # 上游源单一说明: 强势股池目前只有同花顺一个源, 所以 n_sources 多为 1;
+        # 独立来源去重要等多源 (新浪/东财/雪球) 接入后才显现差异。
+        c["hotspots_caveat"] = ("题材热度基于同花顺强势股池(单源), n_sources 多为1; "
+                                 "多源接入后『独立来源只算一次』的去重效果才会充分体现")
+    except Exception as e:
+        print(f"[heat_algo] {e}, 降级为词频", file=sys.stderr)
+        theme_count = {}
+        for s in ths_strong:
+            for kw in str(s.get("reason", "")).replace("+", " ").split():
+                kw = kw.strip()
+                if len(kw) >= 2:
+                    theme_count[kw] = theme_count.get(kw, 0) + 1
+        c["hotspots"] = [{"theme": k, "count": v, "heat": float(v)}
+                         for k, v in sorted(theme_count.items(), key=lambda x: -x[1])[:8] if v >= 2]
     if c["hotspots"]:
         c["summary"].append("资金聚焦题材: " + "、".join(
-            f"{x['theme']}({x['count']})" for x in c["hotspots"][:3]))
+            f"{x['theme']}({x['count']}事件)" for x in c["hotspots"][:3]))
 
     if dt_n >= zt_n:
         c["risks"].append(f"跌停({dt_n})≥涨停({zt_n}), 短期风险释放中, 注意仓位")
