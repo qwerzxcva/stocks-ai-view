@@ -29,7 +29,14 @@ SNAP_DIR = os.environ.get("STOCKS_LIVE_MARKET") or "/root/workspace/stocks-data-
 
 
 def load_klines():
-    """读取全部 bulk K线 → {code: [bars]} (bar = [date,o,c,h,l,v])"""
+    """读取全部 bulk K线 → {code: [bars]} (bar = [date,o,c,h,l,v])
+
+    兼容两种落盘格式:
+      A) day_qfq_XX.csv  (原始): code|date|open|close|high|low|vol  (全 | 分隔)
+      B) day_qfq_extra.csv (补录): code|date,open,close,high,low,vol
+    早期版本用 split(',')[0] 猜分隔符, 对 A 格式整行无逗号导致 0 条解析, 已改为
+    先按 | 切出 code 与其余, 再把其余按 | 或 , 切开。
+    """
     data = {}
     files = sorted(glob.glob(os.path.join(BULK, "day_qfq_*.csv")))
     for p in files:
@@ -38,24 +45,24 @@ def load_klines():
                 line = line.strip()
                 if not line or line.startswith("#"):
                     continue
-                sep = "|" if "|" in line.split(",")[0] else ","
+                if "|" not in line:
+                    continue
+                code, rest = line.split("|", 1)
+                code = code.strip()
+                if not code or not code[0].isalpha():
+                    continue
+                # rest 可能是 "date|o|c|h|l|v" 或 "date,o,c,h,l,v"
+                parts = rest.split("|") if "|" in rest else rest.split(",")
+                if len(parts) < 6:
+                    continue
                 try:
-                    if sep == "|":
-                        code, rest = line.split("|", 1)
-                        parts = rest.split(",")
-                    else:
-                        parts = line.split(",")
-                        code = parts[0]
-                        parts = parts[1:]
-                    if len(parts) < 6:
-                        continue
-                    bar = [parts[0], float(parts[1]), float(parts[2]),
+                    bar = [parts[0].strip(), float(parts[1]), float(parts[2]),
                            float(parts[3]), float(parts[4]), float(parts[5])]
-                    if bar[2] <= 0:
-                        continue
-                    data.setdefault(code, []).append(bar)
                 except (ValueError, IndexError):
                     continue
+                if bar[2] <= 0:
+                    continue
+                data.setdefault(code, []).append(bar)
     # 按日期排序
     for c in data:
         data[c].sort(key=lambda b: b[0])
