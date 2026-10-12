@@ -58,6 +58,15 @@ jobs:
         with:
           python-version: '3.12'
 
+      # 全史统计缓存 (避免每天重拉 8000+ 根K线; key 按周轮换, 周一自动重建)
+      - name: Restore cycle stats cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/cycle_stats_cache.json
+          key: cycle-stats-${{ github.run_number }}
+          restore-keys: |
+            cycle-stats-
+
       # 1) 板块池 + 周期池 (腾讯 mktHs + 指数日K)
       - name: Rebuild sector_pool + cycle
         run: |
@@ -71,7 +80,17 @@ jobs:
         run: |
           python3 scripts/build_lowpool.py --out data/lowpool.json
 
-      # 3) 市场增量数据 (跌停数修正/涨跌家数/两融/龙虎榜等同花顺东财)
+      # 3) 周期深析 (指数全史统计, 每周重算一次; 缓存复用其余天)
+      - name: Cycle deep analysis
+        run: |
+          if [ "$(date +%u)" = "1" ]; then
+            echo "周一: 强制重算全史统计"
+            python3 scripts/cycle_deep.py --out data/cycle_deep.json --rebuild || true
+          else
+            python3 scripts/cycle_deep.py --out data/cycle_deep.json || true
+          fi
+
+      # 4) 市场增量数据 (跌停数修正/涨跌家数/两融/龙虎榜等同花顺东财)
       #    用 --merge 就地合并, 保留远端系统的其他模块
       - name: Merge market extras
         run: |
