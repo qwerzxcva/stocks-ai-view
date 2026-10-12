@@ -163,7 +163,12 @@ def fetch_indices(retries=3):
 
 # ─── 涨跌停池 (东财, 支持回看历史 date) ────────────────────────────────────
 def fetch_pool(kind, date_str, retries=3):
-    """kind: ZT/DT/ZB. price 单位: 千分之一元 (p 字段)。"""
+    """kind: ZT/DT/ZB. price 单位: 千分之一元 (p 字段)。
+
+    重要: 东财该接口 data.pool 有时为空数组, 但 data.tc 仍是权威计数
+    (实测 20261012 DT: pool=[] 而 tc=19)。因此同时返回 tc,
+    调用方须用 tc 作为家数, pool 仅作明细。
+    """
     url = (f"https://push2ex.eastmoney.com/getTopic{kind}Pool"
            f"?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt"
            f"&Pageindex=0&pagesize=300&sort=fbt%3Aasc&date={date_str}")
@@ -171,7 +176,9 @@ def fetch_pool(kind, date_str, retries=3):
         try:
             body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=12).read()
             d = json.loads(body.decode("utf-8"))
-            pool = ((d.get("data") or {}).get(f"{kind}Pool")) or ((d.get("data") or {}).get("pool")) or []
+            data = d.get("data") or {}
+            tc = data.get("tc")
+            pool = data.get(f"{kind}Pool") or data.get("pool") or []
             out = []
             for p in pool:
                 pval = float(p.get("p", 0) or 0)
@@ -182,11 +189,333 @@ def fetch_pool(kind, date_str, retries=3):
                     "chg_pct": round(float(p.get("zdp", 0) or 0), 2),
                     "lianban": int(p.get("lbc", p.get("count", 1)) or 1),
                     "zt_time": str(p.get("fbt", "")),
+                    "industry": str(p.get("hybk", "") or ""),
                 })
-            return out
+            # tc 缺失时退回 len(pool); 两者都不可用才返回空
+            if tc is None:
+                tc = len(pool)
+            return {"count": int(tc), "pool": out}
         except Exception as e:
             print(f"[pool {kind}] retry: {e}", file=sys.stderr)
-    return []
+    return {"count": 0, "pool": []}
+
+
+# ─── 涨跌分布 (上涨/下跌/平家数, 以及各涨幅档位) ───────────────────────────
+def fetch_zdfenbu(date_str):
+    """东财涨跌分布: data.fenbu 是 [{'-11':19}, {'11':46}, ...] 形式。
+    -11 表示跌幅超11%(≈跌停), 11 表示涨幅超11%(≈涨停)。
+    """
+    url = ("https://push2ex.eastmoney.com/getTopicZDFenBu"
+           "?ut=7eea3edcaed734bea9cbfc24409ed989&dpt=wz.ztzt"
+           f"&date={date_str}")
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=12).read()
+        d = json.loads(body.decode("utf-8"))
+        fenbu = ((d.get("data") or {}).get("fenbu")) or []
+        dist = {}
+        for item in fenbu:
+            for k, v in item.items():
+                dist[int(k)] = int(v)
+        if not dist:
+            return {}
+        up = sum(c for pct, c in dist.items() if pct > 0)
+        down = sum(c for pct, c in dist.items() if pct < 0)
+        flat = dist.get(0, 0)
+        # 涨停/跌停口径: 涨幅≥11% / 跌幅≤-11% (东财 fenbu 的 11/-11 档)
+        zt = dist.get(11, 0)
+        dt = dist.get(-11, 0)
+        return {
+            "up": up, "down": down, "flat": flat, "total": up + down + flat,
+            "zt_like": zt, "dt_like": dt,
+            "dist": dist,
+            "up_pct": round(up / max(1, up + down + flat) * 100, 1),
+        }
+    except Exception as e:
+        print(f"[zdfenbu] {e}", file=sys.stderr)
+        return {}
+
+
+# ─── 同花顺强势股 + 题材归因 (零鉴权, 东财被封时的有效替代源) ───────────
+def fetch_ths_strong_stocks(date_str=None):
+    """同花顺 zx.10jqka.com.cn 强势股池: 每只带 reason 题材归因。
+    返回 [{code, name, reason}]。该源在容器内稳定可用 (东财 push2 被 WAF 时仍通)。
+    """
+    if not date_str:
+        date_str = datetime.now(CST).strftime("%Y-%m-%d")
+    url = ("http://zx.10jqka.com.cn/event/api/getharden"
+           f"/date/{date_str}/orderby/date/orderway/desc/charset/GBK/")
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        d = json.loads(body.decode("gbk", "replace"))
+        rows = d.get("data") or []
+        out = []
+        for r in rows:
+            code = str(r.get("code", "") or "").strip()
+            name = str(r.get("name", "") or "").strip()
+            reason = str(r.get("reason", "") or "").strip()
+            if code:
+                out.append({"code": code, "name": name, "reason": reason})
+        print(f"[ths] {len(out)} strong stocks", flush=True)
+        return out
+    except Exception as e:
+        print(f"[ths] {e}", file=sys.stderr)
+        return []
+
+
+# ─── 东财 datacenter: 龙虎榜 / 大宗交易 ─────────────────────────────────
+def fetch_datacenter(report, sort_col, date=None, page_size=20, code=None):
+    """通用东财 datacenter 查询。date 格式 YYYY-MM-DD。"""
+    url = ("https://datacenter-web.eastmoney.com/api/data/v1/get"
+           f"?reportName={report}&columns=ALL&pageSize={page_size}&pageNumber=1"
+           f"&sortColumns={sort_col}&sortTypes=-1&source=WEB&client=WEB")
+    if date:
+        url += f"&filter=(TRADE_DATE%3D%27{date}%27)"
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        d = json.loads(body.decode("utf-8"))
+        return (d.get("result") or {}).get("data") or []
+    except Exception as e:
+        print(f"[dc:{report}] {e}", file=sys.stderr)
+        return []
+
+
+def fetch_lhb(date_str=None):
+    """龙虎榜明细 → 简化为 [{code, name, close, chg, expl, deal_amt}]"""
+    if not date_str:
+        date_str = datetime.now(CST).strftime("%Y-%m-%d")
+    rows = fetch_datacenter("RPT_DAILYBILLBOARD_DETAILS", "TRADE_DATE",
+                            date=date_str, page_size=30)
+    out = []
+    for r in rows:
+        out.append({
+            "code": str(r.get("SECURITY_CODE", "") or ""),
+            "name": str(r.get("SECURITY_NAME_ABBR", "") or ""),
+            "close": r.get("CLOSE_PRICE"),
+            "chg": r.get("CHANGE_RATE"),
+            "deal_amt": r.get("BILLBOARD_DEAL_AMT"),
+            "expl": str(r.get("EXPLAIN", "") or "")[:60],
+        })
+    return out
+
+
+def fetch_blocktrade(date_str=None):
+    """大宗交易 → [{code, name, price, premium, vol, amt, buyer, seller}]"""
+    if not date_str:
+        date_str = datetime.now(CST).strftime("%Y-%m-%d")
+    rows = fetch_datacenter("RPT_DATA_BLOCKTRADE", "TRADE_DATE",
+                            date=date_str, page_size=30)
+    out = []
+    for r in rows:
+        out.append({
+            "code": str(r.get("SECURITY_CODE", "") or ""),
+            "name": str(r.get("SECURITY_NAME_ABBR", "") or ""),
+            "price": r.get("DEAL_PRICE"),
+            "premium": r.get("PREMIUM_RATIO"),
+            "vol": r.get("DEAL_VOLUME"),
+            "amt": r.get("DEAL_AMT"),
+        })
+    return out
+
+
+# ─── 两市成交额 (沪深京合计) ─────────────────────────────────────────────
+def fetch_turnover():
+    """用腾讯行情累加沪深京三市成交额。
+    指数本身的 amount 字段不可靠, 改为: 拉主要指数 + 用其成交额字段。
+    腾讯指数接口 p[37]=成交额(万元)。
+    """
+    total_yi = 0.0
+    parts = {}
+    for code, label in (("sh000001", "沪市"), ("sz399001", "深市")):
+        try:
+            url = f"https://qt.gtimg.cn/q={code}"
+            body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=10).read()
+            text = body.decode("gbk", "replace")
+            for m in re.finditer(r'v_(\w+)="([^"]+)"', text):
+                p = m.group(2).split("~")
+                if len(p) > 37:
+                    yi = float(p[37] or 0) / 1e4   # 万元 → 亿元
+                    parts[label] = round(yi, 1)
+                    total_yi += yi
+                break
+        except Exception as e:
+            print(f"[turnover {code}] {e}", file=sys.stderr)
+    if not parts:
+        return {}
+    return {"parts": parts, "total_yi": round(total_yi, 1)}
+
+
+# ─── 融资融券 (东财 datacenter, 两融余额序列) ───────────────────────────
+def fetch_margin(days=30):
+    """RZYE=融资余额 RQYE=融券余额 RZRQYE=两融余额合计 (单位: 元)"""
+    url = ("https://datacenter-web.eastmoney.com/api/data/v1/get"
+           "?reportName=RPTA_RZRQ_LSHJ&columns=ALL"
+           f"&pageSize={days}&pageNumber=1"
+           "&sortColumns=dim_date&sortTypes=-1&source=WEB&client=WEB")
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        d = json.loads(body.decode("utf-8"))
+        recs = (d.get("result") or {}).get("data") or []
+        out = []
+        for r in recs:
+            out.append({
+                "date": r.get("DIM_DATE", ""),
+                "rzye": r.get("RZYE"),        # 融资余额
+                "rqye": r.get("RQYE"),        # 融券余额
+                "rzrqye": r.get("RZRQYE"),    # 两融余额合计
+                "rzmre": r.get("RZMRE"),      # 融资买入额
+                "rzche": r.get("RZCHE"),      # 融资偿还额
+            })
+        return out
+    except Exception as e:
+        print(f"[margin] {e}", file=sys.stderr)
+        return []
+
+
+# ─── 指数历史日K (画成交量线图; 腾讯源, 东财被封时仍可用) ─────────────────
+def fetch_index_kline(code="sh000001", days=120):
+    """返回 [{date, close, vol_yi}, ...] (成交额单位: 亿元)"""
+    try:
+        url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={code},day,,,{days},qfq"
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=12).read()
+        d = json.loads(body.decode("utf-8"))
+        inner = (d.get("data") or {}).get(code) or {}
+        arr = inner.get("qfqday") or inner.get("day") or []
+        out = []
+        for r in arr:
+            # r = [date, open, close, high, low, vol(手)]
+            out.append({
+                "date": r[0],
+                "close": float(r[2]),
+                "vol": float(r[5]) if len(r) > 5 else 0,
+            })
+        return out
+    except Exception as e:
+        print(f"[kline {code}] {e}", file=sys.stderr)
+        return []
+
+
+# ─── 盘面解读 (规则引擎, 零 LLM 依赖, 每次刷新自动更新) ──────────────────
+def build_commentary(zt_n, dt_n, zb_n, indices, zdfenbu, turnover, phase,
+                     idx_kline, margin, ths_strong):
+    """基于当日客观数据生成结构化盘面解读。
+
+    输出: {summary, breadth, volume, emotion, margin_trend, hotspots, risks[]}
+    全部由数据推导, 不编造; 数据缺失时对应字段留空并说明。
+    """
+    c = {"summary": [], "breadth": {}, "volume": {}, "emotion": {},
+         "margin_trend": {}, "hotspots": [], "risks": []}
+
+    # ---- 1. 涨跌家数 (市场宽度) ----
+    up = zdfenbu.get("up", 0)
+    down = zdfenbu.get("down", 0)
+    flat = zdfenbu.get("flat", 0)
+    tot = max(1, up + down + flat)
+    up_ratio = round(up / tot * 100, 1)
+    c["breadth"] = {"up": up, "down": down, "flat": flat,
+                     "up_ratio": up_ratio, "total": up + down + flat}
+    if up_ratio >= 60:
+        c["summary"].append(f"普涨格局, 上涨 {up} 家占比 {up_ratio}%, 赚钱效应强")
+    elif up_ratio >= 40:
+        c["summary"].append(f"涨跌互现, 上涨占比 {up_ratio}%, 结构市特征")
+    elif up_ratio >= 25:
+        c["summary"].append(f"跌多涨少, 上涨占比仅 {up_ratio}%, 亏钱效应明显")
+    else:
+        c["summary"].append(f"普跌格局, 上涨占比 {up_ratio}% ({up}/{up+down}), 系统性承压")
+
+    # ---- 2. 指数表现 ----
+    sh = next((i for i in indices if i.get("code") == "sh000001"), None)
+    sz = next((i for i in indices if i.get("code") == "sz399001"), None)
+    if sh:
+        c["summary"].append(f"上证 {sh.get('price')} ({sh.get('chg_pct'):+.2f}%)")
+    if sz:
+        c["summary"].append(f"深成 {sz.get('price')} ({sz.get('chg_pct'):+.2f}%)")
+
+    # ---- 3. 成交量与放缩量 ----
+    vols = [(k["date"], k["vol"]) for k in idx_kline if k.get("vol")]
+    if len(vols) >= 6:
+        today_vol = vols[-1][1]
+        prev_vols = [v for _, v in vols[-6:-1]]
+        avg5 = sum(prev_vols) / len(prev_vols)
+        ratio = today_vol / avg5 if avg5 else 0
+        c["volume"] = {
+            "today_vol_wan": round(today_vol / 1e4, 1),
+            "avg5_vol_wan": round(avg5 / 1e4, 1),
+            "ratio": round(ratio, 2),
+        }
+        if ratio >= 1.25:
+            c["summary"].append(f"显著放量, 为5日均量 {ratio:.2f} 倍")
+        elif ratio >= 1.08:
+            c["summary"].append(f"温和放量 (5日均量 {ratio:.2f} 倍)")
+        elif ratio >= 0.92:
+            c["summary"].append(f"量能持平 (5日均量 {ratio:.2f} 倍)")
+        elif ratio >= 0.75:
+            c["summary"].append(f"缩量 (5日均量 {ratio:.2f} 倍)")
+        else:
+            c["summary"].append(f"严重缩量, 仅为5日均量 {ratio:.2f} 倍, 观望情绪浓")
+    if turnover.get("total_yi"):
+        c["volume"]["turnover_yi"] = turnover["total_yi"]
+        c["volume"]["parts"] = turnover.get("parts", {})
+        c["summary"].append(f"沪深两市成交额 {turnover['total_yi']} 亿元")
+
+    # ---- 4. 涨跌停情绪 ----
+    seal = round(zt_n / max(1, zt_n + zb_n) * 100, 1)
+    c["emotion"] = {"zt": zt_n, "dt": dt_n, "zb": zb_n, "seal_rate": seal,
+                     "stage": phase.get("stage"), "score": phase.get("score")}
+    if zt_n >= 60 and seal >= 70:
+        c["summary"].append(f"涨停 {zt_n} 家、封板率 {seal}%, 情绪处于高位")
+    elif zt_n >= 30:
+        c["summary"].append(f"涨停 {zt_n} 家、封板率 {seal}%, 情绪中性偏暖")
+    else:
+        c["summary"].append(f"涨停仅 {zt_n} 家、封板率 {seal}%, 情绪偏冷")
+    if dt_n >= 20:
+        c["summary"].append(f"跌停 {dt_n} 家, 亏钱效应扩散")
+
+    # ---- 5. 融资融券趋势 ----
+    if len(margin) >= 3:
+        latest_m = margin[0]
+        prev_m = margin[1]
+        rz_chg = None
+        if latest_m.get("rzye") and prev_m.get("rzye"):
+            rz_chg = round((latest_m["rzye"] - prev_m["rzye"]) / prev_m["rzye"] * 100, 3)
+        c["margin_trend"] = {
+            "date": latest_m.get("date", "")[:10],
+            "rzye_yi": round((latest_m.get("rzye") or 0) / 1e8, 1),
+            "rzrqye_yi": round((latest_m.get("rzrqye") or 0) / 1e8, 1),
+            "rzye_chg_pct": rz_chg,
+        }
+        if rz_chg is not None:
+            if rz_chg > 0.2:
+                c["summary"].append(f"两融融资余额 {c['margin_trend']['rzye_yi']} 亿, 环比 +{rz_chg}%, 杠杆资金加仓")
+            elif rz_chg < -0.2:
+                c["summary"].append(f"两融融资余额 {c['margin_trend']['rzye_yi']} 亿, 环比 {rz_chg}%, 杠杆资金撤退")
+            else:
+                c["summary"].append(f"两融融资余额 {c['margin_trend']['rzye_yi']} 亿, 环比 {rz_chg}%, 基本持稳")
+
+    # ---- 6. 热点题材 (同花顺归因聚类) ----
+    theme_count = {}
+    for s in ths_strong:
+        for kw in str(s.get("reason", "")).replace("+", " ").split():
+            kw = kw.strip()
+            if len(kw) >= 2:
+                theme_count[kw] = theme_count.get(kw, 0) + 1
+    hot = sorted(theme_count.items(), key=lambda x: -x[1])[:8]
+    c["hotspots"] = [{"theme": k, "count": v} for k, v in hot if v >= 2]
+    if c["hotspots"]:
+        top3 = "、".join(f"{x['theme']}({x['count']})" for x in c["hotspots"][:3])
+        c["summary"].append(f"资金聚焦题材: {top3}")
+
+    # ---- 7. 风险提示 ----
+    if dt_n >= zt_n:
+        c["risks"].append(f"跌停({dt_n})≥涨停({zt_n}), 短期风险释放中, 注意仓位")
+    if seal < 50 and zt_n > 0:
+        c["risks"].append(f"封板率仅 {seal}%, 打板资金接力意愿弱")
+    if up_ratio < 30:
+        c["risks"].append(f"上涨占比 {up_ratio}%, 普跌环境下逆势股易补跌")
+    if phase.get("stage") in ("退潮", "冰点"):
+        c["risks"].append(f"情绪周期处于「{phase.get('stage')}」, 降低交易频率")
+
+    return c
+
 
 
 # ─── 概念板块资金流 (东财 clist, WAF 不稳定 → 自动降级) ──────────────────
@@ -339,20 +668,24 @@ def clamp01(x):
 
 
 # ─── 市场温度计 + 情绪阶段 (TSP 降级口径: 单日快照, 无 2 日确认) ──────────
-def market_phase(zt, dt, zb, yzt, indices):
+def market_phase(zt, dt, zb, yzt, indices, zt_n=None, dt_n=None, zb_n=None):
+    # 家数优先用东财 data.tc (pool 明细可能为空), 缺省退回 len(pool)
+    zt_n = zt_n if zt_n is not None else len(zt)
+    dt_n = dt_n if dt_n is not None else len(dt)
+    zb_n = zb_n if zb_n is not None else len(zb)
     max_boards = max((z["lianban"] for z in zt), default=0)
     ge2 = sum(1 for z in zt if z["lianban"] >= 2)
     first_board = sum(1 for z in zt if z["lianban"] == 1)
-    seal_rate = len(zt) / max(1, len(zt) + len(zb))
-    promo_rate = ge2 / max(1, len(yzt)) if yzt else (ge2 / max(1, len(zt)) if zt else 0.0)
+    seal_rate = zt_n / max(1, zt_n + zb_n)
+    promo_rate = ge2 / max(1, len(yzt)) if yzt else (ge2 / max(1, zt_n) if zt_n else 0.0)
     idx_pct = next((i["chg_pct"] for i in indices if i.get("code") == "sh000001"), 0.0)
 
     def _score(v, low, high):
         return clamp01((v - low) / (high - low)) * 100
 
-    spec = (_score(len(zt), 35, 97) * 0.30 + _score(seal_rate * 100, 57, 75) * 0.40
+    spec = (_score(zt_n, 35, 97) * 0.30 + _score(seal_rate * 100, 57, 75) * 0.40
             + _score(max_boards, 4, 9) * 0.30)
-    profit = _score(len(zt) - len(dt), -20, 60)
+    profit = _score(zt_n - dt_n, -20, 60)
     resilience = _score(idx_pct, -2.5, 2.5)
     score = round(0.45 * spec + 0.30 * profit + 0.25 * resilience, 1)
 
@@ -424,10 +757,27 @@ def main():
     ydate = (now - datetime.timedelta(days=1)).strftime("%Y%m%d")
 
     indices = fetch_indices()
-    zt = fetch_pool("ZT", date_str)
-    dt = fetch_pool("DT", date_str)
-    zb = fetch_pool("ZB", date_str)
-    yzt = fetch_pool("ZT", ydate)
+    _zt = fetch_pool("ZT", date_str)
+    _dt = fetch_pool("DT", date_str)
+    _zb = fetch_pool("ZB", date_str)
+    _yzt = fetch_pool("ZT", ydate)
+    # 家数以东财 data.tc 为准 (pool 明细可能为空), 详见 fetch_pool 注释
+    zt, dt, zb, yzt = _zt["pool"], _dt["pool"], _zb["pool"], _yzt["pool"]
+    zt_n, dt_n, zb_n, yzt_n = _zt["count"], _dt["count"], _zb["count"], _yzt["count"]
+
+    # 新增: 涨跌分布 / 两市成交额 / 融资融券 / 指数历史K线
+    zdfenbu = fetch_zdfenbu(date_str)
+    turnover = fetch_turnover()
+    margin = fetch_margin(30)
+    idx_kline = fetch_index_kline("sh000001", 120)
+    # 同花顺强势股(题材归因) + 东财龙虎榜/大宗交易
+    # 注意: date_str 是 YYYYMMDD (东财涨跌停池口径),
+    #       而 datacenter 接口的 filter 需要 YYYY-MM-DD
+    date_dash = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+    ths_strong = fetch_ths_strong_stocks(date_dash)
+    lhb = fetch_lhb(date_dash)
+    blocktrade = fetch_blocktrade(date_dash)
+
     concepts = fetch_concepts(150)
     news = fetch_news(args.limit)
     if len(news) < 30:
@@ -448,7 +798,7 @@ def main():
                 e["sample"].append(n["title"][:40])
     hot_themes = sorted(theme_news, key=lambda t: theme_news[t]["count"], reverse=True)[:10]
 
-    phase = market_phase(zt, dt, zb, yzt, indices)
+    phase = market_phase(zt, dt, zb, yzt, indices, zt_n=zt_n, dt_n=dt_n, zb_n=zb_n)
     mainlines = mainline_rank(concepts, hot_themes, zt)
 
     # 连板梯队
@@ -501,9 +851,17 @@ def main():
         "date": date_str,
         "market": {
             "indices": indices,
-            "limit_up": len(zt), "limit_down": len(dt), "broken": len(zb),
-            "zt_rate": round(len(zt) / max(1, len(zt) + len(zb)) * 100, 1),
-            "yesterday_zt": len(yzt),
+            # 家数以东财 data.tc 为准 (pool 明细可能为空, 详见 fetch_pool 注释)
+            "limit_up": zt_n, "limit_down": dt_n, "broken": zb_n,
+            "zt_rate": round(zt_n / max(1, zt_n + zb_n) * 100, 1),
+            "yesterday_zt": yzt_n,
+            # 涨跌分布 (东财 fenbu 口径)
+            "advance": zdfenbu.get("up", 0),
+            "decline": zdfenbu.get("down", 0),
+            "flat": zdfenbu.get("flat", 0),
+            "up_pct": zdfenbu.get("up_pct", 0),
+            # 两市成交额 (腾讯累加, 单位: 亿元)
+            "turnover": turnover,
         },
         "phase": phase,
         "themes": [
@@ -519,7 +877,22 @@ def main():
         "limit_down_pool": dt[:30],
         "picks": picks[:30],
         "news_recent": news[:60],
-        "meta": {"source": "tencent+eastmoney+sina", "algo": "tsp-signal-v3",
+        # 融资融券 (最近30日, 单位: 元)
+        "margin": margin,
+        # 上证指数历史日K (画成交量线图, 单位: 手)
+        "index_kline": idx_kline,
+        # 同花顺强势股 + 题材归因
+        "ths_strong": ths_strong[:40],
+        # 龙虎榜 / 大宗交易
+        "lhb": lhb[:20],
+        "blocktrade": blocktrade[:20],
+        # 盘面解读 (规则引擎生成, 不依赖 LLM)
+        "commentary": build_commentary(
+            zt_n=zt_n, dt_n=dt_n, zb_n=zb_n, indices=indices, zdfenbu=zdfenbu,
+            turnover=turnover, phase=phase, idx_kline=idx_kline,
+            margin=margin, ths_strong=ths_strong,
+        ),
+        "meta": {"source": "tencent+eastmoney+sina+ths", "algo": "tsp-signal-v3",
                  "zero_cred": True, "ref": "shy3130/tick-stock-panel"},
     }
 
@@ -531,7 +904,10 @@ def main():
     else:
         print(out)
     print(f"=== summary ===", file=sys.stderr)
-    print(f"indices={len(indices)} zt={len(zt)} dt={len(dt)} zb={len(zb)} yzt={len(yzt)} "
+    print(f"indices={len(indices)} zt={zt_n}(pool{len(zt)}) dt={dt_n}(pool{len(dt)}) "
+          f"zb={zb_n}(pool{len(zb)}) yzt={yzt_n} "
+          f"adv={zdfenbu.get('up',0)} dec={zdfenbu.get('down',0)} "
+          f"turnover={turnover.get('total_yi',0)}yi margin={len(margin)} kline={len(idx_kline)} "
           f"concepts={len(concepts)} news={len(news)} picks={len(picks)} rps={len(rps)} fundrank={len(fund_rank)} "
           f"phase={phase['stage']}({phase['score']})", file=sys.stderr)
 

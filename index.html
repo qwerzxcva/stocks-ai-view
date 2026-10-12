@@ -195,9 +195,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="c-tabs" id="cTabs">
       <button class="c-tab active" data-c="0">AI 推荐</button>
       <button class="c-tab" data-c="1">多池选股</button>
-      <button class="c-tab" data-c="2">热点推演</button>
-      <button class="c-tab" data-c="3">基金排行</button>
-      <button class="c-tab" data-c="4">腾讯数据</button>
+      <button class="c-tab" data-c="2">盘面解读</button>
+      <button class="c-tab" data-c="3">热点推演</button>
+      <button class="c-tab" data-c="4">基金排行</button>
+      <button class="c-tab" data-c="5">腾讯数据</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">未涨停 · 五因子评分 · 实时现价</span></div>
@@ -215,6 +216,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <button class="pool-tab" data-tab="tabLow">低位池</button>
         <button class="pool-tab" data-tab="tabHot">热点推演</button>
         <button class="pool-tab" data-tab="tabMulti">综合</button>
+        <button class="pool-tab" data-tab="tabStrong">强势股</button>
+        <button class="pool-tab" data-tab="tabLhb">龙虎榜</button>
+        <button class="pool-tab" data-tab="tabBlock">大宗交易</button>
       </div>
       <div class="pool-panel active" id="tabBan">
         <div class="pool-kpi" id="banKpis"></div>
@@ -240,19 +244,37 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <div class="pool-kpi" id="multiKpis"></div>
         <div id="multiBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
+      <div class="pool-panel" id="tabStrong">
+        <div class="pool-kpi" id="strongKpis"></div>
+        <div id="strongBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
+      </div>
+      <div class="pool-panel" id="tabLhb">
+        <div class="pool-kpi" id="lhbKpis"></div>
+        <div id="lhbBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
+      </div>
+      <div class="pool-panel" id="tabBlock">
+        <div class="pool-kpi" id="blockKpis"></div>
+        <div id="blockBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
+      </div>
     </div>
     <div class="card c-card" data-ci="2">
-      <div class="hd">热点 → 股票走势推演 <span class="sub">动量延续 / 追高警惕 / 超跌修复 / 横盘蓄势</span></div>
-      <div id="hotImpact" style="padding:0;overflow-y:auto;max-height:280px"><div class="fl" style="padding:12px;text-align:center">加载中…</div></div>
+      <div class="hd">盘面解读 <span class="sub" id="cmtSub">规则引擎 · 数据驱动</span></div>
+      <div id="commentary" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
+      <div class="hd" style="border-top:1px solid var(--border)">两市成交量 <span class="sub">上证指数近60日 · 虚线为5日均量</span></div>
+      <div style="padding:6px 12px 10px" id="volChart"><div class="fl" style="text-align:center">加载中…</div></div>
     </div>
-    <div class="card c-card" data-ci="3">
+    <div class="card c-card" data-ci="3" style="display:none">
+      <div class="hd">热点 → 股票走势推演 <span class="sub">动量延续 / 追高警惕 / 超跌修复 / 横盘蓄势</span></div>
+      <div id="hotImpact" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="padding:12px;text-align:center">加载中…</div></div>
+    </div>
+    <div class="card c-card" data-ci="4" style="display:none">
       <div class="hd">东财混合基金排行 (近1年收益) <span class="sub">KOL 抱团方向代理指标</span></div>
       <div style="padding:0;overflow-y:auto;max-height:180px">
       <table><thead><tr><th>代码</th><th>名称</th><th>净值</th><th>日涨跌</th><th>1月</th><th>3月</th><th>6月</th><th>1年</th></tr></thead>
       <tbody id="fundBody"></tbody></table>
       </div>
     </div>
-    <div class="card c-card" data-ci="4" style="display:none">
+    <div class="card c-card" data-ci="5" style="display:none">
       <div class="hd">腾讯自选股数据 <span class="sub">行业资金 · 筹码 · 技术指标 · 日历</span></div>
       <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)" id="txBody"></div>
     </div>
@@ -457,6 +479,132 @@ function renderHotImpactData(d){
     </tr>`).join('')}
     </tbody></table></div>`).join('');
 }
+
+// ─── 盘面解读 (commentary) ───────────────────────────────────────────
+function renderCommentary(c){
+  var box=document.getElementById('commentary');
+  if(!c||!c.summary||!c.summary.length){box.innerHTML='<div class="no-data">暂无解读数据</div>';return}
+  var b=c.breadth||{},v=c.volume||{},e=c.emotion||{},m=c.margin_trend||{};
+  var upW=b.up_ratio||0,dnW=100-upW;
+  var h='';
+  // 1. 摘要
+  h+='<div style="font-size:11px;line-height:1.7;color:var(--tx)">';
+  for(var i=0;i<c.summary.length;i++){h+='<div style="margin-bottom:2px">▸ '+c.summary[i]+'</div>'}
+  h+='</div>';
+  // 2. 市场宽度条
+  h+='<div style="margin:8px 0"><div style="display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--panel2)">';
+  h+='<div style="width:'+upW+'%;background:var(--up)" title="上涨 '+(b.up||0)+'"></div>';
+  h+='<div style="width:'+dnW+'%;background:var(--dn)" title="下跌 '+(b.down||0)+'"></div>';
+  h+='</div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);margin-top:3px">';
+  h+='<span class="up">涨 '+(b.up||0)+'</span><span>平 '+(b.flat||0)+'</span><span class="dn">跌 '+(b.down||0)+'</span></div></div>';
+  // 3. 关键指标
+  var kpi=[['涨跌停',(e.zt||0)+' / '+(e.dt||0)],['封板率',(e.seal_rate||0)+'%'],
+           ['成交额',(v.turnover_yi||0)+'亿'],['量比5日',v.ratio?v.ratio+'x':'—'],
+           ['两融余额',(m.rzye_yi||0)+'亿'],
+           ['两融环比',m.rzye_chg_pct!=null?(m.rzye_chg_pct>0?'+':'')+m.rzye_chg_pct+'%':'—']];
+  h+='<div class="minis" style="grid-template-columns:repeat(6,1fr)">';
+  for(var j=0;j<kpi.length;j++){
+    h+='<div class="mi"><div class="v" style="font-size:12px">'+kpi[j][1]+'</div><div class="n">'+kpi[j][0]+'</div></div>';
+  }
+  h+='</div>';
+  // 4. 热点题材
+  if(c.hotspots&&c.hotspots.length){
+    h+='<div style="margin:8px 0 4px;font-size:10px;color:var(--tx3)">资金聚焦题材</div><div class="chips">';
+    for(var k=0;k<c.hotspots.length;k++){
+      h+='<span class="chip">'+c.hotspots[k].theme+' <b>'+c.hotspots[k].count+'</b></span>';
+    }
+    h+='</div>';
+  }
+  // 5. 风险提示
+  if(c.risks&&c.risks.length){
+    h+='<div style="margin-top:8px;padding:6px 8px;background:rgba(248,81,73,.08);border-left:2px solid var(--up);border-radius:4px;font-size:10px;color:var(--up)">';
+    for(var r=0;r<c.risks.length;r++){h+='<div>⚠ '+c.risks[r]+'</div>'}
+    h+='</div>';
+  }
+  box.innerHTML=h;
+  var sub=document.getElementById('cmtSub');
+  if(sub)sub.textContent=(e.stage||'—')+' · 评分 '+(e.score!=null?e.score:'—');
+}
+
+// ─── 同花顺强势股 ───────────────────────────────────────────────────
+function renderThsStrong(list){
+  const k=document.getElementById('strongKpis'),b=document.getElementById('strongBody');
+  if(!list||!list.length){b.innerHTML='<div class="no-data">暂无强势股数据 (同花顺源)</div>';return}
+  k.innerHTML=[
+    `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">强势股数</div></div>`,
+    `<div class="pool-kpi-item"><div class="v">${new Set(list.map(s=>s.reason.split('+')[0])).size}</div><div class="n">题材数</div></div>`,
+  ].join('');
+  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>题材归因</th></tr></thead><tbody>'+
+    list.map(s=>`<tr><td>${s.code}</td><td>${s.name}</td>
+      <td class="fl" style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${s.reason}">${s.reason}</td></tr>`).join('')+
+    '</tbody></table>';
+}
+
+// ─── 龙虎榜 ────────────────────────────────────────────────────────
+function renderLhb(list){
+  const k=document.getElementById('lhbKpis'),b=document.getElementById('lhbBody');
+  if(!list||!list.length){b.innerHTML='<div class="no-data">今日暂无龙虎榜数据</div>';return}
+  const totalAmt=list.reduce((s,x)=>s+(x.deal_amt||0),0);
+  k.innerHTML=[
+    `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">上榜条数</div></div>`,
+    `<div class="pool-kpi-item"><div class="v">${(totalAmt/1e8).toFixed(1)}亿</div><div class="n">龙虎榜成交</div></div>`,
+  ].join('');
+  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>收盘</th><th>涨跌</th><th>龙虎榜成交</th><th>席位解读</th></tr></thead><tbody>'+
+    list.map(x=>`<tr>
+      <td>${x.code}</td><td>${(x.name||'').slice(0,6)}</td>
+      <td>${fmt(x.close)}</td>
+      <td class="${x.chg>=0?'up':'dn'}">${sign(x.chg)}%</td>
+      <td>${x.deal_amt?(x.deal_amt/1e8).toFixed(2)+'亿':'—'}</td>
+      <td class="fl" style="max-width:180px;font-size:10px">${x.expl||'—'}</td></tr>`).join('')+
+    '</tbody></table>';
+}
+
+// ─── 大宗交易 ──────────────────────────────────────────────────────
+function renderBlocktrade(list){
+  const k=document.getElementById('blockKpis'),b=document.getElementById('blockBody');
+  if(!list||!list.length){b.innerHTML='<div class="no-data">今日暂无大宗交易</div>';return}
+  const totalAmt=list.reduce((s,x)=>s+(x.amt||0),0);
+  const disc=list.filter(x=>x.premium<0).length;
+  k.innerHTML=[
+    `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">笔数</div></div>`,
+    `<div class="pool-kpi-item"><div class="v">${(totalAmt/1e8).toFixed(2)}亿</div><div class="n">成交额</div></div>`,
+    `<div class="pool-kpi-item"><div class="v dn">${disc}</div><div class="n">折价成交</div></div>`,
+  ].join('');
+  b.innerHTML='<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>成交价</th><th>溢价率</th><th>成交额</th></tr></thead><tbody>'+
+    list.map(x=>`<tr>
+      <td>${x.code}</td><td>${(x.name||'').slice(0,6)}</td>
+      <td>${fmt(x.price)}</td>
+      <td class="${x.premium>=0?'up':'dn'}">${x.premium!=null?(x.premium*100).toFixed(2)+'%':'—'}</td>
+      <td>${x.amt?(x.amt/1e8).toFixed(2)+'亿':'—'}</td></tr>`).join('')+
+    '</tbody></table>';
+}
+
+// ─── 成交量历史线图 (纯 SVG, 零依赖) ─────────────────────────────────
+function renderVolChart(kline){
+  const box=document.getElementById('volChart');
+  if(!box)return;
+  if(!kline||kline.length<10){box.innerHTML='<div class="no-data">K线数据不足</div>';return}
+  const W=300,H=90,P=2;
+  const data=kline.slice(-60);
+  const maxV=Math.max(...data.map(d=>d.vol));
+  const bw=W/data.length;
+  const bars=data.map((d,i)=>{
+    const h=Math.max(1,(d.vol/maxV)*(H-2*P));
+    const x=i*bw,y=H-P-h;
+    const up=i>0&&d.close>=data[i-1].close;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(0.6,bw-0.6).toFixed(1)}" height="${h.toFixed(1)}" fill="${up?'var(--up)':'var(--dn)'}" opacity="0.85"/>`;
+  }).join('');
+  const avg5=data.slice(-5).reduce((s,d)=>s+d.vol,0)/Math.min(5,data.length);
+  const avgY=H-P-(avg5/maxV)*(H-2*P);
+  const last=data[data.length-1];
+  box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:90px;display:block">${bars}
+    <line x1="0" y1="${avgY.toFixed(1)}" x2="${W}" y2="${avgY.toFixed(1)}" stroke="var(--amber)" stroke-width="0.8" stroke-dasharray="3 2"/>
+    </svg>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--tx3);margin-top:2px">
+      <span>${data[0].date.slice(5)}</span>
+      <span class="amber" style="color:var(--amber)">5日均量线</span>
+      <span>${last.date.slice(5)}</span></div>`;
+}
 function renderTicker(d){
   const items=[];
   (d.limit_up_pool||[]).slice(0,8).forEach(z=>items.push(z.name+'('+z.code+') '+z.chg_pct+'%'));
@@ -651,7 +799,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   document.querySelectorAll('.c-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
-  if(b.dataset.c==='4' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
+  if(b.dataset.c==='5' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -659,7 +807,7 @@ document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 async function render(){
   // 并行拉取, 消除串行 waterfall (原来先 latest 再 hot_impact 再 pools)
   const [d,hi]=await fetchAll(['data/latest.json','data/hot_impact.json']);
-  window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="4"].active')) renderTencent(d);
+  window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="5"].active')) renderTencent(d);
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
   const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
   document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
@@ -678,6 +826,11 @@ async function render(){
   renderSummary(d.summary);
   renderTicker(d);
   if(hi)renderHotImpactData(hi);
+  if(d.commentary)renderCommentary(d.commentary);
+  renderThsStrong(d.ths_strong);
+  renderLhb(d.lhb);
+  renderBlocktrade(d.blocktrade);
+  renderVolChart(d.index_kline);
   renderPools(d);
   _failCount=0;
 }
