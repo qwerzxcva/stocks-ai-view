@@ -1,0 +1,50 @@
+# 实时轮询 — 交易时段每 5 分钟拉一次最新数据
+# 交易日 09:30~11:30 / 13:00~15:00 CST，每 5 分钟
+name: realtime-poll
+on:
+  schedule:
+    - cron: '*/5 1,2,3,4,5,6,7,8 * * 1-5'  # UTC 01:00~08:55 = CST 09:00~16:55
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: qwerzxcva/stocks-tools
+          path: tools-repo
+      - uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-live
+          path: data-repo
+      - uses: actions/checkout@v4
+        with:
+          path: .
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run fetch all sources
+        run: |
+          cd tools-repo
+          python3 tools/fetch_all_sources_v2.py "${DATE:-$(date +%Y-%m-%d)}" 2>&1
+          cd ..
+          python3 scripts/export_pools.py
+        env:
+          DATE: ""
+      - name: Commit & push data
+        run: |
+          cd data-repo
+          git config user.name "stocks-bot-realtime"
+          git config user.email "41888888888+stocks-bot@users.noreply.github.com"
+          git add -A
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet HEAD && echo "no changes" || {
+            git commit -m "poll: $ts (realtime snapshot)" && \
+            git -c http.version=HTTP/1.1 push origin main
+          }
