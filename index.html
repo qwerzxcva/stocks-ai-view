@@ -613,7 +613,15 @@ function renderThsStrong(list, meta){
   const k=document.getElementById('strongKpis'),b=document.getElementById('strongBody');
   if(!list||!list.length){b.innerHTML='<div class="no-data">暂无强势股数据 (同花顺源)</div>';return}
   const hasPrice=list.some(s=>s.price!=null);
-  const ztCount=list.filter(s=>s.in_zt).length;
+  // 同花顺源不提供 in_zt, 用涨幅近似判断 (主板≥9.9%, 创业板/科创≥19.9%)
+  const isZt=s=>{
+    if(s.in_zt)return true;
+    const c=String(s.code||'');
+    const chg=s.chg_pct||0;
+    if(c.startsWith('30')||c.startsWith('688'))return chg>=19.8;
+    return chg>=9.8;
+  };
+  const ztCount=list.filter(isZt).length;
   k.innerHTML=[
     `<div class="pool-kpi-item"><div class="v up">${list.length}</div><div class="n">强势股数</div></div>`,
     `<div class="pool-kpi-item"><div class="v up">${ztCount}</div><div class="n">其中涨停</div></div>`,
@@ -626,7 +634,7 @@ function renderThsStrong(list, meta){
     list.map(s=>{
       if(!hasPrice)return `<tr><td>${s.code}</td><td>${s.name}</td><td class="fl" title="${s.reason}">${s.reason}</td></tr>`;
       const sc=s.score>=70?'var(--up)':s.score>=50?'var(--amber)':'var(--tx2)';
-      return `<tr><td>${s.code}</td><td>${s.name}${s.in_zt?' <span class="bdg up">涨停</span>':''}</td>
+      return `<tr><td>${s.code}</td><td>${s.name}${isZt(s)?' <span class="bdg up">涨停</span>':''}</td>
         <td>${(s.price??0).toFixed(2)}</td>
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
         <td class="fl">${(s.turnover||0).toFixed(2)}</td>
