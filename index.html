@@ -153,6 +153,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span class="b" id="algoBadge">tsp-signal-v4</span>
   <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">⏳ 加载中…</span>
+  <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
+  <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
 <div class="main">
@@ -576,6 +578,14 @@ async function render(){
   renderHotImpact();
   renderPools(d);
 }
+async function renderTunnel(){
+  const t = await fetchJSON('data/tunnel.json');
+  const a = document.getElementById('rtLink'), d = document.getElementById('rtDown');
+  if(t && t.ok && t.url){ a.style.display=''; a.href=t.url; d.style.display='none'; }
+  else { a.style.display='none'; d.style.display=''; }
+}
+renderTunnel();
+setInterval(renderTunnel, 300000);
 render();
 setInterval(render,90000);
 
