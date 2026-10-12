@@ -65,11 +65,15 @@ def batch_fetch(codes, batch_size=60):
                         price = float(payload[3] or 0)
                         prev_close = float(payload[4] or 0)
                         chg_pct = float(payload[32]) if len(payload) > 32 else 0
+                        # 实测映射 (茅台/比亚迪/平安银行交叉验证): p[38]换手 p[39]PE p[44]总市值亿 p[45]流通市值亿 p[46]PB
                         turnover = float(payload[38]) if len(payload) > 38 else 0
-                        vol_ratio = float(payload[46]) if len(payload) > 46 else 1.0
-                        # mktcap field index varies; use field 45 (total market cap in 亿元)
-                        mktcap_yi = float(payload[45]) if len(payload) > 45 else 0
-                        mktcap = mktcap_yi * 1e8
+                        pe = float(payload[39]) if len(payload) > 39 else 0
+                        mktcap_yi = float(payload[44]) if len(payload) > 44 else 0
+                        mktcap = mktcap_yi * 1e8  # 亿元→元
+                        floatcap_yi = float(payload[45]) if len(payload) > 45 else 0
+                        floatcap = floatcap_yi * 1e8
+                        pb = float(payload[46]) if len(payload) > 46 else 0
+                        vol_ratio = 1.0  # 量比无独立字段, 默认 1.0 (避免 v5 软惩罚误杀)
                         name = payload[1]
                         records[code] = {
                             "name": name,
@@ -78,6 +82,9 @@ def batch_fetch(codes, batch_size=60):
                             "turnover": turnover,
                             "vol_ratio": vol_ratio,
                             "mktcap": mktcap,
+                            "floatcap": floatcap,
+                            "pe": pe,
+                            "pb": pb,
                         }
                     except (ValueError, IndexError):
                         continue
@@ -106,20 +113,20 @@ def write_snapshot(date_str, records):
             f.write("|".join([
                 bare,
                 r["name"],
-                str(r["price"]),
-                str(r["chg_pct"]),
-                "0",      # amount
-                str(r["turnover"]),
-                "0",      # PE
-                str(r["vol_ratio"]),
-                str(r["mktcap"]),
-                "0",      # floatcap
-                "0",      # PB
-                "0",      # main_net
-                "0",      # main_ratio
-                "0",      # superlarge
-                "0",      # super_ratio
-                "",       # industry
+                str(round(r["price"], 2)),
+                str(round(r["chg_pct"], 2)),
+                "0",              # amount
+                str(round(r["turnover"], 2)),
+                str(round(r.get("pe", 0), 2)),   # PE
+                str(round(r["vol_ratio"], 2)),
+                str(round(r["mktcap"], 0)),      # mktcap (元)
+                "0",              # floatcap
+                str(round(r.get("pb", 0), 2)),   # PB
+                "0",              # main_net
+                "0",              # main_ratio
+                "0",              # superlarge
+                "0",              # super_ratio
+                "",               # industry
             ]) + "\n")
     print(f"[refresh] wrote {len(records)} stocks -> {out_path}")
     return out_path
