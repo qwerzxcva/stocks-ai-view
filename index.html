@@ -95,7 +95,7 @@ tr:hover td{background:rgba(137,87,229,.04)}
 .pool-tabs{display:flex;gap:2px;padding:6px 12px 0;background:var(--panel);border-bottom:1px solid var(--border)}
 .pool-tab{background:transparent;border:none;color:var(--tx3);font-size:10px;padding:4px 10px;border-radius:6px 6px 0 0;cursor:pointer;font-weight:600;letter-spacing:.3px}
 .pool-tab.active{color:var(--accent);background:var(--panel2);border-bottom:2px solid var(--accent)}
-.pool-panel{display:none;padding:0;overflow-y:auto;max-height:calc(100vh - 340px)}
+.pool-panel{display:none;padding:0;overflow-y:auto;max-height:calc(100vh - 300px)}
 .pool-panel.active{display:block}
 .pool-table{width:100%;border-collapse:collapse}
 .pool-table th{color:var(--tx2);font-size:9px;text-align:left;padding:4px 8px;background:var(--panel2);font-weight:600;position:sticky;top:0;z-index:1}
@@ -125,6 +125,26 @@ tr:hover td{background:rgba(137,87,229,.04)}
 
 /* ─── footer ─── */
 .ftr{height:22px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--tx3);flex-shrink:0;gap:12px}
+
+/* ─── v5 layout polish ─── */
+.c-tabs{display:flex;gap:0;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.c-tab{background:transparent;border:none;color:var(--tx3);font-size:11px;padding:8px 13px;cursor:pointer;font-weight:700;border-bottom:2px solid transparent;letter-spacing:.3px}
+.c-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.c-col .card{display:none}
+.c-col .card.on{display:block}
+.c-col .card .hd{display:none}
+.c-col .card.on{animation:fadein .18s ease}
+@keyframes fadein{from{opacity:.4}to{opacity:1}}
+.n-title{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.45;overflow:hidden}
+td:nth-child(n+3),th:nth-child(n+3){text-align:right}
+.tier{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:1100px){
+  html,body{overflow:auto}
+  .main{display:block;overflow:visible}
+  .col{overflow:visible;max-height:none!important;border-right:none;border-bottom:1px solid var(--border)}
+  .c-tabs{display:flex;flex-wrap:wrap}
+}
+@media (max-height:700px){.ftr{height:20px;font-size:8px}.kpis{height:46px}}
 </style>
 </head>
 <body style="display:flex;flex-direction:column">
@@ -160,16 +180,22 @@ tr:hover td{background:rgba(137,87,229,.04)}
       <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th></tr></thead><tbody id="ztBody"></tbody></table></div>
     </div>
   </div>
-  <!-- CENTER: 推荐标的 + 热点推演 -->
-  <div class="col">
-    <div class="card">
+  <!-- CENTER: tab 化面板 -->
+  <div class="col c-col">
+    <div class="c-tabs" id="cTabs">
+      <button class="c-tab active" data-c="0">AI 推荐</button>
+      <button class="c-tab" data-c="1">多池选股</button>
+      <button class="c-tab" data-c="2">热点推演</button>
+      <button class="c-tab" data-c="3">基金排行</button>
+    </div>
+    <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">未涨停 · 五因子评分 · 实时现价</span></div>
-      <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 260px)">
+      <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)">
       <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>首封</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>综合分</th></tr></thead>
       <tbody id="pickBody"></tbody></table>
       </div>
     </div>
-    <div class="card">
+    <div class="card c-card" data-ci="1">
       <div class="hd">多池选股系统 <span class="sub">周期 · 板块 · 低位 · 热点推演 · 综合</span></div>
       <div class="pool-tabs" id="poolTabs">
         <button class="pool-tab active" data-tab="tabBan">打板池</button>
@@ -181,34 +207,34 @@ tr:hover td{background:rgba(137,87,229,.04)}
       </div>
       <div class="pool-panel active" id="tabBan">
         <div class="pool-kpi" id="banKpis"></div>
-        <div id="banBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="banBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
       <div class="pool-panel" id="tabCycle">
         <div class="pool-kpi" id="cycleKpis"></div>
-        <div id="cycleBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="cycleBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
       <div class="pool-panel" id="tabSector">
         <div class="pool-kpi" id="sectorKpis"></div>
-        <div id="sectorBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="sectorBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
       <div class="pool-panel" id="tabLow">
         <div class="pool-kpi" id="lowKpis"></div>
-        <div id="lowBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="lowBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
       <div class="pool-panel" id="tabHot">
         <div class="pool-kpi" id="hotKpis"></div>
-        <div id="hotBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="hotBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
       <div class="pool-panel" id="tabMulti">
         <div class="pool-kpi" id="multiKpis"></div>
-        <div id="multiBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 380px)"><div class="no-data">加载中…</div></div>
+        <div id="multiBody" style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="no-data">加载中…</div></div>
       </div>
     </div>
-    <div class="card">
+    <div class="card c-card" data-ci="2">
       <div class="hd">热点 → 股票走势推演 <span class="sub">动量延续 / 追高警惕 / 超跌修复 / 横盘蓄势</span></div>
       <div id="hotImpact" style="padding:0;overflow-y:auto;max-height:280px"><div class="fl" style="padding:12px;text-align:center">加载中…</div></div>
     </div>
-    <div class="card">
+    <div class="card c-card" data-ci="3">
       <div class="hd">东财混合基金排行 (近1年收益) <span class="sub">KOL 抱团方向代理指标</span></div>
       <div style="padding:0;overflow-y:auto;max-height:180px">
       <table><thead><tr><th>代码</th><th>名称</th><th>净值</th><th>日涨跌</th><th>1月</th><th>3月</th><th>6月</th><th>1年</th></tr></thead>
@@ -224,7 +250,7 @@ tr:hover td{background:rgba(137,87,229,.04)}
     </div>
     <div class="card">
       <div class="hd">24h 热点资讯流 <span class="sub" id="newsCount"></span></div>
-      <div class="bd news-list" id="newsFull" style="padding:4px 12px;max-height:calc(100vh - 340px);overflow-y:auto"></div>
+      <div class="bd news-list" id="newsFull" style="padding:4px 12px;max-height:calc(100vh - 300px);overflow-y:auto"></div>
     </div>
     <div class="card">
       <div class="hd">每日总结 <span class="sub" id="sumTs"></span></div>
@@ -519,6 +545,16 @@ async function renderPools(d){
     document.getElementById('multiBody').innerHTML='<div class="no-data">暂无综合扫描候选</div>';
   } else { document.getElementById('multiBody').innerHTML='<div class="no-data">暂无综合扫描数据</div>'; }
 }
+
+/* ─── Center tabs ─── */
+document.getElementById('cTabs').addEventListener('click', e=>{
+  const b = e.target.closest('.c-tab'); if(!b) return;
+  document.querySelectorAll('.c-tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
+});
+// 默认显示第一张卡
+document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 
 async function render(){
   const d=await fetchJSON('data/latest.json');
