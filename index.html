@@ -194,6 +194,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="1">多池选股</button>
       <button class="c-tab" data-c="2">热点推演</button>
       <button class="c-tab" data-c="3">基金排行</button>
+      <button class="c-tab" data-c="4">腾讯数据</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">未涨停 · 五因子评分 · 实时现价</span></div>
@@ -247,6 +248,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <table><thead><tr><th>代码</th><th>名称</th><th>净值</th><th>日涨跌</th><th>1月</th><th>3月</th><th>6月</th><th>1年</th></tr></thead>
       <tbody id="fundBody"></tbody></table>
       </div>
+    </div>
+    <div class="card c-card" data-ci="4" style="display:none">
+      <div class="hd">腾讯自选股数据 <span class="sub">行业资金 · 筹码 · 技术指标 · 日历</span></div>
+      <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)" id="txBody"></div>
     </div>
   </div>
   <!-- RIGHT: 主题 + 24h资讯流 -->
@@ -575,12 +580,35 @@ async function renderPools(d){
   } else { document.getElementById('multiBody').innerHTML='<div class="no-data">暂无综合扫描数据</div>'; }
 }
 
+/* ─── Tencent (westock) tab ─── */
+let txRendered = false;
+function renderTencent(d){
+  const w = d.westock || {}; const el = document.getElementById('txBody');
+  if(!el) return; let h = '';
+  const esc = s => String(s==null?'-':s);
+  const sr = w.sector_ranking && w.sector_ranking.data || [];
+  if(sr.length){
+    h += '<div style="padding:8px 12px"><b style="font-size:13px">🏆 行业资金排行 Top'+sr.length+'</b></div>';
+    h += '<table><thead><tr><th>行业</th><th>涨跌%</th><th>主力净流入(万)</th><th>5日(万)</th><th>领涨股</th></tr></thead><tbody>' +
+      sr.map(x=>'<tr><td>'+esc(x.name)+'</td><td style="color:'+(parseFloat(x.changePct)>0?'#e06c5a':'#4caf7d')+'">'+esc(x.changePct)+'</td><td>'+esc(x.mainNetInflow)+'</td><td>'+esc(x.mainNetInflow5d)+'</td><td>'+esc(x.leader)+'</td></tr>').join('') + '</tbody></table>';
+  }
+  const cp = w.chip && w.chip.data || [];
+  if(cp.length){
+    const ck = Object.keys(cp[0]);
+    h += '<div style="padding:8px 12px"><b style="font-size:13px">📊 关注池筹码（腾讯）</b></div><table><thead><tr>'+ck.map(k=>'<th>'+k+'</th>').join('')+'</tr></thead><tbody>' +
+      cp.map(x=>'<tr>'+ck.map(k=>'<td>'+esc(x[k])+'</td>').join('')+'</tr>').join('') + '</tbody></table>';
+  }
+  const cal = w.calendar && w.calendar.data || {};
+  if(cal['财报']) h += '<div style="padding:8px 12px"><b style="font-size:13px">📅 财报日历</b><p style="font-size:12px">'+cal['财报'].slice(0,12).map(x=>esc(x[0])+' '+esc(x[2])).join(' · ')+'</p></div>';
+  el.innerHTML = h || '<div class="no-data">暂无腾讯数据</div>';
+}
 /* ─── Center tabs ─── */
 document.getElementById('cTabs').addEventListener('click', e=>{
   const b = e.target.closest('.c-tab'); if(!b) return;
   document.querySelectorAll('.c-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
+  if(b.dataset.c==='4' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -588,6 +616,7 @@ document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 async function render(){
   // 并行拉取, 消除串行 waterfall (原来先 latest 再 hot_impact 再 pools)
   const [d,hi]=await fetchAll(['data/latest.json','data/hot_impact.json']);
+  window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="4"].active')) renderTencent(d);
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
   const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
   document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
