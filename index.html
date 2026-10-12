@@ -623,6 +623,7 @@ async function render(){
   document.getElementById('algoBadge').textContent=(d.meta||{}).algo||'tsp';
   renderKpis(d.market);
   renderPhase(d.phase);
+  renderCycleV2(d.cycle_v2);
   renderLadder(d.ladder);
   renderMainlines(d.mainlines);
   renderThemes(d.themes,document.getElementById('themes'),'themesCount');
