@@ -102,6 +102,25 @@ def main():
         if isinstance(d.get(key), list):
             d[key] = slim(d[key], keep)
 
+    # 新增数据块的字段裁剪 (与 renderTencent/renderVolChart 等前端渲染核对)
+    if isinstance(d.get("index_kline"), list):
+        d["index_kline"] = slim(d["index_kline"], ["date", "close", "vol"])
+    if isinstance(d.get("margin"), list):
+        d["margin"] = slim(d["margin"], ["date", "rzye", "rqye", "rzrqye", "rzmre", "rzche"])
+    if isinstance(d.get("lhb"), list):
+        d["lhb"] = slim(d["lhb"], ["code", "name", "close", "chg", "deal_amt", "expl"])
+    if isinstance(d.get("blocktrade"), list):
+        d["blocktrade"] = slim(d["blocktrade"], ["code", "name", "price", "premium", "vol", "amt"])
+    if isinstance(d.get("ths_strong"), list):
+        d["ths_strong"] = slim(d["ths_strong"], ["code", "name", "reason"])
+    ws = d.get("westock")
+    if isinstance(ws, dict) and isinstance(ws.get("sector_ranking"), dict):
+        sr = ws["sector_ranking"].get("data")
+        if isinstance(sr, list):
+            ws["sector_ranking"]["data"] = slim(
+                sr, ["name", "code", "changePct", "chg5d", "chg20d",
+                     "leader", "leaderPct", "mainNetInflow", "mainNetInflow5d"])
+
     after = len(json.dumps(d, ensure_ascii=False))
     with open(SRC, "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))

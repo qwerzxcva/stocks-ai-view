@@ -394,6 +394,49 @@ def fetch_index_kline(code="sh000001", days=120):
         return []
 
 
+# ─── 腾讯自选股: 行业板块排行 (零鉴权, 东财被封时的替代源) ───────────
+def fetch_tx_sector_ranking(limit=20):
+    """腾讯行业板块涨幅/区间涨幅排行。
+    返回 [{name, code, changePct, chg5d, chg20d, leader, leaderPct}]
+    注: 该接口不含主力净流入字段, mainNetInflow 置 null (前端有兜底)
+    """
+    url = ("https://proxy.finance.qq.com/ifzqgtimg/appstock/app/mktHs/rank"
+           f"?l={limit}&p=1&t=01/averatio")
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        d = json.loads(body.decode("utf-8"))
+        rows = d.get("data") or []
+        out = []
+        for r in rows:
+            name = str(r.get("bd_name", "") or "").strip()
+            if not name:
+                continue
+            out.append({
+                "name": name,
+                "code": str(r.get("bd_code", "") or ""),
+                "changePct": _f(r.get("bd_zdf")),
+                "chg5d": _f(r.get("bd_zdf5")),
+                "chg20d": _f(r.get("bd_zdf20")),
+                "leader": str(r.get("nzg_name", "") or ""),
+                "leaderPct": _f(r.get("nzg_zdf")),
+                "mainNetInflow": None,   # 该源无此字段
+                "mainNetInflow5d": None,
+            })
+        print(f"[tx-rank] {len(out)} sectors", flush=True)
+        return out
+    except Exception as e:
+        print(f"[tx-rank] {e}", file=sys.stderr)
+        return []
+
+
+def _f(v):
+    """安全转 float, 失败返回 None。"""
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 # ─── 盘面解读 (规则引擎, 零 LLM 依赖, 每次刷新自动更新) ──────────────────
 def build_commentary(zt_n, dt_n, zb_n, indices, zdfenbu, turnover, phase,
                      idx_kline, margin, ths_strong):
@@ -777,6 +820,8 @@ def main():
     ths_strong = fetch_ths_strong_stocks(date_dash)
     lhb = fetch_lhb(date_dash)
     blocktrade = fetch_blocktrade(date_dash)
+    # 腾讯自选股行业排行 (东财被封时的替代源, 前端 txBody tab 消费)
+    tx_sector_ranking = fetch_tx_sector_ranking(20)
 
     concepts = fetch_concepts(150)
     news = fetch_news(args.limit)
@@ -883,6 +928,10 @@ def main():
         "index_kline": idx_kline,
         # 同花顺强势股 + 题材归因
         "ths_strong": ths_strong[:40],
+        # 腾讯自选股行业板块排行 (前端 txBody tab)
+        "westock": {
+            "sector_ranking": {"date": date_str, "data": tx_sector_ranking},
+        },
         # 龙虎榜 / 大宗交易
         "lhb": lhb[:20],
         "blocktrade": blocktrade[:20],
@@ -908,6 +957,7 @@ def main():
           f"zb={zb_n}(pool{len(zb)}) yzt={yzt_n} "
           f"adv={zdfenbu.get('up',0)} dec={zdfenbu.get('down',0)} "
           f"turnover={turnover.get('total_yi',0)}yi margin={len(margin)} kline={len(idx_kline)} "
+          f"ths={len(ths_strong)} lhb={len(lhb)} bt={len(blocktrade)} txrank={len(tx_sector_ranking)} "
           f"concepts={len(concepts)} news={len(news)} picks={len(picks)} rps={len(rps)} fundrank={len(fund_rank)} "
           f"phase={phase['stage']}({phase['score']})", file=sys.stderr)
 
