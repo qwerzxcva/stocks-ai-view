@@ -74,12 +74,6 @@ jobs:
           open(f"review/{__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}.md","w").write(md)
           print("llm review done", flush=True)
           PYEOF
-      - name: Pull latest (avoid push race)
-        run: |
-          git config user.name "sync-bot"
-          git config user.email "741059079@qq.com"
-          git pull --rebase origin main || echo "pull skipped"
-
       - name: Commit & push
         run: |
           git config user.name "ai-bot"
