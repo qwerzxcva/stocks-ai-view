@@ -35,6 +35,14 @@ jobs:
           git fetch origin main
           git merge --ff-only origin/main || echo "already up to date"
 
+      # ── 保活: curl Space /health (防 30 分钟休眠, 实现 24h 不间断) ──
+      - name: Keep-alive Space
+        continue-on-error: true
+        run: |
+          echo "curl GitCode Space 保活"
+          curl -sf --max-time 15 "https://gitcode.com/jiegengxiangjianxue/stocks-ai-space" >/dev/null 2>&1 ||
+            echo "Space 地址待启动后确认"
+
       # ── 从 GitCode 组织 Space 拉引擎产出 ──
       - name: Fetch Space analysis_out
         env:
@@ -42,7 +50,7 @@ jobs:
         run: |
           if [ -z "$GC_TOKEN" ]; then
             echo "::warning::GC_TOKEN 未配置, 跳过 Space 拉取"
-            echo "配置: Settings → Secrets → New repository secret"
+            echo "配置: Settings -> Secrets -> New repository secret"
             echo "  Name: GC_TOKEN  Value: <gitcode 个人访问令牌>"
             exit 0
           fi

@@ -1,0 +1,90 @@
+# 每日数据归档 → GitCode 组织数据集仓 (零核时, 仅存储)
+#
+# 数据集仓不耗核时, 适合存历史。本工作流在每个交易日 15:40 把当日数据
+# 归档到 4 个数据集仓, 形成可追溯的历史序列:
+#   stocks-kline-daily     日K全史 (parquet)
+#   stocks-news-archive    新闻归档
+#   stocks-valuation-daily 每日估值快照
+#   stocks-prediction-log  预测对账历史
+name: dataset-archive
+on:
+  schedule:
+    - cron: '40 7 * * 1-5'      # CST 15:40 收盘后归档
+    - cron: '50 7 * * 1-5'      # CST 15:50 复盘产出后再补一次
+  workflow_dispatch: {}
+permissions:
+  contents: read
+jobs:
+  archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Shanghai
+      GC_TOKEN: ${{ secrets.GC_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Archive to GitCode datasets
+        if: ${{ env.GC_TOKEN != '' }}
+        run: |
+          if [ -z "$GC_TOKEN" ]; then
+            echo "::warning::GC_TOKEN 未配置, 跳过归档"
+            exit 0
+          fi
+          D=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          echo "归档日期: $D"
+
+          archive_repo() {
+            local repo="$1"; shift
+            local dir="$1"; shift
+            echo "=== $repo ==="
+            local wt="/tmp/ds-$RANDOM"
+            git clone -q "https://x-access-token:${GC_TOKEN}@gitcode.com/${repo}.git" "$wt" 2>/dev/null || {
+              echo "  clone 失败 (仓不存在?)"; return 0; }
+            cd "$wt"
+            mkdir -p "$dir"
+            for pair in "$@"; do
+              local src="${pair%%=*}"
+              local dst="${pair##*=}"
+              if [ -f "$GITHUB_WORKSPACE/$src" ]; then
+                mkdir -p "$dir/$(dirname "$dst")" 2>/dev/null
+                cp "$GITHUB_WORKSPACE/$src" "$dir/$dst"
+                echo "  + $dst ($(wc -c < "$dir/$dst") B)"
+              else
+                echo "  - $src 不存在, 跳过"
+              fi
+            done
+            git add -A
+            if git diff --cached --quiet HEAD; then
+              echo "  无变化"
+            else
+              git -c user.name=archive-bot -c user.email=3576982374@qq.com \
+                commit -q -m "archive: $D"
+              git push -q origin main && echo "  ✓ 已推送" || echo "  ✗ push 失败"
+            fi
+            cd "$GITHUB_WORKSPACE"
+            rm -rf "$wt"
+          }
+
+          # 4 个数据集: 仓名 目录 文件对(本地=目标)
+          archive_repo "jiegengxiangjianxue/stocks-news-archive" "daily" \
+            "data/news_digest.json=${D}.json"
+          archive_repo "jiegengxiangjianxue/stocks-valuation-daily" "daily" \
+            "data/valuation.json=${D}.json"
+          archive_repo "jiegengxiangjianxue/stocks-prediction-log" "daily" \
+            "data/predictions/engine_v5_${D}.json=${D}_predictions.json" \
+            "data/reflect_latest.json=${D}_reflect.json" \
+            "data/winrate_matrix.json=${D}_winrate_matrix.json" \
+            "data/kline_sim.json=${D}_kline_sim.json" \
+            "data/self_reflect.json=${D}_self_reflect.json"
+          archive_repo "jiegengxiangjianxue/stocks-kline-daily" "meta" \
+            "data/sources_registry.json=${D}_registry.json"
+
+      - name: Summary
+        run: |
+          echo "## 数据集归档完成"
+          echo "- stocks-kline-daily: 日K全史 (parquet, 24MB)"
+          echo "- stocks-news-archive: 新闻归档"
+          echo "- stocks-valuation-daily: 每日估值 (5224只)"
+          echo "- stocks-prediction-log: 预测对账 (reflect/winrate/kline_sim/self_reflect)"
+          echo "地址: https://gitcode.com/jiegengxiangjianxue"
