@@ -1,0 +1,33 @@
+{
+ "ts": "2026-10-13T23:17:16",
+ "E": -19.8,
+ "state": "中性观望",
+ "agreement": 0.5,
+ "parts": {
+  "market_phase": {
+   "score": -80,
+   "weight": 0.3
+  },
+  "cycle_v2": {
+   "score": 0,
+   "weight": 0.25
+  },
+  "global": {
+   "score": 21.2,
+   "weight": 0.2
+  },
+  "win_loop": {
+   "score": 0,
+   "weight": 0.15
+  },
+  "kelly": {
+   "score": 0,
+   "weight": 0.1
+  }
+ },
+ "missing_inputs": [
+  "picks.duckdb (win_loop)",
+  "picks.duckdb (kelly)"
+ ],
+ "note": "多引擎加权融合, 一致性低→观望, 不构成投资建议"
+}
