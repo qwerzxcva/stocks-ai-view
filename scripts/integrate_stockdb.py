@@ -44,7 +44,9 @@ except Exception:
     BULK = "/root/workspace/stocks-data-kline/data/bulk"
     AI_VIEW_DATA = os.path.join(os.path.dirname(HERE), "data")
 
-GH_TOKEN = os.environ.get("GH_TOKEN") or ""
+# GitHub PAT 从环境变量读 (不要硬编码, 会被 GitHub secret scanning 拦截)
+# 用法: GH_TOKEN=<pat> python3 integrate_stockdb.py --check
+GH_TOKEN = os.environ.get("GH_TOKEN", "")
 STOCKDB_REPO = "https://dufuwuxin:{token}@github.com/jiegengxiangjianxue1/stockdb.git"
 DB_NAME = "stock.duckdb"
 PICKS_NAME = "picks.duckdb"

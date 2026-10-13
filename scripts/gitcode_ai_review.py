@@ -35,7 +35,8 @@ except Exception:
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 # GitCode AI 默认 token (用户提供; 也可用环境变量 GITCODE_TOKEN 覆盖)
-DEFAULT_TOKEN = ""
+# GitCode PAT 从环境变量 GITCODE_TOKEN 读 (勿硬编码)
+DEFAULT_TOKEN = os.environ.get("GITCODE_TOKEN", "")
 MODELS = ["deepseek-ai/DeepSeek-V4-Flash", "Qwen/Qwen3-30B-A3B-Instruct-2507"]
 ENDPOINT = "https://gitcode.com/api/v5/chat/completions"
 

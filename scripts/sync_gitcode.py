@@ -39,7 +39,8 @@ GC_OWNER_REPO = "dufuwuxin/stock-system"
 GC_REMOTE = "gitcode"
 GC_BRANCH = "main"
 GC_REF = f"{GC_REMOTE}/{GC_BRANCH}"
-DEFAULT_TOKEN = ""
+# GitCode PAT 从环境变量 GC_TOKEN 读 (勿硬编码, GitHub secret scanning 会拦截)
+DEFAULT_TOKEN = os.environ.get("GC_TOKEN", "")
 
 # 从 GitCode 拉引擎时只认这两个目录
 GC_ENGINE_DIRS = ("engines", "algorithms")

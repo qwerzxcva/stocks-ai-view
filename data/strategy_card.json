@@ -1,0 +1,92 @@
+{
+ "ts": "2026-10-13T23:28:00",
+ "strategy": "B规则(低位+温和量+涨0-5%)+5日持有",
+ "source": "bulk day_qfq (bulk)",
+ "backtest": {
+  "win_rate_5d": 55.5,
+  "baseline_5d": 48.8,
+  "alpha_pp": 6.7,
+  "win_rate_t1": 44.3,
+  "E_t1_pct": 0.28,
+  "n": 1995,
+  "period": "2024-2026"
+ },
+ "gate": {
+  "global_score": -17.6,
+  "trade_ok": false
+ },
+ "candidates": [
+  {
+   "symbol": "sz002759",
+   "close": 13.8,
+   "ret_pct": 1.77,
+   "vratio": 1.89,
+   "pos240": 0.247
+  },
+  {
+   "symbol": "sz000677",
+   "close": 1.71,
+   "ret_pct": 0.0,
+   "vratio": 1.67,
+   "pos240": 0.31
+  },
+  {
+   "symbol": "sz002865",
+   "close": 36.07,
+   "ret_pct": 1.01,
+   "vratio": 1.6,
+   "pos240": 0.309
+  },
+  {
+   "symbol": "sz002402",
+   "close": 17.54,
+   "ret_pct": 0.11,
+   "vratio": 1.4,
+   "pos240": 0.295
+  },
+  {
+   "symbol": "sz002969",
+   "close": 10.51,
+   "ret_pct": 0.29,
+   "vratio": 1.4,
+   "pos240": 0.313
+  },
+  {
+   "symbol": "sh603402",
+   "close": 59.08,
+   "ret_pct": 2.39,
+   "vratio": 1.21,
+   "pos240": 0.308
+  },
+  {
+   "symbol": "sz001237",
+   "close": 49.78,
+   "ret_pct": 1.57,
+   "vratio": 1.2,
+   "pos240": 0.309
+  },
+  {
+   "symbol": "sh603778",
+   "close": 8.32,
+   "ret_pct": 1.46,
+   "vratio": 1.15,
+   "pos240": 0.243
+  },
+  {
+   "symbol": "sh600481",
+   "close": 4.04,
+   "ret_pct": 1.76,
+   "vratio": 0.96,
+   "pos240": 0.349
+  }
+ ],
+ "discipline": [
+  "T+1: 次日冲高+2%止盈(胜率口径44%)",
+  "或持有5日收盘卖(胜率口径55.5%)",
+  "破-2%无条件止损",
+  "仓位=半凯利(实盘胜率闭环)",
+  "全球<-15空仓"
+ ],
+ "picks_db": null,
+ "note": "回测为成本前口径; 胜率天花板约55%(5日口径), 80%需改变持有周期或品种, 不构成投资建议"
+}

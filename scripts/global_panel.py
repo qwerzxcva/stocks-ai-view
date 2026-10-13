@@ -2,14 +2,30 @@
 # ═══ 来源: GitCode dufuwuxin/stock-system · engines/global_panel.py ═══
 # 上游 commit: cf5091f9953c · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
 # 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (输出 stockdb/data/global → data/global/; global_kline 读 data/; --out-dir)
 """全球市场面板 v1: 海外数据 → 大A影响分析
 源: 腾讯qt(美股指数/ETF/黄金/原油/港股) + 新浪(A50期货/汇率)
 输出: data/global/latest.json + 关键传导指标 → 网站/复盘用
 """
-import urllib.request, json, os, datetime, time
+import argparse
+import datetime
+import json
+import os
+import sys
+import time
+import urllib.request
 
-OUT = "/home/agentuser/stockdb/data/global"
-os.makedirs(OUT, exist_ok=True)
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import AI_VIEW_DATA as DATA_DIR
+except Exception:
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
+
+DEFAULT_OUT = os.path.join(DATA_DIR, "global")
+os.makedirs(DEFAULT_OUT, exist_ok=True)
+GLOBAL_KLINE = os.path.join(DATA_DIR, "global_kline.json")
 QT_HDR = {"Referer": "https://gu.qq.com"}
 SINA_HDR = {"Referer": "https://finance.sina.com.cn"}
 
@@ -118,8 +134,8 @@ def analyze(items):
     score += max(-15, min(15, sig.get("sox_pct", 0) * 5))
     # 全球指数真实K线动量(腾讯usfqkline, global_kline.py产出)
     try:
-        import json as _json, os as _os
-        _gk = _json.load(open("/home/agentuser/stockdb/wh/global_kline.json"))
+        import json as _json
+        _gk = _json.load(open(GLOBAL_KLINE, encoding="utf-8"))
         mom = {}
         for s, v in _gk.get("symbols", {}).items():
             closes = [b[2] for b in v.get("bars", []) if len(b) >= 3]
@@ -147,14 +163,22 @@ def analyze(items):
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="全球市场面板 (海外数据 → 大A影响分析)")
+    ap.add_argument("--out-dir", default=DEFAULT_OUT, help="输出目录 (默认 data/global)")
+    args = ap.parse_args()
+    OUT = args.out_dir
+
     items = {}
     items.update(qt_batch(QT_CODES))
     items.update(sina_batch(SINA_CODES))
     an = analyze(items)
     doc = {"ts": datetime.datetime.now().isoformat(), "date": datetime.date.today().isoformat(),
            "n": len(items), "items": items, **an}
-    json.dump(doc, open(f"{OUT}/latest.json", "w"), ensure_ascii=False, indent=1)
-    json.dump(doc, open(f"{OUT}/{doc['date']}_{datetime.datetime.now():%H%M}.json", "w"), ensure_ascii=False)
+    os.makedirs(OUT, exist_ok=True)
+    with open(f"{OUT}/latest.json", "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False, indent=1)
+    with open(f"{OUT}/{doc['date']}_{datetime.datetime.now():%H%M}.json", "w", encoding="utf-8") as f:
+        json.dump(doc, f, ensure_ascii=False)
     print(f"全球面板 {len(items)} 品种")
     for s in an["signals"]:
         print(" ", s)

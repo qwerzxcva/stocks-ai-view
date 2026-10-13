@@ -30,6 +30,7 @@ import glob
 import json
 import os
 import sys
+import threading
 import time
 import urllib.request
 from datetime import datetime, timezone, timedelta
@@ -203,6 +204,8 @@ def main():
     ap.add_argument("--resume", action="store_true", help="跳过已采的")
     ap.add_argument("--workers-report", type=int, default=50,
                     help="每 N 只报告一次进度")
+    ap.add_argument("--threads", type=int, default=4,
+                    help="并发线程数 (默认 4; 每个线程独立 sleep, 总 QPS = threads/interval)")
     args = ap.parse_args()
 
     uni = load_universe()
@@ -236,14 +239,19 @@ def main():
 
     os.makedirs(args.out_dir, exist_ok=True)
     adjs = ["qfq", "hfq"] if args.adj == "both" else [args.adj]
-    ok_n = fail_n = skip_n = 0
+    pending = [c for c in codes if f"{c}:{','.join(adjs)}" not in done]
+    print(f"[plan] 待采 {len(pending)} 只 × adj={adjs} × threads={args.threads}")
+
+    ok_n = fail_n = 0
     fails = []
+    lock = threading.Lock()
+    counter = {"i": 0, "ok": 0, "fail": 0}
     t0 = time.time()
-    for i, code in enumerate(codes, 1):
-        key = f"{code}:{','.join(adjs)}"
-        if key in done:
-            skip_n += 1
-            continue
+
+    def worker(code):
+        nonlocal fails
+        local_fail = []
+        local_ok = 0
         for adj in adjs:
             try:
                 if adj == "hfq":
@@ -252,35 +260,43 @@ def main():
                 else:
                     bars = fetch_qfq_sina(code)
                     src = "sina_vip_getKLineData"
-                    _sleep_qps(QPS_SINA)
                 ok_flag, msg = validate(bars)
                 if not ok_flag:
-                    print(f"  ❌ {code} {adj}: {msg}", file=sys.stderr)
-                    fail_n += 1
-                    fails.append((code, adj, msg))
+                    local_fail.append((code, adj, msg))
                     continue
                 save(code, adj, bars, src, args.out_dir)
-                ok_n += 1
+                local_ok += 1
             except Exception as e:
-                print(f"  ❌ {code} {adj}: {type(e).__name__} {e}", file=sys.stderr)
-                fail_n += 1
-                fails.append((code, adj, f"{type(e).__name__}"))
-        done.add(key)
-        if i % args.workers_report == 0 or i == len(codes):
-            el = time.time() - t0
-            rate = i / el * 60 if el > 0 else 0
-            print(f"  [{i}/{len(codes)}] ok={ok_n} fail={fail_n} "
-                  f"skip={skip_n} {el:.0f}s ({rate:.0f} 只/min)")
-            with open(prog_p, "w", encoding="utf-8") as f:
-                json.dump({"done": sorted(done), "last_update":
-                           datetime.now(CST).isoformat(timespec="seconds"),
-                           "ok": ok_n, "fail": fail_n}, f)
+                local_fail.append((code, adj, f"{type(e).__name__}"))
+            time.sleep(0.1)
+        with lock:
+            counter["i"] += 1
+            counter["ok"] += local_ok
+            counter["fail"] += len(local_fail)
+            fails.extend(local_fail)
+            i = counter["i"]
+            if i % args.workers_report == 0 or i == len(pending):
+                el = time.time() - t0
+                rate = i / el * 60 if el > 0 else 0
+                eta = (len(pending) - i) / (i / el) / 60 if el > 0 and i else 0
+                print(f"  [{i}/{len(pending)}] ok={counter['ok']} "
+                      f"fail={counter['fail']} {el:.0f}s ({rate:.0f} 只/min, "
+                      f"ETA {eta:.0f}min)")
+                with open(prog_p, "w", encoding="utf-8") as f:
+                    json.dump({"done": sorted(done), "last_update":
+                               datetime.now(CST).isoformat(timespec="seconds"),
+                               "ok": counter["ok"], "fail": counter["fail"]}, f)
+
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=args.threads) as ex:
+        list(ex.map(worker, pending))
+
+    ok_n, fail_n = counter["ok"], counter["fail"]
     with open(prog_p, "w", encoding="utf-8") as f:
         json.dump({"done": sorted(done), "last_update":
                    datetime.now(CST).isoformat(timespec="seconds"),
                    "ok": ok_n, "fail": fail_n, "fails": fails[:50]}, f)
-    print(f"\n[done] ok={ok_n} fail={fail_n} skip={skip_n} "
-          f"耗时 {time.time()-t0:.0f}s")
+    print(f"\n[done] ok={ok_n} fail={fail_n} 耗时 {time.time()-t0:.0f}s")
     if fails:
         print(f"失败样例: {fails[:10]}")
     return 0
