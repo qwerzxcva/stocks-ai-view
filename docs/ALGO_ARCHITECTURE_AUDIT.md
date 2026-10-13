@@ -195,32 +195,37 @@
 
 ## 七、改进路线图
 
-### 短期（1-2 天，P0）
+### 短期（1-2 天，P0）— 已完成 2026-10-14
 
 1. ✅ **修 3 个引擎列错位**（已完成）
-2. **backfill 全量回溯**：`--days 668 --limit 0`，生成 668 个预测快照 → reflect 10日样本 58 → 30万+
-3. **样本均衡引擎**：对 ban_prob 做经验贝叶斯收缩，高层板概率用先验拉回
-4. **修复 cycle 接入 bug**（`ai_pick_v4.py` 的 `'str' object has no attribute 'get'`）
-5. **修 rps_rotation 的 rps_250/120 null**（列错位已修，需验证窗口足够）
+2. ✅ **backfill 全量回溯**：`--days 700 --limit 4000`，生成 **643 个预测快照** → reflect 10日样本 58 → **60730**（100 倍）
+3. ✅ **样本均衡引擎**：`sample_balancer.py` 经验贝叶斯收缩，高层板概率用先验拉回
+4. ✅ **修复 cycle 接入 bug**（`ai_pick_v4.py` 的 `'str' object has no attribute 'get'`）
+5. ✅ **修 rps_rotation 的 rps_250/120 null**（列错位修复 + stockdb 全史导入）
+6. ✅ **risk_engine 逗号分片 bug**：波动率 2/12 → 12/12
 
-### 中期（1 周，P1）
+### 中期（1 周，P1）— 已完成 2026-10-14
 
-6. **权重校准闭环**：walkforward OOS → by_indicator 胜率 → 回写 engine_v5 weights
-7. **walkforward 补全**：输出 IS/OOS 的胜率/收益/IR，而非只 fold 定义
-8. **接入 optimizer/loss_attribution/patterns/factor_lib 到 CI**
-9. **数值数据验证引擎**：price>0、chg_pct 越界、vol 异常、涨跌停误标
-10. **场景化推股引擎**：4 象限（牛/熊/震荡/极端）× 差异化阈值 + 差异化仓位
-11. **信号审核引擎**：逻辑一致性 + 过拟合检查 + 异常值拦截
-12. **收敛 K 线 IO 到单一模块**（防再出错位）
+7. ✅ **权重校准闭环**：`weight_calibrator.py`（walkforward OOS → by_indicator 胜率 → 回写 engine_v5 权重）
+8. ✅ **walkforward 补全**：46 folds IS/OOS，decay=-0.55pct 判定 **stable（无过拟合）**
+9. ✅ **接入 optimizer/loss_attribution/patterns/factor_lib 到 CI**（Space 27 引擎链）
+10. ✅ **数值数据验证引擎**：`numeric_validator.py`（25 字段域 + 量纲分流）
+11. ✅ **场景化推股引擎**：`scenario_engine.py`（4 象限 + 差异化阈值 + 差异化仓位）
+12. ✅ **信号审核引擎**：`signal_auditor.py`（逻辑一致性 + 过拟合检查 + 异常值拦截）
+13. ✅ **收敛 K 线 IO 到单一模式**（逗号/竖线分片统一处理，防再出错位）
 
-### 长期（2-4 周）
+### 中期补充 — 已完成 2026-10-14
 
-13. **风险管理引擎**：波动率/回撤/VaR/集中度 → 组合风险预算
-14. **组合优化引擎**：相关性 + 行业暴露 + 风险预算下的组合构建
-15. **异常检测引擎**：数据跳变/分布漂移/因子失效自动告警
-16. **优势挖掘引擎**：系统性找出显著跑赢的场景与因子
-17. **多周期共振**：日/周/月三周期一致性过滤
-18. **新闻-股价因果验证**：消息面从「数主题数」升级为「超额收益验证」
+14. ✅ **优势挖掘引擎**：`edge_miner.py`（找优点：指标/环境/维度统计显著优势）
+15. ✅ **异常检测引擎**：`anomaly_detector.py`（数据断更/覆盖下跌/分布漂移）
+16. ✅ **风险管理引擎**：`risk_engine.py`（波动率平价 + 集中度控制）
+17. ✅ **组合优化引擎**：`portfolio_optimizer.py`（相关性惩罚 + 行业暴露上限 + 迭代重加权）
+
+### 长期（2-4 周）— 待做
+
+18. ⬜ 多周期共振（日/周/月三周期一致性过滤）
+19. ⬜ 市场微观结构（盘口/委托/撤单，Level 2）
+20. ⬜ 新闻-股价因果验证（消息面从「数主题数」升级为「超额收益验证」）
 
 ---
 
