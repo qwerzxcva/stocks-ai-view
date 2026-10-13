@@ -140,6 +140,65 @@ jobs:
         run: |
           python3 scripts/gitcode_ai_review.py || echo "ai_review: GitCode AI 不可用, 保留规则引擎复盘"
 
+      # ── 6h. GitCode 引擎适配集 (walkforward/rps/market_phase/patterns/factor_lib/cyq/predict/pick/moneyflow/global/strategy) ──
+      # 依赖: kline-repo bulk (步骤2已 link) + 6b kline_sim + 6f global_fx; 均在 kline bulk 之后
+      - name: Walk-forward fold plan
+        run: |
+          python3 scripts/walkforward.py --out data/walkforward.json || true
+
+      - name: RPS rotation
+        run: |
+          python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps: bulk 不可用, 跳过"
+
+      - name: Market phase (bulk 涨停结构自算)
+        run: |
+          python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase: bulk 不可用, 跳过"
+
+      - name: Pattern smoke (停机坪/高而窄旗形/回踩年线/无大幅回撤)
+        run: |
+          python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns: bulk 不可用, 跳过"
+
+      - name: Factor lib smoke (29因子)
+        run: |
+          python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib: bulk 不可用, 跳过"
+
+      - name: CYQ chip distribution smoke
+        run: |
+          python3 scripts/cyq.py --out data/cyq_smoke.json || echo "cyq: bulk 不可用, 跳过"
+
+      - name: Next-day probability (predict_algo)
+        run: |
+          python3 scripts/predict_algo.py --local --out data/predict_algo.json || echo "predict: 无指数K线, 跳过"
+
+      - name: Limit-up pick algo (B规则统计驱动)
+        run: |
+          python3 scripts/pick_algo.py --top 20 --out data/pick_algo.json || echo "pick_algo: bulk 不可用, 跳过"
+
+      - name: Theme to stocks (hot_impact 题材 → 60日动量)
+        run: |
+          python3 scripts/theme_to_stocks.py --out data/theme_to_stocks.json || echo "theme_to_stocks: 缺热点题材/kline, 跳过"
+
+      - name: Moneyflow scan (新浪主力净流入)
+        run: |
+          python3 scripts/moneyflow_scan.py --out data/moneyflow/latest.json || echo "moneyflow: 无关注票, 跳过"
+
+      - name: Global kline + panel (腾讯/新浪全球资产)
+        run: |
+          python3 scripts/global_kline.py --out data/global_kline.json || true
+          python3 scripts/global_panel.py --out-dir data/global || echo "global_panel: 海外源不可达, 跳过"
+
+      - name: Strategy card (B规则候选)
+        run: |
+          python3 scripts/strategy_card.py --out data/strategy_card.json || echo "strategy_card: bulk 不可用, 跳过"
+
+      - name: Intraday signal (无分钟线则空信号)
+        run: |
+          python3 scripts/intraday_signal.py --out data/intraday_signal.json || true
+
+      - name: Engine fusion (多引擎加权, 需在 phase/kline_sim/global 之后)
+        run: |
+          python3 scripts/engine_fusion.py --out data/engine_fusion.json || echo "engine_fusion: 输入缺失, 跳过"
+
       # ── 7. 采集摘要 ──
       - name: Summary
         run: |
@@ -162,7 +221,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review
+          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -173,7 +232,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review
+            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
             git commit -m "pipeline: $ts" 2>/dev/null || true
             git push origin main
           }

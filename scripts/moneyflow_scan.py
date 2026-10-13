@@ -70,6 +70,8 @@ def _codes_from(path, key, limit):
     except Exception:
         return out
     for p in (d.get(key) or [])[:limit]:
+        if not isinstance(p, dict):
+            continue
         c = p.get("code") or p.get("symbol") or ""
         if not c:
             continue
@@ -81,9 +83,10 @@ def _codes_from(path, key, limit):
 
 
 def collect_codes(data_dir):
-    """关注票: AI推荐池 + 三池 (本项目 data/ 产物)。"""
+    """关注票: AI推荐池 + 多维引擎头部 + 三池 (本项目 data/ 产物)。"""
     codes = set()
     codes |= _codes_from(os.path.join(data_dir, "ai_picks.json"), "picks", 12)
+    codes |= _codes_from(os.path.join(data_dir, "multidim.json"), "top", 10)
     for name, key in [("multi_v4.json", "picks"), ("lowpool.json", "picks"),
                       ("sector_pool.json", "top"), ("ban_pick.json", "items")]:
         codes |= _codes_from(os.path.join(data_dir, name), key, 8)

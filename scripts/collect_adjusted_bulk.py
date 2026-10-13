@@ -124,28 +124,34 @@ def load_universe():
 
 # ─── 采集 ────────────────────────────────────────────────────
 def fetch_hfq_tencent(code, max_pages=12):
-    """腾讯后复权 (hfqday)。"""
-    tk = _tk(code)
-    allr, end, guard = {}, "", 0
-    while guard < max_pages:
-        guard += 1
-        d = _get(f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
-                 f"?param={tk},day,,{end},800,hfq")
-        node = (d.get("data") or {}).get(tk) or {}
-        arr = node.get("hfqday") or []
-        if not arr:
-            break
-        new = 0
-        for r in arr:
-            if len(r) >= 6 and r[0] not in allr:
-                allr[r[0]] = [r[0], float(r[1]), float(r[2]),
-                              float(r[3]), float(r[4]), float(r[5])]
-                new += 1
-        if new == 0 or len(arr) < 800:
-            break
-        end = arr[0][0]      # 升序, 首行最早
-        _sleep_qps(QPS_TENCENT)
-    return [allr[k] for k in sorted(allr)]
+    """腾讯后复权 (hfqday)。hfq 偶发返回空 → 重试 2 次。"""
+    for attempt in range(2):
+        tk = _tk(code)
+        allr, end, guard = {}, "", 0
+        while guard < max_pages:
+            guard += 1
+            d = _get(f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+                     f"?param={tk},day,,{end},800,hfq")
+            node = (d.get("data") or {}).get(tk) or {}
+            arr = node.get("hfqday") or []
+            if not arr:
+                break
+            new = 0
+            for r in arr:
+                if len(r) >= 6 and r[0] not in allr:
+                    allr[r[0]] = [r[0], float(r[1]), float(r[2]),
+                                  float(r[3]), float(r[4]), float(r[5])]
+                    new += 1
+            if new == 0 or len(arr) < 800:
+                break
+            end = arr[0][0]      # 升序, 首行最早
+            _sleep_qps(QPS_TENCENT)
+        if allr:
+            return [allr[k] for k in sorted(allr)]
+        if attempt == 0:
+            print(f"    [retry] {code} hfq 空, 重试", file=sys.stderr)
+            time.sleep(2)
+    return []
 
 
 def fetch_qfq_sina(code, datalen=6000):
