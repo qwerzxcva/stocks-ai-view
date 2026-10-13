@@ -1,14 +1,20 @@
 {
-  "ts": "2026-10-14T06:07:44+08:00",
+  "ts": "2026-10-14T07:51:11+08:00",
   "engine": "numeric_validator v1",
-  "n_files": 65,
-  "n_issues": 2,
+  "n_files": 64,
+  "n_issues": 3,
   "by_severity": {
-    "critical": 0,
+    "critical": 1,
     "warning": 2,
     "info": 0
   },
   "issues": [
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[6].detail[54].price",
+      "severity": "critical",
+      "msg": "越界 116050.0 不在 [0.0001, 100000]"
+    },
     {
       "file": "all_sources.json",
       "field": "data.fund[0].ret_3m",

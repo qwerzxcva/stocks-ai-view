@@ -1,31 +1,22 @@
 {
-  "ts": "2026-10-14T06:03:05+08:00",
+  "ts": "2026-10-14T07:51:02+08:00",
   "engine": "edge_miner v1 (优势挖掘)",
-  "n_edges": 5,
+  "n_edges": 4,
   "edges": [
-    {
-      "type": "indicator_short_edge",
-      "name": "UltimateOsc",
-      "bear_win_rate": 60.4,
-      "bear_n": 5436,
-      "ci_lo": 59.05,
-      "action": "把 UltimateOsc 用作回避过滤器: 该指标翻空时排除, 历史胜率60.4%(n=5436)",
-      "confidence": "medium"
-    },
     {
       "type": "dim_edge",
       "name": "技术面",
-      "top_avg": 62.9,
+      "top_avg": 62.0,
       "n": 60,
-      "action": "技术面 在推荐票中均分63, 是主要区分维度, 可考虑提高其权重",
+      "action": "技术面 在推荐票中均分62, 是主要区分维度, 可考虑提高其权重",
       "confidence": "medium"
     },
     {
       "type": "dim_edge",
-      "name": "基本面",
-      "top_avg": 62.1,
+      "name": "资金面",
+      "top_avg": 78.0,
       "n": 60,
-      "action": "基本面 在推荐票中均分62, 是主要区分维度, 可考虑提高其权重",
+      "action": "资金面 在推荐票中均分78, 是主要区分维度, 可考虑提高其权重",
       "confidence": "medium"
     },
     {
@@ -45,7 +36,7 @@
       "confidence": "medium"
     }
   ],
-  "summary": "发现 5 个统计显著优势, 见清单。",
+  "summary": "发现 4 个统计显著优势, 见清单。",
   "meta": {
     "min_n": 30,
     "min_ci": 50.0,
