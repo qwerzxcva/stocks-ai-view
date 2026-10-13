@@ -134,6 +134,30 @@ def _is_etf(code):
     return c.startswith(ETF_PREFIX)
 
 
+def validate_bars(bars, adj, code):
+    """复权数据合理性校验。返回 (ok, issues)。
+
+    已发现的问题 (2026-10-13 实测):
+      腾讯 qfq 对超长期高分红股票会算出负价 (茅台 2001 年 qfq 开=-314.3)
+      → 前复权历史价出现 <=0 即为异常, 应换源
+    """
+    issues = []
+    if not bars:
+        return False, ["空数据"]
+    neg = [b for b in bars if b[1] <= 0 or b[2] <= 0]
+    if neg:
+        issues.append(f"{len(neg)}/{len(bars)} 根价格 <=0 (首根异常日 {neg[0][0]})")
+    # 前复权: 末日价应等于当前实际价 (接口 qt 里), 后复权末日价会更高
+    # 高低价关系检查
+    bad_hl = [b for b in bars if b[3] < b[4]]   # high < low
+    if bad_hl:
+        issues.append(f"{len(bad_hl)} 根 high<low")
+    bad_oc = [b for b in bars if b[1] > b[3] or b[2] > b[3]]  # open/close > high
+    if len(bad_oc) > len(bars) * 0.01:
+        issues.append(f"{len(bad_oc)} 根 open/close>high")
+    return (len(issues) == 0), issues
+
+
 def save_one(code, adj, bars, out_dir):
     os.makedirs(out_dir, exist_ok=True)
     kind = "etf" if _is_etf(code) else "stock"
@@ -257,10 +281,15 @@ def main():
                 fail.append((code, adj))
                 print(f"  ❌ {code} {adj}: 空")
                 continue
+            ok_flag, issues = validate_bars(bars, adj, code)
+            if not ok_flag:
+                print(f"  ⚠️ {kind} {code} {adj}: 数据异常 {issues} (仍保存, 但需换源)")
+                fail.append((code, adj, issues))
             p = save_one(code, adj, bars, out_dir)
             ok.append((code, adj, len(bars)))
             print(f"  ✅ {kind} {code} {adj}: {len(bars)} 根 "
-                  f"({bars[0][0]} ~ {bars[-1][0]}) → {os.path.basename(p)}")
+                  f"({bars[0][0]} ~ {bars[-1][0]}) → {os.path.basename(p)}"
+                  f"{' [校验通过]' if ok_flag else ''}")
             if args.to_db:
                 n = to_db(code, adj, bars)
                 print(f"     → DuckDB kline_daily 共 {n} 行")
