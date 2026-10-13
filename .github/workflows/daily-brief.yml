@@ -28,6 +28,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
 
       - name: Checkout kline repo (sparse)
         uses: actions/checkout@v4

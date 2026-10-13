@@ -24,6 +24,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
 
       # K线仓 (低位池需要历史K线; 大仓用 sparse-checkout 只取 bulk 目录)
       - name: Checkout kline repo (sparse)
