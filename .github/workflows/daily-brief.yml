@@ -1,0 +1,72 @@
+# 盘前日报 — 只在非交易时段生成
+# 用户需求: 每日总结开盘到收盘不更新, 只在非开盘时间做实时热点/情绪/财经/政事
+#           多方面分析, 加上盘前分析+今日推股+昨日胜率验证。
+#
+# 时间点 (CST):
+#   07:30  盘前 (为今天做准备, 含隔夜外围)
+#   16:00  盘后 (今日收盘, 含今日推股 vs 实际的胜率验证)
+#   20:00  盘后补充 (当日完整数据)
+#  周六 10:00 周度总结
+name: daily-brief
+on:
+  schedule:
+    - cron: '30 23 * * *'   # CST 07:30 盘前
+    - cron: '0 8 * * 1-5'   # CST 16:00 盘后
+    - cron: '0 12 * * *'    # CST 20:00 盘后补充
+    - cron: '0 2 * * 6'     # 周六 10:00 周度
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kline-repo
+          sparse-checkout: |
+            data/bulk
+          sparse-checkout-cone-mode: false
+
+      - name: Link kline bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          echo "bulk files: $(ls ../stocks-data-kline/data/bulk/ | wc -l)"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 1. 先刷新 AI 推股 (保证日报里的推股是最新的)
+      - name: Build AI picks
+        run: |
+          python3 scripts/build_ai_picks.py --out data/ai_picks.json --limit 3000 || true
+
+      # 2. 生成盘前/盘后日报 (脚本内部会判断是否交易时段, 盘中直接跳过)
+      - name: Build daily brief
+        run: |
+          python3 scripts/build_daily_brief.py --out data/daily_brief.json || true
+          echo "--- 日报预览 ---"
+          head -30 data/daily_brief.md 2>/dev/null || echo "(no md)"
+
+      - name: Commit & push
+        run: |
+          git config user.name "brief-bot"
+          git config user.email "741059079@qq.com"
+          git add -A data/ai_picks.json data/daily_brief.json data/daily_brief.md
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          git diff --quiet --cached HEAD && echo "no changes" || {
+            git commit -m "brief: $ts (盘前日报: 分析+推股+胜率验证+热点)" && \
+            git -c http.version=HTTP/1.1 push origin main; }
