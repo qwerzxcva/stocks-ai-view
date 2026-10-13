@@ -87,9 +87,8 @@
       .catch(function () { return []; });
   }
 
-  // 主力资金流。push2his 有完整历史但在部分浏览器网络下 fetch 直接
-  // TypeError (CORS preflight 失败, 15ms 内返回, 非超时), 所以加 push2delay
-  // 兜底: 它的 ACAO 是 *, 更宽松, 但 lmt 只返当日。
+  // 主力资金流。push2his 有完整历史; push2delay 的 ACAO 是 * (更宽松),
+  // 但 lmt 只返当日, 所以只作兜底。任一级返回空数组都会继续往下走。
   function fetchFundFlow(code, n) {
     var b = bare(code);
     var secid = (prefixed(code).slice(0, 2) === 'sh' ? '1.' : '0.') + b;
@@ -193,7 +192,11 @@
 
   // ─── charts ─────────────────────────────────────────────────
   function renderKlineChart(bars) {
-    if (!bars || bars.length < 5) return '<div class="fl">K-line data unavailable</div>';
+    if (!bars || bars.length < 5) {
+      return '<div class="fl" style="font-size:9px;line-height:1.5">' +
+        'K线取数失败 (tencent / eastmoney / sina 三级均未返回)<br>' +
+        '可能原因: 当前网络到这三个源均被拦截</div>';
+    }
     var W = 460, H = 190, PL = 6, PR = 52, PT = 8, PB = 18;
     var cw = W - PL - PR, ch = H - PT - PB;
     var hi = -1e18, lo = 1e18;
@@ -227,7 +230,11 @@
   }
 
   function renderFundChart(flows) {
-    if (!flows || !flows.length) return '<div class="fl">Fund flow unavailable</div>';
+    if (!flows || !flows.length) {
+      return '<div class="fl" style="font-size:9px;line-height:1.5">' +
+        '资金流取数失败 (eastmoney push2his / push2delay 均未返回)<br>' +
+        '可能原因: 当前网络到东财被拦, 或该股当日无资金流数据</div>';
+    }
     var W = 460, H = 140, PL = 6, PR = 52, PT = 8, PB = 18;
     var cw = W - PL - PR, ch = H - PT - PB;
     var mx = 0;
