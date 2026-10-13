@@ -662,6 +662,81 @@ SOURCES = [
                  "可用于市场环境判定",
     },
 
+    {
+        "id": "em_lcpd_report",
+        "name": "东财业绩快报/财务报告 (datacenter RPT_LICO_FN_CPD)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LICO_FN_CPD&columns=ALL&pageSize=50&pageNumber={n}&sortColumns=UPDATE_DATE,SECURITY_CODE&sortTypes=-1,-1&filter=(REPORTDATE%3D%27{report_date}%27)",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "fields": "每股收益/营业总收入/净利润/ROE/营收同比/净利润同比/每股净资产/销售毛利率/行业 (5700+家全市场)",
+        "provides": [],
+        "notes": "同 datacenter-web 域 (LHB 已验证); 2026-10-13 搜索确认 RPT_LICO_FN_CPD 可用; "
+                 "filter 日期格式 YYYY-MM-DD; 分页 50 条/页 约 116 页; 建议 sleep 0.5s/页",
+    },
+    {
+        "id": "baostock",
+        "name": "Baostock 免费A股数据 (query_history_k_data_plus)",
+        "url": "python 库 (baostock, 需先 login())",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "日K/周K/月K (qfq)/估值/财务指标; 全市场 5000+ 只 2000~2026 全通",
+        "provides": [],
+        "notes": "2026-10-13 实测: baostock 0.9.3 装容器可跑, 茅台 16326 行历史; "
+                 "无注册无积分; K线补录与 tencent_kline 501 限流互补",
+    },
+    {
+        "id": "iwencai_openapi",
+        "name": "同花顺问财 OpenAPI (自然语言查数据)",
+        "url": "https://openapi.iwencai.com/v1/query2data (POST)",
+        "auth": "key (IWENCAI_API_KEY)",
+        "status": "unauth",
+        "freq": "on-demand",
+        "fields": "自然语言选股/行情/财务/指数/基金/板块/期货; /v1/comprehensive/search 搜新闻/公告/研报",
+        "provides": [],
+        "notes": "请求 body {query, source, page, limit, is_cache}; 返回 datas[] + code_count; "
+                 "需申请 key; 限频控制, 30s 超时; 中文语义查询是独家能力",
+    },
+    {
+        "id": "cn_a_stock_data",
+        "name": "cn-a-stock-data (OpenStockData 开源库)",
+        "url": "pip install cn-a-stock-data",
+        "auth": "none (问财层需 key)",
+        "status": "untested",
+        "freq": "varies",
+        "fields": "封装腾讯/东财/百度股市通/同花顺/财联社/新浪/巨潮; 7层: 行情/研报/信号/资金筹码/新闻/基础/公告",
+        "provides": [],
+        "notes": "百度股市通 K线 (baidu_kline_with_ma, 腾讯 fallback) 与 cls.cn 电报封装值得复用; "
+                 "未安装验证; 与 akshare 定位重叠但多了百度源",
+    },
+
+    # ============ 社交/渲染管线 (cookie 源) ============
+    {
+        "id": "xueqiu_anon_token",
+        "name": "雪球匿名 token (访问主页自动下发)",
+        "url": "GET https://xueqiu.com/ (匿名访问自动 set-cookie xq_a_token 与 u)",
+        "auth": "cookie (无需登录, 匿名即可)",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "xq_a_token → 解锁 /v5/stock/hot/list.json 等 v5 API",
+        "provides": [],
+        "notes": "2026-10-13 实测: 容器匿名访问 xueqiu.com 200 并拿到 140 位 token; "
+                 "配合 browser-render 管线可抓雪球热榜; token 有效期短, 需定期重取",
+    },
+    {
+        "id": "toutiao_hot",
+        "name": "今日头条热榜/财经榜",
+        "url": "https://www.toutiao.com/api/"
+             "hotboard/pc/hot-news/feed/?ut=...&max_behave_time=0&_signature=...", "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "热榜 title/hot_value/url/img; 财经榜在 category=finance 下",
+        "provides": ["hot_impact.json (社交情绪补充)"],
+        "notes": "2026-10-13 实测: ut/max_behave_time 可伪造, 热榜 30 条+; "
+                 "_signature 有时校验, 财经榜 412 时跳过不阻断",
+    },
+
     # ============ 本地/仓内数据源 ============
     {
         "id": "local_kline_bulk",
