@@ -1071,7 +1071,7 @@ function renderDailyBrief(d){
 }
 
 /* ─── Tencent (westock) tab ─── */
-let txRendered = false;
+let txActive = false;
 function renderTencent(d){
   const w = d.westock || {}; const el = document.getElementById('txBody');
   if(!el) return; let h = '';
@@ -1098,7 +1098,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   document.querySelectorAll('.c-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
-  if(b.dataset.c==='5' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
+  if(b.dataset.c==='5' && !txActive){ txActive=true; renderTencent(window._lastD||{}); }
   if(b.dataset.c==='6' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
   if(b.dataset.c==='8' && window._fdData && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData); }
 });
@@ -1113,7 +1113,7 @@ async function render(){
     'data/latest.json','data/hot_impact.json',
     'data/cycle.json','data/sector_pool.json','data/lowpool.json'
   ]);
-  window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="5"].active')) renderTencent(d);
+  window._lastD = d;
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
   // 实时行情优先: market_now.json 是每10分钟刷新的独立文件,
   // 不被远端 sync 覆盖 (远端只覆盖 latest.json)
@@ -1127,6 +1127,9 @@ async function render(){
     if(mn.tx_sector_ranking)d.westock={sector_ranking:{date:mn.date,data:mn.tx_sector_ranking}};
     window._realtimeTs=mn.ts;
   }
+  // 腾讯数据 tab: 激活后每次 render 都用最新数据重渲染
+  // (修复时序 bug: 原实现在 market_now 覆盖 westock 之前就渲染, 导致点早了 tab 永远空白)
+  if(txActive) renderTencent(d);
   // 用独立池子文件覆盖 latest.json 里的 pools (若独立文件有效)
   if(d && typeof d==='object'){
     d.pools = d.pools || {};
@@ -1152,7 +1155,7 @@ async function render(){
   renderThemes(d.themes,document.getElementById('themes'),'themesCount');
   renderPicks(d.ai_picks||[]);
   renderZt(d.limit_up_pool);
-  renderFundRank(d.fund_rank);
+  renderFundRank((d.fund_rank&&d.fund_rank.length)?d.fund_rank:((mn&&mn.fund_rank)?mn.fund_rank:[]));
   renderNews(d.news_recent);
   renderSummary(d.summary);
   renderTicker(d);

@@ -23,7 +23,7 @@ sys.path.insert(0, HERE)
 from collect_market_extras import (
     fetch_pool, fetch_zdfenbu, fetch_turnover, fetch_margin, fetch_indices,
     fetch_ths_strong_stocks, fetch_tx_sector_ranking)
-from ai_screener import fetch_news, theme_of, sentiment_of, THEMES
+from ai_screener import fetch_news, theme_of, sentiment_of, THEMES, fetch_fund_rank
 
 
 def main():
@@ -45,10 +45,11 @@ def main():
     margin = fetch_margin(30)
     ths = fetch_ths_strong_stocks(date_dash)
     tx_rank = fetch_tx_sector_ranking(20)
+    fund_rank = fetch_fund_rank(days=90, top=50) or []
 
     print(f"  ZT={zt['count']} DT={dtn['count']} ZB={zb['count']} "
           f"涨={zdfenbu.get('up')} 跌={zdfenbu.get('down')} "
-          f"成交={turnover.get('total_yi')}亿 指数={len(indices)}")
+          f"成交={turnover.get('total_yi')}亿 指数={len(indices)} 基金={len(fund_rank)}")
 
     # 题材热度 (新闻命中)
     news = fetch_news(60)
@@ -78,6 +79,7 @@ def main():
         "margin": margin,
         "ths_strong": ths[:40],
         "tx_sector_ranking": tx_rank,
+        "fund_rank": fund_rank[:50],
         "themes": [{"name": t, "news_count": c}
                    for t, c in sorted(theme_count.items(), key=lambda x: -x[1])[:10]],
         "meta": {
