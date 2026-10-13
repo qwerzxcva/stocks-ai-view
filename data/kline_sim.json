@@ -1,10 +1,10 @@
 {
-  "ts": "2026-10-13T20:19:20+08:00",
+  "ts": "2026-10-14T05:45:14+08:00",
   "sources": {
     "predictions": {
       "dir": "/root/workspace/stocks-ai-view/data/predictions",
-      "files": 12,
-      "n": 600
+      "files": 649,
+      "n": 64250
     }
   },
   "params": {
@@ -20,222 +20,222 @@
     "entry": "信号日后首个K线交易日开盘价",
     "exit": "入场日起第N个交易日收盘价"
   },
-  "n_signals_total": 600,
-  "n_simulated": 550,
+  "n_signals_total": 2000,
+  "n_simulated": 2000,
   "n_held": 20,
   "skipped": {
     "no_kline": 0,
-    "no_forward_data": 50,
+    "no_forward_data": 0,
     "limit_up_at_entry": 0,
     "bad_price": 0
   },
   "overall": {
-    "win_rate": 0.316,
-    "avg_return_pct": -2.563,
-    "max_drawdown_pct": 13.699,
-    "n_pairs": 1250
+    "win_rate": 0.4004,
+    "avg_return_pct": -0.781,
+    "max_drawdown_pct": 0.564,
+    "n_pairs": 8000
   },
   "by_horizon": {
     "1": {
-      "n": 500,
-      "win_rate": 0.384,
-      "avg_ret_pct": -0.665,
-      "median_ret_pct": -1.286,
-      "stdev_pct": 5.989
+      "n": 2000,
+      "win_rate": 0.4505,
+      "avg_ret_pct": -0.089,
+      "median_ret_pct": -0.536,
+      "stdev_pct": 6.001
     },
     "3": {
-      "n": 400,
-      "win_rate": 0.2875,
-      "avg_ret_pct": -2.61,
-      "median_ret_pct": -3.695,
-      "stdev_pct": 8.736
+      "n": 2000,
+      "win_rate": 0.394,
+      "avg_ret_pct": -0.552,
+      "median_ret_pct": -1.428,
+      "stdev_pct": 8.536
     },
     "5": {
-      "n": 300,
-      "win_rate": 0.2533,
-      "avg_ret_pct": -4.505,
-      "median_ret_pct": -6.03,
-      "stdev_pct": 11.216
+      "n": 2000,
+      "win_rate": 0.39,
+      "avg_ret_pct": -0.564,
+      "median_ret_pct": -1.692,
+      "stdev_pct": 10.307
     },
     "10": {
-      "n": 50,
-      "win_rate": 0.24,
-      "avg_ret_pct": -9.506,
-      "median_ret_pct": -14.325,
-      "stdev_pct": 15.386
+      "n": 2000,
+      "win_rate": 0.367,
+      "avg_ret_pct": -1.92,
+      "median_ret_pct": -2.896,
+      "stdev_pct": 12.527
     }
   },
   "equity_curve": {
     "max_day": 10,
     "values": [
       1.0,
-      0.9926,
-      0.9794,
-      0.9543,
-      0.9399,
-      0.9347,
-      0.8991,
-      0.8633,
-      0.863,
-      0.9318,
-      0.8919
+      1.0029,
+      1.007,
+      1.0019,
+      1.0044,
+      1.0125,
+      1.011,
+      1.0251,
+      1.0193,
+      1.0214,
+      1.036
     ]
   },
   "top_signals": [
     {
-      "code": "688553",
+      "code": "000733",
       "name": "",
-      "score": 75.7,
+      "score": 87.4,
       "source": "predictions",
-      "signal_date": "2026-09-24",
-      "entry_date": "2026-09-28",
-      "entry_price": 12.294,
+      "signal_date": "2024-03-01",
+      "entry_date": "2024-03-04",
+      "entry_price": 58.618,
       "ret_by_day": {
-        "1": -1.036,
-        "3": -6.078,
-        "5": -5.752,
-        "10": null
+        "1": -6.012,
+        "3": -8.519,
+        "5": -1.731,
+        "10": 3.232
       }
     },
     {
-      "code": "688004",
+      "code": "688788",
       "name": "",
-      "score": 74.5,
+      "score": 87.3,
       "source": "predictions",
-      "signal_date": "2026-09-18",
-      "entry_date": "2026-09-21",
-      "entry_price": 35.011,
+      "signal_date": "2026-06-17",
+      "entry_date": "2026-06-18",
+      "entry_price": 44.693,
       "ret_by_day": {
-        "1": -0.802,
-        "3": -5.371,
-        "5": -11.367,
-        "10": 19.585
+        "1": -2.588,
+        "3": -1.134,
+        "5": -2.028,
+        "10": -0.999
       }
     },
     {
-      "code": "688488",
+      "code": "002049",
       "name": "",
-      "score": 74.1,
+      "score": 87.2,
       "source": "predictions",
-      "signal_date": "2026-09-24",
-      "entry_date": "2026-09-28",
-      "entry_price": 15.915,
+      "signal_date": "2024-02-27",
+      "entry_date": "2024-02-28",
+      "entry_price": 68.861,
       "ret_by_day": {
-        "1": 1.259,
-        "3": -3.389,
-        "5": -5.776,
-        "10": null
+        "1": 3.932,
+        "3": 8.113,
+        "5": 4.237,
+        "10": 2.437
       }
     },
     {
-      "code": "688004",
+      "code": "600895",
       "name": "",
-      "score": 73.8,
+      "score": 86.9,
       "source": "predictions",
-      "signal_date": "2026-09-21",
-      "entry_date": "2026-09-22",
-      "entry_price": 33.61,
+      "signal_date": "2024-03-01",
+      "entry_date": "2024-03-04",
+      "entry_price": 22.247,
       "ret_by_day": {
-        "1": -0.357,
-        "3": -8.805,
-        "5": -10.917,
-        "10": null
+        "1": 0.749,
+        "3": -5.003,
+        "5": -1.498,
+        "10": -3.61
       }
     },
     {
-      "code": "603067",
+      "code": "001280",
       "name": "",
-      "score": 73.7,
+      "score": 86.8,
       "source": "predictions",
-      "signal_date": "2026-09-28",
-      "entry_date": "2026-09-29",
-      "entry_price": 39.112,
+      "signal_date": "2026-01-19",
+      "entry_date": "2026-01-20",
+      "entry_price": 80.204,
       "ret_by_day": {
-        "1": 2.879,
-        "3": 8.145,
-        "5": 10.675,
-        "10": null
+        "1": 7.593,
+        "3": 13.078,
+        "5": 13.925,
+        "10": 18.275
       }
     },
     {
-      "code": "301486",
+      "code": "002338",
       "name": "",
-      "score": 73.4,
+      "score": 86.7,
       "source": "predictions",
-      "signal_date": "2026-09-18",
-      "entry_date": "2026-09-21",
-      "entry_price": 218.466,
+      "signal_date": "2024-03-04",
+      "entry_date": "2024-03-05",
+      "entry_price": 31.239,
       "ret_by_day": {
-        "1": 0.155,
-        "3": -5.734,
-        "5": -13.102,
-        "10": -2.43
+        "1": -4.284,
+        "3": -4.508,
+        "5": -4.252,
+        "10": -2.332
       }
     },
     {
-      "code": "688768",
+      "code": "600392",
       "name": "",
-      "score": 73.3,
+      "score": 86.7,
       "source": "predictions",
-      "signal_date": "2026-09-23",
-      "entry_date": "2026-09-24",
-      "entry_price": 47.354,
+      "signal_date": "2026-06-16",
+      "entry_date": "2026-06-17",
+      "entry_price": 28.739,
       "ret_by_day": {
-        "1": -0.229,
-        "3": 10.411,
-        "5": 12.628,
-        "10": null
+        "1": 9.089,
+        "3": 6.897,
+        "5": 10.967,
+        "10": 2.932
       }
     },
     {
-      "code": "002491",
+      "code": "000733",
       "name": "",
-      "score": 73.1,
+      "score": 86.6,
       "source": "predictions",
-      "signal_date": "2026-09-22",
-      "entry_date": "2026-09-23",
-      "entry_price": 24.457,
+      "signal_date": "2024-02-29",
+      "entry_date": "2024-03-01",
+      "entry_price": 57.817,
       "ret_by_day": {
-        "1": -2.717,
-        "3": -15.715,
-        "5": -19.149,
-        "10": null
+        "1": -1.046,
+        "3": -3.38,
+        "5": 0.286,
+        "10": 3.26
       }
     },
     {
-      "code": "688657",
+      "code": "600745",
       "name": "",
-      "score": 73.0,
+      "score": 86.6,
       "source": "predictions",
-      "signal_date": "2026-09-24",
-      "entry_date": "2026-09-28",
-      "entry_price": 33.96,
+      "signal_date": "2024-03-01",
+      "entry_date": "2024-03-04",
+      "entry_price": 42.693,
       "ret_by_day": {
-        "1": -0.56,
-        "3": -4.328,
-        "5": -5.83,
-        "10": null
+        "1": -4.181,
+        "3": -7.694,
+        "5": -5.656,
+        "10": -6.593
       }
     },
     {
-      "code": "688768",
+      "code": "000063",
       "name": "",
-      "score": 72.9,
+      "score": 86.5,
       "source": "predictions",
-      "signal_date": "2026-10-08",
-      "entry_date": "2026-10-09",
-      "entry_price": 51.675,
+      "signal_date": "2024-02-27",
+      "entry_date": "2024-02-28",
+      "entry_price": 28.889,
       "ret_by_day": {
-        "1": 4.486,
-        "3": null,
-        "5": null,
-        "10": null
+        "1": 3.331,
+        "3": 4.75,
+        "5": 2.328,
+        "10": 0.909
       }
     }
   ],
   "coverage": {
     "bulk_max_date": "2026-10-13",
-    "bulk_rows_loaded": 28961
+    "bulk_rows_loaded": 510795
   },
   "note": null
 }
