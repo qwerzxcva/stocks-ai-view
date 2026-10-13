@@ -1,0 +1,31 @@
+{
+  "ts": "2026-10-14T02:50:24+08:00",
+  "engine": "signal_auditor v1 (发布前审核)",
+  "n_cards": 12,
+  "n_blocked": 0,
+  "n_warned": 1,
+  "blocked": [],
+  "warned": [
+    {
+      "code": "(portfolio)",
+      "reason": "全部 12 只都是 buy, 无观察/回避分层 (可能是牛市末期信号)",
+      "severity": "warn"
+    }
+  ],
+  "checks": [
+    "逻辑矛盾",
+    "数值异常",
+    "集中度风险",
+    "翻烧饼",
+    "过拟合嫌疑",
+    "缺失必要字段"
+  ],
+  "meta": {
+    "limits": {
+      "max_industry_pct": 40.0,
+      "max_sector_n": 3,
+      "max_score_delta_pct": 30.0
+    },
+    "caveat": "只拦可自动判定的错误, 不替代人工判断"
+  }
+}

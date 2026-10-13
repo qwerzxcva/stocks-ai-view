@@ -228,6 +228,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="7">资金背离</button>
       <button class="c-tab" data-c="8">策略决策</button>
       <button class="c-tab" data-c="9">场景推股</button>
+      <button class="c-tab" data-c="10">海外实时</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">多维评分 · 点击行看K线/资金流</span></div>
@@ -322,6 +323,19 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="card c-card" data-ci="9" style="display:none">
       <div class="hd">🎲 场景化推股 <span class="sub" id="scenSub">牛/熊/震荡/极端 四象限</span></div>
       <div id="scenarioBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
+    </div>
+    <div class="card c-card" data-ci="10" style="display:none">
+      <div class="hd">海外实时 <span class="sub" id="ovTs"></span></div>
+      <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <div class="hd" style="border-top:none;padding:6px 0">实时指数 · A50期货</div>
+        <div id="ovIndices"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">A股影响推演 <span class="sub">隔夜 + 新闻 + A50 + VIX</span></div>
+        <div id="ovImpact"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">环球市场情绪 <span class="sub">关键词打分</span></div>
+        <div id="ovSentiment"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">环球资讯流</div>
+        <div id="ovNews"><div class="fl">加载中…</div></div>
+      </div>
     </div>
   </div>
   <!-- RIGHT: 主题 + 24h资讯流 -->
@@ -1284,6 +1298,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='6' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
   if(b.dataset.c==='7' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
   if(b.dataset.c==='8' && !decRendered){ decRendered=true; renderDecision(window._decData||null); }
+  if(b.dataset.c==='10' && window.Overseas){ window.Overseas.render(); }
   if(b.dataset.c==='9' && !scenRendered){ scenRendered=true; renderScenario(window._scenData||null); }
 });
 // 默认显示第一张卡
@@ -1590,6 +1605,7 @@ document.addEventListener('click', e=>{
 </script>
 <script src="realtime.js" defer></script>
 <script src="db-client.js" defer></script>
+<script src="overseas.js" defer></script>
 <script src="data_origin_patch.js"></script>
 <script src="stock-detail.js" defer></script>
 </body>
