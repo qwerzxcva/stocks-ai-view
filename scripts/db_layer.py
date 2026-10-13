@@ -120,11 +120,13 @@ CREATE TABLE IF NOT EXISTS sources_log (
 
 INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_quotes_code_date ON quotes(code, trade_date)",
-    "CREATE INDEX IF NOT EXISTS idx_quotes_date ON quotes(trade_date)",
+    "CREATE INDEX IF NOT EXISTS idx_quotes_chg ON quotes(trade_date, chg_pct)",
+    "CREATE INDEX IF NOT EXISTS idx_quotes_pe_pb ON quotes(pe, pb)",
     "CREATE INDEX IF NOT EXISTS idx_kline_code_date ON kline_daily(code, date)",
     "CREATE INDEX IF NOT EXISTS idx_kline_year ON kline_daily(year)",
     "CREATE INDEX IF NOT EXISTS idx_events_code_date ON events(code, trade_date)",
     "CREATE INDEX IF NOT EXISTS idx_events_type_date ON events(type, trade_date)",
+    "CREATE INDEX IF NOT EXISTS idx_events_deal ON events(type, trade_date, deal_amt)",
     "CREATE INDEX IF NOT EXISTS idx_pools_kind_date ON pools(kind, date)",
     "CREATE INDEX IF NOT EXISTS idx_sources_log_ts ON sources_log(ts)",
 ]
