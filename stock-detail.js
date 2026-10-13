@@ -87,25 +87,36 @@
       .catch(function () { return []; });
   }
 
+  // 主力资金流。push2his 有完整历史但在部分浏览器网络下 fetch 直接
+  // TypeError (CORS preflight 失败, 15ms 内返回, 非超时), 所以加 push2delay
+  // 兜底: 它的 ACAO 是 *, 更宽松, 但 lmt 只返当日。
   function fetchFundFlow(code, n) {
     var b = bare(code);
     var secid = (prefixed(code).slice(0, 2) === 'sh' ? '1.' : '0.') + b;
-    return jget('https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get'
-      + '?secid=' + secid + '&lmt=' + (n || 30) + '&klt=101'
-      + '&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65')
-      .then(function (d) {
-        var klines = ((d || {}).data || {}).klines || [];
-        return klines.map(function (row) {
-          var f = row.split(',');
-          return {
-            date: f[0],
-            main_net: +f[1], small: +f[2], medium: +f[3],
-            large: +f[4], xlarge: +f[5],
-            main_pct: +f[6],
-            close: f.length > 11 ? +f[11] : 0
-          };
-        });
-      });
+    var fields = '&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65';
+    var url = 'https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get'
+      + '?secid=' + secid + '&lmt=' + (n || 30) + '&klt=101' + fields;
+    return jget(url).then(function (d) {
+      var klines = ((d || {}).data || {}).klines || [];
+      if (klines.length) return parseFlows(klines);
+      // push2his 不可达 → push2delay 兜底 (只返当日)
+      return jget('https://push2delay.eastmoney.com/api/qt/stock/fflow/daykline/get'
+        + '?secid=' + secid + '&lmt=' + (n || 30) + '&klt=101' + fields)
+        .then(function (d2) { return parseFlows(((d2 || {}).data || {}).klines || []); });
+    });
+  }
+
+  function parseFlows(klines) {
+    return klines.map(function (row) {
+      var f = row.split(',');
+      return {
+        date: f[0],
+        main_net: +f[1], small: +f[2], medium: +f[3],
+        large: +f[4], xlarge: +f[5],
+        main_pct: +f[6],
+        close: f.length > 11 ? +f[11] : 0
+      };
+    });
   }
 
   function fetchMinute(code) {

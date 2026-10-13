@@ -61,13 +61,8 @@
       return [MARKET_GH + p.replace(/^data\//, ''), MARKET_GC + p.replace(/^data\//, '')];
     }
     // per-stock paths: data/stocks/<shard>/<code>/...
-    var m = p.match(/^data\/stocks\/(\d\d)\//);
-    if (m && window.DB) {
-      var shard = m[1];
-      var key = window.DB.repos['stocks' + ({'00':'A','30':'B','60':'C','68':'D','15':'D','51':'D','50':'D','52':'D','56':'D','58':'D'}[shard] || 'E')];
-      return [key + p.replace(/^data\/stocks\//, ''),
-              window.DB.repos.stocksGC + p.replace(/^data\/stocks\//, '')];
-    }
+    // 分片仓 (db-stocks-a..e) 未推送成功, 相关键已从 db-client 移除;
+    // 这里相应去掉, 否则 key 为 undefined 会拼出 "undefined..." 的 URL。
     return [AI_VIEW_GH + p, null];
   }
 
