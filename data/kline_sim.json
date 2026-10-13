@@ -1,15 +1,10 @@
 {
-  "ts": "2026-10-13T17:56:34+08:00",
+  "ts": "2026-10-13T20:19:20+08:00",
   "sources": {
-    "multi_v4": {
-      "file": "/root/workspace/stocks-ai-view/data/multi_v4.json",
-      "signal_date": "2026-10-12",
-      "n": 30
-    },
-    "ai_picks": {
-      "file": "/root/workspace/stocks-ai-view/data/ai_picks.json",
-      "signal_date": "2026-10-13",
-      "n": 0
+    "predictions": {
+      "dir": "/root/workspace/stocks-ai-view/data/predictions",
+      "files": 12,
+      "n": 600
     }
   },
   "params": {
@@ -25,213 +20,213 @@
     "entry": "信号日后首个K线交易日开盘价",
     "exit": "入场日起第N个交易日收盘价"
   },
-  "n_signals_total": 30,
-  "n_simulated": 22,
+  "n_signals_total": 600,
+  "n_simulated": 550,
   "n_held": 20,
   "skipped": {
-    "no_kline": 8,
-    "no_forward_data": 0,
+    "no_kline": 0,
+    "no_forward_data": 50,
     "limit_up_at_entry": 0,
     "bad_price": 0
   },
   "overall": {
-    "win_rate": null,
-    "avg_return_pct": null,
-    "max_drawdown_pct": 0.0,
-    "n_pairs": 0
+    "win_rate": 0.316,
+    "avg_return_pct": -2.563,
+    "max_drawdown_pct": 13.699,
+    "n_pairs": 1250
   },
   "by_horizon": {
     "1": {
-      "n": 0,
-      "win_rate": null,
-      "avg_ret_pct": null,
-      "median_ret_pct": null,
-      "stdev_pct": null
+      "n": 500,
+      "win_rate": 0.384,
+      "avg_ret_pct": -0.665,
+      "median_ret_pct": -1.286,
+      "stdev_pct": 5.989
     },
     "3": {
-      "n": 0,
-      "win_rate": null,
-      "avg_ret_pct": null,
-      "median_ret_pct": null,
-      "stdev_pct": null
+      "n": 400,
+      "win_rate": 0.2875,
+      "avg_ret_pct": -2.61,
+      "median_ret_pct": -3.695,
+      "stdev_pct": 8.736
     },
     "5": {
-      "n": 0,
-      "win_rate": null,
-      "avg_ret_pct": null,
-      "median_ret_pct": null,
-      "stdev_pct": null
+      "n": 300,
+      "win_rate": 0.2533,
+      "avg_ret_pct": -4.505,
+      "median_ret_pct": -6.03,
+      "stdev_pct": 11.216
     },
     "10": {
-      "n": 0,
-      "win_rate": null,
-      "avg_ret_pct": null,
-      "median_ret_pct": null,
-      "stdev_pct": null
+      "n": 50,
+      "win_rate": 0.24,
+      "avg_ret_pct": -9.506,
+      "median_ret_pct": -14.325,
+      "stdev_pct": 15.386
     }
   },
   "equity_curve": {
     "max_day": 10,
     "values": [
       1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0
+      0.9926,
+      0.9794,
+      0.9543,
+      0.9399,
+      0.9347,
+      0.8991,
+      0.8633,
+      0.863,
+      0.9318,
+      0.8919
     ]
   },
   "top_signals": [
     {
-      "code": "002796",
-      "name": "世嘉科技",
-      "score": 25,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 23.127,
+      "code": "688553",
+      "name": "",
+      "score": 75.7,
+      "source": "predictions",
+      "signal_date": "2026-09-24",
+      "entry_date": "2026-09-28",
+      "entry_price": 12.294,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": -1.036,
+        "3": -6.078,
+        "5": -5.752,
         "10": null
       }
     },
     {
-      "code": "300488",
-      "name": "恒锋工具",
-      "score": 24,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 32.52,
+      "code": "688004",
+      "name": "",
+      "score": 74.5,
+      "source": "predictions",
+      "signal_date": "2026-09-18",
+      "entry_date": "2026-09-21",
+      "entry_price": 35.011,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": -0.802,
+        "3": -5.371,
+        "5": -11.367,
+        "10": 19.585
+      }
+    },
+    {
+      "code": "688488",
+      "name": "",
+      "score": 74.1,
+      "source": "predictions",
+      "signal_date": "2026-09-24",
+      "entry_date": "2026-09-28",
+      "entry_price": 15.915,
+      "ret_by_day": {
+        "1": 1.259,
+        "3": -3.389,
+        "5": -5.776,
         "10": null
       }
     },
     {
-      "code": "002036",
-      "name": "联创电子",
-      "score": 23,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 5.662,
+      "code": "688004",
+      "name": "",
+      "score": 73.8,
+      "source": "predictions",
+      "signal_date": "2026-09-21",
+      "entry_date": "2026-09-22",
+      "entry_price": 33.61,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": -0.357,
+        "3": -8.805,
+        "5": -10.917,
         "10": null
       }
     },
     {
-      "code": "000070",
-      "name": "特发信息",
-      "score": 23,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 14.254,
+      "code": "603067",
+      "name": "",
+      "score": 73.7,
+      "source": "predictions",
+      "signal_date": "2026-09-28",
+      "entry_date": "2026-09-29",
+      "entry_price": 39.112,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": 2.879,
+        "3": 8.145,
+        "5": 10.675,
         "10": null
       }
     },
     {
-      "code": "688170",
-      "name": "德龙激光",
-      "score": 23,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 49.785,
+      "code": "301486",
+      "name": "",
+      "score": 73.4,
+      "source": "predictions",
+      "signal_date": "2026-09-18",
+      "entry_date": "2026-09-21",
+      "entry_price": 218.466,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": 0.155,
+        "3": -5.734,
+        "5": -13.102,
+        "10": -2.43
+      }
+    },
+    {
+      "code": "688768",
+      "name": "",
+      "score": 73.3,
+      "source": "predictions",
+      "signal_date": "2026-09-23",
+      "entry_date": "2026-09-24",
+      "entry_price": 47.354,
+      "ret_by_day": {
+        "1": -0.229,
+        "3": 10.411,
+        "5": 12.628,
         "10": null
       }
     },
     {
-      "code": "002824",
-      "name": "和胜股份",
-      "score": 22,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 21.136,
+      "code": "002491",
+      "name": "",
+      "score": 73.1,
+      "source": "predictions",
+      "signal_date": "2026-09-22",
+      "entry_date": "2026-09-23",
+      "entry_price": 24.457,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": -2.717,
+        "3": -15.715,
+        "5": -19.149,
         "10": null
       }
     },
     {
-      "code": "002622",
-      "name": "皓宸医疗",
-      "score": 22,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 2.431,
+      "code": "688657",
+      "name": "",
+      "score": 73.0,
+      "source": "predictions",
+      "signal_date": "2026-09-24",
+      "entry_date": "2026-09-28",
+      "entry_price": 33.96,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
+        "1": -0.56,
+        "3": -4.328,
+        "5": -5.83,
         "10": null
       }
     },
     {
-      "code": "002339",
-      "name": "积成电子",
-      "score": 22,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 7.182,
+      "code": "688768",
+      "name": "",
+      "score": 72.9,
+      "source": "predictions",
+      "signal_date": "2026-10-08",
+      "entry_date": "2026-10-09",
+      "entry_price": 51.675,
       "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
-        "10": null
-      }
-    },
-    {
-      "code": "300370",
-      "name": "安控科技",
-      "score": 22,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 2.071,
-      "ret_by_day": {
-        "1": null,
-        "3": null,
-        "5": null,
-        "10": null
-      }
-    },
-    {
-      "code": "002877",
-      "name": "智能自控",
-      "score": 22,
-      "source": "multi_v4",
-      "signal_date": "2026-10-12",
-      "entry_date": "2026-10-13",
-      "entry_price": 7.402,
-      "ret_by_day": {
-        "1": null,
+        "1": 4.486,
         "3": null,
         "5": null,
         "10": null
@@ -240,7 +235,7 @@
   ],
   "coverage": {
     "bulk_max_date": "2026-10-13",
-    "bulk_rows_loaded": 17623
+    "bulk_rows_loaded": 28961
   },
-  "note": "无有效收益样本: 可入场信号 22 个, 但各持有期出场日超出 bulk K线数据范围 (截至 2026-10-13)。更新 bulk K线后重跑。"
+  "note": null
 }

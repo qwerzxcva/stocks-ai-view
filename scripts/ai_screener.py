@@ -602,16 +602,35 @@ def fetch_news(limit=120):
         news.append({"ts": str(ts)[:19], "title": title[:120], "theme": sorted(theme_of(title)),
                      "sentiment": sentiment_of(title), "src": src, "digest": ""})
 
-    # 新浪 7x24 (主源)
+    # 新浪 7x24 (主源: feed.mix.sina 滚动财经, 结构稳定)
+    def _sina_ts(v):
+        """feed.mix 的 ct 是 Unix 秒 (int), app.cj 的 create_time 是字符串。"""
+        try:
+            iv = int(v)
+            if iv > 10**9:
+                return datetime.datetime.fromtimestamp(
+                    iv, datetime.timezone(datetime.timedelta(hours=8))
+                ).strftime("%Y-%m-%d %H:%M:%S")
+        except (TypeError, ValueError):
+            pass
+        return str(v)[:19]
     try:
-        d = _http_json(f"https://app.cj.sina.com.cn/api/news/pc?page=1&num={limit}")
-        feed = d.get("result", {}).get("data", {}).get("feed", {}).get("list") or \
-               d.get("data") or []
-        for it in feed[:limit]:
-            add(it.get("create_time") or it.get("ctime", ""),
-                it.get("rich_text") or it.get("title", ""), "sina")
+        d = _http_json(f"https://feed.mix.sina.com.cn/api/roll/get?pageid=153&lid=2516&num={limit}&page=1")
+        for it in ((d.get("result") or {}).get("data") or [])[:limit]:
+            add(_sina_ts(it.get("ct") or it.get("ctime", "")), it.get("title", ""), "sina")
     except Exception as e:
         print(f"[news-sina] {e}", file=sys.stderr)
+    # 新浪财经7x24 (备用源, 主源失败时补)
+    if not news:
+        try:
+            d = _http_json(f"https://app.cj.sina.com.cn/api/news/pc?page=1&num={limit}")
+            feed = d.get("result", {}).get("data", {}).get("feed", {}).get("list") or \
+                   d.get("data") or []
+            for it in feed[:limit]:
+                add(it.get("create_time") or it.get("ctime", ""),
+                    it.get("rich_text") or it.get("title", ""), "sina")
+        except Exception as e:
+            print(f"[news-sina-cj] {e}", file=sys.stderr)
     # 东财 7x24 (财经/政策/产经, 静默降级)
     for ntype, label in [(8, "em-财经"), (11, "em-政策"), (12, "em-产经")]:
         try:

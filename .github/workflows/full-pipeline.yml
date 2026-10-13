@@ -108,8 +108,13 @@ jobs:
       # ── 6b. K线模拟回测 + 胜率矩阵 (基于已持久化的预测与 bulk K线) ──
       - name: Kline simulation + winrate matrix
         run: |
-          python3 scripts/kline_sim.py --out data/kline_sim.json --days 1,3,5,10 --slip-pct 0.03 || true
+          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --slip-pct 0.03 || true
           python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate_matrix: reflect_latest 样本不足, 跳过"
+
+      # ── 6c. 多维因子引擎 (9维: 技术/资金/高低位/基本面/板块/市场/情绪/周期/消息) ──
+      - name: Multidim factor engine
+        run: |
+          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || true
 
       # ── 7. 采集摘要 ──
       - name: Summary
@@ -133,7 +138,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json
+          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -144,7 +149,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json
+            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt
             git commit -m "pipeline: $ts" 2>/dev/null || true
             git push origin main
           }

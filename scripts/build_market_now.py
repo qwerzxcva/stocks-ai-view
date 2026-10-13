@@ -58,21 +58,27 @@ def main():
         for t in n.get("theme", []):
             theme_count[t] = theme_count.get(t, 0) + 1
 
+    # 涨跌停家数优先用涨跌分布口径 (全天准确, 含20cm/30cm涨停板)
+    # 涨停池 tc 在收盘后只统计到盘中某一时刻 (2026-10-13 实测 67 vs 实际89)
+    limit_up = zdfenbu.get("zt_like") or zt["count"]
+    limit_down = zdfenbu.get("dt_like") or dtn["count"]
     out = {
         "ts": now.isoformat(timespec="seconds"),
         "date": date_str,
         "source": "tencent+eastmoney (零鉴权实时)",
         "market": {
             "indices": indices,
-            "limit_up": zt["count"],
-            "limit_down": dtn["count"],
+            "limit_up": limit_up,
+            "limit_down": limit_down,
             "broken": zb["count"],
-            "zt_rate": round(zt["count"] / max(1, zt["count"] + zb["count"]) * 100, 1),
+            "zt_rate": round(limit_up / max(1, limit_up + zb["count"]) * 100, 1),
             "advance": zdfenbu.get("up", 0),
             "decline": zdfenbu.get("down", 0),
             "flat": zdfenbu.get("flat", 0),
             "up_pct": zdfenbu.get("up_pct", 0),
             "turnover": turnover,
+            "pool_zt_count": zt["count"],
+            "pool_dt_count": dtn["count"],
         },
         "limit_up_pool": zt["pool"][:50],
         "limit_down_pool": dtn["pool"][:30],

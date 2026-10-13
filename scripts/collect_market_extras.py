@@ -123,9 +123,13 @@ def fetch_zdfenbu(date_str):
         up = sum(c for pct, c in dist.items() if pct > 0)
         down = sum(c for pct, c in dist.items() if pct < 0)
         flat = dist.get(0, 0)
+        # 涨停家数 = 所有 ≥+10% 的档位合计 (主板10cm + 双创20cm + 北交所30cm)
+        # 跌停同理 ≤-10%。只用 dist[11] 会漏掉 20cm/30cm 涨停板 (2026-10-13 实测漏 22 家)
+        zt_like = sum(c for pct, c in dist.items() if pct >= 10)
+        dt_like = sum(c for pct, c in dist.items() if pct <= -10)
         return {"up": up, "down": down, "flat": flat, "total": up + down + flat,
                 "up_pct": round(up / max(1, up + down + flat) * 100, 1),
-                "zt_like": dist.get(11, 0), "dt_like": dist.get(-11, 0), "dist": dist}
+                "zt_like": zt_like, "dt_like": dt_like, "dist": dist}
     except Exception as e:
         print(f"[zdfenbu] {e}", file=sys.stderr)
         return {}

@@ -473,7 +473,7 @@ async function renderCloud(){
     document.getElementById('cloudTs').textContent = (c.ts||'').replace('T',' ').slice(5,16) + ' · 统计外推·非投资建议';
     const col = f.bias==='偏多'?'var(--up)':(f.bias==='偏空'?'var(--dn)':'var(--tx)');
     let s = `<div style="margin-bottom:6px">明日展望: <b style="color:${col};font-size:13px">${f.bias||'—'}</b> (综合${f.composite??'—'}) · ${f.as_of}收 ${f.close}</div>`;
-    if(f.next_weekday_stat) s += `<div>下一交易日历史: 日均<b>${f.next_weekday_stat.avg>0?'+':''}${f.next_weekday_stat.avg}%</b> 胜率${f.next_weekday_stat.win}% (n=${f.next_weekday_stat.n})</div>`;
+    if(f.next_weekday_stat) s += `<div>历史同期(同星期): 日均<b>${f.next_weekday_stat.avg>0?'+':''}${f.next_weekday_stat.avg}%</b> 胜率${f.next_weekday_stat.win}% (n=${f.next_weekday_stat.n})</div>`;
     if(f.streak) s += `<div>当前${f.streak} → 续势概率 <b>${f.streak_continue_prob??'—'}%</b> · 20日动量 ${f.mom20}%</div>`;
     const th = c.theme_heat||[];
     if(th.length) s += `<div style="margin-top:5px">涨停题材热度: ${th.slice(0,5).map(x=>`<span style="color:var(--accent)">${x[0]}×${x[1]}</span>`).join(' · ')}</div>`;
