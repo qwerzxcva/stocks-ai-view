@@ -206,6 +206,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div class="hd" style="border-top:1px solid var(--border)">📋 每日总结 <span class="sub" id="sumTs"></span></div>
       <div id="dailySummary" style="padding:8px 14px;font-size:12px;line-height:1.7;max-height:300px;overflow-y:auto"><div class="fl" style="text-align:center">加载中…</div></div>
       <div id="selfReflectBox" style="padding:8px 14px;border-top:1px dashed var(--bd)"></div>
+      <div id="aiReviewBox" style="padding:8px 14px;border-top:1px dashed var(--bd)"></div>
     </div>
     <div class="card">
       <div class="hd">今日主线 <span class="sub">资金×涨幅×成交额×新闻</span></div>
@@ -591,6 +592,16 @@ async function renderSelfReflect(){
   }
   h+='<div class="fl" style="padding:8px 0 2px;font-size:9px">'+(d.meta&&d.meta.principle||'')+' · '+(d.meta&&d.meta.caveat||'')+'</div>';
   el.innerHTML=h;
+}
+// AI 复盘 (GitCode AI DeepSeek-V4-Flash 生成, data/ai_review.json)
+async function renderAiReview(){
+  const el=document.getElementById('aiReviewBox'); if(!el) return;
+  const d=await fetchJSON('data/ai_review.json');
+  if(!d||!d.ok||!d.review){el.innerHTML='';return}
+  const model=(d.model||'').split('/').pop();
+  el.innerHTML='<div style="font-size:11px;margin-bottom:4px"><b>🤖 AI 复盘</b> '+
+    '<span class="fl" style="font-size:9px">'+model+' (GitCode AI) · '+(d.ts||'').replace('T',' ').slice(5,16)+'</span></div>'+
+    '<div style="font-size:11px;line-height:1.65;white-space:pre-wrap">'+d.review+'</div>';
 }
 function renderThemes(ts,el,cnt){
   el.innerHTML=(ts||[]).slice(0,14).map(t=>`<div class="chip"><b>${t.name}</b><span class="fl">${t.news_count}条</span>${t.pos?`<span class="up">+${t.pos}</span>`:''}${t.neg?`<span class="dn">-${t.neg}</span>`:''}</div>`).join('')||'<span class="fl">暂无</span>';
@@ -1349,6 +1360,7 @@ async function render(){
   const db=await fetchJSON('data/daily_brief.json');
   if(db)renderDailyBrief(db);
   renderSelfReflect();
+  renderAiReview();
   renderPools(d);
   _failCount=0;
 }

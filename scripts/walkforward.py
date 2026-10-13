@@ -2,6 +2,7 @@
 # ═══ 来源: GitCode dufuwuxin/stock-system · algorithms/walkforward.py ═══
 # 上游 commit: 4866b80e246a · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
 # 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (from paths import AI_VIEW_DATA; --out 落盘 data/walkforward.json)
 """
 Walk-forward 滚动前推验证 (参考 tick-stock-panel backtest/walkforward)
 用法: python3 walkforward.py --train-days 120 --test-days 20 --step-days 20
@@ -9,9 +10,21 @@ Walk-forward 滚动前推验证 (参考 tick-stock-panel backtest/walkforward)
 """
 from __future__ import annotations
 import argparse
+import json
+import os
 import random
+import sys
 from datetime import date, timedelta
+
 import pandas as pd
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import AI_VIEW_DATA as DATA_DIR
+except Exception:
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 
 class Fold:
@@ -130,12 +143,30 @@ def run_walkforward(df, score_fn, param_grid, train_days=120, test_days=20, step
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description="Walk-forward 滚动前推验证")
     ap.add_argument("--train-days", type=int, default=120)
     ap.add_argument("--test-days", type=int, default=20)
     ap.add_argument("--step-days", type=int, default=20)
+    ap.add_argument("--start", default="2024-01-01", help="起始日期 (默认 2024-01-01)")
+    ap.add_argument("--end", default=None, help="结束日期 (默认 2026-10-11)")
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "walkforward.json"))
     a = ap.parse_args()
-    folds = generate_folds(date(2024, 1, 1), date(2026, 10, 11), a.train_days, a.test_days, a.step_days)
+    d0 = date.fromisoformat(a.start)
+    d1 = date.fromisoformat(a.end) if a.end else date(2026, 10, 11)
+    folds = generate_folds(d0, d1, a.train_days, a.test_days, a.step_days)
+    payload = {
+        "ts": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+        "params": {"train_days": a.train_days, "test_days": a.test_days,
+                   "step_days": a.step_days, "start": d0.isoformat(), "end": d1.isoformat()},
+        "n_folds": len(folds),
+        "folds": [{"fold": f.index, "train": f"{f.train_start}~{f.train_end}",
+                   "test": f"{f.test_start}~{f.test_end}"} for f in folds],
+        "note": "窗口划分仅产出 fold 清单; 收益验证需由调用方提供 score_fn + 日线数据",
+    }
+    os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+    with open(a.out, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, ensure_ascii=False, indent=1)
     print(f"folds: {len(folds)}")
     for f in folds[-3:]:
         print(f"  fold{f.index}: train {f.train_start}~{f.train_end} test {f.test_start}~{f.test_end}")
+    print(f"-> {a.out}")

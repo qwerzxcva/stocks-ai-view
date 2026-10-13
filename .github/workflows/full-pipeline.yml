@@ -133,6 +133,13 @@ jobs:
         run: |
           python3 scripts/build_global_fx.py --out data/global_fx.json || true
 
+      # ── 6g. GitCode AI 每日复盘 (消耗 GitCode 每月 AI 额度, DeepSeek-V4-Flash) ──
+      - name: GitCode AI review
+        env:
+          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+        run: |
+          python3 scripts/gitcode_ai_review.py || echo "ai_review: GitCode AI 不可用, 保留规则引擎复盘"
+
       # ── 7. 采集摘要 ──
       - name: Summary
         run: |
@@ -155,7 +162,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt
+          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -166,7 +173,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt
+            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review
             git commit -m "pipeline: $ts" 2>/dev/null || true
             git push origin main
           }
