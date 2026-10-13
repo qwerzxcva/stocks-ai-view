@@ -1,0 +1,612 @@
+#!/usr/bin/env python3
+"""
+sources_registry.py — 全数据源注册表 (唯一事实来源)
+
+把本项目探测/使用过的所有接口集中登记, 包括:
+  - 可用的 (生产在用)
+  - 不可用的 (被封/需 key/地区限制) —— 同样重要, 避免重复踩坑
+  - 待验证的 (抓到但未接入)
+
+每条记录:
+  id          唯一标识
+  url         接口地址
+  auth        鉴权方式 (none / key / cookie / oauth)
+  status      ok / degraded / blocked / unauth / untested
+  freq        更新频率 (realtime / minute / daily / weekly)
+  delay       数据延迟
+  fields      提供的字段
+  provides    产出到哪个本地文件
+  notes       实测结论/坑
+  degrade_to 降级链 (本源失败时改用什么)
+
+设计原则:
+  - 采集器只读注册表, 不硬编码 URL
+  - 新增源 = 加一条记录 + 写一个 fetch 函数, 不用改管道
+  - 状态由 probe 实测决定, 不靠猜
+
+用法:
+  python3 sources_registry.py --list           # 列出全部
+  python3 sources_registry.py --probe          # 实测所有 none-auth 源
+  python3 sources_registry.py --json           # 导出 JSON
+"""
+import argparse
+import json
+import os
+import sys
+import time
+import urllib.request
+from datetime import datetime, timezone, timedelta
+
+CST = timezone(timedelta(hours=8))
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120"}
+
+# ─────────────────────────────────────────────────────────────────
+# 数据源注册表
+# ─────────────────────────────────────────────────────────────────
+SOURCES = [
+    # ============ A 股核心行情 (可用) ============
+    {
+        "id": "tencent_quote",
+        "name": "腾讯实时行情",
+        "url": "https://qt.gtimg.cn/q={codes}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "realtime",
+        "delay": "秒级 (盘中实时)",
+        "fields": "现价/昨收/开盘/最高/最低/涨跌%/换手%/PE/总市值/流通市值/PB/时间",
+        "field_map": {
+            "p3": "price", "p4": "prev_close", "p5": "open",
+            "p32": "chg_pct", "p33": "high", "p34": "low",
+            "p38": "turnover", "p39": "pe", "p44": "mktcap_yi",
+            "p45": "floatcap_yi", "p46": "pb", "p30": "time",
+        },
+        "encoding": "gbk",
+        "cors": "*",                     # 浏览器可直连 (realtime.js 依赖此点)
+        "provides": ["enrich.json:ths_strong", "latest.json:market.indices"],
+        "notes": "容器内稳定可用; 每码1请求, 支持批量60个/请求; "
+                 "量比无独立字段一律1.0; p44/p45 单位亿元",
+        "degrade_to": ["sina_hq"],
+    },
+    {
+        "id": "tencent_kline",
+        "name": "腾讯日K (前复权)",
+        "url": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={code},day,,,{n},qfq",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日K, 收盘定格",
+        "fields": "date/open/close/high/low/volume (qfq 前复权)",
+        "provides": ["lowpool.json", "cycle.json", "index_kline.json", "hot_impact.json"],
+        "notes": "频率限制: 连续约1750次请求后返回 501 Not Implemented, "
+                 "需错峰分批; 批量补K线建议并发10, 每批间隔0.15s",
+        "degrade_to": ["eastmoney_kline"],
+    },
+    {
+        "id": "tencent_index_history",
+        "name": "腾讯指数全史",
+        "url": "https://web.ifzq.gtimg.cn/appstock/app/kline/kline?param={code},day,,{end},{n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日K",
+        "fields": "指数日K全史 (上证1990起/深成1993/沪深300 2005/创业板2010/科创2019)",
+        "provides": ["cycle_deep.json"],
+        "notes": "分页拉取, 每页最多800根, 用 end 往前翻; "
+                 "实测上证 8566 根 (1990-12-19~2026-10-12)",
+    },
+    {
+        "id": "sina_hq",
+        "name": "新浪实时行情",
+        "url": "https://hq.sinajs.cn/list={codes}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "realtime",
+        "delay": "秒级",
+        "encoding": "gbk",
+        "fields": "指数/个股实时 (需 Referer: finance.sina.com.cn)",
+        "provides": ["(降级备用)"],
+        "notes": "必须带 Referer 头, 否则 403; 主要作为腾讯的降级源",
+    },
+    {
+        "id": "sina_news",
+        "name": "新浪 7x24 快讯",
+        "url": "https://zhibo.sina.com.cn/api/zhibo/feed?page=1",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "minute",
+        "delay": "分钟级",
+        "fields": "title/time/content",
+        "provides": ["latest.json:news_recent", "hot_impact.json"],
+        "notes": "实测返回体经常只有 113 bytes (zhibo_id missing), "
+                 "内容量不稳定; 已由 fetch_remote_news 从 data-news 仓兜底",
+    },
+
+    # ============ 东财 (部分可用) ============
+    {
+        "id": "eastmoney_zt_pool",
+        "name": "东财涨跌停池",
+        "url": "https://push2ex.eastmoney.com/getTopic{kind}Pool",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "分钟级 (收盘定格)",
+        "fields": "涨停/跌停/炸板明细 (code/name/price/涨跌幅/连板/封板时间/行业)",
+        "provides": ["latest.json:market.limit_up/down/broken", "latest.json:limit_up_pool"],
+        "notes": "关键: data.pool 可能为空但 data.tc 是权威计数 "
+                 "(2026-10-12 DT: pool=[] 而 tc=19) → 家数必须读 tc",
+    },
+    {
+        "id": "eastmoney_zdfenbu",
+        "name": "东财涨跌分布",
+        "url": "https://push2ex.eastmoney.com/getTopicZDFenBu",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "分钟级",
+        "fields": "各涨幅档位家数 ({'-11':19},{'11':46},...)",
+        "provides": ["latest.json:market.advance/decline/flat/up_pct"],
+        "notes": "fenbu 的 11/-11 档 ≈ 涨停/跌停口径",
+    },
+    {
+        "id": "eastmoney_datacenter",
+        "name": "东财 datacenter (龙虎榜/大宗交易/两融)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName={report}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "收盘后 (当日数据约 18:00 后出)",
+        "reports": {
+            "RPT_DAILYBILLBOARD_DETAILS": "龙虎榜明细 (席位解读+成功率)",
+            "RPT_DATA_BLOCKTRADE": "大宗交易 (溢价率/成交额)",
+            "RPTA_RZRQ_LSHJ": "融资融券余额历史",
+        },
+        "provides": ["enrich.json:lhb/blocktrade", "latest.json:margin"],
+        "notes": "filter 日期必须 YYYY-MM-DD (横杠), 传 YYYYMMDD 会返回0条; "
+                 "当日数据收盘后才出 → 必须做日期回退 (最多5天); "
+                 "龙虎榜同一股票多行 (不同上榜原因), 需按股票合并",
+        "degrade_to": [],
+    },
+    {
+        "id": "eastmoney_clist",
+        "name": "东财板块列表/资金流 (push2 clist)",
+        "url": "https://push2.eastmoney.com/api/qt/clist/get",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "minute",
+        "delay": "分钟级",
+        "fields": "行业/概念板块涨跌/资金流/成分股",
+        "provides": [],
+        "notes": "容器内间歇 reset (RemoteDisconnected), 约 20 次请求后必然被封; "
+                 "曾导致 sector_pool 只剩2个板块、multi_v5 因缺行业映射出0候选。"
+                 "已用 tencent_mktHs + tv_screener 替代",
+        "degrade_to": ["tencent_mktHs", "tv_screener"],
+    },
+    {
+        "id": "eastmoney_stock_get",
+        "name": "东财个股信息 (含 f127 行业)",
+        "url": "https://push2.eastmoney.com/api/qt/stock/get",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "realtime",
+        "fields": "f127=行业名, f57=代码, f58=名称",
+        "provides": [],
+        "notes": "首次探测成功返回过 industry, 之后同 push2 域一起被 WAF 封; "
+                 "行业映射已改用 tv_screener (5309只全覆盖)",
+        "degrade_to": ["tv_screener"],
+    },
+    {
+        "id": "eastmoney_kline",
+        "name": "东财历史K线",
+        "url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "provides": [],
+        "notes": "push2his 域, 未实测; 列为 tencent_kline 的降级候选",
+    },
+    {
+        "id": "eastmoney_fund_rank",
+        "name": "东财混合基金排行",
+        "url": "https://fund.eastmoney.com/top/default.aspx",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "混合基金近1年收益排行 (KOL抱团方向代理)",
+        "provides": ["latest.json:fund_rank"],
+        "notes": "由 eastmoney_fund_rank.py 实现, 49 条",
+    },
+    {
+        "id": "eastmoney_news",
+        "name": "东财 7x24 / 收评",
+        "url": "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "minute",
+        "provides": [],
+        "notes": "实测 HTTP 567 Unknown Status; 财经/政策/产经三栏目全 567",
+        "degrade_to": ["sina_news", "remote_news"],
+    },
+
+    # ============ 同花顺 (可用) ============
+    {
+        "id": "ths_strong_stocks",
+        "name": "同花顺强势股 + 题材归因",
+        "url": "http://zx.10jqka.com.cn/event/api/getharden/date/{date}/orderby/date/orderway/desc/charset/GBK/",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "分钟级 (盘中实时)",
+        "encoding": "gbk",
+        "fields": "code/name/reason(题材归因)",
+        "provides": ["enrich.json:ths_strong", "hot_impact.json", "latest.json:commentary.hotspots"],
+        "notes": "只返回 code/name/reason 三个字段, 价格必须从腾讯补; "
+                 "实测 48 只/次, 容器内稳定",
+    },
+    {
+        "id": "ths_industry",
+        "name": "同花顺行业板块",
+        "url": "http://q.10jqka.com.cn/interface/stock/thshy/zdf/desc/1/quote/1.js",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "minute",
+        "provides": [],
+        "notes": "实测返回 HTML (SPA fallback) 而非 JSON; 需登录态",
+    },
+
+    # ============ TradingView (可用, 15分钟延迟) ============
+    {
+        "id": "tv_screener",
+        "name": "TradingView 选股器",
+        "url": "https://scanner.tradingview.com/{market}/scan",
+        "auth": "none",
+        "method": "POST",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "约15分钟 (delayed_streaming_900)",
+        "fields": "name/close/change/volume/market_cap/PB/sector/industry/type/"
+                  "Recommend.All(技术评级)",
+        "provides": ["industry_map_tv.json", "latest.json:westock.sector_ranking"],
+        "notes": "零鉴权, market=china → 7476只A股全量; "
+                 "支持服务端条件筛选 (涨幅/市值/PB/RSI); "
+                 "对A股不提供 PE/RSI; name 返回代码, description 返回英文名; "
+                 "非实时源 (15分钟延迟), 页面已标注",
+    },
+
+    # ============ 加密货币 / 海外 (可用但未接入) ============
+    {
+        "id": "coingecko",
+        "name": "CoinGecko 加密货币",
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=usd",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "BTC/ETH 等实时价格",
+        "provides": [],
+        "notes": "完全免费无需 key, 实测 BTC=82532; 免费额度 1万 credits/月; "
+                 "A股项目暂不需要, 保留作海外情绪参考",
+    },
+    {
+        "id": "sec_edgar",
+        "name": "SEC EDGAR 财报 XBRL",
+        "url": "https://data.sec.gov/submissions/{cik}.json",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "美股公司财报全量 XBRL (3.7MB/公司)",
+        "provides": [],
+        "notes": "完全免费无需 key; companyfacts 接口返回完整财务数据; "
+                 "A股用不上, 但可作中概股基本面参考",
+    },
+    {
+        "id": "alpha_vantage",
+        "name": "Alpha Vantage 美股行情",
+        "url": "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={sym}&apikey=demo",
+        "auth": "key",
+        "status": "degraded",
+        "freq": "minute",
+        "fields": "美股实时报价",
+        "provides": [],
+        "notes": "demo key 可用但只能取少数符号, 实测 IBM 返回真实数据; "
+                 "免费额度 25次/天; 注册 key 后 75次/分钟。"
+                 "坑: 用垃圾 key 也返回 200 真实数据, 无法校验 key 有效性",
+    },
+
+    # ============ 需注册 key (未接入) ============
+    {
+        "id": "finnhub",
+        "name": "Finnhub",
+        "url": "https://finnhub.io/api/v1/quote?symbol={sym}&token={key}",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "realtime",
+        "fields": "实时报价/基本面/新闻情绪",
+        "provides": [],
+        "notes": "免费额度最慷慨 (60 req/min); 需注册",
+    },
+    {
+        "id": "twelvedata",
+        "name": "Twelve Data",
+        "url": "https://api.twelvedata.com/quote?symbol={sym}&apikey={key}",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "realtime",
+        "fields": "股/汇/币",
+        "provides": [],
+        "notes": "免费 800次/天, $29/月 55 credits/min 日无限",
+    },
+    {
+        "id": "fmp",
+        "name": "Financial Modeling Prep",
+        "url": "https://financialmodelingprep.com/api/v3/quote/{sym}?apikey={key}",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "realtime",
+        "fields": "基本面/财报",
+        "provides": [],
+        "notes": "免费 250次/天; $15/月平铺",
+    },
+    {
+        "id": "marketstack",
+        "name": "Marketstack",
+        "url": "http://api.marketstack.com/v1/eod?symbols={sym}&access_key={key}",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "daily",
+        "fields": "全球股价日线",
+        "provides": [],
+        "notes": "$9.99/月",
+    },
+    {
+        "id": "tushare",
+        "name": "Tushare",
+        "url": "http://api.tushare.pro",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "daily",
+        "fields": "A股全品类 (行情/财务/因子)",
+        "provides": [],
+        "notes": "国内最主流的 A股数据源, 需注册; 积分制, 免费额度有限",
+    },
+    {
+        "id": "akshare",
+        "name": "AKShare",
+        "url": "python 库 (非HTTP)",
+        "auth": "none",
+        "status": "untested",
+        "freq": "varies",
+        "fields": "聚合东财/新浪/同花顺等 100+ 接口",
+        "provides": [],
+        "notes": "a-share-data 技能依赖它; 容器内未安装。"
+                 "它是封装层不是独立源, 底层仍是上面这些",
+    },
+
+    # ============ 不可用 (地区/反爬) ============
+    {
+        "id": "yahoo_finance",
+        "name": "Yahoo Finance",
+        "url": "https://query1.finance.yahoo.com/v8/finance/chart/{sym}",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "realtime",
+        "provides": [],
+        "notes": "实测 HTTP 429 限流 (chart 与 search 都429)",
+    },
+    {
+        "id": "stooq",
+        "name": "Stooq",
+        "url": "https://stooq.com/q/l/?s={sym}&f=sd2t2ohlcv&h&e=csv",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "daily",
+        "provides": [],
+        "notes": "实测 404, 路径已变更",
+    },
+    {
+        "id": "kaipanla",
+        "name": "开盘啦 kaipanla.com",
+        "url": "https://app.kaipanla.com/open_api.php",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "unknown",
+        "provides": [],
+        "notes": "app./xg. 子域 DNS 不可解析; www 的 open_api.php 被 Nuxt SPA fallback 劫持返回 HTML",
+    },
+    {
+        "id": "cls_cn",
+        "name": "财联社 cls.cn",
+        "url": "https://www.cls.cn/nodeapi/telegraphList",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "unknown",
+        "provides": [],
+        "notes": "实测 404",
+    },
+    {
+        "id": "gitcode_api",
+        "name": "gitcode / AtomGit API",
+        "url": "https://web-api.gitcode.com/api/v2/repos/{owner}/{repo}",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "unknown",
+        "provides": [],
+        "notes": "HTTP 418 反爬 (snomyc/stock 与 gh_mirrors 命名空间); "
+                 "网页 SPA 渲染, 需浏览器+登录才能读源码",
+    },
+    {
+        "id": "mootdx",
+        "name": "mootdx (TCP 7709)",
+        "url": "tcp://119.147.164.60:7709",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "unknown",
+        "provides": [],
+        "notes": "TCP 连接超时, 需国内IP",
+    },
+
+    # ============ 本地/仓内数据源 ============
+    {
+        "id": "local_kline_bulk",
+        "name": "本地 K线 bulk",
+        "url": "file://stocks-data-kline/data/bulk/day_qfq_*.csv",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "全市场日K (qfq), 两种格式: code|date|o|c|h|l|v 与 code|date,o,c,h,l,v",
+        "provides": ["lowpool.json", "optimizer.py 回测"],
+        "notes": "当前覆盖 2577/5343 (48.2%); 腾讯频率限制导致无法一次拉全; "
+                 "nightly-kline 工作流负责增量补录",
+    },
+    {
+        "id": "local_snapshot",
+        "name": "本地全市场快照",
+        "url": "file://stocks-data-live/data/market/snapshot_YYYY-MM-DD.json",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "5278只 name/price/chg_pct/turnover/mktcap/pe",
+        "provides": ["lowpool.json (名称匹配)", "tv_screener 中文名补全"],
+    },
+    {
+        "id": "remote_news",
+        "name": "远端 news 仓",
+        "url": "https://raw.githubusercontent.com/qwerzxcva/stocks-data-news/main/news/{date}.md",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "provides": ["latest.json:news_recent (兜底)"],
+        "notes": "新浪快讯不可用时的兜底; 部分日期返回 404 (未生成)",
+    },
+    {
+        "id": "industry_map_tv",
+        "name": "TV 行业映射 (本地)",
+        "url": "file://stocks-data-live/data/meta/industry_map_tv.json",
+        "auth": "none",
+        "status": "ok",
+        "freq": "weekly",
+        "fields": "5309只 代码 → sector/industry/type",
+        "provides": ["multi_screener 行业匹配"],
+        "notes": "由 tv_screener.py --industry-map 生成; "
+                 "解决了东财被封后 multi_v5 缺行业映射出0候选的问题",
+    },
+]
+
+BY_ID = {s["id"]: s for s in SOURCES}
+
+
+# ─────────────────────────────────────────────────────────────────
+# 查询接口
+# ─────────────────────────────────────────────────────────────────
+def all_sources():
+    return SOURCES
+
+
+def usable():
+    """状态为 ok 或 degraded 的源。"""
+    return [s for s in SOURCES if s["status"] in ("ok", "degraded")]
+
+
+def by_status(status):
+    return [s for s in SOURCES if s["status"] == status]
+
+
+def resolve(sid):
+    """按降级链找第一个可用源 (含自身)。"""
+    seen = set()
+    stack = [sid]
+    while stack:
+        cur = stack.pop(0)
+        if cur in seen or cur not in BY_ID:
+            continue
+        seen.add(cur)
+        s = BY_ID[cur]
+        if s["status"] == "ok":
+            return s
+        stack.extend(s.get("degrade_to") or [])
+    return None
+
+
+# ─────────────────────────────────────────────────────────────────
+# 实测 (只测 none-auth 的 GET 源)
+# ─────────────────────────────────────────────────────────────────
+def probe_one(s, timeout=10):
+    url = s["url"]
+    # 占位符填样例值
+    subs = {"codes": "sh000001", "code": "sh000001", "n": 5, "end": "",
+            "kind": "ZT", "date": "20261012", "market": "china",
+            "ids": "bitcoin", "cik": "0000320193", "sym": "IBM",
+            "report": "RPTA_RZRQ_LSHJ", "owner": "qwerzxcva", "repo": "stocks"}
+    for k, v in subs.items():
+        url = url.replace("{" + k + "}", str(v))
+    if s.get("method") == "POST":
+        url = url.replace("{market}", "china")
+    hdr = dict(UA)
+    if "sina" in s["id"]:
+        hdr["Referer"] = "https://finance.sina.com.cn/"
+    try:
+        req = urllib.request.Request(url, headers=hdr)
+        body = urllib.request.urlopen(req, timeout=timeout).read()
+        return "reachable", len(body)
+    except urllib.error.HTTPError as e:
+        return f"http_{e.code}", 0
+    except Exception as e:
+        return type(e).__name__, 0
+
+
+def probe(only_get=True, sleep_s=0.3):
+    print(f"{'id':26s} {'status':10s} {'probe':22s} bytes")
+    print("-" * 78)
+    for s in SOURCES:
+        if only_get and (s.get("method") == "POST" or s["auth"] != "none"):
+            continue
+        if s["url"].startswith(("file://", "tcp://", "python")):
+            continue
+        st, n = probe_one(s)
+        mark = "✅" if st == "reachable" else "❌"
+        print(f"{s['id']:26s} {s['status']:10s} {mark} {st:20s} {n}")
+        time.sleep(sleep_s)
+
+
+def export(path):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"generated": datetime.now(CST).isoformat(timespec="seconds"),
+                   "total": len(SOURCES),
+                   "by_status": {st: len(by_status(st)) for st in
+                                 ["ok", "degraded", "blocked", "unauth", "untested"]},
+                   "sources": SOURCES}, f, ensure_ascii=False, indent=2)
+    print(f"→ {path}")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--list", action="store_true")
+    ap.add_argument("--probe", action="store_true")
+    ap.add_argument("--json", help="导出 JSON 路径")
+    ap.add_argument("--id", help="只看某个源")
+    args = ap.parse_args()
+
+    srcs = [BY_ID[args.id]] if args.id else SOURCES
+
+    if args.probe:
+        probe()
+        return 0
+
+    if args.json:
+        export(args.json)
+        return 0
+
+    # 默认 list
+    print(f"{'id':26s} {'status':9s} {'freq':9s} {'name'}")
+    print("-" * 78)
+    for s in srcs:
+        icon = {"ok": "✅", "degraded": "🟡", "blocked": "❌",
+                "unauth": "🔑", "untested": "❔"}.get(s["status"], "?")
+        print(f"{s['id']:26s} {icon}{s['status']:8s} {s['freq']:9s} {s['name']}")
+    print()
+    from collections import Counter
+    c = Counter(s["status"] for s in SOURCES)
+    print("统计:", dict(c), f"共 {len(SOURCES)} 个源")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

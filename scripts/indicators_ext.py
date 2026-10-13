@@ -435,6 +435,28 @@ def connors_rsi(close, rsi_n=3, streak_n=2, rank_n=100):
 
 
 # ─── Accumulation/Distribution Line ──────────────────────────────
+def _rsi(closes, period=14):
+    """标准 RSI (Wilder 平滑), 返回与输入等长的序列 (前 period 位 None)。"""
+    out = [None] * len(closes)
+    if len(closes) < period + 1:
+        return out
+    gains = losses = 0.0
+    for i in range(1, period + 1):
+        d = closes[i] - closes[i - 1]
+        if d > 0:
+            gains += d
+        else:
+            losses -= d
+    ag, al = gains / period, losses / period
+    out[period] = 100.0 if al == 0 else round(100 - 100 / (1 + ag / al), 2)
+    for i in range(period + 1, len(closes)):
+        d = closes[i] - closes[i - 1]
+        ag = (ag * (period - 1) + (d if d > 0 else 0)) / period
+        al = (al * (period - 1) + (-d if d < 0 else 0)) / period
+        out[i] = 100.0 if al == 0 else round(100 - 100 / (1 + ag / al), 2)
+    return out
+
+
 def ad_line(high, low, close, volume):
     """累积/派发线 (A/D Line): Σ(CLV × volume), CLV=((C-L)-(H-C))/(H-L)"""
     out = [None] * len(close)
