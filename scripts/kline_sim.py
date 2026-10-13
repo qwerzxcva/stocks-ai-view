@@ -138,6 +138,36 @@ def load_signals(data_dir, sources):
     signals = []
     meta = {}
     for src in sources:
+        # 历史预测快照: data/predictions/engine_v5_*.json (复盘闭环的输入)
+        if src == "predictions":
+            pred_dir = os.path.join(data_dir, "predictions")
+            if not os.path.isdir(pred_dir):
+                meta[src] = {"dir": pred_dir, "missing": True}
+                continue
+            n_total = 0
+            for fp in sorted(glob.glob(os.path.join(pred_dir, "engine_v5_*.json"))):
+                base = os.path.basename(fp)
+                m = re.match(r"engine_v5_(\d{4}-\d{2}-\d{2})\.json", base)
+                pdate = m.group(1) if m else norm_date(json.load(open(fp)).get("ts", "")[:10])
+                try:
+                    d = json.load(open(fp, encoding="utf-8"))
+                except Exception:
+                    continue
+                for it in (d.get("top") or []):
+                    code = str(it.get("code") or "")
+                    if not code:
+                        continue
+                    signals.append({
+                        "code": code[2:] if code[:2] in ("sh", "sz", "bj") else code,
+                        "name": it.get("name", ""),
+                        "score": it.get("score", 0),
+                        "source": "predictions",
+                        "signal_date": pdate,
+                    })
+                    n_total += 1
+            meta[src] = {"dir": pred_dir, "files": len(glob.glob(os.path.join(pred_dir, "engine_v5_*.json"))), "n": n_total}
+            continue
+
         if src == "ai_picks":
             path = os.path.join(data_dir, "ai_picks.json")
             arr_key, date_key = "picks", "date"
@@ -226,7 +256,7 @@ def main():
     ap.add_argument("--max-pos", type=int, default=20, help="最大持仓数 (按 score 取前 N)")
     ap.add_argument("--slip-pct", type=float, default=0.03, help="单边滑点 %% (默认 0.03)")
     ap.add_argument("--limit-up", action="store_true", help="启用涨跌停限制 (触板不买/封板顺延)")
-    ap.add_argument("--source", default="multi_v4,ai_picks", help="选股来源, 逗号分隔")
+    ap.add_argument("--source", default="multi_v4,ai_picks", help="选股来源, 逗号分隔; 含 predictions 则读 data/predictions/ 历史预测快照")
     args = ap.parse_args()
 
     days = sorted({int(x) for x in args.days.split(",") if x.strip()})

@@ -1,22 +1,51 @@
 {
-  "ts": "2026-10-13T08:33:04+08:00",
+  "ts": "2026-10-13T17:54:17+08:00",
   "horizons": [
     1,
     3,
     5
   ],
-  "n_pred_files": 3,
-  "n_records": 150,
+  "n_pred_files": 1,
+  "n_records": 50,
+  "market_phase": {
+    "current": {
+      "label": "range",
+      "source": "market_now.json:market",
+      "detail": "net_adv=8.3%, zt_rate=77.9%"
+    },
+    "sources": [
+      "latest.json",
+      "market_now.json"
+    ],
+    "snapshots": {
+      "20261013": {
+        "label": "range",
+        "detail": "net_adv=8.3%, zt_rate=77.9%"
+      }
+    }
+  },
   "analysis": {
     "overall": {
       "1": {
-        "n": 76,
-        "bull_win_rate": 38.7,
-        "bull_n": 62,
-        "bear_win_rate": 40.0,
-        "bear_n": 10,
-        "avg_ret_pct": -0.51,
-        "raw_win_rate": 39.5
+        "n": 49,
+        "bull_win_rate": 42.9,
+        "bull_win_rate_ci": [
+          30.02,
+          56.73
+        ],
+        "bull_n": 49,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "bear_n": 0,
+        "avg_ret_pct": -0.33,
+        "raw_win_rate": 42.9,
+        "raw_win_rate_ci": [
+          30.02,
+          56.73
+        ]
       },
       "3": {
         "n": 0
@@ -25,14 +54,681 @@
         "n": 0
       }
     },
-    "indicators": {},
-    "ranked": []
+    "by_phase": {
+      "range": {
+        "n_records": 50,
+        "1d": {
+          "n": 49,
+          "bull_win_rate": 42.9,
+          "bull_win_rate_ci": [
+            30.02,
+            56.73
+          ],
+          "bear_win_rate": null,
+          "bear_win_rate_ci": [
+            null,
+            null
+          ],
+          "raw_win_rate": 42.9,
+          "raw_win_rate_ci": [
+            30.02,
+            56.73
+          ]
+        }
+      }
+    },
+    "indicators": {
+      "SuperTrend": {
+        "bull_n": 48,
+        "bull_win_rate": 41.7,
+        "bull_win_rate_ci": [
+          28.85,
+          55.72
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 0.0,
+        "bear_win_rate_ci": [
+          0.0,
+          79.35
+        ],
+        "evidence": "ok"
+      },
+      "MA5/MA20": {
+        "bull_n": 36,
+        "bull_win_rate": 38.9,
+        "bull_win_rate_ci": [
+          24.78,
+          55.14
+        ],
+        "bear_n": 8,
+        "bear_win_rate": 37.5,
+        "bear_win_rate_ci": [
+          13.68,
+          69.43
+        ],
+        "evidence": "ok"
+      },
+      "RSI": {
+        "bull_n": 26,
+        "bull_win_rate": 50.0,
+        "bull_win_rate_ci": [
+          32.06,
+          67.94
+        ],
+        "bear_n": 4,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          51.01,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      "MACD": {
+        "bull_n": 46,
+        "bull_win_rate": 41.3,
+        "bull_win_rate_ci": [
+          28.29,
+          55.66
+        ],
+        "bear_n": 3,
+        "bear_win_rate": 0.0,
+        "bear_win_rate_ci": [
+          0.0,
+          56.15
+        ],
+        "evidence": "ok"
+      },
+      "KDJ(RSV)": {
+        "bull_n": 39,
+        "bull_win_rate": 38.5,
+        "bull_win_rate_ci": [
+          24.89,
+          54.1
+        ],
+        "bear_n": 10,
+        "bear_win_rate": 40.0,
+        "bear_win_rate_ci": [
+          16.82,
+          68.73
+        ],
+        "evidence": "ok"
+      },
+      "BOLL/Keltner": {
+        "bull_n": 28,
+        "bull_win_rate": 39.3,
+        "bull_win_rate_ci": [
+          23.57,
+          57.59
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      "Donchian20": {
+        "bull_n": 7,
+        "bull_win_rate": 57.1,
+        "bull_win_rate_ci": [
+          25.05,
+          84.18
+        ],
+        "bear_n": 14,
+        "bear_win_rate": 50.0,
+        "bear_win_rate_ci": [
+          26.8,
+          73.2
+        ],
+        "evidence": "insufficient"
+      },
+      "CMO": {
+        "bull_n": 23,
+        "bull_win_rate": 34.8,
+        "bull_win_rate_ci": [
+          18.81,
+          55.11
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      "Vortex": {
+        "bull_n": 37,
+        "bull_win_rate": 40.5,
+        "bull_win_rate_ci": [
+          26.35,
+          56.51
+        ],
+        "bear_n": 12,
+        "bear_win_rate": 41.7,
+        "bear_win_rate_ci": [
+          19.33,
+          68.05
+        ],
+        "evidence": "ok"
+      },
+      "UltimateOsc": {
+        "bull_n": 37,
+        "bull_win_rate": 48.6,
+        "bull_win_rate_ci": [
+          33.45,
+          64.11
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      "Choppiness": {
+        "bull_n": 5,
+        "bull_win_rate": 40.0,
+        "bull_win_rate_ci": [
+          11.76,
+          76.93
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      "HullMA": {
+        "bull_n": 32,
+        "bull_win_rate": 37.5,
+        "bull_win_rate_ci": [
+          22.93,
+          54.75
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 47.1,
+        "bear_win_rate_ci": [
+          26.16,
+          69.04
+        ],
+        "evidence": "ok"
+      },
+      "ElderForce": {
+        "bull_n": 48,
+        "bull_win_rate": 43.8,
+        "bull_win_rate_ci": [
+          30.7,
+          57.73
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      "ConnorsRSI": {
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 11,
+        "bear_win_rate": 54.5,
+        "bear_win_rate_ci": [
+          28.01,
+          78.73
+        ],
+        "evidence": "insufficient"
+      },
+      "A/D Line": {
+        "bull_n": 32,
+        "bull_win_rate": 34.4,
+        "bull_win_rate_ci": [
+          20.41,
+          51.69
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 35.3,
+        "bear_win_rate_ci": [
+          17.31,
+          58.7
+        ],
+        "evidence": "ok"
+      },
+      "Pivot": {
+        "bull_n": 32,
+        "bull_win_rate": 31.2,
+        "bull_win_rate_ci": [
+          17.95,
+          48.57
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 35.3,
+        "bear_win_rate_ci": [
+          17.31,
+          58.7
+        ],
+        "evidence": "ok"
+      },
+      "VWMA": {
+        "bull_n": 47,
+        "bull_win_rate": 42.6,
+        "bull_win_rate_ci": [
+          29.51,
+          56.72
+        ],
+        "bear_n": 2,
+        "bear_win_rate": 50.0,
+        "bear_win_rate_ci": [
+          9.45,
+          90.55
+        ],
+        "evidence": "ok"
+      },
+      "CapitalFlowConsistency": {
+        "bull_n": 1,
+        "bull_win_rate": 0.0,
+        "bull_win_rate_ci": [
+          0.0,
+          79.35
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      "SectorResonance": {
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      "InZTPool": {
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      }
+    },
+    "ranked": [
+      {
+        "indicator": "SectorResonance",
+        "quality": 100.0,
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "InZTPool",
+        "quality": 100.0,
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "ConnorsRSI",
+        "quality": 77.2,
+        "bull_n": 1,
+        "bull_win_rate": 100.0,
+        "bull_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "bear_n": 11,
+        "bear_win_rate": 54.5,
+        "bear_win_rate_ci": [
+          28.01,
+          78.73
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "RSI",
+        "quality": 75.0,
+        "bull_n": 26,
+        "bull_win_rate": 50.0,
+        "bull_win_rate_ci": [
+          32.06,
+          67.94
+        ],
+        "bear_n": 4,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          51.01,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "UltimateOsc",
+        "quality": 74.3,
+        "bull_n": 37,
+        "bull_win_rate": 48.6,
+        "bull_win_rate_ci": [
+          33.45,
+          64.11
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "ElderForce",
+        "quality": 71.9,
+        "bull_n": 48,
+        "bull_win_rate": 43.8,
+        "bull_win_rate_ci": [
+          30.7,
+          57.73
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 100.0,
+        "bear_win_rate_ci": [
+          20.65,
+          100.0
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "Donchian20",
+        "quality": 53.5,
+        "bull_n": 7,
+        "bull_win_rate": 57.1,
+        "bull_win_rate_ci": [
+          25.05,
+          84.18
+        ],
+        "bear_n": 14,
+        "bear_win_rate": 50.0,
+        "bear_win_rate_ci": [
+          26.8,
+          73.2
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "VWMA",
+        "quality": 46.3,
+        "bull_n": 47,
+        "bull_win_rate": 42.6,
+        "bull_win_rate_ci": [
+          29.51,
+          56.72
+        ],
+        "bear_n": 2,
+        "bear_win_rate": 50.0,
+        "bear_win_rate_ci": [
+          9.45,
+          90.55
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "HullMA",
+        "quality": 42.3,
+        "bull_n": 32,
+        "bull_win_rate": 37.5,
+        "bull_win_rate_ci": [
+          22.93,
+          54.75
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 47.1,
+        "bear_win_rate_ci": [
+          26.16,
+          69.04
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "Vortex",
+        "quality": 41.1,
+        "bull_n": 37,
+        "bull_win_rate": 40.5,
+        "bull_win_rate_ci": [
+          26.35,
+          56.51
+        ],
+        "bear_n": 12,
+        "bear_win_rate": 41.7,
+        "bear_win_rate_ci": [
+          19.33,
+          68.05
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "Choppiness",
+        "quality": 40.0,
+        "bull_n": 5,
+        "bull_win_rate": 40.0,
+        "bull_win_rate_ci": [
+          11.76,
+          76.93
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "BOLL/Keltner",
+        "quality": 39.3,
+        "bull_n": 28,
+        "bull_win_rate": 39.3,
+        "bull_win_rate_ci": [
+          23.57,
+          57.59
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "KDJ(RSV)",
+        "quality": 39.2,
+        "bull_n": 39,
+        "bull_win_rate": 38.5,
+        "bull_win_rate_ci": [
+          24.89,
+          54.1
+        ],
+        "bear_n": 10,
+        "bear_win_rate": 40.0,
+        "bear_win_rate_ci": [
+          16.82,
+          68.73
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "MA5/MA20",
+        "quality": 38.2,
+        "bull_n": 36,
+        "bull_win_rate": 38.9,
+        "bull_win_rate_ci": [
+          24.78,
+          55.14
+        ],
+        "bear_n": 8,
+        "bear_win_rate": 37.5,
+        "bear_win_rate_ci": [
+          13.68,
+          69.43
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "A/D Line",
+        "quality": 34.8,
+        "bull_n": 32,
+        "bull_win_rate": 34.4,
+        "bull_win_rate_ci": [
+          20.41,
+          51.69
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 35.3,
+        "bear_win_rate_ci": [
+          17.31,
+          58.7
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "CMO",
+        "quality": 34.8,
+        "bull_n": 23,
+        "bull_win_rate": 34.8,
+        "bull_win_rate_ci": [
+          18.81,
+          55.11
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      },
+      {
+        "indicator": "Pivot",
+        "quality": 33.2,
+        "bull_n": 32,
+        "bull_win_rate": 31.2,
+        "bull_win_rate_ci": [
+          17.95,
+          48.57
+        ],
+        "bear_n": 17,
+        "bear_win_rate": 35.3,
+        "bear_win_rate_ci": [
+          17.31,
+          58.7
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "SuperTrend",
+        "quality": 20.9,
+        "bull_n": 48,
+        "bull_win_rate": 41.7,
+        "bull_win_rate_ci": [
+          28.85,
+          55.72
+        ],
+        "bear_n": 1,
+        "bear_win_rate": 0.0,
+        "bear_win_rate_ci": [
+          0.0,
+          79.35
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "MACD",
+        "quality": 20.6,
+        "bull_n": 46,
+        "bull_win_rate": 41.3,
+        "bull_win_rate_ci": [
+          28.29,
+          55.66
+        ],
+        "bear_n": 3,
+        "bear_win_rate": 0.0,
+        "bear_win_rate_ci": [
+          0.0,
+          56.15
+        ],
+        "evidence": "ok"
+      },
+      {
+        "indicator": "CapitalFlowConsistency",
+        "quality": 0.0,
+        "bull_n": 1,
+        "bull_win_rate": 0.0,
+        "bull_win_rate_ci": [
+          0.0,
+          79.35
+        ],
+        "bear_n": 0,
+        "bear_win_rate": null,
+        "bear_win_rate_ci": [
+          null,
+          null
+        ],
+        "evidence": "insufficient"
+      }
+    ]
   },
   "meta": {
-    "method": "预测时点的多空票 vs 预测后 N 日实际涨跌, 无前视偏差",
+    "method": "预测时点的多空票 vs 预测后 N 日实际涨跌, 无前视偏差; Wilson 95% CI 标注胜率可信度",
     "bull_win_rate": "指标看多且实际上涨的比例",
     "bear_win_rate": "指标看空且实际下跌的比例",
     "evidence": "样本<30 标 insufficient, 结论不可信",
-    "caveat": "单一指标历史胜率接近50%即噪声; 只报看多胜率属选择性披露, 故同时报多空双向"
+    "phase_method": "pred_date 附近的 latest.json/market_now.json 市场相位快照匹配; 找不到则用最近快照代理并标注 note",
+    "ci": "Wilson score interval, z=1.96 (95%), 对极端小样本比 Wald 区间更准确",
+    "caveat": "单一指标历史胜率接近50%即噪声; 只报看多胜率属选择性披露, 故同时报多空双向; 分环境样本量小或无历史快照时结果仅供参考"
   }
 }
