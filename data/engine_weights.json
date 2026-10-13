@@ -1,5 +1,5 @@
 {
-  "ts": "2026-10-14T07:51:02+08:00",
+  "ts": "2026-10-14T05:55:29+08:00",
   "engine": "weight_calibrator v1 (特征重要性 → 权重)",
   "source": "reflect_latest.json by_indicator (多持有期胜率+Wilson CI)",
   "method": {
@@ -29,13 +29,16 @@
     "ConnorsRSI": 1.0,
     "A/D Line": 1.0,
     "Pivot": 1.0,
-    "VWMA": 1.0
+    "VWMA": 1.0,
+    "CapitalFlowConsistency": 1.0,
+    "SectorResonance": 1.0,
+    "InZTPool": 1.0
   },
   "reasons": {
     "SuperTrend": {
       "quality": 47.1,
-      "n": 16709,
-      "ci_lo": 39.99,
+      "n": 16731,
+      "ci_lo": 39.96,
       "weight": 1.0,
       "reason": "质量47 噪声区 → 等权",
       "bull_win": 40.8,
@@ -43,19 +46,19 @@
       "weight_final": 1.0
     },
     "MA5/MA20": {
-      "quality": 47.0,
-      "n": 16142,
-      "ci_lo": 40.32,
+      "quality": 46.9,
+      "n": 16159,
+      "ci_lo": 40.26,
       "weight": 1.0,
       "reason": "质量47 噪声区 → 等权",
       "bull_win": 41.1,
-      "bear_win": 52.8,
+      "bear_win": 52.7,
       "weight_final": 1.0
     },
     "RSI": {
       "quality": 48.5,
-      "n": 9045,
-      "ci_lo": 38.67,
+      "n": 9060,
+      "ci_lo": 38.66,
       "weight": 1.0,
       "reason": "质量48 噪声区 → 等权",
       "bull_win": 40.0,
@@ -63,19 +66,19 @@
       "weight_final": 1.0
     },
     "MACD": {
-      "quality": 47.7,
-      "n": 16709,
-      "ci_lo": 40.04,
+      "quality": 47.6,
+      "n": 16731,
+      "ci_lo": 40.0,
       "weight": 1.0,
       "reason": "质量48 噪声区 → 等权",
-      "bull_win": 40.9,
-      "bear_win": 54.5,
+      "bull_win": 40.8,
+      "bear_win": 54.4,
       "weight_final": 1.0
     },
     "KDJ(RSV)": {
       "quality": 48.8,
-      "n": 16709,
-      "ci_lo": 40.52,
+      "n": 16731,
+      "ci_lo": 40.49,
       "weight": 1.0,
       "reason": "质量49 噪声区 → 等权",
       "bull_win": 41.3,
@@ -84,8 +87,8 @@
     },
     "BOLL/Keltner": {
       "quality": 43.6,
-      "n": 13232,
-      "ci_lo": 40.94,
+      "n": 13233,
+      "ci_lo": 40.91,
       "weight": 0.6,
       "reason": "质量44 反向/无效 → 降权",
       "bull_win": 41.8,
@@ -94,7 +97,7 @@
     },
     "Donchian20": {
       "quality": 48.5,
-      "n": 6533,
+      "n": 6538,
       "ci_lo": 41.3,
       "weight": 1.0,
       "reason": "质量49 噪声区 → 等权",
@@ -104,8 +107,8 @@
     },
     "CMO": {
       "quality": 44.5,
-      "n": 12896,
-      "ci_lo": 40.91,
+      "n": 12892,
+      "ci_lo": 40.86,
       "weight": 0.6,
       "reason": "质量44 反向/无效 → 降权",
       "bull_win": 41.8,
@@ -113,28 +116,28 @@
       "weight_final": 0.6
     },
     "Vortex": {
-      "quality": 46.5,
-      "n": 16709,
-      "ci_lo": 39.78,
+      "quality": 46.4,
+      "n": 16731,
+      "ci_lo": 39.73,
       "weight": 1.0,
       "reason": "质量46 噪声区 → 等权",
-      "bull_win": 40.6,
-      "bear_win": 52.4,
+      "bull_win": 40.5,
+      "bear_win": 52.3,
       "weight_final": 1.0
     },
     "UltimateOsc": {
-      "quality": 48.3,
-      "n": 13496,
-      "ci_lo": 40.24,
+      "quality": 48.4,
+      "n": 13507,
+      "ci_lo": 40.23,
       "weight": 1.0,
       "reason": "质量48 噪声区 → 等权",
       "bull_win": 41.1,
-      "bear_win": 55.5,
+      "bear_win": 55.6,
       "weight_final": 1.0
     },
     "Choppiness": {
       "quality": 39.5,
-      "n": 5046,
+      "n": 5039,
       "ci_lo": 33.34,
       "weight": 0.6,
       "reason": "质量40 反向/无效 → 降权",
@@ -143,19 +146,19 @@
       "weight_final": 0.6
     },
     "HullMA": {
-      "quality": 49.4,
-      "n": 16709,
-      "ci_lo": 40.78,
+      "quality": 49.5,
+      "n": 16731,
+      "ci_lo": 40.77,
       "weight": 1.0,
       "reason": "质量49 噪声区 → 等权",
       "bull_win": 41.6,
-      "bear_win": 57.2,
+      "bear_win": 57.3,
       "weight_final": 1.0
     },
     "ElderForce": {
       "quality": 47.0,
-      "n": 16709,
-      "ci_lo": 40.11,
+      "n": 16731,
+      "ci_lo": 40.09,
       "weight": 1.0,
       "reason": "质量47 噪声区 → 等权",
       "bull_win": 40.9,
@@ -164,8 +167,8 @@
     },
     "ConnorsRSI": {
       "quality": 50.1,
-      "n": 6754,
-      "ci_lo": 40.98,
+      "n": 6747,
+      "ci_lo": 41.04,
       "weight": 1.0,
       "reason": "质量50 噪声区 → 等权",
       "bull_win": 44.1,
@@ -174,8 +177,8 @@
     },
     "A/D Line": {
       "quality": 49.0,
-      "n": 16709,
-      "ci_lo": 40.48,
+      "n": 16731,
+      "ci_lo": 40.44,
       "weight": 1.0,
       "reason": "质量49 噪声区 → 等权",
       "bull_win": 41.3,
@@ -183,28 +186,58 @@
       "weight_final": 1.0
     },
     "Pivot": {
-      "quality": 51.2,
-      "n": 16709,
-      "ci_lo": 41.75,
+      "quality": 51.1,
+      "n": 16731,
+      "ci_lo": 41.69,
       "weight": 1.0,
       "reason": "质量51 噪声区 → 等权",
       "bull_win": 42.6,
-      "bear_win": 59.7,
+      "bear_win": 59.6,
       "weight_final": 1.0
     },
     "VWMA": {
       "quality": 48.2,
-      "n": 16709,
-      "ci_lo": 40.31,
+      "n": 16731,
+      "ci_lo": 40.28,
       "weight": 1.0,
       "reason": "质量48 噪声区 → 等权",
       "bull_win": 41.1,
       "bear_win": 55.2,
       "weight_final": 1.0
+    },
+    "CapitalFlowConsistency": {
+      "quality": 0.0,
+      "n": 1,
+      "ci_lo": 0.0,
+      "weight": 1.0,
+      "reason": "样本不足, 保持等权",
+      "bull_win": 0.0,
+      "bear_win": null,
+      "weight_final": 1.0
+    },
+    "SectorResonance": {
+      "quality": 0.0,
+      "n": 1,
+      "ci_lo": 0.0,
+      "weight": 1.0,
+      "reason": "样本不足, 保持等权",
+      "bull_win": 0.0,
+      "bear_win": null,
+      "weight_final": 1.0
+    },
+    "InZTPool": {
+      "quality": 0.0,
+      "n": 1,
+      "ci_lo": 0.0,
+      "weight": 1.0,
+      "reason": "样本不足, 保持等权",
+      "bull_win": 0.0,
+      "bear_win": null,
+      "weight_final": 1.0
     }
   },
   "summary": {
-    "n_total": 17,
+    "n_total": 20,
     "n_effective": 0,
     "n_reversed_or_noise": 3,
     "verdict": "指标有效性弱, 维持等权观察"
