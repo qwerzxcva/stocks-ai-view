@@ -32,7 +32,7 @@ from datetime import datetime, timezone, timedelta
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_LOG = os.environ.get("STOCKS_PROBE_LOG") or os.path.abspath(os.path.join(
-    os.path.dirname(os.path.dirname(HERE)), "..", "stocks-data-live", "data",
+    os.path.dirname(os.path.dirname(HERE)), "stocks-data-live", "data",
     "research", "probe_log.json"))
 
 TTL_H = 24

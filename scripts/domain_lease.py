@@ -46,9 +46,9 @@ from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_TABLE = os.environ.get("STOCKS_DOMAIN_LEASE") or os.path.join(
-    os.path.dirname(os.path.dirname(HERE)), "..", "stocks-data-live", "data",
-    "research", "domain_lease.json")
+DEFAULT_TABLE = os.environ.get("STOCKS_DOMAIN_LEASE") or os.path.abspath(os.path.join(
+    os.path.dirname(os.path.dirname(HERE)), "stocks-data-live", "data",
+    "research", "domain_lease.json"))
 
 DOMAINS = {
     "realtime_quote": "实时行情 (腾讯/新浪/东财/TradingView)",
@@ -163,21 +163,31 @@ def main():
             return 1
         leases = d.setdefault("leases", {})
         L = leases.get(dom)
-        if L and L.get("status") != "done" and not args.force:
-            ca = L.get("claimed_at")
-            age_h = None
-            if ca:
-                try:
-                    age_h = (datetime.now(CST) -
-                             datetime.fromisoformat(ca)).total_seconds() / 3600
-                except ValueError:
-                    pass
-            if age_h is None or age_h <= LEASE_TTL_H:
-                print(f"❌ 域 {dom} 已被 {L.get('agent')} 认领 "
-                      f"({age_h:.1f}h 前, status={L.get('status')})", file=sys.stderr)
-                print(f"   若确需重派: 加 --force, 或先 --release {L.get('agent')} {dom}",
+        if L and not args.force:
+            if L.get("status") == "done":
+                # done 是永久锁定: 该域已完成, 不再重复派 (除非 --force)
+                print(f"❌ 域 {dom} 已由 {L.get('agent')} 完成 "
+                      f"({(L.get('released_at') or L.get('claimed_at') or '')[:19]})",
                       file=sys.stderr)
+                print(f"   产出: {L.get('output') or '(无)'}  备注: {L.get('note') or ''}",
+                      file=sys.stderr)
+                print(f"   若确需重派: 加 --force (会覆盖完成标记)", file=sys.stderr)
                 return 1
+            if L.get("status") != "expired":
+                ca = L.get("claimed_at")
+                age_h = None
+                if ca:
+                    try:
+                        age_h = (datetime.now(CST) -
+                                 datetime.fromisoformat(ca)).total_seconds() / 3600
+                    except ValueError:
+                        pass
+                if age_h is None or age_h <= LEASE_TTL_H:
+                    print(f"❌ 域 {dom} 已被 {L.get('agent')} 认领 "
+                          f"({age_h:.1f}h 前, status={L.get('status')})", file=sys.stderr)
+                    print(f"   若确需重派: 加 --force, 或先 --release {L.get('agent')} {dom}",
+                          file=sys.stderr)
+                    return 1
         leases[dom] = {
             "agent": agent, "status": "claimed",
             "claimed_at": datetime.now(CST).isoformat(timespec="seconds"),
