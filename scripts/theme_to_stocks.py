@@ -2,11 +2,30 @@
 # ═══ 来源: GitCode dufuwuxin/stock-system · engines/theme_to_stocks.py ═══
 # 上游 commit: fcd811f3fc55 · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
 # 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (news_map → data/hot_impact.json; duckdb → DUCKDB_PATH; --out 落盘)
 """
 题材 → 库内个股映射 (结合我们的数据: RPS强势+近期涨停基因+主板过滤)
-用法: python3 theme_to_stocks.py   (读最新 news_map json)
+用法: python3 theme_to_stocks.py   (读 data/hot_impact.json 的热点题材)
 """
-import duckdb, json, glob, os, re, time, urllib.request
+import argparse
+import glob
+import json
+import os
+import re
+import sys
+import time
+import urllib.request
+from datetime import datetime
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import AI_VIEW_DATA as DATA_DIR, DUCKDB_PATH
+except Exception:
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
+    DUCKDB_PATH = os.path.join(os.path.dirname(os.path.dirname(HERE)),
+                               "stocks-data-live", "data", "stocks.duckdb")
 
 THEME_STEM = {
     "券商": ["证券|券商"],
@@ -27,29 +46,57 @@ THEME_STEM = {
     "有色": ["有色|金属|铜|铝|锌"],
 }
 
-def main():
-    import akshare as ak
-    files = sorted(f for f in glob.glob("/home/agentuser/stockdb/data/news_map/*.json") if "_stocks" not in f)
-    if not files:
-        print("no news_map"); return
-    rep = json.load(open(files[-1]))
-    themes = list(rep.get("theme_hits", {}).items())[:6]
-    con = duckdb.connect("/home/agentuser/stockdb/stock.duckdb", read_only=True)
 
-    # 库内全市场名称 + RPS60 + 20日涨停基因
+def load_themes(data_dir):
+    """热点题材来源: hot_impact.json (本项目热点推演产物) 优先, 退化 news_map json。"""
+    themes = []
+    hp = os.path.join(data_dir, "hot_impact.json")
+    if os.path.exists(hp):
+        try:
+            d = json.load(open(hp, encoding="utf-8"))
+            for r in (d.get("reports") or []):
+                th = r.get("theme")
+                if th:
+                    themes.append((th, r.get("news_count") or r.get("heat") or 0))
+        except Exception:
+            pass
+    if not themes:
+        files = sorted(f for f in glob.glob(os.path.join(data_dir, "news_map", "*.json"))
+                       if "_stocks" not in f)
+        if files:
+            try:
+                rep = json.load(open(files[-1], encoding="utf-8"))
+                themes = list((rep.get("theme_hits") or {}).items())
+            except Exception:
+                themes = []
+    return themes[:6]
+
+
+def main():
+    ap = argparse.ArgumentParser(description="题材 → 库内个股映射")
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "theme_to_stocks.json"))
+    args = ap.parse_args()
+
+    themes = load_themes(DATA_DIR)
+    if not themes:
+        print("no themes: 需要 data/hot_impact.json 或 data/news_map/*.json", file=sys.stderr)
+        return 1
+
+    import duckdb
+
+    con = duckdb.connect(DUCKDB_PATH, read_only=True)
+    # 库内全市场名称 + 60日动量 (表名/列名按本项目 db_layer: kline_daily.code)
     base = con.execute("""
-        WITH d AS (SELECT symbol, date, close, volume FROM daily),
-        last AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY date DESC) rn FROM d)
-        SELECT a.symbol, a.close, a.close/NULLIF(b.close,0)-1 AS r60
-        FROM last a JOIN last b ON a.symbol=b.symbol AND b.rn=60
+        WITH d AS (SELECT code, date, close FROM kline_daily),
+        last AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY code ORDER BY date DESC) rn FROM d)
+        SELECT a.code AS symbol, a.close, a.close/NULLIF(b.close,0)-1 AS r60
+        FROM last a JOIN last b ON a.code=b.code AND b.rn=60
         WHERE a.rn=1
     """).fetchdf()
-    zt = con.execute("""
-        SELECT symbol, COUNT(*) zt20 FROM (
-          SELECT symbol, date, close/close-0+close/LAG(close) OVER (PARTITION BY symbol ORDER BY date)-1 AS r
-          FROM daily WHERE date >= (SELECT MAX(date) FROM daily WHERE 1=1)
-        ) WHERE r >= 0.095 GROUP BY symbol
-    """).fetchdf()
+    con.close()
+    if base.empty:
+        print("kline_daily 无数据: 需先跑 db_layer --load 导入日K", file=sys.stderr)
+        return 1
 
     print("=== 热点题材 → 主板映射(60日动量Top) ===")
     out = {}
@@ -58,7 +105,6 @@ def main():
         if not pats:
             continue
         pat = "|".join(pats)
-        # 名称匹配: 需要股票名称 — 暂用 akshare 现货清单缓存
         # 名称映射: 腾讯qt批量(东财spot被墙) — 50只/批
         name_map = {}
         codes = [r["symbol"] for r in base.to_dict("records")]
@@ -89,9 +135,17 @@ def main():
         print(f"\n[{theme}] 快讯{cnt}条 候选:")
         for sym, nm, r in top:
             print(f"  {sym} {nm:8s} 60日动量 {r:+.1%}")
-    con.close()
-    json.dump(out, open(files[-1].replace(".json", "_stocks.json"), "w"), ensure_ascii=False, indent=1)
-    print("\nsaved:", files[-1].replace(".json", "_stocks.json"))
+
+    payload = {"ts": datetime.now().isoformat(timespec="seconds"),
+               "source": "data/hot_impact.json 热点题材 × kline_daily 60日动量 × 腾讯qt名称",
+               "themes": {k: [{"symbol": s, "name": n, "r60": r} for s, n, r in v]
+                          for k, v in out.items()}}
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    with open(args.out, "w", encoding="utf-8") as fh:
+        json.dump(payload, fh, ensure_ascii=False, indent=1)
+    print("\nsaved:", args.out)
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
