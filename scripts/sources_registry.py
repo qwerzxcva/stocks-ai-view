@@ -303,6 +303,19 @@ SOURCES = [
                  "可作东财/腾讯 K线的第三方交叉校验源 (用户反馈 K线数据有问题)",
     },
     {
+        "id": "em_push2his_kline_DEPRECATED",
+        "name": "东财历史K线 (push2his kline) — 已失效",
+        "url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "daily",
+        "fields": "(原: date/open/close/high/low/volume/amount)",
+        "provides": [],
+        "notes": "2026-10-13 晚间复测 rc=102 data=null — 早间 (19:04) 实测 200, 晚间 (21:xx) 失效; "
+                 "疑似按 IP 动态风控或端点改版; K线一律改用 tencent_kline (fqkline) 或 sina_vip_kline; "
+                 "clist 端点 (em_push2his_clist) 仍可用, 勿混淆",
+    },
+    {
         "id": "eastmoney_stock_get",
         "name": "东财个股信息 (含 f127 行业)",
         "url": "https://push2.eastmoney.com/api/qt/stock/get",
