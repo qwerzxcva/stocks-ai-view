@@ -10,8 +10,9 @@ __pycache__/
 data/adjusted/bulk/
 # 全历史/大快照: 只从 GitHub raw 读
 data/adjusted/index_full.json
-data/all_sources.json
-data/search_index.json
+# all_sources.json 不排除: CI 的 Commit & push 会 git add 它, 被 ignore 时
+# add 报 "pathspec did not match any files" → 整条 pipeline exit 1,
+# 采集成果一个都提交不上去 (2026-10-14 实测复现)。文件实际 ~160KB, 可入账。
 # 本地 DuckDB (二进制, 不入库; 采集在 Actions/独立服务器跑)
 *.duckdb
 *.duckdb.wal

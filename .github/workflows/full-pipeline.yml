@@ -198,16 +198,29 @@ jobs:
       # 只提交采集侧产物。引擎产出 (engine_v5/multidim/decision/reflect/
       # kline_sim/self_reflect/valuation/…) 由 space-pull.yml 拉回后提交,
       # 两个工作流写不同的文件, 不会互相覆盖。
+      #
+      # 用 "git add -A -- <存在的路径>" 而非直接 add 字面量:
+      #   `git add` 遇到不存在的 pathspec 会 fatal 退出 (exit 1),
+      #   曾导致每次 pipeline 都在最后一步崩掉, 采集成果全部丢失
+      #   (2026-10-13 20:57 与 2026-10-14 05:12 两次 run 均因此失败)。
       - name: Commit & push
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/ban_prob_balanced.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
+          # 采集侧产物白名单 (引擎产出由 space-pull.yml 负责)
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob.json data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json"
+          # 只保留真实存在的路径, 避免 add 不存在的文件导致 fatal
+          EXIST=""
+          for f in $FILES; do
+            if [ -e "$f" ]; then EXIST="$EXIST $f"; else echo "skip (not generated): $f"; fi
+          done
+          echo "staging:$EXIST"
           git fetch origin main
           git reset --soft origin/main
-          git add -A $FILES
+          # shellcheck disable=SC2086
+          git add -A -- $EXIST
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --quiet --cached HEAD; then
+          if git diff --cached --quiet HEAD; then
             echo "no changes"
           else
             git commit -m "pipeline(collect): $ts"
@@ -216,7 +229,8 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A $FILES
+            # shellcheck disable=SC2086
+            git add -A -- $EXIST
             git commit -m "pipeline(collect): $ts" 2>/dev/null || true
             git push origin main
           }
