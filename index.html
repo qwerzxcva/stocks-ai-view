@@ -1221,7 +1221,7 @@ async function render(){
   renderLadder(d.ladder);
   renderMainlines(d.mainlines, d.themes);
   renderThemes(d.themes,document.getElementById('themes'),'themesCount');
-  renderPicks(d.ai_picks||[]);
+  // AI 推荐已在上面用独立 ai_picks.json 渲染 (避免远端 sync 覆盖 latest.json 后为空)
   renderZt(d.limit_up_pool);
   renderFundRank((d.fund_rank&&d.fund_rank.length)?d.fund_rank:((mn&&mn.fund_rank)?mn.fund_rank:[]));
   renderNews(d.news_recent);
@@ -1240,6 +1240,9 @@ async function render(){
   renderThsStrong(ths, em);
   renderLhb(lhb, em);
   renderBlocktrade(bt, em);
+  // AI 推荐: 优先读独立 data/ai_picks.json (不被远端 sync 覆盖)
+  const apk=await fetchJSON('data/ai_picks.json');
+  renderPicks((apk&&apk.picks&&apk.picks.length)?apk.picks:(d.ai_picks||[]));
   renderVolChart(d.index_kline);
   const cd=await fetchJSON('data/cycle_deep.json');
   window._cdData=cd; if(cd)renderCycleDeep(cd);
@@ -1336,7 +1339,8 @@ if (l2Btn && l2Modal) {
     l2Status.textContent = '❌ 认证失败：' + e.message + '。请确认 UIN/SKEY 正确，或去 gu.qq.com 重新登录';
     l2Save.disabled = false;
   }
-});
+  });
+}
 
 </script>
 <div id="l2Modal" class="l2-modal">

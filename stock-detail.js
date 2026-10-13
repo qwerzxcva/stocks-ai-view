@@ -34,17 +34,17 @@
   }
 
   // ─── 数据获取 ───────────────────────────────────────────────
-  // 周期: day/week/month/year/year → 腾讯 fqkline 参数
+  // 周期: day/week/month/year → 腾讯 fqkline 参数。返回 key: qfqday/qfqweek/qfqmonth/year
   function fetchKline(code, n, period) {
     var p = prefixed(code);
     var klt = period || 'day';
     var cnt = n || 60;
-    if (klt !== 'day') cnt = Math.min(cnt, 200);
-    return jget('https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param='
-                + p + ',' + klt + ',,' + (klt === 'day' ? ',' : ',,') + cnt + ',qfq')
+    var url = 'https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param='
+              + p + ',' + klt + ',,' + (klt === 'day' ? ',' : ',,') + cnt + ',qfq';
+    return jget(url)
       .then(function (d) {
         var node = (d && d.data && d.data[p]) || {};
-        var key = klt === 'day' ? 'qfqday' : 'qfq' + klt;
+        var key = klt === 'day' ? 'qfqday' : (klt === 'year' ? 'year' : 'qfq' + klt);
         var arr = node[key] || node.qfqday || node.day || [];
         return arr.map(function (r) {
           return { date: r[0], open: +r[1], close: +r[2], high: +r[3], low: +r[4], vol: +r[5] };
