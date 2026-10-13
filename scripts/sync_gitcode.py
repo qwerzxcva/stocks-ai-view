@@ -291,6 +291,7 @@ def cmd_push_data():
     print(f"✓ 基于 {GC_REF} 建立临时工作树 {wt}")
     try:
         # data/*.json 原样镜像; scripts/*.py 落到 engines/
+        os.makedirs(os.path.join(wt, "data"), exist_ok=True)
         n_data = 0
         for name, (src, _) in gh_data.items():
             shutil.copy2(src, os.path.join(wt, "data", name))
