@@ -1,6 +1,16 @@
 #!/usr/bin/env python3
-"""audit_data.py — 数据文件健全性审计 (空/旧/缺字段/损坏 逐一标出)"""
-import json, os, glob, sys
+"""audit_data.py — data-file health audit (empty / stale / missing fields / corrupt)
+
+Output:
+  stdout          human-readable report
+  --json <path>   machine-readable JSON (Space writes it to analysis_out/ so it
+                  can be pushed back to GitHub)
+"""
+import argparse
+import json
+import os
+import glob
+import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
@@ -119,3 +129,19 @@ for f in sorted(glob.glob("data/*.json")):
 print(f"\n=== 问题清单 ({len(issues)}) ===")
 for name, kind, detail in issues:
     print(f"  [{kind}] {name}: {detail}")
+
+_ap = argparse.ArgumentParser()
+_ap.add_argument("--json", dest="json_out", default=None,
+                 help="also write the report as JSON to this path")
+_args, _ = _ap.parse_known_args()
+if _args.json_out:
+    os.makedirs(os.path.dirname(os.path.abspath(_args.json_out)), exist_ok=True)
+    payload = {
+        "ts": now.isoformat(),
+        "n_issues": len(issues),
+        "issues": [{"file": n, "kind": k, "detail": d} for n, k, d in issues],
+    }
+    with open(_args.json_out, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    print(f"json report -> {_args.json_out}")
+    sys.exit(0 if not issues else 1)

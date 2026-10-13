@@ -8,10 +8,13 @@
   Tier1(前80) 每分钟采 / Tier2(前300) 每5分 / Tier3 其余 每30分
 输出: data/sampler_tiers.json (minute1_collect读取并按tier调度)
 """
-import json, urllib.request, datetime, math, duckdb
+import json, os, urllib.request, datetime, math, duckdb
 
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
-OUT = "/home/agentuser/stockdb/data/sampler_tiers.json"
+STOCKDB = os.environ.get("STOCKS_STOCKDB") or os.path.join(
+    os.path.expanduser("~"), "stockdb")
+OUT = os.path.join(STOCKDB, "data", "sampler_tiers.json")
+STOCK_DB = os.path.join(STOCKDB, "stock.duckdb")
 
 def qt_batch(codes):
     """腾讯qt批量行情"""
@@ -32,7 +35,10 @@ def qt_batch(codes):
     return out
 
 def main():
-    con = duckdb.connect("/home/agentuser/stockdb/stock.duckdb", read_only=True)
+    if not os.path.exists(STOCK_DB):
+        print(f"stock.duckdb not found at {STOCK_DB}; sampler needs the local DB")
+        return
+    con = duckdb.connect(STOCK_DB, read_only=True)
     # 涨停基因: 近5日涨停(主板10%)
     gene = {r[0] for r in con.execute("""
         SELECT symbol FROM (

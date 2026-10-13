@@ -13,8 +13,10 @@ T+1纪律: 14:45为决策点 — 止盈+2%/止损-2%
 import json, os, sys, datetime, duckdb
 
 HOME = os.path.expanduser("~")
-DB = f"{HOME}/stockdb/picks.duckdb"  # 独立库避开server锁
-WH = f"{HOME}/stockdb/wh"
+STOCKDB = os.environ.get("STOCKS_STOCKDB") or os.path.join(HOME, "stockdb")
+os.makedirs(os.path.join(STOCKDB, "data"), exist_ok=True)
+DB = os.path.join(STOCKDB, "picks.duckdb")  # 独立库避开server锁
+WH = os.path.join(STOCKDB, "wh")
 
 def init(con):
     con.execute("""CREATE TABLE IF NOT EXISTS pick_log(
@@ -25,6 +27,9 @@ def init(con):
 
 def cmd_log():
     """今日 ai_picks.json + tailpick → pick_log(去重)"""
+    if not os.path.exists(DB):
+        print(f"picks.duckdb not found at {DB}; run on the runner that owns it")
+        return
     con = duckdb.connect(DB)
     init(con)
     today = datetime.date.today().isoformat()
@@ -33,21 +38,21 @@ def cmd_log():
         print("already logged", today, n); return
     rows = []
     try:
-        ap = json.load(open(f"{HOME}/stockdb/data/ai_picks.json"))
+        ap = json.load(open(f"{STOCKDB}/data/ai_picks.json"))
         for p in ap.get("picks", []):
             rows.append((p["symbol"], p.get("name", ""), p.get("close"), "ai_pick",
                          ap.get("rule", "")))
     except Exception as e:
         print("ai_picks err:", e)
     try:
-        tp = json.load(open(f"{HOME}/stockdb/data/tailpick.json"))
+        tp = json.load(open(f"{STOCKDB}/data/tailpick.json"))
         for p in tp.get("picks", []):
             rows.append((p["symbol"], p.get("name", ""), p.get("price"), "tailpick",
                          tp.get("rule", "")))
     except Exception:
         try:
             # tailpick在analysis表里
-            con2 = duckdb.connect(f"{HOME}/stockdb/stock.duckdb", read_only=True)
+            con2 = duckdb.connect(f"{STOCKDB}/stock.duckdb", read_only=True)
             for (pl,) in con2.execute("SELECT payload FROM analysis WHERE kind='tailpick' ORDER BY id DESC LIMIT 1").fetchall():
                 con2.close()
                 break
@@ -100,6 +105,9 @@ def _daily_map(symbol):
 
 def cmd_settle():
     """对账: pick_date 之后第一个交易日的 T+1 表现"""
+    if not os.path.exists(DB):
+        print(f"picks.duckdb not found at {DB}; run on the runner that owns it")
+        return
     con = duckdb.connect(DB)
     init(con)
     pend = con.execute("SELECT id, pick_date, symbol, entry_price FROM pick_log WHERE settled=0 AND kind<>'bcard'").fetchall()
@@ -127,6 +135,9 @@ def cmd_settle():
     con.commit()
 
 def cmd_stats():
+    if not os.path.exists(DB):
+        print(f"picks.duckdb not found at {DB}; run on the runner that owns it")
+        return
     con = duckdb.connect(DB, read_only=True)
     total = con.execute("SELECT count(*), sum(CASE WHEN ret_open_close>0 THEN 1 ELSE 0 END) FROM pick_log WHERE settled=1").fetchone()
     if not total[0]:
@@ -154,7 +165,7 @@ def cmd_stats():
                      for r in con.execute("""SELECT pick_date, symbol, name, entry_price, next_date,
                       verdict, ret_open_close, ret_t2 FROM pick_log WHERE settled=1
                       ORDER BY pick_date DESC, id DESC LIMIT 20""").fetchall()]
-    json.dump(out, open(f"{HOME}/stockdb/data/pick_stats.json", "w"), ensure_ascii=False)
+    json.dump(out, open(f"{STOCKDB}/data/pick_stats.json", "w"), ensure_ascii=False)
     print("saved pick_stats.json")
 
 if __name__ == "__main__":

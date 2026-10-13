@@ -10,12 +10,29 @@
   idio       : 其余 → 个股alpha错
 输出: data/loss_attr.json + 建议注入ai_pick/decision
 """
+import os
 import duckdb, json, datetime, urllib.request
 
-OUT = "/home/agentuser/stockdb/data/loss_attr.json"
+STOCKDB = os.environ.get("STOCKS_STOCKDB") or os.path.join(
+    os.path.expanduser("~"), "stockdb")
+OUT = os.path.join(STOCKDB, "data", "loss_attr.json")
+PICKS_DB = os.path.join(STOCKDB, "picks.duckdb")
+
 
 def main():
-    con = duckdb.connect("/home/agentuser/stockdb/picks.duckdb", read_only=True)
+    if not os.path.exists(PICKS_DB):
+        log_skip = f"picks.duckdb not found at {PICKS_DB}; nothing to attribute"
+        print(log_skip)
+        try:
+            os.makedirs(os.path.dirname(OUT), exist_ok=True)
+            json.dump({"ts": datetime.datetime.now().isoformat(timespec="seconds"),
+                       "total_losses": 0, "attr": {}, "advice": "样本不足",
+                       "note": "不构成投资建议", "skipped": log_skip},
+                      open(OUT, "w", encoding="utf-8"), ensure_ascii=False)
+        except Exception:
+            pass
+        return
+    con = duckdb.connect(PICKS_DB, read_only=True)
     rows = con.execute("""SELECT symbol, ts, entry_price, verdict, ret_open_close
                           FROM pick_log WHERE settled=true AND ret_open_close < 0""").fetchall()
     con.close()
