@@ -124,8 +124,12 @@ def load_universe():
 
 # ─── 采集 ────────────────────────────────────────────────────
 def fetch_hfq_tencent(code, max_pages=12):
-    """腾讯后复权 (hfqday)。hfq 偶发返回空 → 重试 2 次。"""
-    for attempt in range(2):
+    """腾讯后复权 (hfqday)。hfq 偶发返回空 → 重试 3 次, 递增 sleep。
+
+    2026-10-13 实测: 并发 6 时空置率高 (000008/000012/000017 连续空),
+    疑为按 IP 的动态风控; 重试 3 次 + sleep 2/4/8s 可救回大部分。
+    """
+    for attempt in range(3):
         tk = _tk(code)
         allr, end, guard = {}, "", 0
         while guard < max_pages:
@@ -145,12 +149,11 @@ def fetch_hfq_tencent(code, max_pages=12):
             if new == 0 or len(arr) < 800:
                 break
             end = arr[0][0]      # 升序, 首行最早
-            _sleep_qps(QPS_TENCENT)
+            time.sleep(0.15)
         if allr:
             return [allr[k] for k in sorted(allr)]
-        if attempt == 0:
-            print(f"    [retry] {code} hfq 空, 重试", file=sys.stderr)
-            time.sleep(2)
+        if attempt < 2:
+            time.sleep(2 * (attempt + 1))
     return []
 
 
