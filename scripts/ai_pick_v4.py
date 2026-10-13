@@ -298,9 +298,20 @@ def main():
     cand.sort(key=lambda x: -x["score"])
     picks = []
     for c in cand[: args.top]:
+        sname = None
+        try:
+            import glob as _g
+            # 从 search_index 取名称 (有缓存则用)
+            si = os.path.join(AI_VIEW_DATA, "search_index.json")
+            if os.path.exists(si):
+                _idx = json.load(open(si, encoding="utf-8"))
+                sname = (_idx.get(c["symbol"]) or {}).get("n")
+        except Exception:
+            pass
         picks.append({
             "code": (c["symbol"][2:] if c["symbol"][:2] in ("sh", "sz", "bj") else c["symbol"]),
             "symbol": c["symbol"], "date": c["date"],
+            "name": sname or "",
             "price": round(c["price"], 2),
             "ret_pct": round(c["ret"] * 100, 2),
             "vratio": round(c["vratio"], 2),

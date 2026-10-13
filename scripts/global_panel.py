@@ -29,6 +29,19 @@ GLOBAL_KLINE = os.path.join(DATA_DIR, "global_kline.json")
 QT_HDR = {"Referer": "https://gu.qq.com"}
 SINA_HDR = {"Referer": "https://finance.sina.com.cn"}
 
+
+def _get_text(url, headers, timeout=8, retries=3):
+    """腾讯/新浪行情偶发连接重置, 重试; 全失败返回空串由调用方按缺失处理。"""
+    last = None
+    for _ in range(retries):
+        try:
+            return urllib.request.urlopen(urllib.request.Request(url, headers=headers),
+                                          timeout=timeout).read().decode("gbk", "ignore")
+        except Exception as e:
+            last = e
+    print(f"[global_panel] 请求失败(重试{retries}次): {url[:60]} {last}", file=sys.stderr)
+    return ""
+
 # ---- 腾讯全球: (代码, 名称, 分组) ----
 QT_CODES = [
     ("usDJI", "道琼斯", "美股指数"), ("usIXIC", "纳斯达克", "美股指数"),
@@ -50,7 +63,7 @@ SINA_CODES = [
 def qt_batch(codes):
     out = {}
     u = "https://qt.gtimg.cn/q=" + ",".join(c[0] for c in codes)
-    b = urllib.request.urlopen(urllib.request.Request(u, headers=QT_HDR), timeout=8).read().decode("gbk", "ignore")
+    b = _get_text(u, QT_HDR)
     lines = b.strip().split(";")
     for (code, name, grp) in codes:
         for line in lines:
@@ -76,7 +89,7 @@ def qt_batch(codes):
 def sina_batch(codes):
     out = {}
     u = "https://hq.sinajs.cn/list=" + ",".join(c[0] for c in codes)
-    b = urllib.request.urlopen(urllib.request.Request(u, headers=SINA_HDR), timeout=8).read().decode("gbk", "ignore")
+    b = _get_text(u, SINA_HDR)
     for (code, name, grp) in codes:
         for line in b.strip().split("\n"):
             if f'hq_str_{code}="' in line:

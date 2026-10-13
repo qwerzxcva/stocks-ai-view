@@ -616,7 +616,6 @@ function valCell(v,dev){
   return '<td style="font-weight:700">'+fmt(v)+'<span style="color:'+col+';font-size:10px;margin-left:3px">'+(dev>0?'+':'')+dev+'%</span></td>';
 }
 function renderPicks(picks){
-  try{ if(picks&&picks.length&&!document.getElementById('probeArg')){ const _d=document.createElement('div'); _d.id='probeArg'; _d.textContent='ARG '+JSON.stringify(picks[0]).slice(0,300); document.body.appendChild(_d);} }catch(e){}
   document.getElementById('pickBody').innerHTML=(picks||[]).slice(0,40).map(p=>{
     // 字段兼容: ai_pick_v4 (ret_pct/pos240_pct/score) vs ai_picks (chg_pct/pos20/score)
     const chg=p.chg_pct!=null?p.chg_pct:p.ret_pct;
@@ -1388,11 +1387,16 @@ async function render(){
   renderLhb(lhb, em);
   renderBlocktrade(bt, em);
   // AI 推荐: 优先 ai_pick_v4 (实测统计驱动+估值), 回退独立 ai_picks.json, 再回退 latest.json
+  // 用原生 fetch + no-store 直取 (绕开 SW/会话缓存, 保证拿到最新注入估值的版本)
+  async function _fresh(path){
+    try{ const r=await fetch(path,{cache:'no-store'}); if(r.ok) return await r.json(); }catch(e){}
+    return null;
+  }
   let pickList=null;
-  const v4=await fetchJSON('data/ai_pick_v4.json');
+  const v4=await _fresh('data/ai_pick_v4.json');
   if(v4&&v4.picks&&v4.picks.length) pickList=v4.picks;
   if(!pickList){
-    const apk=await fetchJSON('data/ai_picks.json');
+    const apk=await _fresh('data/ai_picks.json');
     if(apk&&apk.picks&&apk.picks.length) pickList=apk.picks;
   }
   renderPicks(pickList||d.ai_picks||[]);

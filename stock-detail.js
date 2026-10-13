@@ -242,6 +242,8 @@
           '市值' + (q.mktcap / 1e8).toFixed(0) + '亿 PB' + (q.pb > 0 ? q.pb.toFixed(1) : '—') + '</span><br>';
         h += '<span class="fl" style="font-size:9px">数据源: 腾讯 qt.gtimg.cn 实时 · 东财资金流</span><hr style="border:0;border-top:1px solid var(--border);margin:6px 0">';
       }
+      // 实际价值占位 (异步从 data/valuation.json 填, 拿不到不阻塞)
+      h += '<div id="valBox" style="font-size:11px;padding:2px 0 6px"></div>';
       // 分时
       h += '<div class="fl" style="font-size:9px;margin-bottom:2px">分时 (1分钟, ' + (mins ? mins.length : 0) + '点)</div>';
       h += renderMinuteChart(mins);
@@ -289,6 +291,20 @@
         h += '<div class="fl" style="font-size:9px;margin-top:4px">近5日主力净额: <b class="' + (sum5 >= 0 ? 'up' : 'dn') + '">' + fmtYi(sum5) + '</b> · 仅供研究参考, 不构成投资建议</div>';
       }
       det.innerHTML = h;
+      // 异步填实际价值 (data/valuation.json, 失败静默; no-store 绕开缓存)
+      fetch('data/valuation.json', {cache: 'no-store'}).then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (vd) {
+          var box = document.getElementById('valBox');
+          if (!box || !vd || !vd.table) return;
+          var v = vd.table[prefixed(code)];
+          if (!v || v.intrinsic_value == null) { box.innerHTML = ''; return; }
+          var d = v.dev_pct;
+          var c = d <= -10 ? 'var(--up)' : (d >= 30 ? 'var(--dn)' : 'var(--tx2)');
+          var tag = d <= -25 ? '深度低估' : d <= -10 ? '低估' : d < 10 ? '合理' : d < 30 ? '高估' : '严重高估';
+          box.innerHTML = '实际价值 <b style="color:' + c + ';font-size:14px">' + v.intrinsic_value.toFixed(2) + ' 元</b>' +
+            ' <span style="color:' + c + '">(' + (d > 0 ? '+' : '') + d + '% ' + tag + ')</span>' +
+            ' <span class="fl" style="font-size:9px">现价' + v.price + ' · ' + (v.confidence * 100) + '%置信 · 行业内PE/PB分位+DDM+市场回归</span>';
+        }).catch(function () {});
       // 周期切换按钮事件
       Array.prototype.forEach.call(det.querySelectorAll('button[data-klt]'), function (btn) {
         btn.onclick = function () {

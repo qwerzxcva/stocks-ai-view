@@ -199,6 +199,11 @@ jobs:
         run: |
           python3 scripts/engine_fusion.py --out data/engine_fusion.json || echo "engine_fusion: 输入缺失, 跳过"
 
+      # ── 6h. 实际价值估值 (四法合成, 注入所有股池) ──
+      - name: Valuation engine (intrinsic value)
+        run: |
+          python3 scripts/valuation_engine.py --inject || echo "valuation: 快照缺失, 跳过"
+
       # ── 7. 采集摘要 ──
       - name: Summary
         run: |
@@ -221,7 +226,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
+          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/valuation.json data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -232,7 +237,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
+            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/valuation.json data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
             git commit -m "pipeline: $ts" 2>/dev/null || true
             git push origin main
           }
