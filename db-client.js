@@ -4,11 +4,17 @@
 // from a local copy. Realtime quotes still go direct to the quote providers
 // because they are the only source that is actually realtime.
 //
-// Warehouse layout (see _index.json in the market repo):
-//   jiegengxiangjianxue1/db-market  -> master/, market/, sector/, overseas/
-//   jiegengxiangjianxue2/db-stocks-a -> shards 00/30/60
-//   jiegengxiangjianxue2/db-stocks-b -> shards 15/50/51/52/56/58/68
-//   jiegengxiangjianxue3/db-stocks-c -> remaining shards
+// Warehouse layout (verified against what actually exists upstream):
+//   jiegengxiangjianxue1/db-market -> market/ indices+pools+margin
+//                                 -> sector/ industry/concept + constituents
+//                                 -> overseas/ live+impact+us/hk
+//                                 -> _search.json (6027 code->name index)
+//                                 -> master/ universe
+//
+// Per-stock detail (kline / quote / flow / technical) is NOT in the warehouse:
+// the shard repos db-stocks-a..e and db-market/data/stocks/ return 404 (the
+// bulk push never completed). stock-detail.js fetches those directly from
+// Tencent -> Eastmoney -> Sina instead.
 (function () {
   'use strict';
 
@@ -18,28 +24,10 @@
   var REPOS = {
     market: GH + 'jiegengxiangjianxue1/db-market/main/',
     marketGC: GC + 'dufuwuxin/stocks-db-market/raw/main/',
-    stocksA: GH + 'jiegengxiangjianxue1/db-stocks-a/main/',
-    stocksB: GH + 'jiegengxiangjianxue2/db-stocks-b/main/',
-    stocksC: GH + 'jiegengxiangjianxue2/db-stocks-c/main/',
-    stocksD: GH + 'jiegengxiangjianxue3/db-stocks-d/main/',
-    stocksE: GH + 'jiegengxiangjianxue3/db-stocks-e/main/',
-    stocksGC: GC + 'dufuwuxin/stocks-db-stocks/raw/main/'
-  };
-
-  // shard -> repo. Mirrors scripts/sync_repos.py exactly.
-  var SHARD_REPO = {
-    '00': 'stocksA', '30': 'stocksB', '60': 'stocksC',
-    '68': 'stocksD', '15': 'stocksD', '51': 'stocksD',
-    '50': 'stocksD', '52': 'stocksD', '56': 'stocksD', '58': 'stocksD'
   };
 
   var cache = {};
   var origin = 'github';
-
-  function pickStockRepo(shard) {
-    var key = SHARD_REPO[shard] || 'stocksE';
-    return REPOS[key];
-  }
 
   // Fetch with per-session cache; tries GitHub first, falls back to GitCode.
   function get(url, ttl) {
@@ -51,13 +39,8 @@
       .then(function (j) { cache[url] = { t: now, v: j }; return j; })
       .catch(function () {
         if (url.indexOf(GH) === 0) {
-          var alt = url
-            .replace(GH + 'jiegengxiangjianxue1/db-market/main/', REPOS.marketGC)
-            .replace(GH + 'jiegengxiangjianxue1/db-stocks-a/main/', REPOS.stocksGC)
-            .replace(GH + 'jiegengxiangjianxue2/db-stocks-b/main/', REPOS.stocksGC)
-            .replace(GH + 'jiegengxiangjianxue2/db-stocks-c/main/', REPOS.stocksGC)
-            .replace(GH + 'jiegengxiangjianxue3/db-stocks-d/main/', REPOS.stocksGC)
-            .replace(GH + 'jiegengxiangjianxue3/db-stocks-e/main/', REPOS.stocksGC);
+          var alt = url.replace(GH + 'jiegengxiangjianxue1/db-market/main/',
+                                REPOS.marketGC);
           if (alt !== url) return get(alt, ttl);
         }
         return null;
@@ -100,28 +83,17 @@
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 
     // ── per stock ──
-    stockManifest: function (code) {
-      var shard = String(code).slice(0, 2);
-      return get(pickStockRepo(shard) + shard + '/' + code + '/manifest.json', 300000);
-    },
-    stockQuote: function (code) {
-      var shard = String(code).slice(0, 2);
-      return get(pickStockRepo(shard) + shard + '/' + code + '/money/quote.json', 30000);
-    },
-    stockFlow: function (code) {
-      var shard = String(code).slice(0, 2);
-      return get(pickStockRepo(shard) + shard + '/' + code + '/money/fflow.json', 300000);
-    },
-    stockKline: function (code, freq) {
-      var shard = String(code).slice(0, 2);
-      var f = freq || 'day_qfq';
-      return get(pickStockRepo(shard) + shard + '/' + code + '/kline/' + f + '.csv', 300000)
-        .then(function (txt) { return api.parseCsv(txt); });
-    },
-    stockTechnical: function (code) {
-      var shard = String(code).slice(0, 2);
-      return get(pickStockRepo(shard) + shard + '/' + code + '/technical/latest.json', 300000);
-    },
+    // 分片仓 (db-stocks-a/b/c/d/e) 与 db-market/data/stocks/ 均未推送成功
+    // (实测全部 404, 只有 _search.json 的名称索引在)。个股明细因此不走仓库,
+    // 由 stock-detail.js 的腾讯→东财→新浪三源降级直取; 这里只保留仓库里
+    // 真实存在的数据: 名称索引 + 大盘/板块/海外。
+    searchIndex: function () { return get(REPOS.market + '_search.json', 600000); },
+
+    stockManifest: function (code) { return Promise.resolve(null); },
+    stockQuote: function (code) { return Promise.resolve(null); },
+    stockFlow: function (code) { return Promise.resolve(null); },
+    stockKline: function (code, freq) { return Promise.resolve([]); },
+    stockTechnical: function (code) { return Promise.resolve(null); },
 
     // ── csv helper: "# comment\ndate,open,close,high,low,volume" ──
     parseCsv: function (txt) {
