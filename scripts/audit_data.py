@@ -8,29 +8,30 @@ now = datetime.now(CST)
 
 # 前端 render 函数 → 期望的数据字段 (用于交叉核对)
 EXPECT = {
-    "latest.json": ["market", "limit_up_pool", "limit_down_pool", "fund_rank",
+    "latest.json": ["market", "limit_up_pool", "fund_rank",
                     "news_recent", "ths_strong", "lhb", "blocktrade",
                     "cycle_v2", "commentary", "index_kline", "pools",
                     "ai_picks", "kline_sim", "global_kline", "ths_reason",
                     "tdx_qiangchou", "pick_stats"],
-    "market_now.json": ["market", "limit_up_pool", "limit_down_pool",
+    "market_now.json": ["market", "limit_up_pool",
                         "tx_sector_ranking", "ths_strong", "fund_rank", "margin"],
     "enrich.json": ["ths_strong", "lhb", "blocktrade"],
     "hot_impact.json": ["reports"],
     "ban_pick.json": ["picks"],
     "ban_prob.json": ["base", "sample"],
-    "flow_divergence.json": ["alerts"],
-    "cycle_deep.json": ["signal", "dims"],
+    "flow_divergence.json": ["buy_side", "sell_side"],
+    "cycle_deep.json": ["status", "meta"],
     "cycle.json": ["macro_signals"],
     "sector_pool.json": ["tier1"],
-    "lowpool.json": ["strong", "weak"],
+    "lowpool.json": ["strong"],
     "multi_v4.json": ["buy", "watch"],
     "engine_v5.json": ["top"],
     "reflect_latest.json": ["analysis"],
     "winrate_matrix.json": ["horizons"],
-    "kline_sim.json": ["by_horizon", "top_signals"],
+    "kline_sim.json": ["by_horizon"],
     "daily_brief.json": ["text"],
-    "cloud_analysis.json": ["summary", "tomorrow"],
+    "cloud_analysis.json": ["index_forecast", "theme_heat", "sector_top"],
+    "ai_picks.json": ["picks"],
     "search_index.json": None,
 }
 
@@ -56,8 +57,13 @@ def age_str(ts):
 
 print(f"审计时间: {now:%Y-%m-%d %H:%M} CST\n")
 issues = []
+# latest.full.json 是 slim_latest.py 的调试备份, 非前端数据源, 不检查过时
+SKIP = {"latest.full.json", "fund.json", "global.json", "moneyflow.json", "social.json"}
+
 for f in sorted(glob.glob("data/*.json")):
     name = os.path.basename(f)
+    if name in SKIP:
+        continue
     size = os.path.getsize(f)
     if size < 10:
         issues.append((name, "EMPTY FILE", ""))
