@@ -635,9 +635,24 @@ function renderFundRank(fr){
     <td class="${cls(r.ret_6m)}">${sign(r.ret_6m)}%</td>
     <td class="up" style="font-weight:700">${sign(r.ret_1y)}%</td></tr>`).join('')||'<tr><td colspan="8" class="fl">暂无</td></tr>';
 }
-function renderNews(ns){
-  document.getElementById('newsCount').textContent=(ns||[]).length+'条';
-  document.getElementById('newsFull').innerHTML=(ns||[]).slice(0,80).map(n=>{
+function renderNews(ns, digest){
+  const n=(ns||[]).length;
+  document.getElementById('newsCount').textContent=n+'条';
+  // 数据年龄: news_digest.json 是 CI 生成的, 停了用户必须看得见
+  let ageHtml='';
+  if(digest&&digest.ts){
+    try{
+      const t=new Date(digest.ts), ageMin=(Date.now()-t.getTime())/60000;
+      const col=ageMin<90?'var(--dn)':(ageMin<360?'var(--amber)':'var(--up)');
+      const ageTxt=ageMin<60?Math.round(ageMin)+'分钟前':(ageMin/60).toFixed(1)+'小时前';
+      ageHtml='<div style="padding:2px 12px 4px;font-size:9px;color:var(--tx3)">更新于 '+
+        '<span style="color:'+col+'">'+ageTxt+'</span>'+
+        (digest.stale?' <span style="color:var(--amber)">· 窗口内无新闻, 显示较早内容</span>':'')+
+        ' · 窗口 '+ (digest.keep_hours||24) +'h</div>';
+    }catch(e){}
+  }
+  const box=document.getElementById('newsFull');
+  const list=(ns||[]).slice(0,80).map(n=>{
     // 主题标签: theme 数组 (ai_screener 格式) 或 _cat 分类 (news_digest 格式)
     const tags=(n.theme&&n.theme.length)?n.theme.slice(0,3).map(t=>'#'+t).join(' '):(n._cat?'#'+n._cat:'');
     return `<div class="n-item">
@@ -647,6 +662,7 @@ function renderNews(ns){
       <div class="n-meta"><span>${(n.ts||'').slice(5,16)}</span><span class="n-th">${tags}</span><span>${n.src||''}</span></div>
     </div></div>`;
   }).join('')||'<span class="fl" style="padding:12px;text-align:center">暂无新闻</span>';
+  box.innerHTML=ageHtml+list;
 }
 // 数据已在 render() 里并行取到, 这里只负责渲染 (消除一次串行请求)
 function renderHotImpactData(d){
@@ -1392,7 +1408,7 @@ async function render(){
     // 按时间倒序 (最新的在前)
     newsList.sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
   }
-  renderNews((newsList&&newsList.length)?newsList:d.news_recent);
+  renderNews((newsList&&newsList.length)?newsList:d.news_recent, nd);
   renderSummary(d.summary);
   renderTicker(d);
   if(hi)renderHotImpactData(hi);
