@@ -17,7 +17,10 @@
 name: full-pipeline
 on:
   schedule:
-    - cron: '50 1,2,3,5,6 * * 1-5'
+    # 交易时段每 10 分钟 (UTC 1,2,3,5,6,7 时的 0/10/20/30/40 分
+    # = CST 09:00-15:50 的 :00/:10/:20/:30/:40)。原先是每 60 分钟一次
+    # (只在 :50), 盘中数据最多陈旧 1 小时, 用户看到的是过期行情。
+    - cron: '0,10,20,30,40,50 1,2,3,5,6,7 * * 1-5'
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -255,7 +258,7 @@ jobs:
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
           # 采集侧产物白名单 (引擎产出由 space-pull.yml 负责)
-          FILES="data/sources_registry.json data/all_sources.json data/news_digest.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob.json data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json"
+          FILES="data/sources_registry.json data/all_sources.json data/news_digest.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob.json data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/market_phase.json data/engine_v5.json data/ai_pick_v4.json data/rps_rotation.json data/ban_pick.json data/patterns_smoke.json data/kline_sim.json data/reflect_latest.json data/winrate_matrix.json data/factor_smoke.json data/sample_balance.json data/loss_attribution.json"
           # 只保留真实存在的路径, 避免 add 不存在的文件导致 fatal
           EXIST=""
           for f in $FILES; do
