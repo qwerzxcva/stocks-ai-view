@@ -1,0 +1,78 @@
+// ══════════════════════════════════════════════════════════════════
+// data_origin_patch.js — 数据源优先级: GitHub 优先, 本地兜底
+// 2026-10-13 用户要求: 本地不存大数据, 网站实时查 GitHub/gitcode 数据库
+//
+// 原逻辑: 本地 fetch → 失败走 GitHub
+// 新逻辑: GitHub fetch → 失败走本地 (404/CORS 时兜底)
+// 理由:
+//   1. 本地 data/ 曾 91MB (bulk 复权 81MB), 不需要随站点部署
+//   2. CI 每 10 分钟推 GitHub, 比本地可能几天没跑的数据更新
+//   3. raw.githubusercontent.com CORS 放开 (*), 浏览器可直连
+// ══════════════════════════════════════════════════════════════════
+(function () {
+  if (typeof fetchJSON !== 'function') {
+    console.warn('[data_origin] fetchJSON 未定义, 补丁未生效');
+    return;
+  }
+  var _orig = fetchJSON;
+
+  // GitHub raw 主源 + gitcode 镜像 (raw.gitcode.com 作为第二源)
+  var GH_RAW = 'https://raw.githubusercontent.com/qwerzxcva/stocks-ai-view/main/';
+  var GC_RAW = 'https://raw.gitcode.com/qwerzxcva/stocks-ai-view/raw/main/';
+
+  // 大文件 (bulk 复权/全历史) 只从远端拿, 本地不存
+  var REMOTE_ONLY = /(adjusted\/bulk|index_full|all_sources|search_index)\.json$/;
+
+  // 热数据 (盘中 30 分钟级) 与温数据 (日级) 分开缓存策略
+  var HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now|realtime)\.json$/;
+
+  function _fetchRemote(url, timeoutMs) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var t = timeoutMs || 12000;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, t) : null;
+    return fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+      .then(function (r) {
+        if (timer) clearTimeout(timer);
+        if (!r.ok) throw new Error('remote ' + r.status);
+        return r.json();
+      })
+      .catch(function (e) {
+        if (timer) clearTimeout(timer);
+        throw e;
+      });
+  }
+
+  function _remoteFirst(p) {
+    // 1) GitHub raw (主源)
+    return _fetchRemote(GH_RAW + p)
+      .then(function (j) {
+        if (window.dataOrigin !== 'github') {
+          window.dataOrigin = 'github';
+          var el = document.getElementById('dataSourceTag');
+          if (el) {
+            el.textContent = '⛓️ GitHub源';
+            el.title = '数据实时来自 GitHub 仓库 (CI 每 10 分钟更新)';
+            el.style.display = 'inline-block';
+          }
+        }
+        return j;
+      })
+      .catch(function () {
+        // 2) gitcode 镜像 (GitHub 不可达时)
+        return _fetchRemote(GC_RAW + p).catch(function () { return null; });
+      });
+  }
+
+  // 覆盖 fetchJSON: 远端优先, 本地兜底
+  window.fetchJSON = function (p) {
+    // 本地路径也要尝试 (作为兜底), 但优先级低于远端
+    return _remoteFirst(p).then(function (j) {
+      if (j) return j;
+      // 远端全失败 → 本地兜底 (REMOTE_ONLY 的文件本地没有, 直接 null)
+      if (REMOTE_ONLY.test(p)) return null;
+      return _orig(p);
+    });
+  };
+
+  console.log('[data_origin] 已切换为 GitHub 优先 / 本地兜底');
+})();

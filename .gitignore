@@ -4,3 +4,14 @@ data/latest.full.json
 *.log
 __pycache__/
 .DS_Store
+
+# ── 大文件: 本地不存, 网站实时查 GitHub/gitcode (2026-10-13 用户要求) ──
+# 全市场复权 bulk (单只 qfq+hfq 两个 JSON, 5268 只 → 81MB)
+data/adjusted/bulk/
+# 全历史/大快照: 只从 GitHub raw 读
+data/adjusted/index_full.json
+data/all_sources.json
+data/search_index.json
+# 本地 DuckDB (二进制, 不入库; 采集在 Actions/独立服务器跑)
+*.duckdb
+*.duckdb.wal
