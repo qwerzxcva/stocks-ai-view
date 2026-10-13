@@ -1,0 +1,83 @@
+# 从 GitCode 组织 Space 拉取引擎产出 → GitHub data/ (覆盖旧数据)
+#
+# 架构: GitCode Space (1000核时常驻算力) 跑引擎 → analysis_out/*.json
+#       → 本工作流每20分钟拉回 → 覆盖 GitHub data/ → 网站 fetchJSON 读到
+#
+# 好处:
+#   - GitHub Actions 每月 2000 分钟限额不浪费在重计算上
+#   - Space 用 GitCode 组织每月 1000 核时 (独立额度)
+#   - 双向零凭据: GitHub→GitCode 推数据 (git), Space 拉取 (git pull)
+#               GitCode→GitHub 拉产出 (git fetch), 全程走 git 协议
+name: space-pull
+on:
+  schedule:
+    # 交易时段每 20 分钟 (CST 09:35~15:25) + 收盘后补一次
+    - cron: '5,25,45 1,2,3,4,5,6,7 * * 1-5'
+    - cron: '35 7 * * 1-5'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+concurrency:
+  group: space-pull
+  cancel-in-progress: false
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      # ── 从 GitCode 组织 Space 拉引擎产出 ──
+      - name: Fetch Space analysis_out
+        env:
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+        run: |
+          if [ -z "$GC_TOKEN" ]; then
+            echo "::warning::GC_TOKEN 未配置, 跳过 Space 拉取"
+            echo "配置: Settings → Secrets → New repository secret"
+            echo "  Name: GC_TOKEN  Value: <gitcode 个人访问令牌>"
+            exit 0
+          fi
+          git remote add space "https://x-access-token:${GC_TOKEN}@gitcode.com/jiegengxiangjianxue/stocks-ai-space.git" 2>/dev/null || true
+          if ! git fetch space main 2>/dev/null; then
+            echo "::warning::GitCode Space fetch 失败 (仓不存在或无权限)"
+            exit 0
+          fi
+
+          # Space 产出文件 → GitHub data/ (覆盖旧数据)
+          n=0
+          for f in $(git ls-tree -r --name-only space/main | grep '^analysis_out/.*\.json$'); do
+            base=$(basename "$f")
+            git show "space/main:$f" > "data/$base" 2>/dev/null || continue
+            echo "  <- $base"
+            n=$((n+1))
+          done
+          # 引擎日志也带一份 (便于排查)
+          git show "space/main:analysis_out/engine.log" > data/space_engine.log 2>/dev/null || true
+          echo "共拉取 $n 个产出文件"
+
+      - name: Commit and push
+        run: |
+          git config user.name "space-pull-bot"
+          git config user.email "3576982374@qq.com"
+          git add -A data/
+          if git diff --cached --quiet HEAD; then
+            echo "no changes (Space 产出与本地一致)"
+          else
+            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+            git commit -m "space: pull GitCode Space engine output $ts"
+            git fetch origin main
+            git rebase origin/main 2>/dev/null || git merge origin/main
+            git push origin main || {
+              echo "push raced, retry"
+              git pull --rebase origin main && git push origin main || echo "::warning::push failed"
+            }
+          fi

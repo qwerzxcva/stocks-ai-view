@@ -1,0 +1,113 @@
+# 分钟级实时快照 — 交易时段每 3 分钟 (免费额度内最快)
+#
+# 设计 (2026-10-14, 基于 30 分钟限流实测结论):
+#   push2delay.eastmoney.com 在 60s 频率下 1800 页请求仅 1 次瞬时失败 (0.06%),
+#   每轮全市场 60 页耗时 15-24s → 限流不是瓶颈。
+#   真正的延迟在 git push → GitHub CDN (1-5 分钟), 所以 cron 不必设 1 分钟
+#   (GitHub cron 最细也就 5 分钟), 设 3 分钟平衡额度与延迟。
+#
+# 与 full-pipeline 的分工:
+#   本 workflow  = 轻量实时 (单轮采集 + push, ~90 秒, 无 pip install)
+#   full-pipeline = 重活 (引擎/复盘/因子, ~10 分钟)
+#
+# 额度: 私有仓 2000 分钟/月; 每轮 ~1.5 分钟 × 4 轮/时 × 4 交易小时 × 22 天 ≈ 528 分钟/月 ✅
+name: realtime-minute
+on:
+  schedule:
+    # CST 09:27~11:32 / 13:00~15:02 (UTC 1:27~3:32 / 5:00~7:02), 每 3 分钟
+    - cron: '*/3 1,2,3,5,6,7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      push:
+        description: '是否推送到远端'
+        required: false
+        default: 'true'
+permissions:
+  contents: write
+
+concurrency:
+  group: realtime-minute
+  cancel-in-progress: false    # 不取消在跑的, 避免数据断档
+
+jobs:
+  minute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6          # 一轮约 90 秒, 6 分钟足够容错
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 单轮采集: 全市场 5923 只 (push2delay, 60 页), ~16s
+      # 不装 duckdb/akshare — 这个 workflow 只需要标准库
+      - name: Collect one round
+        id: collect
+        run: |
+          python3 scripts/realtime_minute.py --once 2>&1 | tee /tmp/round.log
+          echo "=== 本轮结果 ==="
+          python3 - <<'PY'
+          import json, os
+          p = 'data/realtime_minute.json'
+          if not os.path.exists(p):
+              print("no output, skip"); raise SystemExit(0)
+          d = json.load(open(p, encoding='utf-8'))
+          s = d.get('summary') or {}
+          print(f"stocks={s.get('n_stocks')} adv={s.get('advance')} "
+                f"dec={s.get('decline')} zt={s.get('limit_up_ge10')} "
+                f"amt_yi={s.get('total_amount_yi')} "
+                f"main_yi={s.get('main_net_inflow_yi')}")
+          print(f"ts={d.get('timestamp')}")
+          # 空数据保护: 0 只或全 0 视为失败, 不推送 (避免把坏数据推上线)
+          if not s.get('n_stocks') or s.get('n_stocks', 0) < 3000:
+              print("::error::快照股票数异常 (<3000), 不推送")
+              raise SystemExit(1)
+          PY
+
+      # 清理滚动快照 (只保留最近 12 个 = 36 分钟窗口, 避免仓库膨胀)
+      - name: Trim rolling snapshots
+        run: |
+          cd data/market 2>/dev/null || exit 0
+          ls -t snapshot_*.json 2>/dev/null | tail -n +13 | xargs -r rm -f
+          echo "保留 $(ls snapshot_*.json 2>/dev/null | wc -l) 个滚动快照"
+
+      - name: Commit & push
+        if: inputs.push != 'false'
+        run: |
+          git config user.name "minute-bot"
+          git config user.email "741059079@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add data/realtime_minute.json data/market/ 2>/dev/null || true
+          ts=$(TZ=Asia/Shanghai date '+%m-%d %H:%M')
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "minute: $ts"
+          fi
+          git push origin main || {
+            echo "push raced, retrying"
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/realtime_minute.json data/market/ 2>/dev/null || true
+            git commit -m "minute: $ts" 2>/dev/null || true
+            git push origin main
+          }
+
+      - name: Summary
+        run: |
+          {
+            echo "## 分钟级采集 $(TZ=Asia/Shanghai date '+%H:%M:%S')"
+            tail -2 /tmp/round.log
+          } >> $GITHUB_STEP_SUMMARY
