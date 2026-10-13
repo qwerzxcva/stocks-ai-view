@@ -218,6 +218,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="5">腾讯数据</button>
       <button class="c-tab" data-c="6">周期深析</button>
       <button class="c-tab" data-c="7">每日总结</button>
+      <button class="c-tab" data-c="8">资金背离</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">未涨停 · 五因子评分 · 实时现价</span></div>
@@ -305,6 +306,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div class="hd">每日总结 <span class="sub" id="sumTs">非交易时段生成</span></div>
       <div id="dailySummary" style="padding:8px 14px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
     </div>
+    <div class="card c-card" data-ci="8" style="display:none">
+      <div class="hd">资金流-价格背离 <span class="sub" id="fdSub">自研引擎</span></div>
+      <div id="flowDivergence" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
+    </div>
   </div>
   <!-- RIGHT: 主题 + 24h资讯流 -->
   <div class="col">
@@ -349,7 +354,7 @@ const _etagCache=new Map();
 async function fetchJSON(p){try{
   // 高频数据 (盘中30分钟更新) 不用 If-None-Match, 避免 ETag 304 命中时
   // 拿到会话内的旧缓存; SW 也已把这些文件改为 network-first。
-  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob)\.json$/.test(p);
+  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|flow_divergence)\.json$/.test(p);
   const hdr={};
   const et=_etagCache.get(p);
   if(et && !HOT)hdr['If-None-Match']=et;
@@ -1058,6 +1063,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
   if(b.dataset.c==='5' && window._lastD && !txRendered){ renderTencent(window._lastD); txRendered=true; }
   if(b.dataset.c==='6' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
+  if(b.dataset.c==='8' && window._fdData && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -1119,6 +1125,8 @@ async function render(){
   window._cdData=cd; if(cd)renderCycleDeep(cd);
   const bpj=await fetchJSON('data/ban_prob.json');
   window._banProb=bpj;
+  const fd=await fetchJSON('data/flow_divergence.json');
+  window._fdData=fd; if(fd)renderFlowDivergence(fd);
   const db=await fetchJSON('data/daily_brief.json');
   if(db)renderDailyBrief(db);
   renderPools(d);

@@ -4,7 +4,7 @@
 //   - data/*.json: network-first, 失败回退缓存 (数据新鲜优先)
 //     * 例外: index_kline.json / search_index.json 等大文件走 stale-while-revalidate
 //   - 跨域请求 (腾讯行情等): 不走 SW, 由 realtime.js 直连
-const CACHE = 'stocks-ai-view-v6';   // v6: ban_prob 加入高频白名单, 强制重装
+const CACHE = 'stocks-ai-view-v7';   // v7: flow_divergence 高频数据, 强制重装
 const SHELL = ['./', './index.html', './realtime.js', './sw.js',
                './data/latest.json'];
 
@@ -52,7 +52,7 @@ self.addEventListener('fetch', e => {
   //
   // 教训: hot_impact 曾因在 SWR 列表而显示 24 小时前的旧缓存;
   //       现在高频数据一律 network-first, 新增高频 JSON 必须加进 HOT_JSON。
-  const HOT_JSON = /(latest|enrich|ai_picks|hot_impact|daily_brief|engine_v5|reflect_latest|cycle_deep|sources_registry|ban_prob)\.json$/;
+  const HOT_JSON = /(latest|enrich|ai_picks|hot_impact|daily_brief|engine_v5|reflect_latest|cycle_deep|sources_registry|ban_prob|flow_divergence)\.json$/;
   const swrJson = /(index_kline|search_index|multi_v4|lowpool|cycle|sector_pool|hotspot_infer)\.json$/.test(path);
   const isHot = HOT_JSON.test(path);
 

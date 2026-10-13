@@ -19,6 +19,11 @@ jobs:
     timeout-minutes: 20
     env:
       TZ: Asia/Shanghai
+      # job 级路径变量: 所有步骤都能读到 (此前只在 lowpool 步骤设, 导致
+      # ban_prob 找不到 K 线 bulk 而算出 0 个涨停事件)
+      STOCKS_KLINE_BULK: ${{ github.workspace }}/data-kline/bulk
+      STOCKS_LIVE_MARKET: ${{ github.workspace }}/data-live/market
+      STOCKS_LIVE_ROOT: ${{ github.workspace }}/data-live
     steps:
       - uses: actions/checkout@v4
         with:
