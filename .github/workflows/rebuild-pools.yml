@@ -147,6 +147,9 @@ jobs:
           git config user.email "741059079@qq.com"
           git add -A data/
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          git diff --quiet --cached HEAD && echo "no changes" || {
-            git commit -m "pools: rebuild $ts (板块池+周期池+低位池+市场增量)" && \
-            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "pools: rebuild $ts (板块池+周期池+低位池+市场增量)"
+            git push origin main || git pull --rebase origin main
+          fi

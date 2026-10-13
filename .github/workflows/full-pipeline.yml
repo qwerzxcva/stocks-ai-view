@@ -118,6 +118,9 @@ jobs:
           git config user.email "741059079@qq.com"
           git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          git diff --quiet --cached HEAD && echo "no changes" || {
-            git commit -m "pipeline: $ts (采集+DB+引擎+复盘)" && \
-            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "pipeline: $ts (采集+DB+引擎+复盘)"
+            git push origin main || git pull --rebase origin main
+          fi
