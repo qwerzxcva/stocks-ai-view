@@ -120,4 +120,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
             git commit -m "pipeline: $ts (采集+DB+引擎+复盘)" && \
-            git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }
+            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main

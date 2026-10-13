@@ -84,4 +84,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
             git commit -m "brief: $ts (盘前日报: 分析+推股+胜率验证+热点)" && \
-            git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }
+            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main

@@ -55,4 +55,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet HEAD && echo "no changes" || \
             { git commit -m "pools-v4: $ts (cycle+sector+low+hotspot+multi)" && \
-              git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }
+              git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main

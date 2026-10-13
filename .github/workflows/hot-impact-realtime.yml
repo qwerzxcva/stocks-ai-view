@@ -101,4 +101,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
             git commit -m "hot-impact: $ts (实时热点推演 + 强势股/龙虎榜/大宗 + AI推股)" && \
-            git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }
+            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main
