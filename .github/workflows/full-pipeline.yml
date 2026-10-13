@@ -119,6 +119,22 @@ jobs:
       - name: Sample balancer
         run: python3 scripts/sample_balancer.py --write-back || echo "balancer skipped (no ban_prob)"
 
+      # ── 6c. 场景化推股 (四象限: 牛/熊/震荡/极端) ──
+      # 轻量 (只读已有 json 重排), GitHub 侧直接跑, 不等 Space
+      - name: Scenario engine
+        run: python3 scripts/scenario_engine.py || echo "scenario skipped (no multidim)"
+
+      # ── 6d. 引擎兜底 (Space 未激活时, GitHub 侧跑轻量引擎链) ──
+      # 主算力在 GitCode Space; 若 Space 未跑 (无 GC_TOKEN/未激活),
+      # 这里跑一遍轻量引擎, 保证网站永远有最新评分/决策/估值。
+      - name: Engine fallback (light chain)
+        run: |
+          python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
+          python3 scripts/multidim_engine.py --out data/multidim.json --limit 200 || echo "multidim skipped"
+          python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
+          python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
+          python3 scripts/scenario_engine.py || echo "scenario skipped"
+
       # ── 7. 数据校验 (采集侧) ──
       - name: Audit collected data
         run: |
@@ -170,7 +186,7 @@ jobs:
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json"
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
           git fetch origin main
           git reset --soft origin/main
           git add -A $FILES

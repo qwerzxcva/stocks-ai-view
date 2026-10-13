@@ -158,12 +158,11 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <div class="logo">A股 AI 量化工作台 <span class="tsp">TSP v4</span></div>
   <span class="b" id="algoBadge">tsp-signal-v4</span>
   <span class="b stage" id="stageBadge" style="display:none"></span>
-  <span class="upd" id="updTime">⏳ 加载中…</span>
-  <span id="rtStatus" title="浏览器直连腾讯行情, 60s 刷新" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">实时 --:--</span>
+  <span class="upd" id="updTime">Loading...</span>
+  <span id="rtStatus" title="Browser-direct tencent quotes, 60s refresh" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">RT --:--</span>
   <span id="dataSourceTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;background:rgba(137,87,229,.18);border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;cursor:help"></span>
-  <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
   <div style="position:relative;margin-left:8px">
-    <input id="symSearch" placeholder="🔍 搜股票/ETF (代码或名称)" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
+    <input id="symSearch" placeholder="Search stock / ETF" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
     <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
   </div>
 <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
@@ -229,6 +228,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="6">周期深析</button>
       <button class="c-tab" data-c="7">资金背离</button>
       <button class="c-tab" data-c="8">策略决策</button>
+      <button class="c-tab" data-c="9">场景推股</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">多维评分 · 点击行看K线/资金流</span></div>
@@ -319,6 +319,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="card c-card" data-ci="8" style="display:none">
       <div class="hd">🎯 策略决策卡 <span class="sub" id="decSub">9维因子 → 可执行决策</span></div>
       <div id="decisionBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
+    </div>
+    <div class="card c-card" data-ci="9" style="display:none">
+      <div class="hd">🎲 场景化推股 <span class="sub" id="scenSub">牛/熊/震荡/极端 四象限</span></div>
+      <div id="scenarioBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)"><div class="fl" style="text-align:center">加载中…</div></div>
     </div>
   </div>
   <!-- RIGHT: 主题 + 24h资讯流 -->
@@ -1074,7 +1078,41 @@ async function renderPools(d){
 let cdRendered = false;
 let fdRendered = false;
 let decRendered = false;
-// 策略决策卡渲染 (decision.json: 市场环境/仓位建议/决策卡列表/回避列表)
+let scenRendered = false;
+// 场景化推股渲染 (scenario.json: 四象限 + 场景权重重排 + 硬规则过滤)
+function renderScenario(d){
+  const box=document.getElementById('scenarioBox');
+  if(!box) return;
+  if(!d||!d.scenario){box.innerHTML='<div class="no-data">暂无场景数据</div>';return}
+  const esc=s=>String(s==null?'—':s);
+  const col={bull:'var(--up)',bear:'var(--dn)',range:'var(--amber)',extreme:'var(--tx3)'};
+  const cfg=d.config||{};
+  let h='<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">';
+  h+='<span style="font-size:13px">当前场景: <b style="color:'+(col[d.scenario]||'var(--tx2)')+'">'+esc(d.scenario_label)+'</b></span>';
+  h+='<span class="bdg" style="background:rgba(137,87,229,.18);color:var(--accent)">仓位≤'+((cfg.position_cap||0)*100).toFixed(0)+'%</span>';
+  h+='<span class="bdg fl">门槛 '+esc(cfg.min_composite)+'</span>';
+  h+='<span class="fl" style="font-size:9px">'+esc(d.detect_reason)+'</span>';
+  h+='</div>';
+  h+='<div class="fl" style="font-size:9px;margin-bottom:6px;line-height:1.5">偏好: '+esc(cfg.prefer)+'<br>禁止: '+esc(cfg.forbid)+'</div>';
+  const dw=cfg.dim_weights||{};
+  h+='<div class="chips" style="margin-bottom:6px">'+Object.entries(dw).sort((a,b)=>b[1]-a[1]).slice(0,5)
+     .map(([k,v])=>'<span class="chip">'+k+' <b>'+Math.round(v*100)+'%</b></span>').join('')+'</div>';
+  const actCol={buy:'var(--up)',watch:'var(--amber)',avoid:'var(--dn)'};
+  h+='<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>场景分</th><th>原综合</th><th>操作</th></tr></thead><tbody>';
+  (d.picks||[]).slice(0,20).forEach(p=>{ h+='<tr class="clk" data-code="'+esc(p.code)+'">'+
+    '<td>'+esc(p.code)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.price)+'</td>'+
+    '<td style="font-weight:700">'+(p.intrinsic_value!=null?esc(p.intrinsic_value):'—')+
+    (p.value_dev_pct!=null?'<span style="font-size:10px;margin-left:3px;color:'+(p.value_dev_pct<=-10?'var(--up)':p.value_dev_pct>=30?'var(--dn)':'var(--tx3)')+'">'+(p.value_dev_pct>0?'+':'')+p.value_dev_pct+'%</span>':'')+'</td>'+
+    '<td style="font-weight:700;color:var(--accent)">'+esc(p.scenario_score)+'</td>'+
+    '<td class="fl">'+esc(p.composite)+'</td>'+
+    '<td style="color:'+(actCol[p.action]||'var(--tx2)')+';font-weight:700">'+esc(p.action||'观察')+'</td></tr>';
+    if(p.why&&p.why['资金面']) h+='<tr><td></td><td colspan="6" class="fl" style="font-size:9px">'+esc(p.why['资金面'])+' · '+esc((p.why['高低位']||'')).slice(0,50)+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  if(d.n_rejected) h+='<div class="fl" style="padding:6px 0;font-size:9px">场景硬规则拒绝 '+d.n_rejected+' 只 (高位/涨幅越界/量比不符)</div>';
+  h+='<div class="fl" style="padding:8px 0 2px;font-size:9px">'+esc((d.meta||{}).detect_rules)+'</div>';
+  box.innerHTML=h;
+}
 function renderDecision(d){
   const box=document.getElementById('decisionBox');
   if(!box) return;
@@ -1247,6 +1285,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='6' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
   if(b.dataset.c==='7' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
   if(b.dataset.c==='8' && !decRendered){ decRendered=true; renderDecision(window._decData||null); }
+  if(b.dataset.c==='9' && !scenRendered){ scenRendered=true; renderScenario(window._scenData||null); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -1380,6 +1419,8 @@ async function render(){
   window._fdData=fd; if(fd)renderFlowDivergence(fd);
   const dec=await fetchJSON('data/decision.json');
   window._decData=dec; if(dec&&decRendered)renderDecision(dec);
+  const scen=await _fresh('data/scenario.json');
+  window._scenData=scen; if(scen&&scenRendered)renderScenario(scen);
   const db=await fetchJSON('data/daily_brief.json');
   if(db)renderDailyBrief(db);
   renderSelfReflect();
@@ -1397,18 +1438,10 @@ function scheduleNext(){
     scheduleNext();
   },delay);
 }
-async function renderTunnel(){
-  const t = await fetchJSON('data/tunnel.json');
-  const a = document.getElementById('rtLink'), d = document.getElementById('rtDown');
-  if(t && t.ok && t.url){ a.style.display=''; a.href=t.url; d.style.display='none'; }
-  else { a.style.display='none'; d.style.display=''; }
-}
-renderTunnel();
-setInterval(renderTunnel, 300000);
 render();
 scheduleNext();
 
-// ─── Level 2 Cookie 弹窗 (元素缺失时静默跳过, 不阻断后续脚本) ───
+// ─── Level 2 Cookie modal (skipped silently if elements are missing) ───
 const l2Modal = document.getElementById('l2Modal');
 const l2Btn = document.getElementById('l2Btn');
 const l2Close = document.getElementById('l2Close');

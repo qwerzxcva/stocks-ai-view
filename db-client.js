@@ -18,22 +18,27 @@
   var REPOS = {
     market: GH + 'jiegengxiangjianxue1/db-market/main/',
     marketGC: GC + 'dufuwuxin/stocks-db-market/raw/main/',
-    stocksA: GH + 'jiegengxiangjianxue2/db-stocks-a/main/',
+    stocksA: GH + 'jiegengxiangjianxue1/db-stocks-a/main/',
     stocksB: GH + 'jiegengxiangjianxue2/db-stocks-b/main/',
-    stocksC: GH + 'jiegengxiangjianxue3/db-stocks-c/main/',
+    stocksC: GH + 'jiegengxiangjianxue2/db-stocks-c/main/',
+    stocksD: GH + 'jiegengxiangjianxue3/db-stocks-d/main/',
+    stocksE: GH + 'jiegengxiangjianxue3/db-stocks-e/main/',
     stocksGC: GC + 'dufuwuxin/stocks-db-stocks/raw/main/'
   };
 
-  var SHARDS_A = ['00', '30', '60'];
-  var SHARDS_B = ['15', '50', '51', '52', '56', '58', '68'];
+  // shard -> repo. Mirrors scripts/sync_repos.py exactly.
+  var SHARD_REPO = {
+    '00': 'stocksA', '30': 'stocksB', '60': 'stocksC',
+    '68': 'stocksD', '15': 'stocksD', '51': 'stocksD',
+    '50': 'stocksD', '52': 'stocksD', '56': 'stocksD', '58': 'stocksD'
+  };
 
   var cache = {};
   var origin = 'github';
 
   function pickStockRepo(shard) {
-    if (SHARDS_A.indexOf(shard) >= 0) return REPOS.stocksA;
-    if (SHARDS_B.indexOf(shard) >= 0) return REPOS.stocksB;
-    return REPOS.stocksC;
+    var key = SHARD_REPO[shard] || 'stocksE';
+    return REPOS[key];
   }
 
   // Fetch with per-session cache; tries GitHub first, falls back to GitCode.
@@ -46,10 +51,13 @@
       .then(function (j) { cache[url] = { t: now, v: j }; return j; })
       .catch(function () {
         if (url.indexOf(GH) === 0) {
-          var alt = url.replace(GH + 'jiegengxiangjianxue1/db-market/main/', REPOS.marketGC)
-                       .replace(GH + 'jiegengxiangjianxue2/db-stocks-a/main/', REPOS.stocksGC)
-                       .replace(GH + 'jiegengxiangjianxue2/db-stocks-b/main/', REPOS.stocksGC)
-                       .replace(GH + 'jiegengxiangjianxue3/db-stocks-c/main/', REPOS.stocksGC);
+          var alt = url
+            .replace(GH + 'jiegengxiangjianxue1/db-market/main/', REPOS.marketGC)
+            .replace(GH + 'jiegengxiangjianxue1/db-stocks-a/main/', REPOS.stocksGC)
+            .replace(GH + 'jiegengxiangjianxue2/db-stocks-b/main/', REPOS.stocksGC)
+            .replace(GH + 'jiegengxiangjianxue2/db-stocks-c/main/', REPOS.stocksGC)
+            .replace(GH + 'jiegengxiangjianxue3/db-stocks-d/main/', REPOS.stocksGC)
+            .replace(GH + 'jiegengxiangjianxue3/db-stocks-e/main/', REPOS.stocksGC);
           if (alt !== url) return get(alt, ttl);
         }
         return null;

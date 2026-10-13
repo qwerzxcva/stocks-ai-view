@@ -64,10 +64,9 @@
     var m = p.match(/^data\/stocks\/(\d\d)\//);
     if (m && window.DB) {
       var shard = m[1];
-      var base = window.DB.repos.stocksA;
-      if (window.DB.repos.stocksB.indexOf(shard) >= 0) base = window.DB.repos.stocksB;
-      else if (shard !== '00' && shard !== '30' && shard !== '60') base = window.DB.repos.stocksC;
-      return [base + p.replace(/^data\/stocks\//, ''), window.DB.repos.stocksGC + p.replace(/^data\/stocks\//, '')];
+      var key = window.DB.repos['stocks' + ({'00':'A','30':'B','60':'C','68':'D','15':'D','51':'D','50':'D','52':'D','56':'D','58':'D'}[shard] || 'E')];
+      return [key + p.replace(/^data\/stocks\//, ''),
+              window.DB.repos.stocksGC + p.replace(/^data\/stocks\//, '')];
     }
     return [AI_VIEW_GH + p, null];
   }
