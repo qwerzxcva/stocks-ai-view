@@ -116,6 +116,23 @@ jobs:
         run: |
           python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || true
 
+      # ── 6d. 策略决策引擎 (多维因子 → 可执行决策卡) ──
+      - name: Decision engine
+        run: |
+          python3 scripts/decision_engine.py --out data/decision.json || true
+          python3 scripts/decision_engine.py --out data/decision_card_$(TZ=Asia/Shanghai date +%Y%m%d).json || true
+
+      # ── 6e. 自我反思与总括改进 (证据驱动) ──
+      - name: Self reflect
+        run: |
+          python3 scripts/self_reflect.py --out data/self_reflect.json || true
+          python3 scripts/audit_data.py > data/audit_report.txt 2>&1 || true
+
+      # ── 6f. 全球指标 (离岸人民币/美元指数, 供前端读) ──
+      - name: Global FX
+        run: |
+          python3 scripts/build_global_fx.py --out data/global_fx.json || true
+
       # ── 7. 采集摘要 ──
       - name: Summary
         run: |

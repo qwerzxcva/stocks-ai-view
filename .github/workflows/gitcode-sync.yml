@@ -1,0 +1,150 @@
+# GitHub → GitCode 实时镜像同步
+# 每次 main 有推送 (或 CI 数据更新) 时, 把 data/ 与 scripts/ 同步到 GitCode 公开仓
+# GitCode 侧作为: 1) 数据镜像/异地备份 2) 云容器算力入口 (CLOUD_SETUP.md 已说明)
+#
+# 双向互联:
+#   GitHub (CI 采集+引擎+Pages)  ──push──▶  GitCode stock-system (镜像+云容器)
+#   GitHub Actions 16:00 ◀──pull review_input──  GitCode analysis/review_input
+name: gitcode-sync
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'scripts/**'
+      - 'index.html'
+      - 'sw.js'
+      - 'stock-detail.js'
+      - 'realtime.js'
+  schedule:
+    # 每 30 分钟兜底同步一次 (CST 与数据更新节奏对齐)
+    - cron: '*/30 2,3,4,5,6,7,8 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      # ── 推送到 GitCode (公开仓, 用 GC_TOKEN) ──
+      - name: Push to GitCode
+        env:
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+        run: |
+          if [ -z "$GC_TOKEN" ]; then
+            echo "::warning::GC_TOKEN 未配置, 跳过 GitCode 同步"
+            echo "配置方法: Settings → Secrets → New repository secret"
+            echo "  Name: GC_TOKEN  Value: <gitcode 个人访问令牌>"
+            exit 0
+          fi
+          git remote add gitcode "https://x-access-token:${GC_TOKEN}@gitcode.com/dufuwuxin/stock-system.git" 2>/dev/null || \
+            git remote set-url gitcode "https://x-access-token:${GC_TOKEN}@gitcode.com/dufuwuxin/stock-system.git"
+
+          ts=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')
+          git config user.name "stocks-sync-bot"
+          git config user.email "3576982374@qq.com"
+
+          # 只推数据/脚本/前端, 不动 GitCode 侧已有的 algorithms/engines/cloud 结构
+          git add -A data/ scripts/ index.html sw.js stock-detail.js realtime.js 2>/dev/null || true
+          if git diff --cached --quiet HEAD; then
+            echo "no changes to mirror"
+          else
+            git commit -m "mirror: $ts (GitHub → GitCode 数据/脚本同步)" || true
+          fi
+
+          # GitCode 侧允许历史分叉 (双平台各自提交), 用 force-with-lease 保护
+          git push gitcode HEAD:main --force-with-lease || {
+            echo "::warning::GitCode push 冲突, 尝试拉取合并后重试"
+            git fetch gitcode main || true
+            git merge --no-edit gitcode/main -X ours || true
+            git push gitcode HEAD:main --force-with-lease || echo "::error::GitCode 同步失败"
+          }
+          echo "✅ 已同步到 GitCode: https://gitcode.com/dufuwuxin/stock-system"
+
+      # ── 从 GitCode 拉回 AI 复盘输入 + 新增引擎 (GitCode→GitHub 反向链路) ──
+      - name: Pull from GitCode (review input + new engines)
+        env:
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+        run: |
+          if [ -z "$GC_TOKEN" ]; then exit 0; fi
+          git remote add gc-src "https://x-access-token:${GC_TOKEN}@gitcode.com/dufuwuxin/stock-system.git" 2>/dev/null || true
+          git fetch gc-src main 2>/dev/null || { echo "GitCode fetch 失败 (可能仓库为空或无权限)"; exit 0; }
+
+          # 1) 拉 GitCode 侧 engines/ + algorithms/ 里 GitHub 没有的 .py → scripts/
+          mkdir -p scripts
+          n_new=0
+          for f in $(git ls-tree -r --name-only gc-src/main | grep -E '^(engines|algorithms)/.*\.py$'); do
+            base=$(basename "$f")
+            if [ ! -f "scripts/$base" ]; then
+              mkdir -p scripts
+              git show "gc-src/main:$f" > "scripts/$base" 2>/dev/null || continue
+              # 文件头标注来源 (便于追溯)
+              if ! head -3 "scripts/$base" | grep -q 'gitcode.com/dufuwuxin/stock-system'; then
+                printf '# 来源: gitcode.com/dufuwuxin/stock-system %s (自动拉取)\n%s' "$f" "$(cat scripts/$base)" > "scripts/$base.tmp" && mv "scripts/$base.tmp" "scripts/$base"
+              fi
+              echo "  ← 新引擎 scripts/$base (来自 $f)"
+              n_new=$((n_new+1))
+            fi
+          done
+
+          # 2) 拉 analysis/review_input → data/gitcode_review/
+          mkdir -p data/gitcode_review
+          for f in $(git ls-tree -r --name-only gc-src/main | grep '^analysis/review_input/' | tail -5); do
+            git show "gc-src/main:$f" > "data/gitcode_review/$(basename $f)" 2>/dev/null && echo "  ← $f"
+          done
+
+          # 3) 有新增就 commit 回 GitHub
+          git add -A scripts/ data/gitcode_review/ 2>/dev/null || true
+          if ! git diff --cached --quiet HEAD; then
+            git commit -m "sync: 从 GitCode 拉回 ${n_new} 个新引擎 + 复盘输入 $(TZ=Asia/Shanghai date +%Y%m%d_%H%M)" || true
+            git push origin main || echo "::warning::回推 GitHub 失败 (可能并发)"
+          else
+            echo "GitCode 侧无新增内容"
+          fi
+
+      # ── 把 GitHub 侧新脚本推到 GitCode engines/ (保持两侧脚本同步) ──
+      - name: Push GitHub scripts to GitCode engines/
+        env:
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+        run: |
+          if [ -z "$GC_TOKEN" ]; then exit 0; fi
+          git remote add gitcode "https://x-access-token:${GC_TOKEN}@gitcode.com/dufuwuxin/stock-system.git" 2>/dev/null || true
+          git fetch gitcode main 2>/dev/null || { echo "GitCode fetch 失败"; exit 0; }
+          git checkout -B gc-mirror gitcode/main
+          mkdir -p engines
+          n_sync=0
+          for f in scripts/*.py; do
+            [ -f "$f" ] || continue
+            b=$(basename "$f")
+            if [ ! -f "engines/$b" ] || ! cmp -s "$f" "engines/$b"; then
+              cp "$f" "engines/$b"
+              n_sync=$((n_sync+1))
+            fi
+          done
+          # data/ 也同步过去 (镜像)
+          mkdir -p data
+          cp -r data/*.json data/ 2>/dev/null || true
+          git add -A engines/ data/ 2>/dev/null || true
+          if git diff --cached --quiet HEAD; then
+            echo "engines/ 已是最新"
+          else
+            git config user.name "stocks-sync-bot"
+            git config user.email "3576982374@qq.com"
+            git commit -m "engines sync: ${n_sync} 个脚本 + 数据镜像 $(TZ=Asia/Shanghai date +%Y%m%d_%H%M)" || true
+            git push gitcode gc-mirror:main --force-with-lease || echo "::warning::GitCode engines 推送失败"
+          fi
+          git checkout main
