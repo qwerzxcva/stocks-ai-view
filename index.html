@@ -782,35 +782,49 @@ async function renderPools(d){
   const pools = d.pools || {};
   const picks = d.picks || [];
   
-  // ---- 打板池 (picks: 涨停+连板票，按算法分排序) ----
+  // ---- 打板池 (实证概率: 次日涨停率/炸板率/期望收益) ----
   const banKpis = document.getElementById('banKpis');
   const banBody = document.getElementById('banBody');
+  const bp = window._banProb || {};
+  const bpBase = bp.base || {};
+  const bpByLb = bpBase.by_lianban || {};
   if(picks.length){
     const maxLB = Math.max(...picks.map(p=>p.lianban||1));
     const byLB = {};
     picks.forEach(p => { const k=p.lianban>=2?p.lianban+'板':'首板'; (byLB[k]=byLB[k]||[]).push(p); });
+    // 全样本首板次日涨停率
+    const firstLB = bpByLb['首板'] || {};
+    const topLB = bpByLb[maxLB+'连板'] || bpByLb['6连板'] || firstLB;
     banKpis.innerHTML = [
       `<div class="pool-kpi-item"><div class="v up">${picks.length}</div><div class="n">候选总数</div></div>`,
       `<div class="pool-kpi-item"><div class="v" style="color:var(--amber)">${maxLB}</div><div class="n">最高连板</div></div>`,
-      `<div class="pool-kpi-item"><div class="v">${Object.keys(byLB).length}</div><div class="n">梯队分层</div></div>`,
+      `<div class="pool-kpi-item"><div class="v up">${firstLB.zt_next_rate!=null?firstLB.zt_next_rate+'%':'—'}</div><div class="n">首板次日涨停率</div></div>`,
+      `<div class="pool-kpi-item"><div class="v up">${topLB.zt_next_rate!=null?topLB.zt_next_rate+'%':'—'}</div><div class="n">${maxLB}板次日涨停率</div></div>`,
     ].join('');
     let rows='';
     for(const tier of ['9板','8板','7板','6板','5板','4板','3板','2板','首板']){
       const sp = byLB[tier];
       if(!sp) continue;
-      rows += `<tr style="background:rgba(137,87,229,.06)"><td colspan="9" style="font-size:10px;padding:2px 8px;color:var(--accent)">▶ ${tier} · ${sp.length}只</td></tr>`;
+      const lbN = tier==='首板'?1:parseInt(tier);
+      const key = lbN>1?(Math.min(lbN,6)+'连板'):'首板';
+      const st = bpByLb[key] || {};
+      const pZt = st.zt_next_rate, pZb = st.zhaban_next_rate, eRet = st.ret_next_avg;
+      const pCol = pZt==null?'fl':(pZt>=40?'up':pZt>=25?'amber':'fl');
+      rows += `<tr style="background:rgba(137,87,229,.06)"><td colspan="9" style="font-size:10px;padding:2px 8px;color:var(--accent)">▶ ${tier} · ${sp.length}只 · 历史次日涨停率 <b class="${pCol}">${pZt!=null?pZt+'%':'—'}</b> · 炸板率 ${pZb!=null?pZb+'%':'—'} · 期望收益 ${eRet!=null?eRet+'%':'—'} (n=${st.n_samples||'?'})</td></tr>`;
       sp.slice(0,5).forEach(s=>{
+        const col = pZt==null?'fl':(pZt>=40?'up':pZt>=25?'amber':'fl');
         rows += `<tr>
           <td>${s.code}</td><td><b>${s.name}</b></td><td>${fmt(s.price)}</td>
           <td>${s.lianban>=2?'<span class="bdg up">'+s.lianban+'板</span>':'<span class="bdg fl">首板</span>'}</td>
           <td class="fl">${fmtTime(s.zt_time)}</td>
           <td>${s.rps5??'—'}</td><td>${s.rps20??'—'}</td>
           <td>${s.theme_hit?'<span class="hot">★</span>':'<span class="fl">—</span>'}</td>
-          <td style="font-weight:700;color:${s.score>=0.6?'var(--up)':'var(--amber)'}">${s.score.toFixed(3)}</td>
+          <td style="font-weight:700;color:${col}">${pZt!=null?pZt+'%':'—'}</td>
         </tr>`;
       });
     }
-    banBody.innerHTML = `<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>首封</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>综合分</th></tr></thead><tbody>${rows}</tbody></table>`;
+    banBody.innerHTML = `<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>首封</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>次日涨停概率</th></tr></thead><tbody>${rows}</tbody></table>`+
+      (bp.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">概率口径: 基于本地 ${bp.sample?bp.sample.n_stocks:''} 只 × ${bp.sample?bp.sample.n_zt_events:''} 个涨停事件实证统计 · 数据源: 腾讯前复权日K<br>涨停定义: ${bp.meta.zt_def||''}<br>${bp.meta.caveat||''}</div>`:'');
   } else {
     banKpis.innerHTML=''; banBody.innerHTML='<div class="no-data">暂无打板数据</div>';
   }
@@ -1103,6 +1117,8 @@ async function render(){
   renderVolChart(d.index_kline);
   const cd=await fetchJSON('data/cycle_deep.json');
   window._cdData=cd; if(cd)renderCycleDeep(cd);
+  const bpj=await fetchJSON('data/ban_prob.json');
+  window._banProb=bpj;
   const db=await fetchJSON('data/daily_brief.json');
   if(db)renderDailyBrief(db);
   renderPools(d);
