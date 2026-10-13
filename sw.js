@@ -4,7 +4,7 @@
 //   - data/*.json: network-first, 失败回退缓存 (数据新鲜优先)
 //     * 例外: index_kline.json / search_index.json 等大文件走 stale-while-revalidate
 //   - 跨域请求 (腾讯行情等): 不走 SW, 由 realtime.js 直连
-const CACHE = 'stocks-ai-view-v4';   // v4: 显式列出高频 JSON 白名单, 强制 SW 重装
+const CACHE = 'stocks-ai-view-v5';   // v5: stock-detail.js GBK 解码修复, 强制重装
 const SHELL = ['./', './index.html', './realtime.js', './sw.js',
                './data/latest.json'];
 
@@ -86,16 +86,19 @@ self.addEventListener('fetch', e => {
   }
 
   if (isShell) {
-    // 应用外壳: cache-first + 后台刷新
+    // HTML/JS/CSS: network-first
+    // JS 曾用 cache-first, 导致代码更新后用户仍跑旧版 (反复'修复了但没生效'),
+    // 这些文件仅几 KB, network-first 开销可忽略, 换来永远最新
     e.respondWith((async () => {
       const cache = await caches.open(CACHE);
-      const hit = await cache.match(req);
-      const net = fetch(req).then(r => {
-        if (r && r.ok) cache.put(req, r.clone());
-        return r;
-      }).catch(() => null);
-      if (hit) { e.waitUntil(net); return hit; }
-      return await net || new Response('', { status: 503 });
+      try {
+        const fresh = await fetch(req);
+        if (fresh && fresh.ok) cache.put(req, fresh.clone());
+        return fresh;
+      } catch (_) {
+        const hit = await cache.match(req);
+        return hit || new Response('', { status: 503 });
+      }
     })());
     return;
   }

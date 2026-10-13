@@ -91,19 +91,25 @@
       });
   }
 
+  // 腾讯行情是 GBK 编码, fetch().json() 按 UTF-8 解析会失败, 需手动解码
   function fetchQuote(code) {
     var p = prefixed(code);
-    return jget('https://qt.gtimg.cn/q=' + p).then(function (d) {
-      // 腾讯返回 key 形如 v_sh600519
-      var raw = (d && (d['v_' + p] || d[p])) || '';
-      var f = String(raw).split('~');
-      if (f.length < 40) return null;
-      return {
-        code: code, name: f[1], price: +f[3], prev_close: +f[4], open: +f[5],
-        high: +f[33], low: +f[34], chg_pct: +f[32], turnover: +f[38],
-        pe: +f[39], mktcap: (+f[44] || 0) * 1e8, pb: +f[46], time: f[30]
-      };
-    });
+    return fetch('https://qt.gtimg.cn/q=' + p)
+      .then(function (r) { return r.arrayBuffer(); })
+      .then(function (buf) {
+        var txt;
+        try { txt = new TextDecoder('gbk').decode(buf); } catch (e) { txt = ''; }
+        var m = txt.match(/v_([a-z0-9]+)="([^"]*)"/);
+        if (!m) return null;
+        var f = m[2].split('~');
+        if (f.length < 40) return null;
+        return {
+          code: code, name: f[1], price: +f[3], prev_close: +f[4], open: +f[5],
+          high: +f[33], low: +f[34], chg_pct: +f[32], turnover: +f[38],
+          pe: +f[39], mktcap: (+f[44] || 0) * 1e8, pb: +f[46], time: f[30]
+        };
+      })
+      .catch(function () { return null; });
   }
 
   // ─── 渲染: K线图 (SVG 蜡烛) ──────────────────────────────────
