@@ -1,0 +1,162 @@
+{
+  "ts": "2026-10-14T05:21:11+08:00",
+  "engine": "risk_engine v1 (风险预算/波动率平价/集中度控制)",
+  "n_positions": 12,
+  "total_position": 0.6,
+  "total_position_pct": "60.0%",
+  "scenario_cap": 0.6,
+  "capped_by_scenario": true,
+  "total_risk_budget": 0.06,
+  "risk_per_trade": 0.005,
+  "portfolio_vol_estimate": 0.3252,
+  "limits": {
+    "max_single": 0.25,
+    "max_sector": 0.4
+  },
+  "plan": [
+    {
+      "code": "603906",
+      "name": "龙蟠科技",
+      "industry": null,
+      "suggested_position": 0.0257,
+      "position_pct": "2.6%",
+      "annual_vol": 0.633,
+      "risk_contribution": 0.0271,
+      "stop_loss": 19.38,
+      "target": 22.03
+    },
+    {
+      "code": "601166",
+      "name": "兴业银行",
+      "industry": null,
+      "suggested_position": 0.1178,
+      "position_pct": "11.8%",
+      "annual_vol": 0.138,
+      "risk_contribution": 0.0271,
+      "stop_loss": 17.48,
+      "target": 19.87
+    },
+    {
+      "code": "600026",
+      "name": "中远海能",
+      "industry": null,
+      "suggested_position": 0.025,
+      "position_pct": "2.5%",
+      "annual_vol": 0.653,
+      "risk_contribution": 0.0271,
+      "stop_loss": 20.61,
+      "target": 23.43
+    },
+    {
+      "code": "002142",
+      "name": "宁波银行",
+      "industry": null,
+      "suggested_position": 0.0724,
+      "position_pct": "7.2%",
+      "annual_vol": 0.225,
+      "risk_contribution": 0.0271,
+      "stop_loss": 34.34,
+      "target": 39.04
+    },
+    {
+      "code": "600863",
+      "name": "华能蒙电",
+      "industry": null,
+      "suggested_position": 0.0442,
+      "position_pct": "4.4%",
+      "annual_vol": 0.368,
+      "risk_contribution": 0.0271,
+      "stop_loss": 4.93,
+      "target": 5.61
+    },
+    {
+      "code": "601929",
+      "name": "吉视传媒",
+      "industry": null,
+      "suggested_position": 0.0193,
+      "position_pct": "1.9%",
+      "annual_vol": 0.846,
+      "risk_contribution": 0.0271,
+      "stop_loss": 2.61,
+      "target": 2.97
+    },
+    {
+      "code": "300760",
+      "name": "迈瑞医疗",
+      "industry": null,
+      "suggested_position": 0.0637,
+      "position_pct": "6.4%",
+      "annual_vol": 0.255,
+      "risk_contribution": 0.0271,
+      "stop_loss": 157.77,
+      "target": 179.36
+    },
+    {
+      "code": "000001",
+      "name": "平安银行",
+      "industry": null,
+      "suggested_position": 0.1039,
+      "position_pct": "10.4%",
+      "annual_vol": 0.157,
+      "risk_contribution": 0.0271,
+      "stop_loss": 11.16,
+      "target": 12.69
+    },
+    {
+      "code": "603533",
+      "name": "掌阅科技",
+      "industry": null,
+      "suggested_position": 0.022,
+      "position_pct": "2.2%",
+      "annual_vol": 0.74,
+      "risk_contribution": 0.0271,
+      "stop_loss": 26.58,
+      "target": 30.22
+    },
+    {
+      "code": "002805",
+      "name": "丰元股份",
+      "industry": null,
+      "suggested_position": 0.0256,
+      "position_pct": "2.6%",
+      "annual_vol": 0.635,
+      "risk_contribution": 0.0271,
+      "stop_loss": 17.94,
+      "target": 20.39
+    },
+    {
+      "code": "688199",
+      "name": "久日新材",
+      "industry": null,
+      "suggested_position": 0.0514,
+      "position_pct": "5.1%",
+      "annual_vol": 0.317,
+      "risk_contribution": 0.0271,
+      "stop_loss": 25.68,
+      "target": 29.19
+    },
+    {
+      "code": "688353",
+      "name": "华盛锂电",
+      "industry": null,
+      "suggested_position": 0.029,
+      "position_pct": "2.9%",
+      "annual_vol": 0.561,
+      "risk_contribution": 0.0271,
+      "stop_loss": 83.88,
+      "target": 95.36
+    }
+  ],
+  "sector_allocation": [
+    {
+      "industry": "unknown",
+      "position": 1.0,
+      "msg": "行业 unknown 合计 100.0% (> 40% 上限)"
+    }
+  ],
+  "meta": {
+    "method": "仓位 = 风险预算/年化波动率 (风险平价); 同行业>2只降权0.7; 单票≤25% 单行业≤40%",
+    "correlation_note": "未算两两相关 (需协方差矩阵), 用行业近似",
+    "caveat": "风险预算是统计建议, 不构成投资建议"
+  }
+}
