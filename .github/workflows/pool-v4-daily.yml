@@ -37,16 +37,6 @@ jobs:
           DATE: ""
       - name: Verify data files
         run: python3 scripts/verify_data.py
-      - name: Sync before commit
-        run: |
-          git fetch origin main
-          git stash push -u -m "generated" -- data/ 2>/dev/null || true
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || { git stash pop; exit 1; }
-          fi
-          git stash pop 2>/dev/null || true
-
       - name: Commit & push
         run: |
           git config user.name "stocks-bot-v4"

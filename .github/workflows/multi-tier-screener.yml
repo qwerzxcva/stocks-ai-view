@@ -36,23 +36,25 @@ jobs:
         run: |
           set -e
           python3 scripts/multi_screener.py --out-dir . --rounds 3 --top 30 --llm ghc
-      - name: Sync before commit
-        run: |
-          git fetch origin main
-          git stash push -u -m "generated" -- data/ 2>/dev/null || true
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || { git stash pop; exit 1; }
-          fi
-          git stash pop 2>/dev/null || true
-
       - name: Commit & push
         run: |
           git config user.name "screener-bot"
           git config user.email "41888888888+stocks-ai-bot@users.noreply.github.com"
           git add -A
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          git diff --quiet HEAD && echo "no changes" || {
-            git commit -m "screener: $ts (multi-tier v3 rounds)" && \
-            git -c http.version=HTTP/1.1 push origin main
-          }
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "screener: $ts (multi-tier v3 rounds)"
+          fi
+          git fetch origin main
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || {
+              for f in .; do
+                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
+              done
+              git rebase --continue || git rebase --abort
+            }
+          fi
+          git push origin main || git pull --rebase origin main

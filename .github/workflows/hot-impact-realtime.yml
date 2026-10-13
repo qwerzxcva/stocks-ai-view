@@ -83,16 +83,6 @@ jobs:
                   print(f"WARN: meta 缺 {k}")
           PY
 
-      - name: Sync before commit
-        run: |
-          git fetch origin main
-          git stash push -u -m "generated" -- data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json 2>/dev/null || true
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || { git stash pop; exit 1; }
-          fi
-          git stash pop 2>/dev/null || true
-
       - name: Commit & push
         run: |
           git config user.name "hot-bot"
@@ -102,6 +92,17 @@ jobs:
           if git diff --quiet --cached HEAD; then
             echo "no changes"
           else
-            git commit -m "hot-impact: $ts (实时热点推演 + 强势股/龙虎榜/大宗 + AI推股)"
-            git push origin main || git pull --rebase origin main
+            git commit -m "hot-impact: $ts"
           fi
+          git fetch origin main
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || {
+              for f in data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json; do
+                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
+              done
+              git rebase --continue || git rebase --abort
+            }
+          fi
+          git push origin main || git pull --rebase origin main
+

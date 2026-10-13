@@ -49,7 +49,19 @@ jobs:
           git config user.email "41888888888+stocks-bot@users.noreply.github.com"
           git add -A
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          git diff --quiet HEAD && echo "no changes" || {
-            git commit -m "poll: $ts (realtime snapshot)" && \
-            git -c http.version=HTTP/1.1 push origin main
-          }
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "poll: $ts (realtime snapshot)"
+          fi
+          git fetch origin main
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || {
+              for f in .; do
+                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
+              done
+              git rebase --continue || git rebase --abort
+            }
+          fi
+          git push origin main || git pull --rebase origin main

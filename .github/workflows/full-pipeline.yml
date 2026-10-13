@@ -102,16 +102,6 @@ jobs:
               print(f"  - {g}: {v['raw']} → {v['merged']}")
           PY
 
-      - name: Sync before commit
-        run: |
-          git fetch origin main
-          git stash push -u -m "generated" -- data/sources_registry.json data/engine_v5.json data/reflect_latest.json 2>/dev/null || true
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || { git stash pop; exit 1; }
-          fi
-          git stash pop 2>/dev/null || true
-
       - name: Commit & push
         run: |
           git config user.name "pipeline-bot"
@@ -121,6 +111,17 @@ jobs:
           if git diff --quiet --cached HEAD; then
             echo "no changes"
           else
-            git commit -m "pipeline: $ts (采集+DB+引擎+复盘)"
-            git push origin main || git pull --rebase origin main
+            git commit -m "pipeline: $ts"
           fi
+          git fetch origin main
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || {
+              for f in data/sources_registry.json data/engine_v5.json data/reflect_latest.json; do
+                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
+              done
+              git rebase --continue || git rebase --abort
+            }
+          fi
+          git push origin main || git pull --rebase origin main
+
