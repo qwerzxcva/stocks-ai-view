@@ -27,8 +27,14 @@
       .catch(function () { return null; });
   }
 
-  // ─── data sources ───────────────────────────────────────────
-  function fetchKline(code, n, period) {
+  var KLT_MAP = { day: 101, week: 102, month: 103 };
+
+  function secid(code) {
+    var b = bare(code);
+    return (prefixed(code).slice(0, 2) === 'sh' ? '1.' : '0.') + b;
+  }
+
+  function fetchKlineTencent(code, n, period) {
     var p = prefixed(code);
     var klt = period || 'day';
     var cnt = n || 60;
@@ -42,6 +48,43 @@
         return { date: r[0], open: +r[1], close: +r[2], high: +r[3], low: +r[4], vol: +r[5] };
       });
     });
+  }
+
+  // 东财: 全史 6019 根, fqt=1 前复权, fields2 = 日期/开/收/高/低/成交量(手)/成交额/振幅
+  function fetchKlineEastmoney(code, n, period) {
+    var url = 'https://push2his.eastmoney.com/api/qt/stock/kline/get'
+      + '?secid=' + secid(code)
+      + '&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58'
+      + '&klt=' + (KLT_MAP[period] || 101) + '&fqt=1&end=20500101&lmt=' + (n || 60);
+    return jget(url).then(function (d) {
+      var klines = ((d || {}).data || {}).klines || [];
+      return klines.map(function (row) {
+        var f = row.split(',');
+        return { date: f[0], open: +f[1], close: +f[2], high: +f[3], low: +f[4], vol: +f[5] };
+      });
+    });
+  }
+
+  // 新浪: scale 240=日 1200=周 7200=月, 只支持日/周/月三档
+  function fetchKlineSina(code, n, period) {
+    var scale = { day: 240, week: 1200, month: 7200 }[period || 'day'] || 240;
+    var url = 'https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/'
+      + 'CN_MarketData.getKLineData?symbol=' + prefixed(code)
+      + '&scale=' + scale + '&ma=5&datalen=' + (n || 60);
+    return jget(url).then(function (arr) {
+      if (!Array.isArray(arr)) return [];
+      return arr.map(function (r) {
+        return { date: r.day, open: +r.open, close: +r.close,
+                 high: +r.high, low: +r.low, vol: +r.volume };
+      });
+    });
+  }
+
+  function fetchKline(code, n, period) {
+    return fetchKlineTencent(code, n, period)
+      .then(function (bars) { return bars && bars.length ? bars : fetchKlineEastmoney(code, n, period); })
+      .then(function (bars) { return bars && bars.length ? bars : fetchKlineSina(code, n, period); })
+      .catch(function () { return []; });
   }
 
   function fetchFundFlow(code, n) {
@@ -77,7 +120,43 @@
           var f = String(row).split(' ');
           return { t: f[0], price: +f[1], vol: +f[2], amt: +f[3] };
         }).filter(function (x) { return x.price > 0; });
-      });
+      })
+      .then(function (mins) {
+        return mins && mins.length ? mins : fetchMinuteEastmoney(code);
+      })
+      .catch(function () { return fetchMinuteEastmoney(code); });
+  }
+
+  // 东财分时兜底: trends2 返回 "YYYY-MM-DD HH:MM,price,vol,avgprice"
+  function fetchMinuteEastmoney(code) {
+    var url = 'https://push2his.eastmoney.com/api/qt/stock/trends2/get?secid=' + secid(code)
+      + '&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13'
+      + '&fields2=f51,f53,f56,f58&iscr=0&ndays=1';
+    return jget(url).then(function (d) {
+      var trends = ((d || {}).data || {}).trends || [];
+      return trends.map(function (row) {
+        var f = String(row).split(',');
+        return { t: (f[0] || '').slice(11), price: +f[1], vol: +f[2], amt: 0 };
+      }).filter(function (x) { return x.price > 0; });
+    });
+  }
+
+  // 实时报价: 腾讯 qt.gtimg 为主 (GBK 解码保证中文名不乱码),
+  // 被 WAF 拦时降级东财 push2 单股接口 (字段已 /100 还原)。
+  function fetchQuoteEastmoney(code) {
+    var url = 'https://push2.eastmoney.com/api/qt/stock/get?secid=' + secid(code)
+      + '&fields=f43,f44,f45,f46,f57,f58,f60,f116,f162,f167,f170';
+    return jget(url).then(function (d) {
+      var v = (d || {}).data;
+      if (!v || !v.f43) return null;
+      return {
+        code: prefixed(code), name: v.f58 || '',
+        price: v.f43 / 100, prev_close: v.f60 / 100,
+        open: v.f46 / 100, high: v.f44 / 100, low: v.f45 / 100,
+        chg_pct: v.f170 / 100, turnover: 0,
+        pe: v.f162 / 100, mktcap: v.f116, pb: v.f167 / 100, time: ''
+      };
+    });
   }
 
   function fetchQuote(code) {
@@ -97,7 +176,8 @@
           pe: +f[39], mktcap: (+f[44] || 0) * 1e8, pb: +f[46], time: f[30]
         };
       })
-      .catch(function () { return null; });
+      .then(function (q) { return q || fetchQuoteEastmoney(code); })
+      .catch(function () { return fetchQuoteEastmoney(code); });
   }
 
   // ─── charts ─────────────────────────────────────────────────
