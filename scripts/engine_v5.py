@@ -51,8 +51,96 @@ def _prev(seq, n=1):
     return vals[-1 - n] if len(vals) > n else None
 
 
-def build_votes(close, high, low, vol):
-    """16 指标 → 投票列表"""
+# ─── 外部数据增强 (collect_all_sources 合并去重后的 all_sources.json) ───
+def _data_dir():
+    """ai-view data 目录 (CI/本地双环境兼容, 与 paths.py 逻辑对齐)"""
+    env = os.environ.get("STOCKS_AI_VIEW_DATA")
+    if env:
+        return env
+    p = os.path.join(HERE, "..", "data")
+    return os.path.abspath(p)
+
+
+def load_all_sources(data_dir=None):
+    """读 data/all_sources.json (collect_all_sources.py 合并去重输出)。
+    不存在或损坏时返回 None, 不影响纯技术模式。"""
+    if data_dir is None:
+        data_dir = _data_dir()
+    p = os.path.join(data_dir, "all_sources.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        with open(p, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _code_match(bare, key):
+    """裸码 (301030) 与带前缀码 (sh600000/sz000001) 双向归一化比较"""
+    a = str(bare).lower().lstrip("shszbj").zfill(6)
+    b = str(key).lower().lstrip("shszbj").zfill(6)
+    return a == b
+
+
+def sector_resonance(all_src, industry_hint):
+    """板块联动共振指标: 该股票所属行业板块当日表现。
+
+    判读: all_src.data.sector 里匹配行业名 (双向包含), 取板块当日涨幅:
+      领涨 ≥2%  → 看多; 领跌 ≤-2% → 看空; 其余中性不投方向票。
+    返回 (vote, strength, why) 或 None (无板块数据/无行业标签)。
+    """
+    secs = (all_src or {}).get("data", {}).get("sector") or []
+    if not secs or not industry_hint:
+        return None
+    matches = [s for s in secs
+               if industry_hint in str(s.get("sector", "")) or str(s.get("sector", "")) in industry_hint]
+    if not matches:
+        return None
+    chgs = [float(s.get("chg_pct") or 0) for s in matches]
+    avg_chg = sum(chgs) / len(chgs)
+    if avg_chg >= 2.0:
+        return (1, min(avg_chg / 6.0, 1.0),
+                f"板块[{matches[0].get('sector', '')}] 当日 {avg_chg:+.2f}% 领涨, 板块联动")
+    if avg_chg <= -2.0:
+        return (-1, min(abs(avg_chg) / 6.0, 1.0),
+                f"板块[{matches[0].get('sector', '')}] 当日 {avg_chg:+.2f}% 领跌")
+    return (0, 0.1, f"板块[{matches[0].get('sector', '')}] 当日 {avg_chg:+.2f}% 中性")
+
+
+def capital_flow_consistency(code, data_dir=None):
+    """资金流向一致性: moneyflow.json 中该股主力净流入方向。
+
+    net3_wan (3日累计主力) 与 net_main_wan (当日) 同向 → 投方向票;
+    反方向 → 中性不投。返回 (vote, strength, why) 或 None。
+    """
+    if data_dir is None:
+        data_dir = _data_dir()
+    p = os.path.join(data_dir, "moneyflow.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        with open(p, encoding="utf-8") as f:
+            mf = json.load(f)
+    except Exception:
+        return None
+    flows = mf.get("flows") or {}
+    key = next((k for k in flows if _code_match(code, k)), None)
+    if not key:
+        return None
+    rec = flows[key]
+    net = float(rec.get("net_main_wan") or 0)
+    net3 = float(rec.get("net3_wan") or 0)
+    strength = min(abs(net3) / max(abs(net) * 5, 1e6) * 1.0, 1.0) if net else 0.0
+    if net3 > 0 and net > 0:
+        return (1, max(0.2, strength), f"主力净流入 {net3:+.0f}万 (3日), 当日 {net:+.0f}万 方向一致")
+    if net3 < 0 and net < 0:
+        return (-1, max(0.2, strength), f"主力净流出 {net3:+.0f}万 (3日), 当日 {net:+.0f}万 方向一致")
+    return (0, 0.1, f"主力资金当日/3日方向不一致 (当日{net:+.0f}万, 3日{net3:+.0f}万)")
+
+
+def build_votes(close, high, low, vol, source_info=None, code_bare=""):
+    """指标投票列表: 1-17 技术指标 + 18-20 外部数据增强 (板块/资金/涨停池)"""
     votes = []
 
     def add(ind, vote, strength, why):
@@ -209,12 +297,59 @@ def build_votes(close, high, low, vol):
         add("VWMA", v, min(abs(close[-1] - lvw) / lvw * 100 / 2, 1),
             f"VWMA={lvw:.2f} (量均价)")
 
+    # 18. 板块联动 (行业板块当日涨幅共振)
+    if source_info and source_info.get("all_sources"):
+        idx = source_info.get("industry") or ""
+        sr = sector_resonance(source_info["all_sources"], idx)
+        data = source_info["all_sources"].get("data", {})
+        c6 = str(code_bare)
+        if sr is None and not idx:
+            for e in (data.get("event") or []):
+                if _code_match(c6, e.get("code", "")) and e.get("industry"):
+                    idx = e["industry"]
+                    sr = sector_resonance(source_info["all_sources"], idx)
+                    break
+        if sr is None and not idx:
+            for q in (data.get("quote") or []):
+                if q.get("kind") != "ZT":
+                    continue
+                for x in (q.get("detail") or []):
+                    if _code_match(c6, x.get("code", "")) and x.get("industry"):
+                        idx = x["industry"]
+                        sr = sector_resonance(source_info["all_sources"], idx)
+                        break
+                if sr:
+                    break
+        if sr:
+            add("SectorResonance", sr[0], sr[1], sr[2])
+
+    # 19. 资金流向一致性
+    if source_info:
+        cf = capital_flow_consistency(code_bare)
+        if cf:
+            add("CapitalFlowConsistency", cf[0], cf[1], cf[2])
+
+    # 20. 涨停池强度（当日该股是否仍在涨停池）
+    if source_info and source_info.get("all_sources"):
+        zts = source_info["all_sources"].get("data", {}).get("quote", []) or []
+        zt_list = next((q.get("detail") for q in zts if q.get("kind") == "ZT"), None) or []
+        dt_list = next((q.get("detail") for q in zts if q.get("kind") == "DT"), None) or []
+        c6 = str(code_bare)
+        found = [x for x in zt_list if _code_match(c6, x.get("code", ""))]
+        if found:
+            lb = found[0].get("lianban", 1)
+            add("InZTPool", 1, min(lb / 6.0, 1.0),
+                f"当日涨停池, 连板{lb}板")
+        else:
+            found2 = [x for x in dt_list if _code_match(c6, x.get("code", ""))]
+            if found2:
+                add("InDTPool", -1, 0.9, "当日跌停池")
     return votes
 
 
-def score_stock(close, high, low, vol, weights=None):
-    """多指标共振评分。"""
-    votes = build_votes(close, high, low, vol)
+def score_stock(close, high, low, vol, weights=None, source_info=None, code_bare=""):
+    """多指标共振评分（含外部数据增强）。"""
+    votes = build_votes(close, high, low, vol, source_info, code_bare)
     if not votes:
         return None
     w = weights or {}
@@ -276,6 +411,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--min-score", type=float, default=60)
+    ap.add_argument("--no-ext", action="store_true", help="禁用外部数据源增强 (仅指标共振)")
     args = ap.parse_args()
 
     bulk = args.bulk
@@ -285,7 +421,22 @@ def main():
     klines = load_klines(bulk, args.limit)
     print(f"[engine_v5] 加载 {len(klines)} 只K线", flush=True)
 
+    all_sources = None if args.no_ext else load_all_sources()
+    print(f"[engine_v5] all_sources {'已加载' if all_sources else '未找到 (仅用技术指标)'}", flush=True)
+
     results = []
+    # 预提取行业标签: 从事件/涨停池中收集 (code -> industry)
+    industry_map = {}
+    events = (all_sources or {}).get('data', {}).get('event', []) or []
+    for e in events:
+        industry_map.setdefault(str(e.get('code', '')).zfill(6), e.get('industry', ''))
+    # 预提取涨停池中的行业
+    zts = (all_sources or {}).get('data', {}).get('quote', []) or []
+    for q in zts:
+        if q.get('kind') == 'ZT':
+            for x in (q.get('detail') or []):
+                industry_map.setdefault(str(x.get('code', '')).zfill(6), x.get('industry', ''))
+
     for code, bars in klines.items():
         if len(bars) < 30:
             continue
@@ -293,34 +444,54 @@ def main():
         high = [b[3] for b in bars]
         low = [b[4] for b in bars]
         vol = [b[5] for b in bars]
-        r = score_stock(close, high, low, vol)
+        bare = str(code).zfill(6) if isinstance(code, str) else code
+        source_info = None
+        if all_sources and not args.no_ext:
+            source_info = {
+                "all_sources": all_sources,
+                "industry": industry_map.get(bare, ''),
+            }
+        r = score_stock(close, high, low, vol, source_info=source_info, code_bare=bare)
         if not r:
             continue
-        r["code"] = code
+        r["code"] = bare
         r["date"] = bars[-1][0]
         r["price"] = close[-1]
         r["bars"] = len(bars)
+        r["source_ts"] = (all_sources or {}).get('summary', {}).get('ts')
+        r["data_provenance"] = {
+            "technical": "indicators_ext (17 指标, 等权)",
+            "external": "collect_all_sources/all_sources.json" if all_sources and source_info else "none",
+            "resonance_new": ["SectorResonance", "CapitalFlowConsistency", "InZTPool"],
+            "industry_from": industry_map.get(bare, "unknown") or "N/A",
+        }
         results.append(r)
 
     results.sort(key=lambda x: -x["score"])
     now = datetime.now(CST)
     out = {
         "ts": now.isoformat(timespec="seconds"),
-        "engine": "v5 (多指标共振 + 自适应权重)",
+        "engine": "v5 (多指标共振 + 自适应权重 + 外部数据增强)",
         "n_scanned": len(klines),
         "n_scored": len(results),
-        "indicators": 17,
+        "indicators": 20,  # 17 tech + 3 external
         "formula": "score = 50 + 50 * (Σ w·vote·strength / Σ w) * (0.6 + 0.4*共振率)",
         "top": results[:50],
         "meta": {
             "resonance": "同向票数/方向票数, 分歧大时降权 (0.6~1.0 系数)",
             "weights": "默认等权; 可由 optimizer.py walk_forward 校准后写入",
+            "external_enhancement": [
+                "SectorResonance: 行业板块当日涨幅 + 板块内股票共振",
+                "CapitalFlowConsistency: 主力资金近 3 日净流入方向",
+                "InZTPool: 当日是否处于涨停池（连板数加权）",
+            ],
+            "provenance_note": "每只股票顶部含 source_ts / data_provenance 字段, 用于可追溯",
             "caveat": "技术指标共振不等于必然上涨, 只反映多维度信号一致性; "
                       "样本外未验证的权重不应用于实盘",
         },
     }
     with open(args.out, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False)
+        json.dump(out, f, ensure_ascii=False, indent=2)
 
     print(f"\n=== TOP 10 (共振度优先) ===")
     for r in results[:10]:

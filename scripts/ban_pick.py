@@ -175,6 +175,7 @@ def analyze_one(code, name, bars, bp):
             base_p, base_zb, base_ret, n_samp = DEFAULTS.get(min(lb_n, 6), DEFAULTS[1])
         layers = (bp.get("layers") or {}).get("layers") or {}
         ratios = []
+        factor_deltas = []
         for dim, val in (("seal_strength", seal), ("vol_ratio", vr), ("prior_gain", prior)):
             bk = bucket_of(dim, val)
             st = layers.get(dim, {}).get(bk)
@@ -182,7 +183,15 @@ def analyze_one(code, name, bars, bp):
                 continue
             r = st["zt_next_rate"] / base_p if base_p > 0 else 1.0
             ratios.append(max(0.6, min(1.6, r)))
-            factors.append(f"{dim}={bk}({st['zt_next_rate']}%)")
+            factors.append(f"{dim}={bk}(zt_next={st['zt_next_rate']}%,n={st['n']})")
+            factor_deltas.append({
+                "factor": dim,
+                "bucket": bk,
+                "layer_rate": st["zt_next_rate"],
+                "layer_n": st["n"],
+                "ratio_to_base": round(r, 3),
+                "delta_to_base_pct": round((r - 1.0) * base_p, 2),
+            })
         if ratios:
             adj = 1.0
             for r in ratios:
@@ -215,14 +224,30 @@ def analyze_one(code, name, bars, bp):
     score = round(max(0, min(100,
         p_zt * 1.2 + (e_ret * 3) - p_zb * 1.5 - max(0, prior - 30) * 0.5)), 1)
 
+    # 因子 delta 贡献分解 (相对连板数基准的绝对增量; 用于归因解释)
+    total_delta = p_zt - base_p
+    factor_decomp = []
+    if factor_deltas:
+        for d in factor_deltas:
+            pct_of_total = round(d["delta_to_base_pct"] / total_delta * 100, 1) if total_delta else None
+            factor_decomp.append({**d, "delta_pct_of_total": pct_of_total})
+    else:
+        factor_decomp = [{"note": "无有效分层因子 (样本不足/缺失)", "delta": None}]
+
     return {
         "code": code, "name": name, "lianban": lb_n, "date": cur[0],
         "close": cur[2], "chg_pct": round(chg, 2),
         "seal_strength": round(seal, 3), "vol_ratio": round(vr, 2),
         "prior_gain_5d": round(prior, 2),
         "p_zt_next": p_zt, "p_zhaban_next": p_zb, "exp_ret_next": e_ret,
+        "base_p": round(base_p, 2),
         "n_samples": n_samp, "adj_factor": round(adj, 3),
         "verdict": verdict, "score": score, "reasons": reasons,
+        "factor_delta": {
+            "total_delta_to_base": round(total_delta, 2),
+            "decomposition": factor_decomp,
+            "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分",
+        },
     }
 
 
@@ -264,6 +289,8 @@ def main():
                     "p_zt_next": None, "p_zhaban_next": None, "exp_ret_next": None,
                     "n_samples": 0, "verdict": "无K线",
                     "score": 0, "reasons": ["本地无该股K线, 无法计算因子"],
+                    "factor_delta": {"total_delta_to_base": None, "decomposition": [],
+                                     "note": "无K线数据, 无法分解"},
                 })
                 continue
             r = analyze_one(code, p.get("name", ""), bars, bp)
@@ -299,6 +326,8 @@ def main():
             "score_formula": "score = p_zt*1.2 + exp_ret*3 - p_zhaban*1.5 - max(0,prior-30)*0.5",
             "p_zt_next": "次日继续涨停概率 (连板基准 × 因子调整)",
             "p_zhaban_next": "次日盘中触及涨停但收盘未封的概率",
+            "base_p": "连板数基准概率 (来自 ban_prob.json by_lianban)",
+            "factor_delta": "p_zt_next 相对 base_p 的绝对增量分解 (各因子 ratio_to_base × 贡献占比)",
             "source": "东财涨跌停池 + 本地K线 + ban_prob 因子分层 + 腾讯行情",
             "caveat": "概率基于历史统计, 非必然; 打板属高风险交易, 次日炸板即大幅亏损; "
                       "仅供研究不构成投资建议",

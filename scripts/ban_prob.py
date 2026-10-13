@@ -158,7 +158,17 @@ def base_stats(klines):
             "ret_next_win_rate": round(s["ret_next_win"] / n * 100, 2),
             "evidence": "ok" if n >= 30 else "insufficient",
         }
-    return {"events": n_events, "by_lianban": out}
+    # 连板层级覆盖检查: 1板/2板/3板/4板+ (≥7 板在计算时已合并到 6连板桶)
+    expected = {1: "首板", 2: "2连板", 3: "3连板", 4: "4连板", 5: "5连板", 6: "6连板"}
+    missing = [lb_n for lb_n, lbl in expected.items()
+               if lbl not in out or not out[lbl].get("n_samples")]
+    coverage = {
+        "levels": [f"{lb_n}板" if lb_n > 1 else "首板" for lb_n in expected],
+        "missing": [f"{lb_n}板" for lb_n in missing],
+        "complete": not missing,
+        "note": "≥7连板样本并入 6连板桶 (min(lb,6)), 保证 4板+ 层有概率基准",
+    }
+    return {"events": n_events, "by_lianban": out, "lianban_coverage": coverage}
 
 
 # ─── B. 分层概率 (找真正有效的因子) ────────────────────────────
