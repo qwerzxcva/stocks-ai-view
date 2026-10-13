@@ -236,6 +236,73 @@ SOURCES = [
                  "降级链: push2 clist → tencent_mktHs → tv_screener → push2delay",
     },
     {
+        "id": "em_push2his_clist",
+        "name": "东财全市场快照 (push2his 域, 绕开 push2 WAF)",
+        "url": "https://push2his.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f12,f14,f2,f3,f4,f5,f6,f7,f8,f9,f10,f20,f21&fid=f8",
+        "auth": "none",
+        "status": "ok",
+        "freq": "realtime",
+        "delay": "秒级 (与 push2 同源)",
+        "fields": "f12=代码 f14=名称 f2=最新价(分) f3=涨跌幅 f4=涨跌额 f5=成交量 f6=成交额 f7=振幅 f8=换手 f9=市盈 f10=量比 f20=总市值 f21=流通市值",
+        "provides": ["quotes 表 (全市场)"],
+        "notes": "2026-10-13 实测 200 total=5923 (全 A 股); 关键: push2 域 TLS reset 但 "
+                 "push2his 域同路径可用 → 这是 push2 WAF 的绕行方案, 不是降级; "
+                 "价格单位是分 (f2=3880 → 38.80 元)",
+    },
+    {
+        "id": "em_push2his_etf_onsite",
+        "name": "东财场内基金/ETF 全量快照 (push2his)",
+        "url": "https://push2his.eastmoney.com/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fs=b:MK0021&fields=f12,f13,f14,f2,f3,f6",
+        "auth": "none",
+        "status": "ok",
+        "freq": "realtime",
+        "fields": "f12=代码 f13=市场(0深1沪) f14=名称 f2=最新价(分) f3=涨跌幅 f6=成交额",
+        "provides": ["fund_nav 表 (场内基金实时)"],
+        "notes": "2026-10-13 实测 200 total=1357 只场内基金; fs=b:MK0021 是场内基金板块参数; "
+                 "ETF 在用户交易范围内, 此前 catalog 缺这个源",
+    },
+    {
+        "id": "em_fund_lsjz",
+        "name": "天天基金历史净值 (api.fund.eastmoney.com/f10/lsjz)",
+        "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode={code}&pageIndex=1&pageSize=50",
+        "auth": "none (Referer 静默鉴权, 必带)",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "T+1 (当日净值 20:00 后)",
+        "fields": "DWJZ=单位净值 LJJZ=累计净值 JZZZL=日增长率 FSRQ=净值日期 SGZT=申购状态 SHZT=赎回状态",
+        "provides": ["fund_nav 表"],
+        "notes": "2026-10-13 实测: 不带 Referer 返回 HTTP 200 + ErrCode=-999 + Data="" (97B) "
+                 "—— 静默失败比 403 更危险, 必须校验 ErrCode; "
+                 "必带 Referer: https://fundf10.eastmoney.com/jjjz_{code}.html; "
+                 "TotalCount 给全量条数 (510300 实测 3508)",
+    },
+    {
+        "id": "jisilu_dividend_rate",
+        "name": "集思录股息率列表 (含估值温度/5年均值)",
+        "url": "https://www.jisilu.cn/data/stock/dividend_rate_list/?rp=100&page=1",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "dividend_rate=股息率 dividend_rate2 pb_temperature/pe_temperature=历史分位0-100 roe_average/revenue_average/profit_average=5年均值 负债率/质押率/行业/省份",
+        "provides": [],
+        "notes": "2026-10-13 实测 200, 105KB, 100 只/页; 单接口信息密度最高: "
+                 "估值温度可直接做低估值筛选, 5年均值规避单期财报噪音; "
+                 "需先访问首页拿 session + Referer: /data/stock/",
+    },
+    {
+        "id": "sina_vip_kline",
+        "name": "新浪多周期 K线 (vip.stock.finance.sina.com.cn)",
+        "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={code}&scale=240&ma=5&datalen=1023",
+        "auth": "none (需 Referer: finance.sina.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "day/open/high/low/close/volume + ma_price5/ma_volume5/ma_price10/ma_volume10",
+        "provides": [],
+        "notes": "2026-10-13 实测 200; scale=5/15/30/60/240 分钟/日; ma=5/10/20; "
+                 "datalen 最多 1023; 支持指数 sh000001; 接口直返 MA, 省本地计算; "
+                 "可作东财/腾讯 K线的第三方交叉校验源 (用户反馈 K线数据有问题)",
+    },
+    {
         "id": "eastmoney_stock_get",
         "name": "东财个股信息 (含 f127 行业)",
         "url": "https://push2.eastmoney.com/api/qt/stock/get",
