@@ -38,7 +38,7 @@ except ImportError:
     print("需要 duckdb: pip install duckdb", file=sys.stderr)
     raise SystemExit(1)
 
-DB_PATH = os.environ.get("STOCKS_DB") or "/root/workspace/stocks-data-live/stocks.duckdb"
+DB_PATH = os.environ.get("STOCKS_DB") or None   # None → paths.DUCKDB_PATH
 
 SCHEMA = """
 -- 日行情快照 (腾讯/东财合并后)
@@ -131,8 +131,12 @@ INDEXES = [
 
 
 def connect(path=None, read_only=False):
-    os.makedirs(os.path.dirname(os.path.abspath(path or DB_PATH)), exist_ok=True)
-    return duckdb.connect(path or DB_PATH, read_only=read_only)
+    path = path or DB_PATH
+    if path is None:
+        from paths import DUCKDB_PATH
+        path = DUCKDB_PATH
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
+    return duckdb.connect(path, read_only=read_only)
 
 
 def init_db(path=None):
@@ -259,6 +263,9 @@ def main():
     args = ap.parse_args()
 
     p = args.path or DB_PATH
+    if p is None:
+        from paths import DUCKDB_PATH
+        p = DUCKDB_PATH
     if args.init:
         init_db(p)
         return 0

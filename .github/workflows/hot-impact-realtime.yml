@@ -78,6 +78,12 @@ jobs:
                   print(f"WARN: meta 缺 {k}")
           PY
 
+      - name: Pull latest (avoid push race)
+        run: |
+          git config user.name "sync-bot"
+          git config user.email "741059079@qq.com"
+          git pull --rebase origin main || echo "pull skipped"
+
       - name: Commit & push
         run: |
           git config user.name "hot-bot"

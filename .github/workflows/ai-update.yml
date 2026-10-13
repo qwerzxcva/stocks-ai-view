@@ -21,6 +21,12 @@ jobs:
           python-version: '3.x'
       - name: Run AI screener
         run: python3 scripts/ai_screener.py --out data/latest.json
+      - name: Pull latest (avoid push race)
+        run: |
+          git config user.name "sync-bot"
+          git config user.email "741059079@qq.com"
+          git pull --rebase origin main || echo "pull skipped"
+
       - name: Commit & push
         run: |
           git config user.name "stocks-ai-bot"

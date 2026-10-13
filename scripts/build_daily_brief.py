@@ -29,7 +29,8 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
-DATA = "/root/workspace/stocks-ai-view/data"
+from paths import AI_VIEW_DATA
+DATA = AI_VIEW_DATA
 
 
 def load(name):
@@ -210,7 +211,10 @@ def main():
         return 0
 
     # 09:15 前 = 盘前 (为今天做准备); 15:05 后 = 盘后 (总结今天)
+    trading = in_trading_hours(now)
     session = "盘前" if (now.hour < 9 or (now.hour == 9 and now.minute < 15)) else "盘后"
+    if trading:
+        session = "盘中(强制)"
     md, sec = build(now)
 
     out = {

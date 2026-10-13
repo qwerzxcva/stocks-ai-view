@@ -38,10 +38,7 @@ sys.path.insert(0, HERE)
 
 from engine_v5 import score_stock, load_klines
 from collect_all_sources import fetch_tencent_quote
-
-BULK = "/root/workspace/stocks-data-kline/data/bulk"
-INDUSTRY_MAP = "/root/workspace/stocks-data-live/data/meta/industry_map_tv.json"
-SNAPSHOT_GLOB = "/root/workspace/stocks-data-live/data/market/snapshot_*.json"
+from paths import BULK, INDUSTRY_MAP, SNAPSHOT_GLOB
 
 
 def load_industry():

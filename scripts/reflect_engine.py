@@ -182,7 +182,7 @@ def analyze(results_list, horizons):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--pred-dir", default="/tmp", help="engine_v5 输出所在目录")
-    ap.add_argument("--bulk", default="/root/workspace/stocks-data-kline/data/bulk")
+    ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
     ap.add_argument("--horizons", default="5,10")
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -193,7 +193,11 @@ def main():
         print(f"未找到预测文件: {args.pred_dir}/engine_v5*.json", file=sys.stderr)
         return 1
 
-    klines = load_klines(args.bulk)
+    bulk = args.bulk
+    if not bulk:
+        from paths import BULK
+        bulk = BULK
+    klines = load_klines(bulk)
     print(f"[reflect] K线 {len(klines)} 只, 预测文件 {len(pred_files)} 个", flush=True)
 
     results_list = []

@@ -8,13 +8,15 @@
      远端 sync 只动 latest.json, 不碰 enrich.json。
 """
 import json
+import os
 import sys
 from datetime import datetime, timezone, timedelta
 
-sys.path.insert(0, "/root/workspace/stocks-ai-view/scripts")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from collect_market_extras import collect_all
+from paths import AI_VIEW_DATA
 
-OUT = "/root/workspace/stocks-ai-view/data/enrich.json"
+OUT = os.path.join(AI_VIEW_DATA, "enrich.json")
 now_iso = datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
 
 extras = collect_all()
@@ -42,6 +44,7 @@ payload = {
     },
 }
 
+os.makedirs(os.path.dirname(OUT), exist_ok=True)
 with open(OUT, "w", encoding="utf-8") as f:
     json.dump(payload, f, ensure_ascii=False)
 

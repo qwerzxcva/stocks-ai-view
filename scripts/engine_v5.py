@@ -272,13 +272,17 @@ def load_klines(bulk_dir, limit=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--bulk", default="/root/workspace/stocks-data-kline/data/bulk")
+    ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--min-score", type=float, default=60)
     args = ap.parse_args()
 
-    klines = load_klines(args.bulk, args.limit)
+    bulk = args.bulk
+    if not bulk:
+        from paths import BULK
+        bulk = BULK
+    klines = load_klines(bulk, args.limit)
     print(f"[engine_v5] 加载 {len(klines)} 只K线", flush=True)
 
     results = []

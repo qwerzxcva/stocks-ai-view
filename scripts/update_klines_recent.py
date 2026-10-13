@@ -25,7 +25,7 @@ from datetime import datetime, timezone, timedelta
 CST = timezone(timedelta(hours=8))
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
       "Referer": "https://gu.qq.com/"}
-BULK = "/root/workspace/stocks-data-kline/data/bulk"
+from paths import BULK
 OUT = os.path.join(BULK, "day_qfq_recent.csv")
 
 

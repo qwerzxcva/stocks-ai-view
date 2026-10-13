@@ -61,6 +61,12 @@ jobs:
           echo "--- 日报预览 ---"
           head -30 data/daily_brief.md 2>/dev/null || echo "(no md)"
 
+      - name: Pull latest (avoid push race)
+        run: |
+          git config user.name "sync-bot"
+          git config user.email "741059079@qq.com"
+          git pull --rebase origin main || echo "pull skipped"
+
       - name: Commit & push
         run: |
           git config user.name "brief-bot"

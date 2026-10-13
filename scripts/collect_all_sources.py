@@ -37,6 +37,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 from sources_registry import SOURCES, by_status
+from paths import SNAPSHOT_GLOB
 
 # 来源优先级 (冲突时越高越可信): 数字越大优先级越高
 SOURCE_PRIORITY = {
@@ -103,7 +104,7 @@ def fetch_tencent_quote(codes=None):
         codes = ["sh000001", "sz399001", "sh000300", "sz399006", "sh000688", "bj899050"]
         # 尝试从本地快照补全市场
         import glob
-        snaps = sorted(glob.glob("/root/workspace/stocks-data-live/data/market/snapshot_*.json"))
+        snaps = sorted(glob.glob(SNAPSHOT_GLOB))
         if snaps:
             try:
                 d = json.load(open(snaps[-1], encoding="utf-8"))
