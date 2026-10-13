@@ -161,7 +161,8 @@ def dim_position(bars, rsi):
     """涨跌高低位: 20/60日分位 + 乖离; 高位套人/低位吸筹 标记"""
     if len(bars) < 60:
         return None, "K线不足"
-    closes = [float(b[1]) for b in bars]
+    # bars 来自 engine_v5.load_klines: [date, open, close, high, low, vol]
+    closes = [float(b[2]) for b in bars]
     last = closes[-1]
     w20 = closes[-20:]
     w60 = closes[-60:]
@@ -315,7 +316,7 @@ def main():
     def liq(rows):
         try:
             b = rows[-1]
-            return float(b[4]) * float(b[5])
+            return float(b[2]) * float(b[5])   # close*vol ≈ 成交额 (bars: [date,open,close,high,low,vol])
         except (ValueError, IndexError):
             return 0.0
     ranked = sorted(klines.items(), key=lambda kv: -liq(kv[1]))
@@ -330,10 +331,11 @@ def main():
         if len(bars) < 30:
             continue
         try:
-            close = [float(b[1]) for b in bars]
-            high = [float(b[2]) for b in bars]
-            low = [float(b[3]) for b in bars]
-            vol = [float(b[4]) for b in bars]
+            # bars: [date, open, close, high, low, vol] — 注意 b[2] 才是 close
+            close = [float(b[2]) for b in bars]
+            high = [float(b[3]) for b in bars]
+            low = [float(b[4]) for b in bars]
+            vol = [float(b[5]) for b in bars]
             bare = code[2:] if code[:2] in ("sh", "sz", "bj") else code
             r = E.score_stock(close, high, low, vol, code_bare=bare)
         except Exception:

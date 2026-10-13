@@ -54,7 +54,8 @@ def load_closes(bulk_dir: str) -> pd.DataFrame:
                     if len(parts) < 6:
                         continue
                     try:
-                        recs.append((parts[0], parts[1], float(parts[2])))
+                        # CSV: code|date|open|close|high|low|vol → parts[3] 才是 close
+                        recs.append((parts[0], parts[1], float(parts[3])))
                     except ValueError:
                         continue
             if recs:

@@ -75,10 +75,12 @@ def main():
             if len(bars) < 30:
                 continue
             try:
-                close = [float(b[1]) for b in bars]
-                high = [float(b[2]) for b in bars]
-                low = [float(b[3]) for b in bars]
-                vol = [float(b[4]) for b in bars]
+                # bars 来自 engine_v5.load_klines: [date, open, close, high, low, vol]
+                # 注意: b[1]=open, b[2]=close, b[3]=high, b[4]=low (不是直觉顺序!)
+                close = [float(b[2]) for b in bars]
+                high = [float(b[3]) for b in bars]
+                low = [float(b[4]) for b in bars]
+                vol = [float(b[5]) for b in bars]
                 r = E.score_stock(close, high, low, vol, code_bare=code[2:] if code[:2] in ("sh", "sz", "bj") else code)
             except Exception:
                 continue
