@@ -408,12 +408,15 @@ function renderTdxQc(qc){
   document.getElementById('tdxQc').innerHTML=qc.items.slice(0,15).map((it,i)=>`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid var(--bd)"><span>${i+1}. <b>${it.name}</b> <span style="color:var(--tx3)">${it.code}</span></span><span>${((it.bid_amt||0)/10000).toFixed(0)}万委托</span></div>`).join('');
 }
 function renderKpis(m){
+  // 数值兜底: 上游字段缺失时显示 — 而不是 NaN (realtime_minute 的
+  // limit_down_le-10 曾被写成无括号属性访问, 全站跌停都显示 NaN)
+  const num=v=>(typeof v==='number'&&isFinite(v))?v:'—';
   const idx=(m.indices||[]).slice(0,4).map(i=>`<div class="kpi"><div class="n">${i.name}</div><div class="v ${cls(i.chg_pct)}">${fmt(i.price)}</div><div class="c ${cls(i.chg_pct)}">${sign(i.chg_pct)}%</div></div>`).join('');
   document.getElementById('kpis').innerHTML=idx+`
-  <div class="kpi"><div class="n">涨停</div><div class="v up">${m.limit_up}</div><div class="c fl">家</div></div>
-  <div class="kpi"><div class="n">跌停</div><div class="v dn">${m.limit_down}</div><div class="c fl">家</div></div>
-  <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${m.broken}</div><div class="c fl">家</div></div>
-  <div class="kpi"><div class="n">封板率</div><div class="v">${m.zt_rate}</div><div class="c fl">%</div></div>`;
+  <div class="kpi"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
+  <div class="kpi"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
+  <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${num(m.broken)}</div><div class="c fl">家</div></div>
+  <div class="kpi"><div class="n">封板率</div><div class="v">${num(m.zt_rate)}</div><div class="c fl">%</div></div>`;
   // 市场宽度热力条 (market.advance/decline/turnover)
   const up=m.advance, dn=m.decline, tv=(m.turnover&&m.turnover.total_yi)||null;
   if(up&&dn){
@@ -906,7 +909,8 @@ function renderTicker(d){
   (d.limit_up_pool||[]).slice(0,8).forEach(z=>items.push(z.name+'('+z.code+') '+z.chg_pct+'%'));
   (d.fund_rank||[]).slice(0,5).forEach(f=>items.push('📈'+f.name+' 1年'+f.ret_1y+'%'));
   document.getElementById('tickerScroll').textContent=items.join('    ⏸    ');
-  document.getElementById('tickerMeta').textContent='涨停'+d.market.limit_up+' · 跌停'+d.market.limit_down+' · 炸板'+d.market.broken;
+  const _n=v=>(typeof v==='number'&&isFinite(v))?v:'—';
+  document.getElementById('tickerMeta').textContent='涨停'+_n(d.market.limit_up)+' · 跌停'+_n(d.market.limit_down)+' · 炸板'+_n(d.market.broken);
 }
 
 /* ─── Pool tabs switching ─── */
