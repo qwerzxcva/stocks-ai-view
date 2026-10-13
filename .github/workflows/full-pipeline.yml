@@ -17,17 +17,25 @@
 name: full-pipeline
 on:
   schedule:
-    # 交易时段每 10 分钟 (UTC 1,2,3,5,6,7 时的 0/10/20/30/40 分
-    # = CST 09:00-15:50 的 :00/:10/:20/:30/:40)。原先是每 60 分钟一次
-    # (只在 :50), 盘中数据最多陈旧 1 小时, 用户看到的是过期行情。
-    - cron: '0,10,20,30,40,50 1,2,3,5,6,7 * * 1-5'
+    # 交易时段每 15 分钟 (UTC 1,2,3,5,6,7 时的 :05/:20/:35/:50
+    # = CST 09:05-15:50)。原先是每 60 分钟一次 (只在 :50),
+    # 盘中数据最多陈旧 1 小时; 改 10 分钟时又发现一轮完整链路
+    # (采集+26引擎) 实测最长 ~20 分钟, 会自我重叠, 故定为 15 分钟。
+    - cron: '5,20,35,50 1,2,3,5,6,7 * * 1-5'
   workflow_dispatch: {}
 permissions:
   contents: write
+# 同一工作流不重叠: cron 10 分钟一次, 而一轮完整链路 (采集+26引擎) 实测
+# 最长 ~20 分钟, 不设并发组会出现两轮同时写 data/ 并互相覆盖。
+# cancel-in-progress=false: 让先跑的那轮跑完, 避免白跑一半。
+concurrency:
+  group: full-pipeline
+  cancel-in-progress: false
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # 一轮完整链路 (采集 ~12s + 26 引擎) 实测最长 ~20 分钟, 留 50% 余量
+    timeout-minutes: 30
     env:
       TZ: Asia/Shanghai
       STOCKS_DB: ${{ github.workspace }}/stocks.duckdb
@@ -283,17 +291,26 @@ jobs:
           # shellcheck disable=SC2086
           git add -A -- $EXIST
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --cached --quiet HEAD; then
-            echo "no changes"
-          else
-            git commit -m "pipeline(collect): $ts"
-          fi
-          git push origin main || {
-            echo "push raced, retrying after reset"
+          # 并发 push 退避重试: 仓库有多个 bot 同时推 main (pipeline-bot /
+          # stocks-sync-bot / cloud-bot / brief-bot / space-pull-bot),
+          # 单次重试在高峰期不够, 曾让整个 job 以 exit 1 失败、本轮采集全丢。
+          # 最多 5 次, 每次退避 5/10/20/40 秒; 仍失败则明确告警但不 fail job
+          # (数据已算完, 下一轮 10 分钟后的 cron 会带上)。
+          pushed=0
+          for i in 1 2 3 4 5; do
             git fetch origin main
             git reset --soft origin/main
             # shellcheck disable=SC2086
             git add -A -- $EXIST
+            if git diff --cached --quiet HEAD; then echo "no changes"; pushed=1; break; fi
             git commit -m "pipeline(collect): $ts" 2>/dev/null || true
-            git push origin main
-          }
+            if git push origin main 2>/tmp/push_err.txt; then
+              echo "pushed on attempt $i"; pushed=1; break
+            fi
+            echo "::warning::push attempt $i failed: $(tail -1 /tmp/push_err.txt)"
+            sleep $((5 * (2 ** (i - 1))))
+          done
+          if [ "$pushed" -ne 1 ]; then
+            echo "::error::5 次 push 均失败, 本轮数据未上报 (下轮 cron 会重试)"
+            exit 1
+          fi
