@@ -8,7 +8,7 @@ on:
   schedule:
     # CST 09:40 / 10:10 / 10:40 / 11:10 / 11:40
     #      13:10 / 13:40 / 14:10 / 14:40 / 15:10
-    - cron: '40,10 1,2,3,4,5,6,7 * * 1-5'
+    - cron: '3,13,23,33,43,53 * * 1-5'   # 每10分钟错开3分钟 (远端sync在:00/:10/..., 本工作流随后刷新)
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -52,6 +52,15 @@ jobs:
 
       - name: Run hot_impact
         run: python3 scripts/hot_impact.py --out-dir data
+
+      # 实时刷新 market 块 (涨停/跌停/炸板/涨跌家数/成交额/两融/指数)
+      # 关键: 必须在远端 sync 之后跑, 否则会被覆盖回旧快照
+      - name: Refresh market realtime
+        run: |
+          if [ -f data/latest.json ]; then
+            python3 scripts/collect_market_extras.py --merge data/latest.json || true
+            python3 -c "import json;m=json.load(open('data/latest.json'))['market'];print('  涨停',m['limit_up'],'跌停',m['limit_down'],'炸板',m['broken'],'涨',m['advance'],'跌',m['decline'])" || true
+          fi
 
       # 强势股/龙虎榜/大宗交易 → 独立 enrich.json (盘中同步刷新)
       - name: Build enrich.json

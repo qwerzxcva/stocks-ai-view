@@ -240,6 +240,37 @@ def fetch_blocktrade(date_dash):
     } for r in fetch_datacenter("RPT_DATA_BLOCKTRADE", "TRADE_DATE", date_dash, 30)]
 
 
+# ─── 实时指数行情 ────────────────────────────────────────────
+def fetch_indices():
+    """腾讯实时指数 (GBK 解码, 字段已实测核对)"""
+    IDX = [("sh000001", "上证指数"), ("sz399001", "深证成指"), ("sh000300", "沪深300"),
+           ("sz399006", "创业板指"), ("sh000688", "科创50"), ("bj899050", "北证50")]
+    out = []
+    url = "https://qt.gtimg.cn/q=" + ",".join(c for c, _ in IDX)
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        text = body.decode("gbk", "replace")
+        for m in re.finditer(r'v_([a-z0-9]+)="([^"]*)"', text):
+            sym, payload = m.group(1), m.group(2).split("~")
+            if len(payload) < 40:
+                continue
+            nm = next((n for c, n in IDX if c == sym), payload[1])
+            try:
+                out.append({
+                    "code": sym, "name": nm, "price": float(payload[3] or 0),
+                    "chg_pct": float(payload[32] or 0),
+                    "turnover": float(payload[38] or 0) if len(payload) > 38 else 0,
+                    "pe": float(payload[39] or 0) if len(payload) > 39 else 0,
+                    "mktcap": (float(payload[44] or 0) if len(payload) > 44 else 0) * 1e8,
+                    "pb": float(payload[46] or 0) if len(payload) > 46 else 0,
+                })
+            except (ValueError, IndexError):
+                continue
+    except Exception as e:
+        print(f"[indices] {e}", file=sys.stderr)
+    return out
+
+
 # ─── 8. 腾讯行业板块排行 ────────────────────────────────────────────
 def fetch_tx_sector_ranking(limit=20):
     url = ("https://proxy.finance.qq.com/ifzqgtimg/appstock/app/mktHs/rank"
@@ -438,12 +469,13 @@ def collect_all(date_str=None, indices=None, phase=None):
     tx_rank = fetch_tx_sector_ranking(20)
 
     if indices is None:
-        indices = []
+        indices = fetch_indices()
     if phase is None:
         phase = {"stage": "—", "score": None}
 
     return {
         "market": {
+            "indices": indices,
             "limit_up": zt["count"], "limit_down": dt["count"], "broken": zb["count"],
             "zt_rate": round(zt["count"] / max(1, zt["count"] + zb["count"]) * 100, 1),
             "yesterday_zt": yzt["count"],
@@ -481,9 +513,9 @@ def main():
             return 1
         with open(args.merge, encoding="utf-8") as f:
             d = json.load(f)
-        # 合并: market 逐键更新 (保留 indices), 其余整块替换
+        # 合并: market 整块替换 (含 indices), 其余模块增量更新
         mk = extras.pop("market")
-        d.setdefault("market", {}).update({k: v for k, v in mk.items() if k != "indices"})
+        d["market"] = mk
         d.update(extras)
         with open(args.merge, "w", encoding="utf-8") as f:
             json.dump(d, f, ensure_ascii=False)
