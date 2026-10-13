@@ -70,6 +70,8 @@ jobs:
         run: |
           git config user.name "brief-bot"
           git config user.email "741059079@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
           git add -A data/ai_picks.json data/daily_brief.json data/daily_brief.md
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
@@ -77,15 +79,12 @@ jobs:
           else
             git commit -m "brief: $ts"
           fi
-          git fetch origin main
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || {
-              for f in data/ai_picks.json data/daily_brief.json data/daily_brief.md; do
-                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
-              done
-              git rebase --continue || git rebase --abort
-            }
-          fi
-          git push origin main || git pull --rebase origin main
+          git push origin main || {
+            echo "push raced, retrying after reset"
+            git fetch origin main
+            git reset --soft origin/main
+            git add -A data/ai_picks.json data/daily_brief.json data/daily_brief.md
+            git commit -m "brief: $ts" 2>/dev/null || true
+            git push origin main
+          }
 
