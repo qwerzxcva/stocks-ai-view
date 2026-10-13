@@ -1220,9 +1220,21 @@ if('serviceWorker' in navigator){
     }).catch(err=>console.warn('[sw] register failed:',err));
   });
 }
+
+// ─── 全站股票代码可点击 → 个股详情 (K线/资金流/分时) ──────────
+// 事件委托: 任何 td 内是 6 位数字即视为股票代码, 点击弹出详情
+document.addEventListener('click', e=>{
+  const td=e.target.closest && e.target.closest('td');
+  if(!td)return;
+  const code=(td.textContent||'').trim();
+  if(!/^\d{6}$/.test(code))return;
+  if(!window.StockDetail)return;
+  e.stopPropagation();
+  window.StockDetail.render(code);
+});
 </script>
 
-<div id="symDetail" style="display:none;position:fixed;z-index:100;top:15%;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px;width:340px;font-size:11px;box-shadow:0 4px 24px rgba(0,0,0,.4)"></div>
+<div id="symDetail" style="display:none;position:fixed;z-index:100;top:12%;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px;width:520px;max-height:76vh;overflow-y:auto;font-size:11px;box-shadow:0 4px 24px rgba(0,0,0,.5)"></div>
 <script>
 (function(){
   let IDX=null;
@@ -1245,34 +1257,14 @@ if('serviceWorker' in navigator){
     box.querySelectorAll('.sr').forEach(el=>el.onclick=()=>showDetail(el.dataset.s));
   });
   document.addEventListener('click', e=>{ if(box && !box.contains(e.target) && e.target!==inp) box.style.display='none'; });
-  async function showDetail(sym){
-    const v=IDX&&IDX[sym]; if(!v) return;
-    det.style.display='block';
-    det.innerHTML='<b style="font-size:13px">'+v.n+' ('+sym+')</b> '+(v.t==='etf'?'<span style="color:var(--accent)">ETF</span>':'')+
-      ' <span onclick="document.getElementById(\'symDetail\').style.display=\'none\'" style="float:right;cursor:pointer;color:var(--tx3)">✕</span>'+
-      '<br>现价 '+v.p+' ('+(v.chg>0?'+':'')+v.chg+'%)<br><span style="color:var(--tx3)">复权日K加载中…</span>';
-    try{
-      const j=await fetch('https://raw.githubusercontent.com/qwerzxcva/t8-fq/main/json/'+sym+'.json?t='+Date.now()).then(r=>{if(!r.ok)throw 0;return r.json();});
-      const d=j.slice(-30);
-      let mn=1e9, mx=-1e9;
-      d.forEach(r=>{mn=Math.min(mn,r[3]);mx=Math.max(mx,r[2]);});
-      let bars='';
-      for(let k=0;k<d.length;k++){
-        const h=Math.max(40*(d[k][2]-mn)/(mx-mn||1),1), b=40*(d[k][3]-mn)/(mx-mn||1);
-        const up=k>0?d[k][2]>=d[k-1][2]:d[k][2]>=d[k][1];
-        bars+='<div style="display:inline-block;width:7px;height:42px;position:relative;vertical-align:bottom">'+
-          '<div style="position:absolute;bottom:'+b+'px;height:'+Math.max(h-b,1)+'px;width:7px;background:'+(up?'var(--up)':'var(--dn)')+'"></div></div>';
-      }
-      det.innerHTML='<b style="font-size:13px">'+v.n+' ('+sym+')</b> '+(v.t==='etf'?'<span style="color:var(--accent)">ETF</span>':'')+
-        ' <span onclick="document.getElementById(\'symDetail\').style.display=\'none\'" style="float:right;cursor:pointer;color:var(--tx3)">✕</span>'+
-        '<br>现价 '+v.p+' ('+(v.chg>0?'+':'')+v.chg+'%) · 前复权全史 '+j.length+' 日 (1999起含分红除权)'+
-        '<div style="margin-top:6px">'+bars+'</div><span style="color:var(--tx3)">近30日 qfq 走势 · '+d[0][0]+' ~ '+d[d.length-1][0]+' · 数据源: 腾讯 · 非投资建议</span>';
-    }catch(e){
-      det.innerHTML+='<br><span style="color:var(--tx3)">复权数据尚未回补此票 (采集进行中)</span>';
-    }
+  // 点击股票 → 完整详情 (腾讯日K/分时 + 东财资金流, 浏览器直连)
+  function showDetail(sym){
+    box.style.display='none';
+    if(window.StockDetail){ window.StockDetail.render(sym); }
   }
 })();
 </script>
 <script src="realtime.js" defer></script>
+<script src="stock-detail.js" defer></script>
 </body>
 </html>
