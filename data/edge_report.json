@@ -1,8 +1,17 @@
 {
-  "ts": "2026-10-14T05:55:35+08:00",
+  "ts": "2026-10-14T06:03:05+08:00",
   "engine": "edge_miner v1 (优势挖掘)",
-  "n_edges": 4,
+  "n_edges": 5,
   "edges": [
+    {
+      "type": "indicator_short_edge",
+      "name": "UltimateOsc",
+      "bear_win_rate": 60.4,
+      "bear_n": 5436,
+      "ci_lo": 59.05,
+      "action": "把 UltimateOsc 用作回避过滤器: 该指标翻空时排除, 历史胜率60.4%(n=5436)",
+      "confidence": "medium"
+    },
     {
       "type": "dim_edge",
       "name": "技术面",
@@ -36,7 +45,7 @@
       "confidence": "medium"
     }
   ],
-  "summary": "发现 4 个统计显著优势, 见清单。",
+  "summary": "发现 5 个统计显著优势, 见清单。",
   "meta": {
     "min_n": 30,
     "min_ci": 50.0,
