@@ -161,82 +161,102 @@ def base_stats(klines):
     return {"events": n_events, "by_lianban": out}
 
 
-# ─── B. 分层概率 ────────────────────────────────────────────────
+# ─── B. 分层概率 (找真正有效的因子) ────────────────────────────
 def layered_stats(klines):
-    """按市值/涨幅分层, 看哪些因子真的影响次日涨停概率"""
-    layers = {
-        "mktcap": defaultdict(lambda: {"n": 0, "zt": 0, "ret": 0.0}),
-        "chg": defaultdict(lambda: {"n": 0, "zt": 0, "ret": 0.0}),
-        "vol": defaultdict(lambda: {"n": 0, "zt": 0, "ret": 0.0}),
-    }
+    """按本地K线可算的因子分层, 看哪些真的影响次日涨停概率。
 
-    def cap_bucket(v):
-        if v is None or v <= 0:
-            return None
-        yi = v / 1e8
-        if yi < 50:
-            return "<50亿"
-        if yi < 200:
-            return "50-200亿"
-        if yi < 1000:
-            return "200-1000亿"
-        return ">1000亿"
+    因子 (全部由K线算出, 无需外部数据):
+      seal_strength  封板强度 = (close/prev-1) / 涨停阈值, 越接近1封得越死
+      vol_ratio      量比 = 当日量 / 前5日均量
+      prior_gain     前3日累计涨幅 (追高风险)
+      lianban        连板数
+    """
+    dims = ["seal_strength", "vol_ratio", "prior_gain", "lianban"]
+    layers = {d: defaultdict(lambda: {"n": 0, "zt": 0, "ret": 0.0, "zb": 0}) for d in dims}
 
-    def chg_bucket(code, close, prev):
+    def seal_bucket(code, close, prev):
         if prev <= 0:
             return None
-        c = (close / prev - 1) * 100
-        if c < 7:
-            return "<7%"
-        if c < 9.8:
-            return "7-9.8%"
-        if c < zt_threshold(code):
-            return "9.8%-涨停"
-        return "涨停"
+        th = zt_threshold(code)
+        s = (close / prev - 1) * 100 / th
+        if s >= 0.999:
+            return "一字/满封"
+        if s >= 0.98:
+            return "接近满封"
+        if s >= 0.95:
+            return "小幅松动"
+        return "弱封"
 
-    def vol_bucket(v):
-        if v is None or v <= 0:
+    def vol_bucket(vol, avg5):
+        if avg5 <= 0:
             return None
-        if v < 2:
-            return "<2"
-        if v < 5:
-            return "2-5"
-        if v < 10:
-            return "5-10"
-        return ">10"
+        r = vol / avg5
+        if r < 1.5:
+            return "<1.5"
+        if r < 3:
+            return "1.5-3"
+        if r < 6:
+            return "3-6"
+        return ">6"
+
+    def prior_bucket(bars, i):
+        if i < 3:
+            return None
+        base = bars[i - 3][2]
+        if base <= 0:
+            return None
+        g = (bars[i][2] / base - 1) * 100
+        if g < 10:
+            return "<10%"
+        if g < 25:
+            return "10-25%"
+        if g < 40:
+            return "25-40%"
+        return ">40%"
 
     n = 0
     for code, bars in klines.items():
-        if len(bars) < 3:
+        if len(bars) < 6:
             continue
         lb = lianban_series(code, bars)
-        for i in range(1, len(bars) - 1):
+        for i in range(3, len(bars) - 1):
             if lb[i] == 0:
                 continue
             cur = bars[i]
+            prev = bars[i - 1]
             nxt = bars[i + 1]
-            if cur[2] <= 0:
+            if cur[2] <= 0 or prev[2] <= 0:
                 continue
-            # 本地K线无市值/量比字段, 用价格×成交量近似 (或跳过)
-            # 这里用「当日是否首板/连板」+ 涨幅分层, 市值分层需外部快照补充
-            chg_b = chg_bucket(code, cur[2], bars[i - 1][2])
+            avg5 = sum(b[5] for b in bars[max(0, i - 5):i]) / max(1, min(5, i))
             ret = (nxt[2] / cur[2] - 1) * 100
             is_zt_next = is_zt(code, nxt[2], cur[2])
-            if chg_b:
-                layers["chg"][chg_b]["n"] += 1
-                layers["chg"][chg_b]["zt"] += 1 if is_zt_next else 0
-                layers["chg"][chg_b]["ret"] += ret
+            is_zb_next = is_zhaban(code, nxt[3], nxt[2], cur[2])
+            buckets = {
+                "seal_strength": seal_bucket(code, cur[2], prev[2]),
+                "vol_ratio": vol_bucket(cur[5], avg5),
+                "prior_gain": prior_bucket(bars, i),
+                "lianban": f"{min(lb[i], 6)}连板" if lb[i] > 1 else "首板",
+            }
+            for dim, b in buckets.items():
+                if not b:
+                    continue
+                s = layers[dim][b]
+                s["n"] += 1
+                s["zt"] += 1 if is_zt_next else 0
+                s["zb"] += 1 if is_zb_next else 0
+                s["ret"] += ret
             n += 1
 
     out = {}
-    for dim, buckets in layers.items():
+    for dim in dims:
         out[dim] = {}
-        for b, s in sorted(buckets.items()):
+        for b, s in sorted(layers[dim].items()):
             if s["n"] < 10:
                 continue
             out[dim][b] = {
                 "n": s["n"],
                 "zt_next_rate": round(s["zt"] / s["n"] * 100, 2),
+                "zhaban_next_rate": round(s["zb"] / s["n"] * 100, 2),
                 "ret_next_avg": round(s["ret"] / s["n"], 2),
                 "evidence": "ok" if s["n"] >= 30 else "insufficient",
             }
@@ -244,13 +264,15 @@ def layered_stats(klines):
 
 
 # ─── C. 个股级: 打板池每只股票 ──────────────────────────────────
-def stock_prob(code, bars, klines_stats):
-    """给定股票, 用其连板数+涨幅分层估算次日涨停概率"""
-    if len(bars) < 3:
+def stock_prob(code, bars, base, layers):
+    """给定股票, 基准概率(按连板数) × 因子调整(封板强度/量比/前期涨幅)。
+
+    调整方法: 分层概率相对该连板数基准的比率, 取各因子比率的几何平均,
+    限制在 [0.6, 1.6] 区间 (避免过度外推)。样本不足的因子不参与调整。
+    """
+    if len(bars) < 6:
         return None
     lb = lianban_series(code, bars)
-    i = len(bars) - 2          # 最近一个完整「次日」可验证的交易日
-    # 实际用于预测: 最新交易日 (i = len-1) 的次日, 用分层概率
     last = len(bars) - 1
     if lb[last] == 0:
         return None
@@ -258,9 +280,57 @@ def stock_prob(code, bars, klines_stats):
     prev = bars[last - 1]
     lb_n = lb[last]
 
-    by_lb = klines_stats["by_lianban"]
     key = f"{min(lb_n, 6)}连板" if lb_n > 1 else "首板"
-    base = by_lb.get(key, {})
+    b = base["by_lianban"].get(key, {})
+    base_p = b.get("zt_next_rate")
+    if base_p is None:
+        return None
+
+    # 因子提取
+    avg5 = sum(x[5] for x in bars[max(0, last - 5):last]) / max(1, min(5, last))
+    th = zt_threshold(code)
+    seal = (cur[2] / prev[2] - 1) * 100 / th if prev[2] > 0 else 0
+    vr = cur[5] / avg5 if avg5 > 0 else 1
+    prior = (cur[2] / bars[last - 3][2] - 1) * 100 if bars[last - 3][2] > 0 else 0
+
+    def bucket_of(dim, val, buckets):
+        if dim == "seal_strength":
+            return ("一字/满封" if val >= 0.999 else "接近满封" if val >= 0.98
+                    else "小幅松动" if val >= 0.95 else "弱封")
+        if dim == "vol_ratio":
+            return ("<1.5" if val < 1.5 else "1.5-3" if val < 3
+                    else "3-6" if val < 6 else ">6")
+        if dim == "prior_gain":
+            return ("<10%" if val < 10 else "10-25%" if val < 25
+                    else "25-40%" if val < 40 else ">40%")
+        return None
+
+    # 收集有效因子的调整比率
+    ratios = []
+    used = []
+    for dim, val in (("seal_strength", seal), ("vol_ratio", vr), ("prior_gain", prior)):
+        bk = bucket_of(dim, val, None)
+        st = (layers.get(dim) or {}).get(bk)
+        if not st or st.get("evidence") != "ok" or st.get("n", 0) < 30:
+            continue
+        r = st["zt_next_rate"] / base_p if base_p > 0 else 1.0
+        ratios.append(max(0.6, min(1.6, r)))
+        used.append(f"{dim}={bk}({st['zt_next_rate']}%,n={st['n']})")
+
+    if ratios:
+        adj = 1.0
+        for r in ratios:
+            adj *= r
+        adj **= (1.0 / len(ratios))
+    else:
+        adj = 1.0
+
+    p_zt = round(min(95.0, base_p * adj), 2)
+    # 炸板率同样按比率缩放 (但用 zb 基准)
+    base_zb = b.get("zhaban_next_rate") or 0
+    p_zb = round(min(95.0, base_zb * adj), 2)
+    base_ret = b.get("ret_next_avg") or 0
+    e_ret = round(base_ret * adj, 2)
 
     return {
         "code": code,
@@ -268,12 +338,15 @@ def stock_prob(code, bars, klines_stats):
         "date": cur[0],
         "close": cur[2],
         "chg_pct": round((cur[2] / prev[2] - 1) * 100, 2),
-        "p_zt_next": base.get("zt_next_rate"),
-        "p_zhaban_next": base.get("zhaban_next_rate"),
-        "exp_ret_next": base.get("ret_next_avg"),
-        "n_samples": base.get("n_samples"),
-        "evidence": base.get("evidence", "insufficient"),
-        "basis": f"{key}全样本概率 (n={base.get('n_samples')})",
+        "p_zt_next": p_zt,
+        "p_zhaban_next": p_zb,
+        "exp_ret_next": e_ret,
+        "n_samples": b.get("n_samples"),
+        "evidence": b.get("evidence", "insufficient"),
+        "base_p": base_p,
+        "adj_factor": round(adj, 3),
+        "factors_used": used,
+        "basis": f"{key}基准{base_p}% × 因子调整{adj:.2f} (n={b.get('n_samples')})",
     }
 
 
@@ -313,7 +386,7 @@ def main():
         for c in codes:
             for k, bars in klines.items():
                 if k.endswith(c) or k == c:
-                    r = stock_prob(k, bars, base)
+                    r = stock_prob(k, bars, base, layers["layers"])
                     if r:
                         stocks.append(r)
     else:
@@ -322,7 +395,7 @@ def main():
         for code, bars in klines.items():
             if not bars or bars[-1][0] != latest_date:
                 continue
-            r = stock_prob(code, bars, base)
+            r = stock_prob(code, bars, base, layers["layers"])
             if r:
                 stocks.append(r)
         stocks.sort(key=lambda x: -(x["p_zt_next"] or 0))
