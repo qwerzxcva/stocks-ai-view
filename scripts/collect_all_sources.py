@@ -316,37 +316,44 @@ def fetch_tv_ranking(limit=20):
     return out, {"source": "tencent_mktHs", "n": len(out)}
 
 
-def fetch_sina_news(limit=50):
+def fetch_sina_news(limit=100):
     """新浪财经7x24快讯 → 按 title hash 主键
 
     必须带 zhibo_id: 缺省时接口返回 {"code":11,"msg":"zhibo_id missing"},
     feed 为空, 曾经导致 news_digest 长期为 0 条 (2026-10-14 定位)。
     zhibo_id=152 是「财经滚动」直播流, 实测有实时数据。
+
+    翻两页拿 ~40 条: 单页 page_size=20 只够撑起很小的资讯流,
+    而 24h 面板按分类展示需要更多样本。
     """
-    out = []
+    out, seen = [], set()
     for zhibo_id in ("152", "153"):
-        url = ("https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=20"
-               f"&zhibo_id={zhibo_id}")
-        b = _http(url, timeout=12, headers={"Referer": "https://finance.sina.com.cn/"})
-        if not b:
-            continue
-        try:
-            d = json.loads(b.decode("utf-8"))
-            feed = ((d.get("result") or {}).get("data") or {}).get("feed", {})
-            for item in (feed.get("list") or [])[:limit]:
-                title = str(item.get("rich_text", "") or "").strip()
-                if not title:
-                    continue
-                h = hashlib.md5(re.sub(r"\W+", "", title[:40]).encode()).hexdigest()[:12]
-                out.append({
-                    "_key": h, "_src": "sina_news",
-                    "title": title[:120],
-                    "ts": str(item.get("create_time", "") or ""),
-                })
-        except Exception:
-            pass
-        if out:
-            break
+        for page in (1, 2):
+            url = ("https://zhibo.sina.com.cn/api/zhibo/feed?page="
+                   f"{page}&page_size=20&zhibo_id={zhibo_id}")
+            b = _http(url, timeout=12, headers={"Referer": "https://finance.sina.com.cn/"})
+            if not b:
+                continue
+            try:
+                d = json.loads(b.decode("utf-8"))
+                feed = ((d.get("result") or {}).get("data") or {}).get("feed", {})
+                for item in (feed.get("list") or [])[:limit]:
+                    title = str(item.get("rich_text", "") or "").strip()
+                    if not title:
+                        continue
+                    h = hashlib.md5(re.sub(r"\W+", "", title[:40]).encode()).hexdigest()[:12]
+                    if h in seen:
+                        continue
+                    seen.add(h)
+                    out.append({
+                        "_key": h, "_src": "sina_news",
+                        "title": title[:120],
+                        "ts": str(item.get("create_time", "") or ""),
+                    })
+            except Exception:
+                pass
+            if len(out) >= limit:
+                break
     return out, {"source": "sina_news", "n": len(out)}
 
 
@@ -521,9 +528,11 @@ FETCHERS = {
     "sector": [
         ("tencent_mktHs", lambda ctx: fetch_tv_ranking(ctx.get("limit", 20))),
     ],
+    # 抖音热榜不放 news 组: 实测返回的是全站热搜 (体育/娱乐占多数),
+    # 混进 news_digest 会让「24h 热点资讯流」被无关内容淹没。
+    # 它作为情绪参考单独走 social 组。
     "news": [
         ("sina_news", lambda ctx: fetch_sina_news()),
-        ("douyin_hot", lambda ctx: fetch_douyin_hot()),
     ],
     "fund": [
         ("eastmoney_fund_rank", lambda ctx: fetch_fund_rank()),

@@ -1351,7 +1351,7 @@ async function render(){
     d.market.decline=rm.summary.decline;
     d.market.flat=rm.summary.flat;
     d.market.limit_up=rm.summary.limit_up_ge10;
-    d.market.limit_down=rm.summary.limit_down_le-10;
+    d.market.limit_down=rm.summary['limit_down_le-10'];
     d.market.total_amount_yi=rm.summary.total_amount_yi;
     d.market.main_net_inflow_yi=rm.summary.main_net_inflow_yi;
     d.market.n_stocks=rm.summary.n_stocks;

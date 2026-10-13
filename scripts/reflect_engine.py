@@ -213,7 +213,13 @@ def reflect_engine_v5(pred_file, klines, horizons=(5, 10)):
         for h in horizons:
             row[f"actual_{h}d"] = verify_prediction(bars, pred_date, h)
         # 记录每个指标的票, 用于统计指标胜率
-        row["votes"] = {v["indicator"]: v["vote"] for v in r.get("votes", [])}
+        # votes 兼容两种形式: slim 前 list[{indicator,vote}] / slim 后 dict{indicator:vote}
+        _v = r.get("votes") or []
+        if isinstance(_v, list):
+            row["votes"] = {v["indicator"]: v["vote"] for v in _v
+                           if isinstance(v, dict) and "indicator" in v}
+        else:
+            row["votes"] = dict(_v)
         results.append(row)
     return {"pred_file": os.path.basename(pred_file), "pred_date": pred_date,
             "n": len(results), "rows": results}
