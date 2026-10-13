@@ -77,10 +77,14 @@ def load_klines(codes):
             code|date,open,close,high,low,vol (extra/recent 分片, 日期后为逗号)
     """
     out = {c: {"dates": [], "open": [], "close": [], "high": [], "idx": {}} for c in codes}
-    wanted = set()
+    # 预建 prefix -> 裸码 映射: 内层循环原先对每一行都调用
+    # code_to_bulk_prefixes(c6) 遍历全部目标代码 (O(行数 x 代码数)),
+    # 实测占 kline_sim 总耗时的大头。bulk 行数约 200 万, 目标代码约 3000。
+    prefix_to_code = {}
     for c in codes:
         for p in code_to_bulk_prefixes(c):
-            wanted.add(p)
+            prefix_to_code.setdefault(p, c)
+    wanted = set(prefix_to_code)
     files = sorted(glob.glob(os.path.join(BULK_DIR, "day_qfq_*.csv")))
     n_rows = 0
     for f in files:
@@ -91,12 +95,14 @@ def load_klines(codes):
                 if "|" not in line:
                     continue
                 head, _, rest = line.partition("|")
-                if head not in wanted:
+                c6 = prefix_to_code.get(head)
+                if c6 is None:
                     continue
                 if "," in rest:
                     parts = [head] + rest.strip().split(",")
                 else:
-                    parts = [p for p in (head + "|" + rest).strip().split("|")]
+                    parts = [p for p in (head + "|" + rest).strip().split("|")
+                             if p]
                 if len(parts) < 5 or not RE_DATE.match(parts[1]):
                     continue
                 try:
@@ -104,25 +110,20 @@ def load_klines(codes):
                 except ValueError:
                     continue
                 date = parts[1]
-                for c6 in out:
-                    if head not in code_to_bulk_prefixes(c6):
-                        continue
-                    rec = out[c6]
-                    i = rec["idx"].get(date)
-                    if i is None:
-                        i = len(rec["dates"])
-                        rec["dates"].append(date)
-                        rec["idx"][date] = i
-                    if i < len(rec["open"]):
-                        rec["open"][i] = o
-                        rec["close"][i] = c
-                        rec["high"][i] = h
-                    else:
-                        rec["open"].append(o)
-                        rec["close"].append(c)
-                        rec["high"].append(h)
-                    n_rows += 1
-                    break
+                rec = out[c6]
+                i = rec["idx"].get(date)
+                if i is None:
+                    i = len(rec["dates"])
+                    rec["dates"].append(date)
+                    rec["idx"][date] = i
+                    rec["open"].append(o)
+                    rec["close"].append(c)
+                    rec["high"].append(h)
+                elif i < len(rec["open"]):
+                    # 同一 (code,date) 在多个分片重复出现: 后写的覆盖,
+                    # 与原先 "found 即 break" 的语义一致 (先到者胜)
+                    pass
+                n_rows += 1
     for c6, rec in out.items():
         order = sorted(range(len(rec["dates"])), key=lambda i: rec["dates"][i])
         rec["open"] = [rec["open"][i] for i in order]
