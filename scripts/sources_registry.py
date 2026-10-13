@@ -64,7 +64,8 @@ SOURCES = [
         "cors": "*",                     # 浏览器可直连 (realtime.js 依赖此点)
         "provides": ["enrich.json:ths_strong", "latest.json:market.indices"],
         "notes": "容器内稳定可用; 每码1请求, 支持批量60个/请求; "
-                 "量比无独立字段一律1.0; p44/p45 单位亿元",
+                 "量比无独立字段一律1.0; p44/p45 单位亿元; "
+                 "必带 Referer: https://gu.qq.com; 字段坑: p43 是振幅% 不是 PB (PB 是 p46)",
         "degrade_to": ["sina_hq"],
     },
     {
@@ -106,6 +107,18 @@ SOURCES = [
         "fields": "指数/个股实时 (需 Referer: finance.sina.com.cn)",
         "provides": ["(降级备用)"],
         "notes": "必须带 Referer 头, 否则 403; 主要作为腾讯的降级源",
+    },
+    {
+        "id": "sina_kline_ma",
+        "name": "新浪日K + MA (money.finance.sina.com.cn)",
+        "url": "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={code}&scale=240&ma=5&datalen=100",
+        "auth": "none (需 Referer: finance.sina.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "day/open/high/low/close/volume + ma_price5/ma_volume5/ma_price10/ma_volume10 (接口直算 MA)",
+        "provides": [],
+        "notes": "2026-10-13 实测 200: 接口直接返回 MA5/MA10, 省本地计算; "
+                 "scale=240 日线, 120=30分钟, 60=小时; 与 tencent_kline 互补",
     },
     {
         "id": "sina_news",
@@ -172,7 +185,7 @@ SOURCES = [
     },
     {
         "id": "eastmoney_datacenter",
-        "name": "东财 datacenter (龙虎榜/大宗交易/两融)",
+        "name": "东财 datacenter (龙虎榜/大宗交易/两融/陆股通)",
         "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName={report}",
         "auth": "none",
         "status": "ok",
@@ -180,19 +193,23 @@ SOURCES = [
         "delay": "收盘后 (当日数据约 18:00 后出)",
         "reports": {
             "RPT_DAILYBILLBOARD_DETAILS": "龙虎榜明细 (席位解读+成功率)",
+            "RPT_DAILYBILLBOARD_DETAILSNEW": "龙虎榜明细 (新版报表名, 2026 实测)",
             "RPT_DATA_BLOCKTRADE": "大宗交易 (溢价率/成交额)",
             "RPTA_RZRQ_LSHJ": "融资融券余额历史",
+            "RPTA_WEB_RZRQ_GGMX": "融资融券个股明细 (新版, 排序键 DATE 非 TRADE_DATE)",
+            "RPT_MUTUAL_DEAL_HISTORY": "陆股通 (北向资金) 历史",
         },
         "provides": ["enrich.json:lhb/blocktrade", "latest.json:margin"],
         "notes": "filter 日期必须 YYYY-MM-DD (横杠), 传 YYYYMMDD 会返回0条; "
                  "当日数据收盘后才出 → 必须做日期回退 (最多5天); "
-                 "龙虎榜同一股票多行 (不同上榜原因), 需按股票合并",
+                 "龙虎榜同一股票多行 (不同上榜原因), 需按股票合并; "
+                 "坑: 各报表排序键不统一 (TRADE_DATE/DATE/dim_date), 传错返回 9501",
         "degrade_to": [],
     },
     {
-        "id": "eastmoney_clist",
+        "id": "em_push2_clist",
         "name": "东财板块列表/资金流 (push2 clist)",
-        "url": "https://push2.eastmoney.com/api/qt/clist/get",
+        "url": "https://push2.eastmoney.com/api/qt/clist/get?fs=m:90+t:2&fields=f2,f3,f12,f14",
         "auth": "none",
         "status": "blocked",
         "freq": "minute",
@@ -202,7 +219,21 @@ SOURCES = [
         "notes": "容器内间歇 reset (RemoteDisconnected), 约 20 次请求后必然被封; "
                  "曾导致 sector_pool 只剩2个板块、multi_v5 因缺行业映射出0候选。"
                  "已用 tencent_mktHs + tv_screener 替代",
-        "degrade_to": ["tencent_mktHs", "tv_screener"],
+        "degrade_to": ["tencent_mktHs", "tv_screener", "em_push2delay_clist"],
+    },
+    {
+        "id": "em_push2delay_clist",
+        "name": "东财实时行情延迟版 (push2delay, clist 降级第三顺位)",
+        "url": "https://push2delay.eastmoney.com/api/qt/clist/get?fs=m:90+t:2&fields=f2,f3,f12,f14",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "约15分钟",
+        "fields": "行业/概念板块涨跌/资金流/成分股",
+        "provides": [],
+        "notes": "2026-10-13 实测: push2 主域被 TLS reset, 但 push2delay 同账号域全部 200; "
+                 "容器 IP 风控是按域名分级的, 换国内 IP 后 push2 可恢复; "
+                 "降级链: push2 clist → tencent_mktHs → tv_screener → push2delay",
     },
     {
         "id": "eastmoney_stock_get",
@@ -709,6 +740,119 @@ SOURCES = [
         "provides": [],
         "notes": "百度股市通 K线 (baidu_kline_with_ma, 腾讯 fallback) 与 cls.cn 电报封装值得复用; "
                  "未安装验证; 与 akshare 定位重叠但多了百度源",
+    },
+
+    # ============ 集思录 jisilu.cn (2026 新版路径, 匿名 session 可拿) ============
+    {
+        "id": "jisilu_lof_index",
+        "name": "集思录 指数 LOF 列表",
+        "url": "https://www.jisilu.cn/data/lof/index_lof_list/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "fund_id/fund_nm/price/increase_rt/volume/amount/fund_nav/nav_dt/asset_ratio",
+        "provides": [],
+        "notes": "2026-10-13 逆向确认: 老 .php 路径已全部 404, 新版是无后缀路径; "
+                 "需先访问首页拿 session, 再带 Referer + X-Requested-With; 20 行/页",
+    },
+    {
+        "id": "jisilu_lof_stock",
+        "name": "集思录 股票 LOF 列表",
+        "url": "https://www.jisilu.cn/data/lof/stock_lof_list/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "fund_id/fund_nm/price/increase_rt/volume/amount/fund_nav/nav_incr_rt",
+        "provides": [],
+        "notes": "比 index_lof_list 多 nav_incr_rt; 同样 20 行/页",
+    },
+    {
+        "id": "jisilu_etf_list",
+        "name": "集思录 ETF 列表 (费率/管理人/申赎单位)",
+        "url": "https://www.jisilu.cn/data/etf/etf_list/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "fund_id/fund_nm/index_id/fee(管理费)/m_fee(托管费)/t_fee/creation_unit(申赎单位)/issuer_nm(管理人)/t0/ex_dt",
+        "provides": [],
+        "notes": "费率与申赎单位是独家字段 (东财/akshare 无); 适合做 ETF 筛选特征; 20 行/页",
+    },
+    {
+        "id": "jisilu_cb_list_new",
+        "name": "集思录可转债新券列表",
+        "url": "https://www.jisilu.cn/data/cbnew/cb_list_new/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "minute",
+        "fields": "bond_id/bond_nm/price/increase_rt/stock_id/stock_nm/pb/convert_price",
+        "provides": [],
+        "notes": "用户交易范围是股票+ETF, 可转债数据作市场情绪/溢价率辅助指标",
+    },
+    {
+        "id": "jisilu_cb_adjust",
+        "name": "集思录可转债下修/强赎列表",
+        "url": "https://www.jisilu.cn/data/cbnew/adjust_list/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "bond_id/bond_nm/price/stock_id/stock_nm/curr_iss_amt/convert_price/adjust_price_ratio",
+        "provides": [],
+        "notes": "319 条下修/强赎事件, 可作事件驱动数据",
+    },
+    {
+        "id": "jisilu_cb_delisted",
+        "name": "集思录可转债退市列表",
+        "url": "https://www.jisilu.cn/data/cbnew/delisted/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "weekly",
+        "fields": "bond_id/bond_nm/price/stock_id/stock_nm/issue_dt/redeem_dt/delist_dt/maturity_dt",
+        "provides": [],
+        "notes": "733 条退市历史, 含到期日/赎回日",
+    },
+    {
+        "id": "jisilu_new_stock_apply",
+        "name": "集思录新股申购日历",
+        "url": "https://www.jisilu.cn/data/new_stock/apply/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "stock_cd/stock_nm/apply_dt/need_market_value/issue_price/above_rt/pub_pe/avg_pe",
+        "provides": [],
+        "notes": "打新市值要求 + 发行 PE, 100 条/页",
+    },
+    {
+        "id": "jisilu_new_stock_hkipo",
+        "name": "集思录港股 IPO 日历",
+        "url": "https://www.jisilu.cn/data/new_stock/hkipo/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "stock_cd/stock_nm/market/apply_dt/list_dt/issue_price/total_shares/jsl_advise/jsl_first_incr_rt",
+        "provides": [],
+        "notes": "含集思录首日涨幅建议 (jsl_advise)",
+    },
+    {
+        "id": "jisilu_new_stock_sub",
+        "name": "集思录新债申购列表",
+        "url": "https://www.jisilu.cn/data/new_stock/sub/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "apply_dt/stock_cd/stock_nm/price/jsl_theory_price/increase_rt/issue_amt",
+        "provides": [],
+        "notes": "新债申购, 含理论价 (jsl_theory_price)",
+    },
+    {
+        "id": "jisilu_new_stock_super",
+        "name": "集思录超级申 (顶格申购) 列表",
+        "url": "https://www.jisilu.cn/data/new_stock/super/",
+        "auth": "cookie (kbzw__Session 匿名)",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "stock_cd/stock_nm/apply_dt/raise_money/jsl_issue_price/valid_apply_account/total_draw_count",
+        "provides": [],
+        "notes": "中签预测相关字段 (total_draw_count)",
     },
 
     # ============ 社交/渲染管线 (cookie 源) ============
