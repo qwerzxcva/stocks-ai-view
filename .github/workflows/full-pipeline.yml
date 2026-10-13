@@ -136,6 +136,10 @@ jobs:
       - name: Edge miner
         run: python3 scripts/edge_miner.py || echo "edge_miner skipped"
 
+      # ── 6c5. 异常检测 (时序/分布: 数据断更/覆盖下跌/分布漂移) ──
+      - name: Anomaly detector
+        run: python3 scripts/anomaly_detector.py || echo "anomaly skipped"
+
       # ── 6d. 引擎兜底 (Space 未激活时, GitHub 侧跑轻量引擎链) ──
       # 主算力在 GitCode Space; 若 Space 未跑 (无 GC_TOKEN/未激活),
       # 这里跑一遍轻量引擎, 保证网站永远有最新评分/决策/估值。
@@ -198,7 +202,7 @@ jobs:
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/ban_prob_balanced.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/ban_prob_balanced.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
           git fetch origin main
           git reset --soft origin/main
           git add -A $FILES

@@ -1,0 +1,24 @@
+{
+  "ts": "2026-10-14T02:56:48+08:00",
+  "engine": "anomaly_detector v1 (时序/分布异常)",
+  "kline_coverage": 3997,
+  "n_issues": 0,
+  "by_severity": {
+    "critical": 0,
+    "warning": 0
+  },
+  "issues": [],
+  "checks": [
+    "数据断更",
+    "K线覆盖率下跌",
+    "分布漂移"
+  ],
+  "meta": {
+    "limits": {
+      "trading_stale_min": 40,
+      "nontrading_stale_h": 20
+    },
+    "todo": "数值跳变/因子失效待接 (需历史快照对比)",
+    "caveat": "异常告警是数据质量门禁, 不构成投资建议"
+  }
+}

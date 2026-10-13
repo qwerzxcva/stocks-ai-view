@@ -39,8 +39,11 @@ try:
     from paths import SNAPSHOT_GLOB, AI_VIEW_DATA, INDUSTRY_MAP
 except Exception:
     AI_VIEW_DATA = os.path.join(os.path.dirname(HERE), "data")
-    SNAPSHOT_GLOB = "/root/workspace/stocks-data-live/data/market/snapshot_*.json"
-    INDUSTRY_MAP = "/root/workspace/stocks-data-live/data/meta/industry_map_tv.json"
+    SNAPSHOT_GLOB = os.environ.get("STOCKS_SNAPSHOT_GLOB") or os.path.join(
+        os.environ.get("STOCKS_LIVE_MARKET", ""), "snapshot_*.json")
+    INDUSTRY_MAP = os.environ.get("STOCKS_INDUSTRY_MAP") or os.path.join(
+        os.path.dirname(HERE), "..", "stocks-data-live", "data", "meta",
+        "industry_map_tv.json")
 
 # ─── 估值参数 (可解释的保守假设) ────────────────────────────────
 REQUIRED_RETURN = 0.10      # 要求回报率 10%

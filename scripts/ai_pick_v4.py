@@ -31,7 +31,8 @@ sys.path.insert(0, HERE)
 try:
     from paths import BULK, AI_VIEW_DATA
 except Exception:
-    BULK = "/root/workspace/stocks-data-kline/data/bulk"
+    BULK = os.environ.get("STOCKS_KLINE_BULK") or os.path.join(
+        os.path.dirname(HERE), "..", "stocks-data-kline", "data", "bulk")
     AI_VIEW_DATA = os.path.join(os.path.dirname(HERE), "data")
 
 

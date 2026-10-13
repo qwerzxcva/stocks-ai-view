@@ -44,9 +44,11 @@ UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 try:
-    from paths import BULK
+    from paths import BULK, AI_VIEW_DATA
 except Exception:
     BULK = os.environ.get("STOCKS_KLINE_BULK") or "/root/workspace/stocks-data-kline/data/bulk"
+    AI_VIEW_DATA = os.path.join(os.path.dirname(HERE), "data")
+DATA_DIR = os.environ.get("STOCKS_AI_VIEW_DATA") or AI_VIEW_DATA
 
 from collect_market_extras import fetch_pool, fetch_zdfenbu
 
@@ -109,8 +111,8 @@ def lianban_series(code, bars):
 
 def load_ban_prob():
     """读 ban_prob.json 拿分层概率"""
-    for p in ["/root/workspace/stocks-ai-view/data/ban_prob.json",
-              os.path.join(os.path.dirname(os.path.dirname(HERE)), "data", "ban_prob.json")]:
+    for p in [os.path.join(DATA_DIR, "ban_prob.json"),
+              os.path.join(os.path.dirname(HERE), "data", "ban_prob.json")]:
         if os.path.exists(p):
             try:
                 return json.load(open(p, encoding="utf-8"))
