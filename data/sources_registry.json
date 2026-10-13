@@ -1,12 +1,12 @@
 {
-  "generated": "2026-10-13T16:24:54+08:00",
-  "total": 39,
+  "generated": "2026-10-14T05:22:40+08:00",
+  "total": 83,
   "by_status": {
-    "ok": 19,
-    "degraded": 5,
-    "blocked": 9,
-    "unauth": 5,
-    "untested": 1
+    "ok": 57,
+    "degraded": 6,
+    "blocked": 12,
+    "unauth": 6,
+    "untested": 2
   },
   "sources": [
     {
@@ -38,7 +38,7 @@
         "enrich.json:ths_strong",
         "latest.json:market.indices"
       ],
-      "notes": "容器内稳定可用; 每码1请求, 支持批量60个/请求; 量比无独立字段一律1.0; p44/p45 单位亿元",
+      "notes": "容器内稳定可用; 每码1请求, 支持批量60个/请求; 量比无独立字段一律1.0; p44/p45 单位亿元; 必带 Referer: https://gu.qq.com; 字段坑: p43 是振幅% 不是 PB (PB 是 p46)",
       "degrade_to": [
         "sina_hq"
       ]
@@ -93,6 +93,17 @@
       "notes": "必须带 Referer 头, 否则 403; 主要作为腾讯的降级源"
     },
     {
+      "id": "sina_kline_ma",
+      "name": "新浪日K + MA (money.finance.sina.com.cn)",
+      "url": "https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={code}&scale=240&ma=5&datalen=100",
+      "auth": "none (需 Referer: finance.sina.com.cn)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "day/open/high/low/close/volume + ma_price5/ma_volume5/ma_price10/ma_volume10 (接口直算 MA)",
+      "provides": [],
+      "notes": "2026-10-13 实测 200: 接口直接返回 MA5/MA10, 省本地计算; scale=240 日线, 120=30分钟, 60=小时; 与 tencent_kline 互补"
+    },
+    {
       "id": "sina_news",
       "name": "新浪 7x24 快讯",
       "url": "https://zhibo.sina.com.cn/api/zhibo/feed?page=1",
@@ -106,6 +117,28 @@
         "hot_impact.json"
       ],
       "notes": "实测返回体经常只有 113 bytes (zhibo_id missing), 内容量不稳定; 已由 fetch_remote_news 从 data-news 仓兜底"
+    },
+    {
+      "id": "sina_kline_daily",
+      "name": "新浪个股日K (akshare stock_zh_a_daily_sina)",
+      "url": "via akshare.stock_zh_a_daily(symbol='sh600519', adjust='qfq')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "date/open/high/low/close/volume/amount/outstanding_share/turnover",
+      "provides": [],
+      "notes": "2026-10-13 实测 茅台日K全史 6019 行, 0.79s; tencent_kline 501 限流后的 K线补录源"
+    },
+    {
+      "id": "sina_etf_hist",
+      "name": "新浪 ETF 日K (akshare fund_etf_hist_sina)",
+      "url": "via akshare.fund_etf_hist_sina(symbol='sh510500')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "date/open/high/low/close/volume/amount/postVol/postAmt",
+      "provides": [],
+      "notes": "2026-10-13 实测 510500 全史 3294 行, 0.27s; ETF 净值域接入"
     },
     {
       "id": "eastmoney_zt_pool",
@@ -138,7 +171,7 @@
     },
     {
       "id": "eastmoney_datacenter",
-      "name": "东财 datacenter (龙虎榜/大宗交易/两融)",
+      "name": "东财 datacenter (龙虎榜/大宗交易/两融/陆股通)",
       "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName={report}",
       "auth": "none",
       "status": "ok",
@@ -146,20 +179,23 @@
       "delay": "收盘后 (当日数据约 18:00 后出)",
       "reports": {
         "RPT_DAILYBILLBOARD_DETAILS": "龙虎榜明细 (席位解读+成功率)",
+        "RPT_DAILYBILLBOARD_DETAILSNEW": "龙虎榜明细 (新版报表名, 2026 实测)",
         "RPT_DATA_BLOCKTRADE": "大宗交易 (溢价率/成交额)",
-        "RPTA_RZRQ_LSHJ": "融资融券余额历史"
+        "RPTA_RZRQ_LSHJ": "融资融券余额历史",
+        "RPTA_WEB_RZRQ_GGMX": "融资融券个股明细 (新版, 排序键 DATE 非 TRADE_DATE)",
+        "RPT_MUTUAL_DEAL_HISTORY": "陆股通 (北向资金) 历史"
       },
       "provides": [
         "enrich.json:lhb/blocktrade",
         "latest.json:margin"
       ],
-      "notes": "filter 日期必须 YYYY-MM-DD (横杠), 传 YYYYMMDD 会返回0条; 当日数据收盘后才出 → 必须做日期回退 (最多5天); 龙虎榜同一股票多行 (不同上榜原因), 需按股票合并",
+      "notes": "filter 日期必须 YYYY-MM-DD (横杠), 传 YYYYMMDD 会返回0条; 当日数据收盘后才出 → 必须做日期回退 (最多5天); 龙虎榜同一股票多行 (不同上榜原因), 需按股票合并; 坑: 各报表排序键不统一 (TRADE_DATE/DATE/dim_date), 传错返回 9501",
       "degrade_to": []
     },
     {
-      "id": "eastmoney_clist",
+      "id": "em_push2_clist",
       "name": "东财板块列表/资金流 (push2 clist)",
-      "url": "https://push2.eastmoney.com/api/qt/clist/get",
+      "url": "https://push2.eastmoney.com/api/qt/clist/get?fs=m:90+t:2&fields=f2,f3,f12,f14",
       "auth": "none",
       "status": "blocked",
       "freq": "minute",
@@ -169,8 +205,95 @@
       "notes": "容器内间歇 reset (RemoteDisconnected), 约 20 次请求后必然被封; 曾导致 sector_pool 只剩2个板块、multi_v5 因缺行业映射出0候选。已用 tencent_mktHs + tv_screener 替代",
       "degrade_to": [
         "tencent_mktHs",
-        "tv_screener"
+        "tv_screener",
+        "em_push2delay_clist"
       ]
+    },
+    {
+      "id": "em_push2delay_clist",
+      "name": "东财实时行情延迟版 (push2delay, clist 降级第三顺位)",
+      "url": "https://push2delay.eastmoney.com/api/qt/clist/get?fs=m:90+t:2&fields=f2,f3,f12,f14",
+      "auth": "none",
+      "status": "ok",
+      "freq": "minute",
+      "delay": "约15分钟",
+      "fields": "行业/概念板块涨跌/资金流/成分股",
+      "provides": [],
+      "notes": "2026-10-13 实测: push2 主域被 TLS reset, 但 push2delay 同账号域全部 200; 容器 IP 风控是按域名分级的, 换国内 IP 后 push2 可恢复; 降级链: push2 clist → tencent_mktHs → tv_screener → push2delay"
+    },
+    {
+      "id": "em_push2his_clist",
+      "name": "东财全市场快照 (push2his 域, 绕开 push2 WAF)",
+      "url": "https://push2his.eastmoney.com/api/qt/clist/get?pn=1&pz=100&po=1&np=1&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f12,f14,f2,f3,f4,f5,f6,f7,f8,f9,f10,f20,f21&fid=f8",
+      "auth": "none",
+      "status": "ok",
+      "freq": "realtime",
+      "delay": "秒级 (与 push2 同源)",
+      "fields": "f12=代码 f14=名称 f2=最新价(分) f3=涨跌幅 f4=涨跌额 f5=成交量 f6=成交额 f7=振幅 f8=换手 f9=市盈 f10=量比 f20=总市值 f21=流通市值",
+      "provides": [
+        "quotes 表 (全市场)"
+      ],
+      "notes": "2026-10-13 实测 200 total=5923 (全 A 股); 关键: push2 域 TLS reset 但 push2his 域同路径可用 → 这是 push2 WAF 的绕行方案, 不是降级; 价格单位是分 (f2=3880 → 38.80 元)"
+    },
+    {
+      "id": "em_push2his_etf_onsite",
+      "name": "东财场内基金/ETF 全量快照 (push2his)",
+      "url": "https://push2his.eastmoney.com/api/qt/clist/get?pn=1&pz=200&po=1&np=1&fs=b:MK0021&fields=f12,f13,f14,f2,f3,f6",
+      "auth": "none",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "f12=代码 f13=市场(0深1沪) f14=名称 f2=最新价(分) f3=涨跌幅 f6=成交额",
+      "provides": [
+        "fund_nav 表 (场内基金实时)"
+      ],
+      "notes": "2026-10-13 实测 200 total=1357 只场内基金; fs=b:MK0021 是场内基金板块参数; ETF 在用户交易范围内, 此前 catalog 缺这个源"
+    },
+    {
+      "id": "em_fund_lsjz",
+      "name": "天天基金历史净值 (api.fund.eastmoney.com/f10/lsjz)",
+      "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode={code}&pageIndex=1&pageSize=50",
+      "auth": "none (Referer 静默鉴权, 必带)",
+      "status": "ok",
+      "freq": "daily",
+      "delay": "T+1 (当日净值 20:00 后)",
+      "fields": "DWJZ=单位净值 LJJZ=累计净值 JZZZL=日增长率 FSRQ=净值日期 SGZT=申购状态 SHZT=赎回状态",
+      "provides": [
+        "fund_nav 表"
+      ],
+      "notes": "2026-10-13 实测: 不带 Referer 返回 HTTP 200 + ErrCode=-999 + Data= (97B) —— 静默失败比 403 更危险, 必须校验 ErrCode; 必带 Referer: https://fundf10.eastmoney.com/jjjz_{code}.html; TotalCount 给全量条数 (510300 实测 3508)"
+    },
+    {
+      "id": "jisilu_dividend_rate",
+      "name": "集思录股息率列表 (含估值温度/5年均值)",
+      "url": "https://www.jisilu.cn/data/stock/dividend_rate_list/?rp=100&page=1",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "dividend_rate=股息率 dividend_rate2 pb_temperature/pe_temperature=历史分位0-100 roe_average/revenue_average/profit_average=5年均值 负债率/质押率/行业/省份",
+      "provides": [],
+      "notes": "2026-10-13 实测 200, 105KB, 100 只/页; 单接口信息密度最高: 估值温度可直接做低估值筛选, 5年均值规避单期财报噪音; 需先访问首页拿 session + Referer: /data/stock/"
+    },
+    {
+      "id": "sina_vip_kline",
+      "name": "新浪多周期 K线 (vip.stock.finance.sina.com.cn)",
+      "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol={code}&scale=240&ma=5&datalen=1023",
+      "auth": "none (需 Referer: finance.sina.com.cn)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "day/open/high/low/close/volume + ma_price5/ma_volume5/ma_price10/ma_volume10",
+      "provides": [],
+      "notes": "2026-10-13 实测 200; scale=5/15/30/60/240 分钟/日; ma=5/10/20; datalen 最多 1023; 支持指数 sh000001; 接口直返 MA, 省本地计算; 可作东财/腾讯 K线的第三方交叉校验源 (用户反馈 K线数据有问题)"
+    },
+    {
+      "id": "em_push2his_kline_DEPRECATED",
+      "name": "东财历史K线 (push2his kline) — 已失效",
+      "url": "https://push2his.eastmoney.com/api/qt/stock/kline/get",
+      "auth": "none",
+      "status": "blocked",
+      "freq": "daily",
+      "fields": "(原: date/open/close/high/low/volume/amount)",
+      "provides": [],
+      "notes": "2026-10-13 晚间复测 rc=102 data=null — 早间 (19:04) 实测 200, 晚间 (21:xx) 失效; 疑似按 IP 动态风控或端点改版; K线一律改用 tencent_kline (fqkline) 或 sina_vip_kline; clist 端点 (em_push2his_clist) 仍可用, 勿混淆"
     },
     {
       "id": "eastmoney_stock_get",
@@ -194,7 +317,18 @@
       "status": "ok",
       "freq": "daily",
       "provides": [],
-      "notes": "push2his 域, 未实测; 列为 tencent_kline 的降级候选"
+      "notes": "2026-10-13 实测: push2his 域不在 push2 的 WAF 封锁范围; 茅台全史 6019 根, 381B 样本; fqt=1 前复权; 需带 Referer: quote.eastmoney.com; 并发 10 安全"
+    },
+    {
+      "id": "em_a_hist",
+      "name": "东财A股历史K线 (akshare stock_zh_a_hist)",
+      "url": "via akshare.stock_zh_a_hist(symbol='600519', period='daily', adjust='qfq')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "日期/股票代码/开盘/收盘/最高/最低/成交量/成交额/振幅/涨跌幅/涨跌额/换手率",
+      "provides": [],
+      "notes": "akshare 封装, 底层 push2his; 2026-10-13 实测 489 行/0.25s"
     },
     {
       "id": "eastmoney_fund_rank",
@@ -210,14 +344,36 @@
       "notes": "由 eastmoney_fund_rank.py 实现, 49 条"
     },
     {
+      "id": "em_fund_etf_hist_min",
+      "name": "东财 ETF 历史净值 (akshare fund_etf_fund_info_em)",
+      "url": "via akshare.fund_etf_fund_info_em(fund='511280', start_date='20000101')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "净值日期/单位净值/累计净值/日增长率/申购状态/赎回状态",
+      "provides": [],
+      "notes": "2026-10-13 实测 784 行全史; 坑: 参数名是 fund 不是 symbol"
+    },
+    {
+      "id": "em_ann_np",
+      "name": "东财公告 API (np-ann)",
+      "url": "https://np-ann.eastmoney.com/api/security/ann?sr=-1&page_size=5&ann_type=A&client_source=web&f_node=0&s_code={code}",
+      "auth": "none",
+      "status": "degraded",
+      "freq": "daily",
+      "fields": "公告标题/日期/类型/URL",
+      "provides": [],
+      "notes": "2026-10-13 实测: 无 XHR 头返回 HTML SPA 壳; 需 X-Requested-With: XMLHttpRequest 头 (未完整验证); 公告域首选巨潮/交易所, 此为备选"
+    },
+    {
       "id": "eastmoney_news",
       "name": "东财 7x24 / 收评",
-      "url": "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns",
+      "url": "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns?client=web&biz=web7_24&fastColumn=100&column=100&req_trace={uuid}",
       "auth": "none",
       "status": "degraded",
       "freq": "minute",
       "provides": [],
-      "notes": "实测 HTTP 567 Unknown Status; 财经/政策/产经三栏目全 567",
+      "notes": "实测 HTTP 567 Unknown Status; 财经/政策/产经三栏目全 567; 2026-10-13 补充: req_trace 为随机 32位hex UUID, 带上后正常返回 JSON; 567 多为容器本地出口, GitHub Actions 出口通常全通",
       "degrade_to": [
         "sina_news",
         "remote_news"
@@ -249,6 +405,52 @@
       "freq": "minute",
       "provides": [],
       "notes": "实测返回 HTML (SPA fallback) 而非 JSON; 需登录态"
+    },
+    {
+      "id": "ths_industry_list",
+      "name": "同花顺行业板块列表 (akshare stock_board_industry_name_ths)",
+      "url": "via akshare.stock_board_industry_name_ths()",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "name/code (90 个行业板块)",
+      "provides": [],
+      "notes": "底层 d.10jqka.com.cn 板块 API, 同花顺域名零 WAF; 2026-10-13 实测 90 行/0.22s"
+    },
+    {
+      "id": "ths_concept_list",
+      "name": "同花顺概念板块列表 (akshare stock_board_concept_name_ths)",
+      "url": "via akshare.stock_board_concept_name_ths()",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "name/code (375 个概念板块)",
+      "provides": [],
+      "notes": "2026-10-13 实测 375 概念/8.3s (39 页分页); 概念代码可作事件驱动标签; 建议 8 req/min"
+    },
+    {
+      "id": "ths_financial_abstract",
+      "name": "同花顺财务摘要 (akshare stock_financial_abstract_ths)",
+      "url": "via akshare.stock_financial_abstract_ths(symbol='600519')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "quarterly",
+      "fields": "报告期/净利润/扣非净利润/营业总收入/基本每股收益/销售毛利率/净资产收益率/资产负债率",
+      "provides": [],
+      "notes": "2026-10-13 实测 茅台 1998~2026 共 103 报告期; 坑: 字段值含'亿'字需 parse; False 表示无数据"
+    },
+    {
+      "id": "ths_financial_abstract_v2",
+      "name": "同花顺财务摘要 v2 (akshare stock_financial_abstract_new_ths)",
+      "url": "via akshare.stock_financial_abstract_new_ths(symbol='600519')",
+      "auth": "none",
+      "status": "ok",
+      "freq": "quarterly",
+      "fields": "report_date/report_name/report_period/metric_name/value/yoy/mom (宽表→长表)",
+      "provides": [
+        "financial_summary 表"
+      ],
+      "notes": "2026-10-13 实测 1200 行/0.26s; 长表格式直接入库无需 parse; 2014 年前 yoy/mom 多为空; 推荐作为财务域入库源"
     },
     {
       "id": "tv_screener",
@@ -392,11 +594,11 @@
       "name": "AKShare",
       "url": "python 库 (非HTTP)",
       "auth": "none",
-      "status": "untested",
+      "status": "ok",
       "freq": "varies",
       "fields": "聚合东财/新浪/同花顺等 100+ 接口",
       "provides": [],
-      "notes": "a-share-data 技能依赖它; 容器内未安装。它是封装层不是独立源, 底层仍是上面这些"
+      "notes": "akshare 1.19.1 容器已安装验证 (2026-10-13): 新浪日K/ETF K线、东财 push2his 历史K、同花顺财务摘要、统计局宏观数据均跑通; 它是封装层不是独立源, 底层仍是上面这些"
     },
     {
       "id": "yahoo_finance",
@@ -478,6 +680,319 @@
       "fields": "热门股票列表 (需 xq_a_token)",
       "provides": [],
       "notes": "无 cookie 时返回 400 / 302 反爬 JS; 需 xq_a_token cookie 认证; 容器内无法获取有效 cookie; 考虑替代: 东方财富股吧热帖 / 同花顺热榜"
+    },
+    {
+      "id": "cninfo_announce",
+      "name": "巨潮资讯公告 (cninfo.com.cn)",
+      "url": "https://www.cninfo.com.cn/new/hisAnnouncement/query?column={col}&secuCode={code}&seDate={range}",
+      "auth": "none",
+      "status": "blocked",
+      "freq": "daily",
+      "fields": "公告标题/日期/类型/PDF URL",
+      "provides": [],
+      "notes": "2026-10-13 容器内 HTTP 500; 推测大陆网络可用, 容器出口被限; 公告域首选候选, 国内服务器上再验"
+    },
+    {
+      "id": "sse_market",
+      "name": "上交所行情数据 API",
+      "url": "http://query.sse.com.cn/commonQuery.do?sqlId={sql_id}&pageHelp.pageSize=10&_=timestamp",
+      "auth": "none (Referer: sse.com.cn 必带)",
+      "status": "untested",
+      "freq": "daily",
+      "fields": "沪市行情/公告/基金/财务",
+      "provides": [],
+      "notes": "2026-10-13 实测 200 但 data=null; sqlId 需配合有效会话/Referer; 待进一步探测正确参数组合"
+    },
+    {
+      "id": "szse_api",
+      "name": "深交所官方数据 API",
+      "url": "https://www.szse.cn/api/report/ShowReport?SHOWTYPE=JSON&CATALOGID={id}&TABPAGE=1&pageNum=1&pageSize=5",
+      "auth": "none",
+      "status": "blocked",
+      "freq": "daily",
+      "fields": "深市行情/公告/监管数据",
+      "provides": [],
+      "notes": "2026-10-13 容器内 CATALOGID=1835/1803/1805 均 HTTP 500; 可能需大陆出口 IP; 国内服务器上再验"
+    },
+    {
+      "id": "macro_china_cpi_gdp",
+      "name": "宏观数据 CPI/GDP (akshare)",
+      "url": "via akshare.macro_china_cpi() / akshare.macro_china_gdp()",
+      "auth": "none",
+      "status": "ok",
+      "freq": "monthly",
+      "fields": "CPI: 月份/全国当月/同比/环比; GDP: 季度/绝对值/同比",
+      "provides": [],
+      "notes": "统计局数据; 2026-10-13 实测 CPI 224 行/GDP 82 行; 可用于市场环境判定"
+    },
+    {
+      "id": "em_lcpd_report",
+      "name": "东财业绩快报/财务报告 (datacenter RPT_LICO_FN_CPD)",
+      "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LICO_FN_CPD&columns=ALL&pageSize=50&pageNumber={n}&sortColumns=UPDATE_DATE,SECURITY_CODE&sortTypes=-1,-1&filter=(REPORTDATE%3D%27{report_date}%27)",
+      "auth": "none",
+      "status": "ok",
+      "freq": "quarterly",
+      "fields": "每股收益/营业总收入/净利润/ROE/营收同比/净利润同比/每股净资产/销售毛利率/行业 (5700+家全市场)",
+      "provides": [],
+      "notes": "同 datacenter-web 域 (LHB 已验证); 2026-10-13 搜索确认 RPT_LICO_FN_CPD 可用; filter 日期格式 YYYY-MM-DD; 分页 50 条/页 约 116 页; 建议 sleep 0.5s/页"
+    },
+    {
+      "id": "baostock",
+      "name": "Baostock 免费A股数据 (query_history_k_data_plus)",
+      "url": "python 库 (baostock, 需先 login())",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "日K/周K/月K (qfq)/估值/财务指标; 全市场 5000+ 只 2000~2026 全通",
+      "provides": [],
+      "notes": "2026-10-13 实测: baostock 0.9.3 装容器可跑, 茅台 16326 行历史; 无注册无积分; K线补录与 tencent_kline 501 限流互补"
+    },
+    {
+      "id": "iwencai_openapi",
+      "name": "同花顺问财 OpenAPI (自然语言查数据)",
+      "url": "https://openapi.iwencai.com/v1/query2data (POST)",
+      "auth": "key (IWENCAI_API_KEY)",
+      "status": "unauth",
+      "freq": "on-demand",
+      "fields": "自然语言选股/行情/财务/指数/基金/板块/期货; /v1/comprehensive/search 搜新闻/公告/研报",
+      "provides": [],
+      "notes": "请求 body {query, source, page, limit, is_cache}; 返回 datas[] + code_count; 需申请 key; 限频控制, 30s 超时; 中文语义查询是独家能力"
+    },
+    {
+      "id": "cn_a_stock_data",
+      "name": "cn-a-stock-data (OpenStockData 开源库)",
+      "url": "pip install cn-a-stock-data",
+      "auth": "none (问财层需 key)",
+      "status": "untested",
+      "freq": "varies",
+      "fields": "封装腾讯/东财/百度股市通/同花顺/财联社/新浪/巨潮; 7层: 行情/研报/信号/资金筹码/新闻/基础/公告",
+      "provides": [],
+      "notes": "百度股市通 K线 (baidu_kline_with_ma, 腾讯 fallback) 与 cls.cn 电报封装值得复用; 未安装验证; 与 akshare 定位重叠但多了百度源"
+    },
+    {
+      "id": "em_fflow_history",
+      "name": "东财历史资金流 (五档: 超大/大/中/小单净流入)",
+      "url": "https://push2delay.eastmoney.com/api/qt/stock/fflow/kline/get?secid={1|0}.{code}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58&lmt={n}&klt={101日|102周|103月|104年}",
+      "auth": "none (需 Referer: quote.eastmoney.com)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "date/主力净流入/小单净流入/中单净流入/大单净流入/超大单净流入 (元); klines 逗号分隔, 6列(部分版本7列带收盘)",
+      "provides": [
+        "level2/{code}_fflow_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200; push2delay 域未被 WAF; 主力=超大单+大单; 当日数据收盘后才出; klt=101/102/103/104 日周月年"
+    },
+    {
+      "id": "em_quote_snapshot",
+      "name": "东财个股实时快照 (24字段: 盘口/资金/市值/估值/量比)",
+      "url": "https://push2delay.eastmoney.com/api/qt/stock/get?secid={1|0}.{code}&fltt=2&invt=2&fields=f43,f44,...",
+      "auth": "none (需 Referer: quote.eastmoney.com)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "f43=价 f44=高 f45=低 f46=开 f47=成交量(手) f48=成交额 f49=外盘(手) f50=内盘 f51=涨停价 f52=跌停价 f60=昨收 f71=均价 f116=总市值 f117=流通市值 f162=PE(TTM) f167=PB f168=换手% f169=涨跌额 f170=涨跌幅 f171=振幅 f177=量比",
+      "provides": [
+        "level2/{code}_quote_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200; 单接口覆盖用户要求的 价/量/额/市值/PE/PB/换手/量比/内外盘/均价/振幅; 坑: f50 内盘实测值 0.85 (需折算), f177 量比 577 (需 /100)"
+    },
+    {
+      "id": "em_tick_details",
+      "name": "东财逐笔成交 (3秒聚合, 主买主卖方向)",
+      "url": "https://push2delay.eastmoney.com/api/qt/stock/details/get?secid={1|0}.{code}&fields1=f1..f6&fields2=f51,f52,f53,f54,f55&pos={-N}&fltt=2",
+      "auth": "none (需 Referer: quote.eastmoney.com)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "f51=时间 HH:MM:SS f52=成交价 f53=笔数 f54=成交量(手) f55=方向 1=主买/2=主卖",
+      "provides": [
+        "level2/{code}_tick_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200; pos=-N 取最近 N 条 (倒序); 3秒聚合快照, 非逐笔委托"
+    },
+    {
+      "id": "tx_tick_detail",
+      "name": "腾讯分笔成交 (3秒聚合, B/S/M 性质 + 成交额)",
+      "url": "https://stock.gtimg.cn/data/index.php?appn=detail&action=data&c={sh|sz}{code}&p={page}",
+      "auth": "none (需 Referer: gu.qq.com)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "col1=时间 col2=价 col3=价格变动 col4=成交量(手) col5=成交金额(元) col6=性质 B=主买 S=主卖 M=中性",
+      "provides": [
+        "level2/{code}_tick_tx_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200; 比东财 tick 多成交额字段; p=0 最新页; 格式 v_detail_data_sz000001=[...], 需正则提取引号内 | 分隔"
+    },
+    {
+      "id": "tx_minute",
+      "name": "腾讯分时 (每分钟累计成交量/成交额)",
+      "url": "https://web.ifzq.gtimg.cn/appstock/app/minute/query?code={sh|sz}{code}",
+      "auth": "none (需 Referer: gu.qq.com)",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "HHMM 价格 累计成交量(手) 累计成交额(元) — 每日 240 行; data.date=交易日",
+      "provides": [
+        "level2/{code}_minute_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200, 267 行 (9:30-15:00); 累计值需 diff 得每分钟量"
+    },
+    {
+      "id": "sina_bill_sum",
+      "name": "新浪大单分级汇总 (分档占比 + 主买/中性/主卖)",
+      "url": "http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Bill.GetBillSum?symbol={sh|sz}{code}&volume=0",
+      "auth": "none (需 Referer: finance.sina.com.cn)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "minvol=档位阈值 voltype=分档类型(0=固定4万/5万/6万/7万/8万/2万股, 1-5=成交量分位, 11=全部) totalvol=总量 totalvolpct=占比 totalamt=总额 avgprice=均价 kuvolume=主买量",
+      "provides": [
+        "level2/{code}_bill_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200, 茅台 28 档; 大单占比直接用 totalvolpct; HTTP (非 HTTPS); volume=0 全部, 40000=仅4万股以上"
+    },
+    {
+      "id": "sina_trans_list",
+      "name": "新浪逐笔成交 (含内外盘总量)",
+      "url": "http://vip.stock.finance.sina.com.cn/quotes_service/view/CN_TransListV2.php?num={n}&symbol={sh|sz}{code}",
+      "auth": "none (需 Referer: finance.sina.com.cn)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "trade_item_list[]=时间/成交量/价/方向(UP/DOWN/EQUAL); trade_INVOL_OUTVOL=外盘/内盘",
+      "provides": [
+        "level2/{code}_trans_{date}.json"
+      ],
+      "notes": "2026-10-13 实测 200; HTTP; 返回 JS Array 需正则解析; 收盘后 direction 多为 EQUAL"
+    },
+    {
+      "id": "jisilu_lof_index",
+      "name": "集思录 指数 LOF 列表",
+      "url": "https://www.jisilu.cn/data/lof/index_lof_list/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "fund_id/fund_nm/price/increase_rt/volume/amount/fund_nav/nav_dt/asset_ratio",
+      "provides": [],
+      "notes": "2026-10-13 逆向确认: 老 .php 路径已全部 404, 新版是无后缀路径; 需先访问首页拿 session, 再带 Referer + X-Requested-With; 20 行/页"
+    },
+    {
+      "id": "jisilu_lof_stock",
+      "name": "集思录 股票 LOF 列表",
+      "url": "https://www.jisilu.cn/data/lof/stock_lof_list/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "fund_id/fund_nm/price/increase_rt/volume/amount/fund_nav/nav_incr_rt",
+      "provides": [],
+      "notes": "比 index_lof_list 多 nav_incr_rt; 同样 20 行/页"
+    },
+    {
+      "id": "jisilu_etf_list",
+      "name": "集思录 ETF 列表 (费率/管理人/申赎单位)",
+      "url": "https://www.jisilu.cn/data/etf/etf_list/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "fund_id/fund_nm/index_id/fee(管理费)/m_fee(托管费)/t_fee/creation_unit(申赎单位)/issuer_nm(管理人)/t0/ex_dt",
+      "provides": [],
+      "notes": "费率与申赎单位是独家字段 (东财/akshare 无); 适合做 ETF 筛选特征; 20 行/页"
+    },
+    {
+      "id": "jisilu_cb_list_new",
+      "name": "集思录可转债新券列表",
+      "url": "https://www.jisilu.cn/data/cbnew/cb_list_new/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "bond_id/bond_nm/price/increase_rt/stock_id/stock_nm/pb/convert_price",
+      "provides": [],
+      "notes": "用户交易范围是股票+ETF, 可转债数据作市场情绪/溢价率辅助指标"
+    },
+    {
+      "id": "jisilu_cb_adjust",
+      "name": "集思录可转债下修/强赎列表",
+      "url": "https://www.jisilu.cn/data/cbnew/adjust_list/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "bond_id/bond_nm/price/stock_id/stock_nm/curr_iss_amt/convert_price/adjust_price_ratio",
+      "provides": [],
+      "notes": "319 条下修/强赎事件, 可作事件驱动数据"
+    },
+    {
+      "id": "jisilu_cb_delisted",
+      "name": "集思录可转债退市列表",
+      "url": "https://www.jisilu.cn/data/cbnew/delisted/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "weekly",
+      "fields": "bond_id/bond_nm/price/stock_id/stock_nm/issue_dt/redeem_dt/delist_dt/maturity_dt",
+      "provides": [],
+      "notes": "733 条退市历史, 含到期日/赎回日"
+    },
+    {
+      "id": "jisilu_new_stock_apply",
+      "name": "集思录新股申购日历",
+      "url": "https://www.jisilu.cn/data/new_stock/apply/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "stock_cd/stock_nm/apply_dt/need_market_value/issue_price/above_rt/pub_pe/avg_pe",
+      "provides": [],
+      "notes": "打新市值要求 + 发行 PE, 100 条/页"
+    },
+    {
+      "id": "jisilu_new_stock_hkipo",
+      "name": "集思录港股 IPO 日历",
+      "url": "https://www.jisilu.cn/data/new_stock/hkipo/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "stock_cd/stock_nm/market/apply_dt/list_dt/issue_price/total_shares/jsl_advise/jsl_first_incr_rt",
+      "provides": [],
+      "notes": "含集思录首日涨幅建议 (jsl_advise)"
+    },
+    {
+      "id": "jisilu_new_stock_sub",
+      "name": "集思录新债申购列表",
+      "url": "https://www.jisilu.cn/data/new_stock/sub/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "apply_dt/stock_cd/stock_nm/price/jsl_theory_price/increase_rt/issue_amt",
+      "provides": [],
+      "notes": "新债申购, 含理论价 (jsl_theory_price)"
+    },
+    {
+      "id": "jisilu_new_stock_super",
+      "name": "集思录超级申 (顶格申购) 列表",
+      "url": "https://www.jisilu.cn/data/new_stock/super/",
+      "auth": "cookie (kbzw__Session 匿名)",
+      "status": "ok",
+      "freq": "daily",
+      "fields": "stock_cd/stock_nm/apply_dt/raise_money/jsl_issue_price/valid_apply_account/total_draw_count",
+      "provides": [],
+      "notes": "中签预测相关字段 (total_draw_count)"
+    },
+    {
+      "id": "xueqiu_anon_token",
+      "name": "雪球匿名 token (访问主页自动下发)",
+      "url": "GET https://xueqiu.com/ (匿名访问自动 set-cookie xq_a_token 与 u)",
+      "auth": "cookie (无需登录, 匿名即可)",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "xq_a_token → 解锁 /v5/stock/hot/list.json 等 v5 API",
+      "provides": [],
+      "notes": "2026-10-13 实测: 容器匿名访问 xueqiu.com 200 并拿到 140 位 token; 配合 browser-render 管线可抓雪球热榜; token 有效期短, 需定期重取"
+    },
+    {
+      "id": "toutiao_hot",
+      "name": "今日头条热榜/财经榜",
+      "url": "https://www.toutiao.com/api/hotboard/pc/hot-news/feed/?ut=...&max_behave_time=0&_signature=...",
+      "auth": "none",
+      "status": "ok",
+      "freq": "minute",
+      "fields": "热榜 title/hot_value/url/img; 财经榜在 category=finance 下",
+      "provides": [
+        "hot_impact.json (社交情绪补充)"
+      ],
+      "notes": "2026-10-13 实测: ut/max_behave_time 可伪造, 热榜 30 条+; _signature 有时校验, 财经榜 412 时跳过不阻断"
     },
     {
       "id": "local_kline_bulk",

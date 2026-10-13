@@ -1,16 +1,88 @@
 {
-  "ts": "2026-10-14T05:21:28+08:00",
+  "ts": "2026-10-14T05:23:07+08:00",
   "engine": "edge_miner v1 (优势挖掘)",
-  "n_edges": 4,
+  "n_edges": 12,
   "edges": [
     {
       "type": "indicator_short_edge",
-      "name": "UltimateOsc",
-      "bear_win_rate": 60.7,
-      "bear_n": 5521,
-      "ci_lo": 59.36,
-      "action": "把 UltimateOsc 用作回避过滤器: 该指标翻空时排除, 历史胜率60.7%(n=5521)",
+      "name": "SuperTrend",
+      "bear_win_rate": 67.2,
+      "bear_n": 61,
+      "ci_lo": 54.72,
+      "action": "把 SuperTrend 用作回避过滤器: 该指标翻空时排除, 历史胜率67.2%(n=61)",
       "confidence": "medium"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "RSI",
+      "bear_win_rate": 62.5,
+      "bear_n": 72,
+      "ci_lo": 50.95,
+      "action": "把 RSI 用作回避过滤器: 该指标翻空时排除, 历史胜率62.5%(n=72)",
+      "confidence": "medium"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "MACD",
+      "bear_win_rate": 67.7,
+      "bear_n": 62,
+      "ci_lo": 55.37,
+      "action": "把 MACD 用作回避过滤器: 该指标翻空时排除, 历史胜率67.7%(n=62)",
+      "confidence": "medium"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "KDJ(RSV)",
+      "bear_win_rate": 73.6,
+      "bear_n": 72,
+      "ci_lo": 62.42,
+      "action": "把 KDJ(RSV) 用作回避过滤器: 该指标翻空时排除, 历史胜率73.6%(n=72)",
+      "confidence": "high"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "Donchian20",
+      "bear_win_rate": 67.8,
+      "bear_n": 90,
+      "ci_lo": 57.57,
+      "action": "把 Donchian20 用作回避过滤器: 该指标翻空时排除, 历史胜率67.8%(n=90)",
+      "confidence": "medium"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "HullMA",
+      "bear_win_rate": 77.0,
+      "bear_n": 243,
+      "ci_lo": 71.26,
+      "action": "把 HullMA 用作回避过滤器: 该指标翻空时排除, 历史胜率77.0%(n=243)",
+      "confidence": "high"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "ConnorsRSI",
+      "bear_win_rate": 63.2,
+      "bear_n": 152,
+      "ci_lo": 55.25,
+      "action": "把 ConnorsRSI 用作回避过滤器: 该指标翻空时排除, 历史胜率63.2%(n=152)",
+      "confidence": "medium"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "A/D Line",
+      "bear_win_rate": 74.8,
+      "bear_n": 131,
+      "ci_lo": 66.74,
+      "action": "把 A/D Line 用作回避过滤器: 该指标翻空时排除, 历史胜率74.8%(n=131)",
+      "confidence": "high"
+    },
+    {
+      "type": "indicator_short_edge",
+      "name": "Pivot",
+      "bear_win_rate": 72.8,
+      "bear_n": 235,
+      "ci_lo": 66.74,
+      "action": "把 Pivot 用作回避过滤器: 该指标翻空时排除, 历史胜率72.8%(n=235)",
+      "confidence": "high"
     },
     {
       "type": "dim_edge",
@@ -37,7 +109,7 @@
       "confidence": "medium"
     }
   ],
-  "summary": "发现 4 个统计显著优势, 见清单。",
+  "summary": "发现 12 个统计显著优势, 见清单。",
   "meta": {
     "min_n": 30,
     "min_ci": 50.0,

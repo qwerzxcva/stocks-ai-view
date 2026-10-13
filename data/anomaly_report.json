@@ -1,13 +1,21 @@
 {
-  "ts": "2026-10-14T02:56:48+08:00",
+  "ts": "2026-10-14T05:23:08+08:00",
   "engine": "anomaly_detector v1 (时序/分布异常)",
-  "kline_coverage": 3997,
-  "n_issues": 0,
+  "kline_coverage": 1677,
+  "n_issues": 1,
   "by_severity": {
-    "critical": 0,
+    "critical": 1,
     "warning": 0
   },
-  "issues": [],
+  "issues": [
+    {
+      "type": "coverage_drop",
+      "prev": 3997,
+      "now": 1677,
+      "severity": "critical",
+      "msg": "K线覆盖 3997 → 1677 (-58%), 数据源可能出问题"
+    }
+  ],
   "checks": [
     "数据断更",
     "K线覆盖率下跌",
