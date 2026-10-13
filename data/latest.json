@@ -3736,5 +3736,123 @@
     "algo": "tsp-signal-v3",
     "zero_cred": true,
     "ref": "shy3130/tick-stock-panel"
+  },
+  "stale": {
+    "is_stale": false,
+    "age_hours": 0.0,
+    "threshold_hours": 2,
+    "note": "本文件为盘中旧快照, 收盘后未刷新; 页面应优先读 market_now.json (最新) 并显示数据时间",
+    "checked_at": "2026-10-13T21:03:18+08:00"
+  },
+  "provenance": {
+    "stamped_at": "2026-10-13T21:03:20+08:00",
+    "stamped_by": "data_audit.py",
+    "fields": {
+      "ts": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "date": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "market": {
+        "source": "eastmoney_push2ex + push2his",
+        "confidence": "high",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "phase": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "themes": {
+        "source": "local_cluster + ths_strong",
+        "confidence": "medium",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "mainlines": {
+        "source": "eastmoney_clist_degraded_to_theme_cluster",
+        "confidence": "low",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "fund_rank": {
+        "source": "eastmoney_fund_rank_html",
+        "confidence": "medium",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "ladder": {
+        "source": "eastmoney_zt_pool_lianban",
+        "confidence": "high",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "limit_up_pool": {
+        "source": "eastmoney_push2ex_ztpool",
+        "confidence": "high",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "limit_down_pool": {
+        "source": "eastmoney_push2ex_dtpool",
+        "confidence": "high",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "picks": {
+        "source": "tsp_v4_multi_pool",
+        "confidence": "medium",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "news_recent": {
+        "source": "sina_7x24 + remote_news_fallback",
+        "confidence": "medium",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "margin": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "index_kline": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "ths_strong": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "westock": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "lhb": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "blocktrade": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "commentary": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "meta": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      },
+      "stale": {
+        "source": "unknown",
+        "confidence": "unknown",
+        "snapshot_ts": "2026-10-13T20:53:14.630417+08:00"
+      }
+    }
   }
 }

@@ -34,13 +34,18 @@
   }
 
   // ─── 数据获取 ───────────────────────────────────────────────
-  function fetchKline(code, n) {
+  // 周期: day/week/month/year/year → 腾讯 fqkline 参数
+  function fetchKline(code, n, period) {
     var p = prefixed(code);
+    var klt = period || 'day';
+    var cnt = n || 60;
+    if (klt !== 'day') cnt = Math.min(cnt, 200);
     return jget('https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param='
-                + p + ',day,,,' + (n || 60) + ',qfq')
+                + p + ',' + klt + ',,' + (klt === 'day' ? ',' : ',,') + cnt + ',qfq')
       .then(function (d) {
         var node = (d && d.data && d.data[p]) || {};
-        var arr = node.qfqday || node.day || [];
+        var key = klt === 'day' ? 'qfqday' : 'qfq' + klt;
+        var arr = node[key] || node.qfqday || node.day || [];
         return arr.map(function (r) {
           return { date: r[0], open: +r[1], close: +r[2], high: +r[3], low: +r[4], vol: +r[5] };
         });
@@ -206,17 +211,22 @@
     return v.toFixed(0);
   }
 
+  var PERIODS = [{ k: 'day', label: '日K' }, { k: 'week', label: '周K' },
+                 { k: 'month', label: '月K' }, { k: 'year', label: '年K' }];
+  var curPeriod = 'day';
+
   // ─── 主渲染 ─────────────────────────────────────────────────
   function render(code) {
     var det = document.getElementById('symDetail');
     if (!det) return;
     det.style.display = 'block';
+    curPeriod = 'day';
     det.innerHTML = '<b style="font-size:13px">' + code + '</b> ' +
       '<span onclick="document.getElementById(\'symDetail\').style.display=\'none\'" style="float:right;cursor:pointer;color:var(--tx3)">✕</span>' +
       '<br><span class="fl">加载中… (腾讯K线 + 东财资金流)</span>';
 
     Promise.all([
-      fetchQuote(code), fetchKline(code, 60), fetchFundFlow(code, 30), fetchMinute(code)
+      fetchQuote(code), fetchKline(code, 60, curPeriod), fetchFundFlow(code, 30), fetchMinute(code)
     ]).then(function (res) {
       var q = res[0], bars = res[1], flows = res[2], mins = res[3];
       var h = '';
@@ -230,19 +240,37 @@
         h += '<span class="fl" style="font-size:10px">换手' + q.turnover.toFixed(2) + '% ' +
           'PE' + (q.pe > 0 ? q.pe.toFixed(1) : '亏') + ' ' +
           '市值' + (q.mktcap / 1e8).toFixed(0) + '亿 PB' + (q.pb > 0 ? q.pb.toFixed(1) : '—') + '</span><br>';
-        h += '<span class="fl" style="font-size:9px">数据源: 腾讯 qt.gtimg.cn 实时 · 东财资金流</span><hr style="border-color:var(--border);margin:6px 0">';
+        h += '<span class="fl" style="font-size:9px">数据源: 腾讯 qt.gtimg.cn 实时 · 东财资金流</span><hr style="border:0;border-top:1px solid var(--border);margin:6px 0">';
       }
       // 分时
       h += '<div class="fl" style="font-size:9px;margin-bottom:2px">分时 (1分钟, ' + (mins ? mins.length : 0) + '点)</div>';
       h += renderMinuteChart(mins);
-      // K线
-      h += '<div class="fl" style="font-size:9px;margin:6px 0 2px">日K (前复权, ' + (bars ? bars.length : 0) + '日) · 数据源: 腾讯 fqkline</div>';
-      h += renderKlineChart(bars);
+      // K线 + 周期切换
+      h += '<div style="display:flex;align-items:center;gap:4px;margin:6px 0 2px">' +
+           '<span class="fl" style="font-size:9px">K线 (前复权, ' + (bars ? bars.length : 0) + '根)</span>';
+      PERIODS.forEach(function (p) {
+        var on = p.k === curPeriod;
+        h += '<button data-klt="' + p.k + '" style="font-size:9px;padding:1px 6px;border-radius:8px;cursor:pointer;' +
+             'border:1px solid ' + (on ? 'var(--accent)' : 'var(--border)') + ';' +
+             'background:' + (on ? 'rgba(137,87,229,.2)' : 'transparent') + ';' +
+             'color:' + (on ? 'var(--accent)' : 'var(--tx3)') + ';font-weight:700">' + p.label + '</button>';
+      });
+      h += '</div>';
+      h += '<div id="klineChartBox">' + renderKlineChart(bars) + '</div>';
       // 资金流
       h += '<div class="fl" style="font-size:9px;margin:6px 0 2px">主力资金流 (近' + (flows ? flows.length : 0) + '日, 净额) · 数据源: 东财 push2his</div>';
-      h += renderFundChart(flows);
-      // 资金流明细表
+      h += '<div id="flowChartBox">' + renderFundChart(flows) + '</div>';
+      // 净流入/净流出汇总
       if (flows && flows.length) {
+        var inflow = flows.filter(function (f) { return f.main_net > 0; })
+                          .reduce(function (s, f) { return s + f.main_net; }, 0);
+        var outflow = flows.filter(function (f) { return f.main_net < 0; })
+                           .reduce(function (s, f) { return s + f.main_net; }, 0);
+        h += '<div style="display:flex;gap:10px;font-size:10px;margin:4px 0">' +
+             '<span>主力净流入 <b class="up">' + fmtYi(inflow) + '</b></span>' +
+             '<span>主力净流出 <b class="dn">' + fmtYi(outflow) + '</b></span>' +
+             '<span>净额 <b class="' + (inflow + outflow >= 0 ? 'up' : 'dn') + '">' + fmtYi(inflow + outflow) + '</b></span></div>';
+        // 资金流明细表
         h += '<table class="pool-table" style="margin-top:6px"><thead><tr><th>日期</th><th>主力净额</th><th>占比%</th><th>超大单</th><th>大单</th><th>中单</th><th>小单</th><th>收盘</th></tr></thead><tbody>';
         flows.slice(0, 12).forEach(function (f) {
           var c = f.main_net >= 0 ? 'up' : 'dn';
@@ -261,6 +289,26 @@
         h += '<div class="fl" style="font-size:9px;margin-top:4px">近5日主力净额: <b class="' + (sum5 >= 0 ? 'up' : 'dn') + '">' + fmtYi(sum5) + '</b> · 仅供研究参考, 不构成投资建议</div>';
       }
       det.innerHTML = h;
+      // 周期切换按钮事件
+      Array.prototype.forEach.call(det.querySelectorAll('button[data-klt]'), function (btn) {
+        btn.onclick = function () {
+          curPeriod = btn.dataset.klt;
+          var box = document.getElementById('klineChartBox');
+          if (box) box.innerHTML = '<span class="fl" style="font-size:9px">加载中…</span>';
+          fetchKline(code, 60, curPeriod).then(function (nb) {
+            if (box) box.innerHTML = renderKlineChart(nb);
+            var lab = det.querySelector('#klineCount');
+            if (lab) lab.textContent = nb.length + '根';
+            // 刷新按钮态
+            Array.prototype.forEach.call(det.querySelectorAll('button[data-klt]'), function (b2) {
+              var on2 = b2.dataset.klt === curPeriod;
+              b2.style.border = '1px solid ' + (on2 ? 'var(--accent)' : 'var(--border)');
+              b2.style.background = on2 ? 'rgba(137,87,229,.2)' : 'transparent';
+              b2.style.color = on2 ? 'var(--accent)' : 'var(--tx3)';
+            });
+          });
+        };
+      });
     });
   }
 
