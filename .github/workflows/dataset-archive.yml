@@ -78,7 +78,9 @@ jobs:
             "data/kline_sim.json=${D}_kline_sim.json" \
             "data/self_reflect.json=${D}_self_reflect.json"
           archive_repo "jiegengxiangjianxue/stocks-kline-daily" "meta" \
-            "data/sources_registry.json=${D}_registry.json"
+            "data/sources_registry.json=${D}_registry.json" \
+            "data/walkforward.json=${D}_walkforward.json" \
+            "data/engine_weights.json=${D}_engine_weights.json"
 
       - name: Summary
         run: |
