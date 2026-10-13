@@ -1,0 +1,103 @@
+{
+  "ts": "2026-10-14T05:51:31+08:00",
+  "engine": "sample_balancer v1 (EB shrinkage)",
+  "method": "empirical-Bayes shrinkage, k=50, prior flows top-down",
+  "k": 50,
+  "min_sufficient": 100,
+  "global_prior": {
+    "zt_next_rate": 0.32,
+    "zhaban_next_rate": 0.25,
+    "ret_next_avg": 0.024
+  },
+  "by_lianban": {
+    "首板": {
+      "lianban": 1,
+      "n_samples": 20081,
+      "raw_zt_next_rate": 0.2,
+      "bal_zt_next_rate": 0.2,
+      "raw_zhaban_next_rate": 0.2,
+      "bal_zhaban_next_rate": 0.2,
+      "raw_ret_next_avg": 0.02,
+      "bal_ret_next_avg": 0.02,
+      "confidence": 0.998,
+      "sufficient": true,
+      "prior_used": 0.32
+    },
+    "2连板": {
+      "lianban": 2,
+      "n_samples": 40,
+      "raw_zt_next_rate": 40.0,
+      "bal_zt_next_rate": 17.89,
+      "raw_zhaban_next_rate": 10.0,
+      "bal_zhaban_next_rate": 4.56,
+      "raw_ret_next_avg": 1.51,
+      "bal_ret_next_avg": 0.682,
+      "confidence": 0.444,
+      "sufficient": false,
+      "prior_used": 0.2
+    },
+    "3连板": {
+      "lianban": 3,
+      "n_samples": 16,
+      "raw_zt_next_rate": 25.0,
+      "bal_zt_next_rate": 19.61,
+      "raw_zhaban_next_rate": 31.25,
+      "bal_zhaban_next_rate": 11.03,
+      "raw_ret_next_avg": -0.09,
+      "bal_ret_next_avg": 0.495,
+      "confidence": 0.242,
+      "sufficient": false,
+      "prior_used": 17.89
+    },
+    "4连板": {
+      "lianban": 4,
+      "n_samples": 4,
+      "raw_zt_next_rate": 50.0,
+      "bal_zt_next_rate": 21.86,
+      "raw_zhaban_next_rate": 25.0,
+      "bal_zhaban_next_rate": 12.06,
+      "raw_ret_next_avg": 3.12,
+      "bal_ret_next_avg": 0.689,
+      "confidence": 0.074,
+      "sufficient": false,
+      "prior_used": 19.61
+    },
+    "5连板": {
+      "lianban": 5,
+      "n_samples": 2,
+      "raw_zt_next_rate": 100.0,
+      "bal_zt_next_rate": 24.87,
+      "raw_zhaban_next_rate": 0.0,
+      "bal_zhaban_next_rate": 11.6,
+      "raw_ret_next_avg": 10.02,
+      "bal_ret_next_avg": 1.048,
+      "confidence": 0.038,
+      "sufficient": false,
+      "prior_used": 21.86
+    },
+    "6连板": {
+      "lianban": 6,
+      "n_samples": 2,
+      "raw_zt_next_rate": 0.0,
+      "bal_zt_next_rate": 23.91,
+      "raw_zhaban_next_rate": 50.0,
+      "bal_zhaban_next_rate": 13.08,
+      "raw_ret_next_avg": -3.55,
+      "bal_ret_next_avg": 0.871,
+      "confidence": 0.038,
+      "sufficient": false,
+      "prior_used": 24.87
+    }
+  },
+  "sample_imbalance": {
+    "total": 20145,
+    "top_tier_share_pct": 99.7,
+    "insufficient_tiers": [
+      "2连板",
+      "3连板",
+      "4连板",
+      "5连板",
+      "6连板"
+    ]
+  }
+}
