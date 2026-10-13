@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>A股 AI 量化工作台 · TSP v4</title>
+<title>Market Signal Workbench</title>
 <!-- 预连接: 腾讯行情域名提前完成 DNS+TCP+TLS, 首屏实时数据更快 -->
 <link rel="preconnect" href="https://qt.gtimg.cn">
 <link rel="dns-prefetch" href="https://qt.gtimg.cn">
@@ -155,7 +155,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
 </head>
 <body style="display:flex;flex-direction:column">
 <div class="hdr">
-  <div class="logo">A股 AI 量化工作台 <span class="tsp">TSP v4</span></div>
+  <div class="logo">Market Signal Workbench <span class="tsp">v4</span></div>
   <span class="b" id="algoBadge">tsp-signal-v4</span>
   <span class="b stage" id="stageBadge" style="display:none"></span>
   <span class="upd" id="updTime">Loading...</span>
@@ -165,7 +165,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <input id="symSearch" placeholder="Search stock / ETF" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
     <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
   </div>
-<span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
 <div id="mktBreadth" style="display:none;margin:6px 0 10px;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;font-size:11px">
