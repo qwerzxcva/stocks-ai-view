@@ -123,6 +123,7 @@ jobs:
       - name: Audit collected data
         run: |
           python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
+          python3 scripts/numeric_validator.py --out data/validation_report.json || true
 
       # ── 8. 触发 Space 跑引擎链 ────────────────────────────────
       # Space 的 auto_sync_loop 每 30 分钟会自己拉取; 这里额外 curl /health
@@ -169,7 +170,7 @@ jobs:
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json"
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json"
           git fetch origin main
           git reset --soft origin/main
           git add -A $FILES

@@ -7,7 +7,9 @@
 
 **瓶颈不在数据量，而在三重截断的乘积**：`--days 12`（只回溯 12 个交易日）× `--limit 300`（每天只评成交额 Top 300）× `--top-per-day 50`（每天只存前 50 只），把 117.9 万个可评分 (股票, 日期) 组合压成了 600 条可验证记录——**数据利用率 0.05%**。
 
-三重截断里最硬的闸门是 `--top-per-day`：把 `--limit` 从 300 拉到全市场，对 reflect 样本量的贡献是 **0**。
+三重截断里最硬的闸门是 `--top-per-day`：把 `--limit` 从 300 拉到全市场，在 `--top-per-day` 仍为默认 50 时对 reflect 样本量的贡献是 **0**。
+
+> 本报告撰写期间，另一会话已在跑全量回溯（截至测量时 173 个快照 / 16,700 条记录 / 10 日 n=13,857），瓶颈正在被解除。下文同时保留原始基线与当前实测两套数字。
 
 ---
 
@@ -32,14 +34,14 @@
 `backfill_predictions.py` 的样本生成公式：
 
 ```
-每天产出 = min(--limit, 当日可评分股票数)   → 再被 results[:50] 砍到 50
-总样本   = Σ_天数 min(--limit, 可评分数)    → 再被 50/天 砍一刀
+每天产出 = min(--limit, 当日可评分股票数)   → 再被 --top-per-day 砍到 50
+总样本   = Σ_天数 min(--limit, 可评分数)    → 再被 top50/天 砍一刀
 ```
 
 | 层级 | 参数/代码位置 | 当前值 | 全量值 | 样本影响 |
 |---|---|---|---|---|
 | 回溯天数 | `--days`，`backfill_predictions.py:37` | 12 | 668（或 813） | 12 → 668：**×55.7** |
-| 每日评分股票数 | `--limit`，`backfill_predictions.py:37-38` | 300 | 0（全部 3990） | 300 → 3990：**×13.3** |
+| 每日评分股票数 | `--limit`，`backfill_predictions.py:38-39` | 300 | 0（全部 3990） | 300 → 3990：**×13.3** |
 | 每日落盘条数 | `--top-per-day`，`backfill_predictions.py:40-41`（默认 50） | 50 | 可配 | 不变（默认值），**这是最硬的天花板** |
 | reflect 读取 | `d.get("top", [])`，`reflect_engine.py:206` | 50/天 | 50/天 | 不变 |
 
@@ -49,22 +51,26 @@ reflect 对每个 pred_file 取 `top` 全部条目（[reflect_engine.py:204-214]
 
 | 配置 | pred 文件数 | 1 日 n | 3 日 n | 5 日 n | 10 日 n |
 |---|---|---|---|---|---|
-| 当前（12 天 × limit 300 × top50，字段已修） | 12 | 521（实测） | 421（实测） | 318（实测） | 58（实测） |
+| 原始基线（12 天 × limit 300 × top50，字段已修） | 12 | 521（实测） | 421（实测） | 318（实测） | 58（实测） |
+| **当前实测**（173 文件，字段已修，回溯进行中） | 173 | **14,318** | **14,218** | **14,116** | **13,857** |
 | `--days 668 --limit 0 --top-per-day 50` | 668 | ~33,400 | ~33,400 | ~33,300 | ~32,900 |
 | `--days 813 --limit 0 --top-per-day 50` | 813 | ~40,650 | ~40,650 | ~40,550 | ~40,150 |
 | `--days 668 --limit 0 --top-per-day 200` | 668 | ~133,600 | ~133,600 | ~133,300 | ~131,600 |
 | `--days 813 --limit 0 --top-per-day 200` | 813 | ~162,600 | ~162,600 | ~162,400 | ~160,600 |
 
-> 10 日样本比 1 日少的量 = 末尾 10 天 × 50，因为最后 10 个交易日没有 10 日未来数据（`verify_prediction` 里 `j >= len(bars)` 返回 None，[reflect_engine.py:188-189](scripts/reflect_engine.py#L188)）。
+> 上表「当前实测」一行是本报告撰写期间另一会话正在跑的全量回溯（2023-11 ~ 2024-06 段，`--top-per-day 100`）的中间态，文件数仍在增长。10 日持有期样本已达 13,857（Wilson CI 宽约 ±1.6pp），相比原始 58 个样本（CI 宽 ±11.7pp）已是质变。
+> 10 日样本比 1 日少的量 = 末尾 10 天 × 每日落盘数，因为最后 10 个交易日没有 10 日未来数据（`verify_prediction` 里 `j >= len(bars)` 返回 None，[reflect_engine.py:188-189](scripts/reflect_engine.py#L188)）。
 > 3 日/5 日比 1 日略少，同因——不同股票的 K线末尾日期不完全齐平，短股票提前耗尽未来数据。
 
-### 2.4 当前配置的实际浪费率
+### 2.4 各配置的实际浪费率
 
 | 口径 | 可评分组合 | 实际落盘 | 浪费 |
 |---|---|---|---|
-| 当前 12 天 | 47,880 | 600 | **98.7%** |
+| 原始基线 12 天 | 47,880 | 600 | **98.7%** |
 | 全量 813 天（`--top-per-day 50`） | 1,178,801 | 40,650 | **96.6%** |
+| 全量 813 天（`--top-per-day 100`，当前回溯所用） | 1,178,801 | 81,300 | **93.1%** |
 | 全量 813 天（`--top-per-day 200`） | 1,178,801 | 162,600 | **86.2%** |
+| 全量 813 天（不截断，`--limit 0 --top-per-day 0`） | 1,178,801 | 1,178,801 | 0% |
 
 ---
 
@@ -106,7 +112,7 @@ reflect 对每个 pred_file 取 `top` 全部条目（[reflect_engine.py:204-214]
 
 1. **按日期切片**：`--days` 不支持起点偏移，需加 `--start-date`；或用 shell 循环 `for d in $(dates); do python3 backfill_predictions.py --start-date $d --days 1 ...`。
 2. **按股票切片**：`--limit` 只取 Top N，需加 `--offset` 或 `--shard i/n` 做股票分片，多进程并行。
-3. **一次性写入 SQLite/DuckDB 而非 668 个 JSON**：现在每个 JSON 84 KB、含全部 17 指标 votes，668 个文件 = 56 MB，reflect 每次全量 glob 读取（`reflect_engine.py:main` 的 `pred_files = sorted(glob.glob(...))`）也要重读全部。
+3. **一次性写入 SQLite/DuckDB 而非 668 个 JSON**：现在每份快照 84~154 KB（top50 时 84 KB，top200 时约 154 KB），668 个文件 = 56~100 MB，reflect 每次全量 glob 读取（`reflect_engine.py:main` 的 `pred_files = sorted(glob.glob(...))`）也要重读全部。
 
 推荐做法：**加 `--start-date` + 每天跑一次 CI**（或一次性分批跑 668 天，每批 30 天约 20 分钟），不要在一次 workflow 里跑完。
 
@@ -136,7 +142,7 @@ reflect 对每个 pred_file 取 `top` 全部条目（[reflect_engine.py:204-214]
 
 `backfill_predictions.py:76` 用 `bars = [b for b in rows if b[0] <= asof]` 截断，`score_stock` 只接收这批 bars。方向上是干净的。
 
-但有一个**独立的字段错位缺陷**（见第 6 节），它不构成前视偏差，却让所有回溯样本的指标口径与实时 `engine_v5.py` 不一致。
+K线列序问题曾是独立缺陷（曾让回溯指标口径与实时引擎不一致），已在 commit `1976a56` 修复，详见 §6。当前 HEAD 无前视偏差。
 
 ### 5.2 指标预热窗口：早期样本会偏斜，但不被过滤
 
@@ -170,7 +176,7 @@ reflect 对每个 pred_file 取 `top` 全部条目（[reflect_engine.py:204-214]
 
 ### 5.3 另一个偏斜来源：`--limit` 按「最近一根 bar 的成交额」静态排序
 
-`backfill_predictions.py:66` 的 `ranked` 是**一次性**按全历史最后一根 bar 的 `vol*close` 排的，对所有 asof 用同一个名单。这带来两个问题：
+`backfill_predictions.py:67` 的 `ranked` 是**一次性**按全历史最后一根 bar 的 `vol*close` 排的，对所有 asof 用同一个名单。这带来两个问题：
 
 1. 对早期 asof，这个名单里的股票当时可能还没上市或成交额极低（`bars < 30` 被 skip，见 `backfill_predictions.py:76-78`）；
 2. 名单偏向大市值蓝筹，**涨停小票几乎永远进不了 limit 300**——这正好解释了为什么 4 万涨停样本对验证毫无贡献。实测当前 12 份快照的 top50 中 `InZTPool` 命中数 = **0/50**（`engine_v5.py:332-345` 的涨停池投票从未触发，因为 `source_info` 在 backfill 里根本没传，[backfill_predictions.py:86](scripts/backfill_predictions.py#L86) 调 `score_stock` 时未传 `source_info`）。
@@ -281,29 +287,44 @@ return float(b[4]) * float(b[5])
 
 | 改动 | 1 日 n | 10 日 n |
 |---|---|---|
-| 现状（字段已修，12 天 × top50） | 521 | 58 |
-| P1 top200 + P2/P3（668 天全量） | ~133,600 | ~131,600 |
+| 原始基线（字段已修，12 天 × top50） | 521 | 58 |
+| 进行中的全量回溯（173 文件实测） | 14,318 | 13,857 |
+| `--top-per-day 200` 全量 668 天 | ~133,600 | ~131,600 |
 | 再加 P4（min-bars 120，约 -25%） | ~100,000 | ~98,000 |
 
-**约 200 倍提升**，且是在修正后的指标口径上。届时 Wilson CI 宽度从 ±4.3pp 收到 ±0.9pp 以内，`evidence: insufficient`（样本<30）的指标会从大部分变成极少数。
+**相比原始基线约 250 倍提升**，且是在修正后的指标口径上。Wilson CI 宽度从 ±11.2pp（10 日 n=58，CI[17.75, 40.2]）收到 ±0.8pp（10 日 n≈13.8 万，CI[35.3, 36.9]），`evidence: insufficient`（样本<30）的指标会从大部分变成极少数。
+
+注意：胜率本身并没有随样本量变「好看」——全量后 1 日看多胜率 42.7%、10 日 36.1%，仍低于 50%。样本量的价值在于**把这个结论的可信度从「噪声」提到「可决策」**，而不是把胜率拉高。
 
 ---
 
-## 附：本机实测命令
+## 附：本机实测命令与结果
 
 ```bash
-# 小规模计时（含 K线加载）
+# 1. 小规模计时（含 K线加载）
 python3 scripts/backfill_predictions.py --days 3 --limit 50 --out-dir /tmp/bf_bench
 # → 2.87 s，3 天 × 50 只
 
-# score_stock 复杂度曲线（sz000610, 803 根）
+# 2. score_stock 复杂度曲线（sz000610, 803 根）
 # bars=30→0.41ms  60→1.08  120→2.63  200→5.21  400→11.93  668→19.85  803→25.81
+# 随机 300 只全 bars: 7.78 ms/只 → 4000 只/天 ≈ 31 s
 
-# 当前 reflect 基线
-python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out /tmp/reflect_check.json
-# → n_records=600, 1d n=514 (43.8%), 3d n=414, 5d n=299, 10d n=59 (22.0%, -9.98%)
+# 3. 原始 reflect 基线（12 份快照, 字段已修）
+python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out /tmp/r.json
+# → n_records=600, 1d n=521 (40.3%), 3d n=421 (32.0%), 5d n=318 (27.1%), 10d n=58 (27.6%)
 
-# kline_sim 基线
-python3 scripts/kline_sim.py --source predictions --out /tmp/kline_sim_check.json --days 1,3,5,10 --slip-pct 0.03
-# → 信号=600 可模拟=514, 1日 n=462, 10日 n=35
+# 4. 当前 reflect（173 份快照, 全量回溯进行中）
+python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out /tmp/r.json
+# → n_records=16700, 1d n=14318 (42.7%) CI[41.86,43.48], 3d n=14218 (39.9%),
+#   5d n=14116 (38.4%), 10d n=13857 (36.1%) CI[35.31,36.91]
+
+# 5. kline_sim 基线（12 份快照）
+python3 scripts/kline_sim.py --source predictions --out /tmp/ks.json --days 1,3,5,10 --slip-pct 0.03
+# → 信号=600 可模拟=521, 1日 n=470 (33.2%), 10日 n=27 (29.6%)
+# 注意: 快照数上百后 kline_sim 单次要跑数分钟（它按 signal_date 逐日重算持仓曲线），
+# 已实测超 120s 超时；样本量大后建议只对 reflect 做验证，kline_sim 抽样跑。
 ```
+
+## 附：一句话回答「为什么 600 个信号」
+
+因为 `backfill_predictions.py` 默认只回溯 12 天、每天只评成交额 Top 300 只、且只把前 50 名写进快照，而 `reflect_engine.py` 只读快照里的 `top`。三层限制相乘：12 × 300 → 12 × 50 = 600。底层 207 万行 K线里那 117.9 万个可评分组合，有 98.7% 从未进入验证流程。

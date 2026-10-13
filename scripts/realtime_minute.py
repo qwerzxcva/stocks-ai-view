@@ -127,7 +127,12 @@ def fetch_market_snapshot(max_pages=60):
         for f in ("chg_pct", "amplitude", "turnover_rate", "pe_ttm",
                   "volume_ratio", "main_net_ratio"):
             if isinstance(r.get(f), (int, float)):
-                r[f] = round(r[f] / 100, 2)
+                v = round(r[f] / 100, 2)
+                # 涨跌幅/振幅兜底: A股日涨跌停 20cm(科创/创业)/30cm(北交所)
+                # 超 35% 必然是脏数据 (首日新股除外, 但占比极小, 宁可截断)
+                if f in ("chg_pct", "amplitude") and abs(v) > 35:
+                    v = max(-35.0, min(35.0, v))
+                r[f] = v
         rows.append(r)
     return total, rows
 

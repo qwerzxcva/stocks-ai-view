@@ -1,38 +1,33 @@
-// ══════════════════════════════════════════════════════════════════
-// data_origin_patch.js — 数据源优先级: GitHub 优先, 本地兜底
-// 2026-10-13 用户要求: 本地不存大数据, 网站实时查 GitHub/gitcode 数据库
+// data_origin.js — Cloud-first data routing for the dashboard.
 //
-// 原逻辑: 本地 fetch → 失败走 GitHub
-// 新逻辑: GitHub fetch → 失败走本地 (404/CORS 时兜底)
-// 理由:
-//   1. 本地 data/ 曾 91MB (bulk 复权 81MB), 不需要随站点部署
-//   2. CI 每 10 分钟推 GitHub, 比本地可能几天没跑的数据更新
-//   3. raw.githubusercontent.com CORS 放开 (*), 浏览器可直连
-// ══════════════════════════════════════════════════════════════════
+// The local data/ directory was removed (2026-10-14): the site is deployed
+// from the cloud only. Every fetch goes to the cloud warehouse first and
+// falls back to the GitCode mirror when GitHub raw is unreachable.
+//
+// Realtime quote providers (qt.gtimg.cn / push2his.eastmoney.com) are called
+// directly by stock-detail.js; this module only handles warehouse JSON.
 (function () {
-  if (typeof fetchJSON !== 'function') {
-    console.warn('[data_origin] fetchJSON 未定义, 补丁未生效');
+  'use strict';
+
+  if (typeof window.fetchJSON !== 'function') {
+    console.warn('[data_origin] fetchJSON undefined, patch inactive');
     return;
   }
-  var _orig = fetchJSON;
 
-  // GitHub raw 主源 + gitcode 镜像 (raw.gitcode.com 作为第二源)
-  var GH_RAW = 'https://raw.githubusercontent.com/qwerzxcva/stocks-ai-view/main/';
-  var GC_RAW = 'https://raw.gitcode.com/qwerzxcva/stocks-ai-view/raw/main/';
+  var GH = 'https://raw.githubusercontent.com/';
+  var GC = 'https://gitcode.com/';
 
-  // 大文件 (bulk 复权/全历史) 只从远端拿, 本地不存
-  var REMOTE_ONLY = /(adjusted\/bulk|index_full|all_sources|search_index)\.json$/;
+  // Cloud warehouse repos (see db-client.js for the shard routing).
+  var MARKET_GH = GH + 'jiegengxiangjianxue1/db-market/main/';
+  var MARKET_GC = GC + 'dufuwuxin/stocks-db-market/raw/main/';
+  var AI_VIEW_GH = GH + 'qwerzxcva/stocks-ai-view/main/';
 
-  // 分钟级实时数据 (云服务器常驻采集, 优先级最高)
-  var MINUTE_LEVEL = /realtime_minute\.json$/;
+  // Legacy engine outputs that still live in the ai-view repo.
+  var AI_VIEW_ONLY = /^(latest|market_now|hot_impact|enrich|ai_picks|ai_pick_v4|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|valuation|multidim|decision|self_reflect|global_fx|news_digest|cycle|sector_pool|lowpool|index_kline|search_index|kline_sim|realtime_minute|tunnel)\.json$/;
 
-  // 热数据 (盘中 30 分钟级) 与温数据 (日级) 分开缓存策略
-  var HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now|realtime)\.json$/;
-
-  function _fetchRemote(url, timeoutMs) {
+  function remote(url, timeoutMs) {
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-    var t = timeoutMs || 12000;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, t) : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, timeoutMs || 12000) : null;
     return fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) {
         if (timer) clearTimeout(timer);
@@ -45,44 +40,57 @@
       });
   }
 
-  function _remoteFirst(p) {
-    // 1) GitHub raw (主源)
-    return _fetchRemote(GH_RAW + p)
+  function tag(text, title) {
+    if (window.dataOrigin === 'github') return;
+    window.dataOrigin = 'github';
+    var el = document.getElementById('dataSourceTag');
+    if (el) {
+      el.textContent = text;
+      el.title = title;
+      el.style.display = 'inline-block';
+    }
+  }
+
+  // Resolve a legacy data/<file>.json path to its cloud origin.
+  function resolve(p) {
+    if (AI_VIEW_ONLY.test(p.replace(/^data\//, ''))) {
+      return [AI_VIEW_GH + p, null];
+    }
+    if (p.indexOf('data/master/') === 0 || p.indexOf('data/market/') === 0 ||
+      p.indexOf('data/sector/') === 0 || p.indexOf('data/overseas/') === 0) {
+      return [MARKET_GH + p.replace(/^data\//, ''), MARKET_GC + p.replace(/^data\//, '')];
+    }
+    // per-stock paths: data/stocks/<shard>/<code>/...
+    var m = p.match(/^data\/stocks\/(\d\d)\//);
+    if (m && window.DB) {
+      var shard = m[1];
+      var base = window.DB.repos.stocksA;
+      if (window.DB.repos.stocksB.indexOf(shard) >= 0) base = window.DB.repos.stocksB;
+      else if (shard !== '00' && shard !== '30' && shard !== '60') base = window.DB.repos.stocksC;
+      return [base + p.replace(/^data\/stocks\//, ''), window.DB.repos.stocksGC + p.replace(/^data\/stocks\//, '')];
+    }
+    return [AI_VIEW_GH + p, null];
+  }
+
+  window.fetchJSON = function (p) {
+    var r = resolve(p);
+    return remote(r[0])
       .then(function (j) {
-        if (window.dataOrigin !== 'github') {
-          window.dataOrigin = 'github';
-          var el = document.getElementById('dataSourceTag');
-          if (el) {
-            el.textContent = '⛓️ GitHub源';
-            el.title = '数据实时来自 GitHub 仓库 (CI 每 10 分钟更新)';
-            el.style.display = 'inline-block';
-          }
-        }
+        tag('CLOUD', 'Data served live from the GitHub warehouse');
         return j;
       })
       .catch(function () {
-        // 2) gitcode 镜像 (GitHub 不可达时)
-        return _fetchRemote(GC_RAW + p).catch(function () { return null; });
+        if (r[1]) return remote(r[1]).catch(function () { return null; });
+        return null;
       });
-  }
+  };
 
-  // 覆盖 fetchJSON: 远端优先, 本地兜底
-  window.fetchJSON = function (p) {
-    // 本地路径也要尝试 (作为兜底), 但优先级低于远端
-    return _remoteFirst(p).then(function (j) {
-      if (j) return j;
-      // 远端全失败 → 本地兜底 (REMOTE_ONLY 的文件本地没有, 直接 null)
-      if (REMOTE_ONLY.test(p)) return null;
-      return _orig(p);
+  window.fetchJSONMinute = function (p) {
+    var r = resolve(p);
+    return remote(r[0], 8000).catch(function () {
+      return r[1] ? remote(r[1], 8000) : null;
     });
   };
 
-  // 分钟级数据专用: 远端 + no-store, 失败不兜底本地 (避免读到几分钟前的旧值)
-  var _origMinute = window.fetchJSON;
-  window.fetchJSONMinute = function (p) {
-    return _fetchRemote(GH_RAW + p, 8000)
-      .catch(function () { return _fetchRemote(GC_RAW + p, 8000); });
-  };
-
-  console.log('[data_origin] 已切换为 GitHub 优先 / 本地兜底');
+  console.log('[data_origin] cloud-first routing active');
 })();

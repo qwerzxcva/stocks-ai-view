@@ -362,46 +362,15 @@ const UP='#f85149',DN='#3fb950',GR='#8b949e';
 //  3. 轮询带指数退避, 失败时不疯狂重试
 const _etagCache=new Map();
 const _jsonCache=new Map();
-// GitHub 仓库数据兜底: 本地取不到 (404/跨域/离线) 时直接读仓库里的 data/*
-// CI 每10分钟把最新数据推到 main, 所以 GitHub 上的数据滞后不超过 ~10min
-const GH_RAW='https://raw.githubusercontent.com/qwerzxcva/stocks-ai-view/main/';
-const _localFail=new Set();           // 本地已知失败的 key (会话内直接走 GitHub, 不再浪费请求)
-let dataOrigin='local';               // 'local' | 'github' — 页头指示器用
-function _ghFallback(p){
-  return fetch(GH_RAW+p,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('gh '+r.status);return r.json()})
-    .then(j=>{ if(dataOrigin!=='github'){dataOrigin='github';_showDataOrigin();} return j; })
-    .catch(()=>null);
-}
-function _showDataOrigin(){
-  const el=document.getElementById('dataSourceTag');
-  if(!el)return;
-  el.textContent=dataOrigin==='github'?'⛓️ GitHub源':'本地数据';
-  el.title=dataOrigin==='github'?'本地数据源不可达, 已切换到 GitHub 仓库数据 (CI 每10分钟更新)':'数据来自当前服务器';
-  el.style.display=dataOrigin==='github'?'inline-block':'none';
-}
+// Cloud-only: data_origin_patch.js overrides fetchJSON with cloud-first routing.
+// This inline definition is the fallback used before the patch loads.
+let dataOrigin='cloud';
+function _showDataOrigin(){}
 async function fetchJSON(p){try{
-  // 高频数据 (盘中30分钟更新) 不用 If-None-Match, 避免 ETag 304 命中时
-  // 拿到会话内的旧缓存; SW 也已把这些文件改为 network-first。
-  const HOT = /(hot_impact|latest|enrich|ai_picks|ai_pick_v4|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now|realtime_minute|valuation|multidim|decision|self_reflect|global_fx)\.json$/.test(p);
-  if(!_localFail.has(p)){
-    const hdr={};
-    const et=_etagCache.get(p);
-    if(et && !HOT)hdr['If-None-Match']=et;
-    const r=await fetch(p,{headers:hdr, cache: HOT ? 'no-store' : 'default'});
-    if(r.status===304){const c=_jsonCache.get(p); if(c)return c; _localFail.add(p);}
-    else if(r.ok){
-      const net=r.headers.get('etag');
-      if(net)_etagCache.set(p,net);
-      const j=await r.json();
-      _jsonCache.set(p,j);
-      return j;
-    } else _localFail.add(p);
-  }
-  // 本地失败/未命中 → GitHub 仓库兜底 (CORS 允许, raw.githubusercontent.com *)
-  const gh=await _ghFallback(p);
-  if(gh){_jsonCache.set(p,gh);return gh;}
-  return _jsonCache.get(p)||null;
-}catch(e){return _jsonCache.get(p)||null}}
+  const r=await fetch(p,{cache:'no-store'});
+  if(r.ok)return await r.json();
+  return null;
+}catch(e){return null}}
 // 并发加载多个数据源, 单个失败不影响其他
 async function fetchAll(paths){const rs=await Promise.allSettled(paths.map(p=>fetchJSON(p)));return rs.map(r=>r.status==='fulfilled'?r.value:null)}
 function fmt(n){return n==null?'—':Number(n).toFixed(2)}
@@ -481,7 +450,7 @@ function renderWinRate(ps){
 }
 async function renderCloud(){
   try{
-    const _lat = await fetch('data/latest.json?t='+Date.now()).then(r=>r.json()).catch(()=>null);
+    const _lat = await fetchJSON('data/latest.json');
     renderWinRate((_lat||{}).pick_stats||null);
     // 次日K线模拟: 读独立 data/kline_sim.json (针对 predictions 历史推荐信号的回测)
     const _ks = await fetchJSON('data/kline_sim.json'); const _ksEl=document.getElementById('klineSim');
@@ -506,7 +475,7 @@ async function renderCloud(){
     if(_gkEl){ _gkEl.style.display = (_gk||fxHtml)?'':'none';
       if(_gk&&_gk.symbols) _gkEl.innerHTML = '<b>🌍 全球K线动量</b> ' + Object.entries(_gk.symbols).map(([s,v])=>{const m=v.last&&v.last.chg_pct; const col=m==null?'':(m>=0?'class="up"':'class="dn"'); return `<span ${col} style="margin-right:6px">${s} ${m==null?'':(m>0?'+':'')+m+'%'}</span>`;}).join('');
       if(fxHtml) _gkEl.innerHTML += (_gkEl.innerHTML?'<br>':'')+fxHtml; }
-    const c = await fetch('data/cloud_analysis.json?t='+Date.now()).then(r=>r.json());
+    const c = await fetchJSON('data/cloud_analysis.json');
     const f = c.index_forecast||{}; const el=document.getElementById('cloudBox');
     if(!el) return;
     document.getElementById('cloudTs').textContent = (c.ts||'').replace('T',' ').slice(5,16) + ' · 统计外推·非投资建议';
@@ -1558,11 +1527,11 @@ document.addEventListener('click', e=>{
   inp.addEventListener('input', async ()=>{
     const q=inp.value.trim().toLowerCase();
     if(!q){box.style.display='none';return;}
-    if(!IDX){ try{IDX=await fetchJSON('data/search_index.json'); window._searchIdx=IDX;}catch(e){return;} }
+    if(!IDX){ try{IDX=await DB.search(); window._searchIdx=IDX;}catch(e){return;} }
     if(!IDX||typeof IDX!=='object'||!Object.keys(IDX).length){
-      // 本地+GitHub 都拿不到时不永久锁死, 允许下次输入重试 (GitHub 数据有滞后, 可能刚提交还未 sync)
+      // Cloud index unavailable: allow retry on next input rather than locking.
       IDX=null;
-      box.innerHTML='<div style="padding:6px 8px;color:var(--tx3)">索引加载中… (本地+GitHub 都失败)</div>';
+      box.innerHTML='<div style="padding:6px 8px;color:var(--tx3)">Loading index...</div>';
       box.style.display='block';
       return;
     }
@@ -1588,6 +1557,7 @@ document.addEventListener('click', e=>{
 })();
 </script>
 <script src="realtime.js" defer></script>
+<script src="db-client.js" defer></script>
 <script src="data_origin_patch.js"></script>
 <script src="stock-detail.js" defer></script>
 </body>

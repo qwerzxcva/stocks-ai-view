@@ -88,10 +88,13 @@ def fetch_pool(kind, date_str, retries=3):
             out = []
             for p in pool:
                 pval = float(p.get("p", 0) or 0)
+                # 东财价格单位是「厘」: 116050 → 116.05 元
+                # 阈值判定: 正常股价 <1000 元, 故 pval>1000 才是厘
+                price = pval / 1000.0 if pval > 1000 else pval
                 out.append({
                     "code": str(p.get("c", p.get("code", ""))),
                     "name": str(p.get("n", p.get("name", ""))),
-                    "price": round(pval / 1000, 2) if pval > 100 else pval,
+                    "price": round(price, 2),
                     "chg_pct": round(float(p.get("zdp", 0) or 0), 2),
                     "lianban": int(p.get("lbc", p.get("count", 1)) or 1),
                     "zt_time": str(p.get("fbt", "")),

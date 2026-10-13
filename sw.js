@@ -1,12 +1,12 @@
-// sw.js — stocks-ai-view Service Worker
-// 策略:
-//   - HTML / JS / CSS (应用外壳): cache-first + 后台更新 (首屏快)
-//   - data/*.json: network-first, 失败回退缓存 (数据新鲜优先)
-//     * 例外: index_kline.json / search_index.json 等大文件走 stale-while-revalidate
-//   - 跨域请求 (腾讯行情等): 不走 SW, 由 realtime.js 直连
-const CACHE = 'stocks-ai-view-v13';   // v13: 估值列 + HOT_JSON 补全 (ai_pick_v4/valuation/multidim/decision 等)
-const SHELL = ['./', './index.html', './realtime.js', './sw.js',
-               './data/latest.json'];
+// sw.js — Service worker for the cloud-deployed dashboard.
+//
+// The local data/ directory no longer exists, so there is nothing to cache
+// for data: everything is fetched from the cloud warehouse at request time
+// (see data_origin_patch.js). This worker only caches the app shell so the
+// page still opens offline.
+const CACHE = 'stocks-ai-view-v14';   // v14: cloud-only, no local data cache
+const SHELL = ['./', './index.html', './db-client.js', './realtime.js',
+               './data_origin_patch.js', './stock-detail.js'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE)
@@ -26,83 +26,18 @@ self.addEventListener('fetch', e => {
 
   let url;
   try { url = new URL(req.url); } catch (_) { return; }
-  if (url.origin !== location.origin) return;   // 跨域不走 SW
+  if (url.origin !== location.origin) return;   // cross-origin: not ours
 
-  // HTML 导航: network-first (保证拿到最新版本), 失败用缓存
-  if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req).then(r => {
-        const copy = r.clone();
-        caches.open(CACHE).then(c => c.put(req, copy));
-        return r;
-      }).catch(() => caches.match(req).then(r => r || caches.match('./index.html')))
-    );
-    return;
-  }
-
-  const path = url.pathname;
-  const isJson = path.endsWith('.json');
-  const isShell = /\.(js|css)$/.test(path) || path.endsWith('.html');
-
-  // ─── JSON 分级策略 ───────────────────────────────────────────
-  // 高频 (盘中30分钟更新) → network-first: latest/enrich/ai_picks/hot_impact/
-  //   daily_brief/engine_v5/reflect/cycle_deep/sources_registry
-  // 低频大块 (日频, 秒开优先) → SWR: index_kline/search_index/multi_v4/
-  //   lowpool/cycle/sector_pool/hotspot_infer/hot_impact.md
-  //
-  // 教训: hot_impact 曾因在 SWR 列表而显示 24 小时前的旧缓存;
-  //       现在高频数据一律 network-first, 新增高频 JSON 必须加进 HOT_JSON。
-  const HOT_JSON = /(latest|enrich|ai_picks|ai_pick_v4|hot_impact|daily_brief|engine_v5|reflect_latest|cycle_deep|sources_registry|ban_prob|ban_pick|flow_divergence|market_now|valuation|multidim|decision|self_reflect|global_fx|winrate_matrix|kline_sim)\.json$/;
-  const swrJson = /(index_kline|search_index|multi_v4|lowpool|cycle|sector_pool|hotspot_infer)\.json$/.test(path);
-  const isHot = HOT_JSON.test(path);
-
-  if (isJson && (isHot || !swrJson)) {
-    // latest.json 等高频数据: network-first
-    e.respondWith((async () => {
-      const cache = await caches.open(CACHE);
-      try {
-        const fresh = await fetch(req);
-        if (fresh && fresh.ok) cache.put(req, fresh.clone());
-        return fresh;
-      } catch (_) {
-        const hit = await cache.match(req);
-        return hit || new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });
-      }
-    })());
-    return;
-  }
-
-  if (isJson && swrJson) {
-    e.respondWith((async () => {
-      const cache = await caches.open(CACHE);
+  // App shell + same-origin assets: network-first, fall back to cache.
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
+    try {
+      const fresh = await fetch(req);
+      if (fresh && fresh.ok) cache.put(req, fresh.clone());
+      return fresh;
+    } catch (_) {
       const hit = await cache.match(req);
-      const net = fetch(req).then(r => {
-        if (r && r.ok) cache.put(req, r.clone());
-        return r;
-      }).catch(() => null);
-      return hit || await net || new Response('{}', { status: 503, headers: { 'Content-Type': 'application/json' } });
-    })());
-    return;
-  }
-
-  if (isShell) {
-    // HTML/JS/CSS: network-first
-    // JS 曾用 cache-first, 导致代码更新后用户仍跑旧版 (反复'修复了但没生效'),
-    // 这些文件仅几 KB, network-first 开销可忽略, 换来永远最新
-    e.respondWith((async () => {
-      const cache = await caches.open(CACHE);
-      try {
-        const fresh = await fetch(req);
-        if (fresh && fresh.ok) cache.put(req, fresh.clone());
-        return fresh;
-      } catch (_) {
-        const hit = await cache.match(req);
-        return hit || new Response('', { status: 503 });
-      }
-    })());
-    return;
-  }
-
-  // 其他静态资源: cache-first
-  e.respondWith(caches.match(req).then(h => h || fetch(req)));
+      return hit || new Response('', { status: 503 });
+    }
+  })());
 });
