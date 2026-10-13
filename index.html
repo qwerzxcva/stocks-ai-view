@@ -233,7 +233,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">多维评分 · 点击行看K线/资金流</span></div>
       <div style="padding:0;overflow-y:auto;max-height:calc(100vh - 235px)">
-      <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨跌%</th><th>综合分</th><th>共振</th><th>多/空</th><th>20日位</th><th>行业</th></tr></thead>
+      <table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>偏离</th><th>涨跌%</th><th>综合分</th><th>共振</th><th>多/空</th><th>20日位</th><th>行业</th></tr></thead>
       <tbody id="pickBody"></tbody></table>
       </div>
     </div>
@@ -382,7 +382,7 @@ function _showDataOrigin(){
 async function fetchJSON(p){try{
   // 高频数据 (盘中30分钟更新) 不用 If-None-Match, 避免 ETag 304 命中时
   // 拿到会话内的旧缓存; SW 也已把这些文件改为 network-first。
-  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now)\.json$/.test(p);
+  const HOT = /(hot_impact|latest|enrich|ai_picks|ai_pick_v4|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now|realtime_minute|valuation|multidim|decision|self_reflect|global_fx)\.json$/.test(p);
   if(!_localFail.has(p)){
     const hdr={};
     const et=_etagCache.get(p);
@@ -607,19 +607,33 @@ function renderThemes(ts,el,cnt){
   el.innerHTML=(ts||[]).slice(0,14).map(t=>`<div class="chip"><b>${t.name}</b><span class="fl">${t.news_count}条</span>${t.pos?`<span class="up">+${t.pos}</span>`:''}${t.neg?`<span class="dn">-${t.neg}</span>`:''}</div>`).join('')||'<span class="fl">暂无</span>';
   if(cnt)document.getElementById(cnt).textContent=(ts||[]).length+'个主题';
 }
+// 实际价值单元格: value=每股内在价值, dev=偏离% (负=低估)
+function valCell(v,dev){
+  if(v==null||v===undefined) return '<td class="fl">—</td>';
+  if(dev==null||dev===undefined) return '<td class="fl">'+fmt(v)+'</td>';
+  // 低估=绿(现价低于价值, 有安全垫); 高估=红
+  const col=dev<=-10?'var(--up)':dev>=30?'var(--dn)':'var(--tx2)';
+  return '<td style="font-weight:700">'+fmt(v)+'<span style="color:'+col+';font-size:10px;margin-left:3px">'+(dev>0?'+':'')+dev+'%</span></td>';
+}
 function renderPicks(picks){
+  try{ if(picks&&picks.length&&!document.getElementById('probeArg')){ const _d=document.createElement('div'); _d.id='probeArg'; _d.textContent='ARG '+JSON.stringify(picks[0]).slice(0,300); document.body.appendChild(_d);} }catch(e){}
   document.getElementById('pickBody').innerHTML=(picks||[]).slice(0,40).map(p=>{
-    const sc=p.score??0, col=sc>=70?'var(--up)':sc>=60?'var(--amber)':'var(--tx3)';
+    // 字段兼容: ai_pick_v4 (ret_pct/pos240_pct/score) vs ai_picks (chg_pct/pos20/score)
+    const chg=p.chg_pct!=null?p.chg_pct:p.ret_pct;
+    const pos=p.pos20!=null?p.pos20:p.pos240_pct;
+    const sc=(p.score??0)>1?p.score*100:p.score*100;  // v4 是0-1, 统一到0-100
+    const col=sc>=70?'var(--up)':sc>=60?'var(--amber)':'var(--tx3)';
     return `<tr class="clk" data-code="${p.code}">
-    <td>${p.code}</td><td><b>${p.name}</b></td><td>${fmt(p.price)}</td>
-    <td class="${cls(p.chg_pct)}">${sign(p.chg_pct)}%</td>
+    <td>${p.code}</td><td><b>${p.name||''}</b></td><td>${fmt(p.price)}</td>
+    ${valCell(p.intrinsic_value,p.value_dev_pct)}
+    <td class="${cls(chg)}">${chg!=null?sign(chg)+'%':'—'}</td>
     <td style="font-weight:700;color:${col}">${sc.toFixed(1)}</td>
     <td class="fl">${(p.resonance??0).toFixed(2)}</td>
     <td class="fl">${p.bull??'—'}/${p.bear??'—'}</td>
-    <td class="fl">${p.pos20!=null?p.pos20.toFixed(0)+'%':'—'}</td>
+    <td class="fl">${pos!=null?pos.toFixed(0)+'%':'—'}</td>
     <td class="fl" style="font-size:10px">${(p.industry||'—').slice(0,10)}</td>
   </tr>`;
-  }).join('')||'<tr><td colspan="9" class="fl" style="text-align:center">暂无</td></tr>';
+  }).join('')||'<tr><td colspan="11" class="fl" style="text-align:center">暂无</td></tr>';
 }
 function renderZt(zts){
   document.getElementById('ztBody').innerHTML=(zts||[]).slice(0,15).map(z=>`<tr>
@@ -933,17 +947,18 @@ async function renderPools(d){
         rows+=`<tr style="background:rgba(137,87,229,.06)"><td colspan="8" style="font-size:10px;padding:2px 8px;color:${vc};font-weight:700">▶ ${s.verdict} · ${cnt[s.verdict]||0}只</td></tr>`;
       }
       const pzt=s.p_zt_next, pzb=s.p_zhaban_next, er=s.exp_ret_next;
-      rows+=`<tr>
+      rows+=`<tr class="clk" data-code="${s.code}">
         <td>${s.code}</td><td><b>${(s.name||'')}</b></td>
         <td>${s.lianban>=2?'<span class="bdg up">'+s.lianban+'板</span>':'<span class="bdg fl">首板</span>'}</td>
         <td>${fmt(s.close)}</td>
+        ${valCell(s.intrinsic_value,s.value_dev_pct)}
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
         <td style="font-weight:700;color:${pzt==null?'fl':pzt>=25?'var(--up)':pzt>=18?'var(--amber)':'var(--dn)'}">${pzt!=null?pzt+'%':'—'}</td>
         <td class="${pzb==null?'fl':pzb<16?'up':pzb<22?'amber':'dn'}">${pzb!=null?pzb+'%':'—'}</td>
         <td class="fl">${er!=null?er+'%':'—'}</td>
       </tr>`;
     });
-    banBody.innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>现价</th><th>涨%</th><th>次日涨停率</th><th>次日炸板率</th><th>期望收益</th></tr></thead><tbody>${rows}</tbody></table>`+
+    banBody.innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>现价</th><th>实际价值</th><th>涨%</th><th>次日涨停率</th><th>次日炸板率</th><th>期望收益</th></tr></thead><tbody>${rows}</tbody></table>`+
       (bp.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">`+
        `判定: ${bp.meta.verdict_rules||''}<br>`+
        `价值分: ${bp.meta.score_formula||''}<br>`+
@@ -1014,10 +1029,11 @@ async function renderPools(d){
       <div class="pool-kpi-item"><div class="v up">${ld.strong_buy}</div><div class="n">强烈买入</div></div>
       <div class="pool-kpi-item"><div class="v">${(ld.watch_count??(Array.isArray(ld.watch)?ld.watch.length:0))}</div><div class="n">关注</div></div>
       <div class="pool-kpi-item"><div class="v">${ld.total_filtered||0}</div><div class="n">候选总数</div></div>`;
-    document.getElementById('lowBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>涨%</th><th>位置%</th><th>RSI</th><th>核心信号</th></tr></thead><tbody>
-      ${(ld.strong||[]).slice(0,20).map(s=>`<tr>
+    document.getElementById('lowBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>涨%</th><th>位置%</th><th>RSI</th><th>核心信号</th></tr></thead><tbody>
+      ${(ld.strong||[]).slice(0,20).map(s=>`<tr class="clk" data-code="${s.code}">
         <td>${s.code}</td><td>${(s.name||'').slice(0,6)}</td>
         <td>${(s.price||0).toFixed(2)}</td>
+        ${valCell(s.intrinsic_value,s.value_dev_pct)}
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
         <td class="fl">${s.price_pct??'—'}%</td>
         <td>${s.rsi??'—'}</td>
@@ -1039,12 +1055,13 @@ async function renderPools(d){
       <div class="pool-kpi-item"><div class="v up">${hd.strong_count}</div><div class="n">强烈推荐</div></div>
       <div class="pool-kpi-item"><div class="v">${hd.watch_count||0}</div><div class="n">关注</div></div>
       <div class="pool-kpi-item"><div class="v">${hd.themes_processed||0}</div><div class="n">主题数</div></div>`;
-    document.getElementById('hotBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>主题</th><th>行业</th><th>现价</th><th>涨%</th><th>得分</th><th>信号</th></tr></thead><tbody>
-      ${(hd.strong||[]).slice(0,20).map(s=>`<tr>
+    document.getElementById('hotBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>主题</th><th>行业</th><th>现价</th><th>实际价值</th><th>涨%</th><th>得分</th><th>信号</th></tr></thead><tbody>
+      ${(hd.strong||[]).slice(0,20).map(s=>`<tr class="clk" data-code="${s.code}">
         <td>${s.code}</td><td>${(s.name||'').slice(0,6)}</td>
         <td class="hot">${s.theme}</td>
         <td class="fl">${(s.industry||'').slice(0,6)}</td>
         <td>${(s.price||0).toFixed(2)}</td>
+        ${valCell(s.intrinsic_value,s.value_dev_pct)}
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
         <td style="font-weight:700;color:var(--up)">${s.score}</td>
         <td class="fl" style="max-width:130px;font-size:10px">${(s.signals||[]).slice(0,2).join('; ')}</td>
@@ -1065,11 +1082,12 @@ async function renderPools(d){
       <div class="pool-kpi-item"><div class="v">${md.tier_watch_count}</div><div class="n">建议关注</div></div>
       <div class="pool-kpi-item"><div class="v dn">${md.tier_avoid_count}</div><div class="n">回避</div></div>
       <div class="pool-kpi-item"><div class="v">${ph[md.market_phase]||md.market_phase||'—'}</div><div class="n">市场周期</div></div>`;
-    document.getElementById('multiBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>现价</th><th>涨%</th><th>综合分</th><th>信号</th></tr></thead><tbody>
-      ${(md.buy||[]).slice(0,20).map(s=>`<tr>
+    document.getElementById('multiBody').innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>行业</th><th>现价</th><th>实际价值</th><th>涨%</th><th>综合分</th><th>信号</th></tr></thead><tbody>
+      ${(md.buy||[]).slice(0,20).map(s=>`<tr class="clk" data-code="${s.code}">
         <td>${s.code}</td><td>${(s.name||'').slice(0,6)}</td>
         <td class="fl">${(s.industry||'').slice(0,6)}</td>
         <td>${(s.price||0).toFixed(2)}</td>
+        ${valCell(s.intrinsic_value,s.value_dev_pct)}
         <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
         <td style="font-weight:700;color:${s.score>=15?'var(--up)':'var(--amber)'}">${s.score}</td>
         <td class="fl" style="max-width:160px;font-size:10px">${(s.signals||[]).slice(0,3).join('; ')}</td>
@@ -1106,10 +1124,12 @@ function renderDecision(d){
   h+='<div class="fl" style="font-size:9px;margin-bottom:6px">'+esc(d.regime_detail)+' · '+esc(pa.reason)+'</div>';
   const actCol={buy:'var(--up)',watch:'var(--amber)',avoid:'var(--dn)'};
   const actLbl={buy:'买入',watch:'观察',avoid:'回避'};
-  h+='<table><thead><tr><th>操作</th><th>代码</th><th>名称</th><th>现价</th><th>综合</th><th>置信</th><th>入场</th><th>止损</th><th>目标</th></tr></thead><tbody>';
+  h+='<table><thead><tr><th>操作</th><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>综合</th><th>置信</th><th>入场</th><th>止损</th><th>目标</th></tr></thead><tbody>';
   (d.cards||[]).forEach(c=>{ h+='<tr class="clk" data-code="'+esc(c.code)+'">'+
     '<td style="color:'+actCol[c.action]+';font-weight:700">'+esc(actLbl[c.action]||c.action)+'</td>'+
     '<td>'+esc(c.code)+'</td><td><b>'+esc(c.name)+'</b></td><td>'+esc(c.price)+'</td>'+
+    '<td style="font-weight:700">'+(c.intrinsic_value!=null?esc(c.intrinsic_value):'—')+
+    (c.value_dev_pct!=null?'<span style="font-size:10px;margin-left:3px;color:'+(c.value_dev_pct<=-10?'var(--up)':c.value_dev_pct>=30?'var(--dn)':'var(--tx3)')+'">'+(c.value_dev_pct>0?'+':'')+c.value_dev_pct+'%</span>':'')+'</td>'+
     '<td style="font-weight:700">'+esc(c.composite)+'</td>'+
     '<td>'+(c.confidence*100).toFixed(0)+'%</td>'+
     '<td class="fl">'+esc(c.entry)+'</td><td class="dn">'+esc(c.stop)+'</td><td class="up">'+esc(c.target)+'</td></tr>';
@@ -1285,6 +1305,30 @@ async function render(){
     if(mn.tx_sector_ranking)d.westock={sector_ranking:{date:mn.date,data:mn.tx_sector_ranking}};
     window._realtimeTs=mn.ts;
   }
+  // 分钟级实时 (2026-10-14): realtime_minute.json 由云服务器常驻采集,
+  // 交易时段每 60 秒更新 → 覆盖 market_now 的 summary (更细: 含成交额/主力净流入)
+  const rm=await fetchJSON('data/realtime_minute.json');
+  if(rm&&rm.summary){
+    d.market=d.market||{};
+    d.market.advance=rm.summary.advance;
+    d.market.decline=rm.summary.decline;
+    d.market.flat=rm.summary.flat;
+    d.market.limit_up=rm.summary.limit_up_ge10;
+    d.market.limit_down=rm.summary.limit_down_le-10;
+    d.market.total_amount_yi=rm.summary.total_amount_yi;
+    d.market.main_net_inflow_yi=rm.summary.main_net_inflow_yi;
+    d.market.n_stocks=rm.summary.n_stocks;
+    window._realtimeTs=rm.timestamp;
+    // 页面顶部显示分钟级时间戳 + 数据源
+    const ut=document.getElementById('updTime');
+    if(ut){
+      const t=new Date(rm.timestamp);
+      const hh=String(t.getHours()).padStart(2,'0');
+      const mm=String(t.getMinutes()).padStart(2,'0');
+      ut.textContent=`⚡ ${hh}:${mm} 分钟级 (${rm.market_total||rm.summary.n_stocks}只)`;
+      ut.title=`数据时间: ${rm.timestamp}\n来源: ${rm.source}\n成交额: ${rm.summary.total_amount_yi}亿\n主力净流入: ${rm.summary.main_net_inflow_yi}亿`;
+    }
+  }
   // 腾讯数据 tab: 激活后每次 render 都用最新数据重渲染
   // (修复时序 bug: 原实现在 market_now 覆盖 westock 之前就渲染, 导致点早了 tab 永远空白)
   if(txActive) renderTencent(d);
@@ -1343,9 +1387,15 @@ async function render(){
   renderThsStrong(ths, em);
   renderLhb(lhb, em);
   renderBlocktrade(bt, em);
-  // AI 推荐: 优先读独立 data/ai_picks.json (不被远端 sync 覆盖)
-  const apk=await fetchJSON('data/ai_picks.json');
-  renderPicks((apk&&apk.picks&&apk.picks.length)?apk.picks:(d.ai_picks||[]));
+  // AI 推荐: 优先 ai_pick_v4 (实测统计驱动+估值), 回退独立 ai_picks.json, 再回退 latest.json
+  let pickList=null;
+  const v4=await fetchJSON('data/ai_pick_v4.json');
+  if(v4&&v4.picks&&v4.picks.length) pickList=v4.picks;
+  if(!pickList){
+    const apk=await fetchJSON('data/ai_picks.json');
+    if(apk&&apk.picks&&apk.picks.length) pickList=apk.picks;
+  }
+  renderPicks(pickList||d.ai_picks||[]);
   renderVolChart(d.index_kline);
   const cd=await fetchJSON('data/cycle_deep.json');
   window._cdData=cd; if(cd)renderCycleDeep(cd);
@@ -1534,6 +1584,7 @@ document.addEventListener('click', e=>{
 })();
 </script>
 <script src="realtime.js" defer></script>
+<script src="data_origin_patch.js"></script>
 <script src="stock-detail.js" defer></script>
 </body>
 </html>

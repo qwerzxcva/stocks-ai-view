@@ -45,6 +45,9 @@ PATCH = r"""
   // 大文件 (bulk 复权/全历史) 只从远端拿, 本地不存
   var REMOTE_ONLY = /(adjusted\/bulk|index_full|all_sources|search_index)\.json$/;
 
+  // 分钟级实时数据 (云服务器常驻采集, 优先级最高)
+  var MINUTE_LEVEL = /realtime_minute\.json$/;
+
   // 热数据 (盘中 30 分钟级) 与温数据 (日级) 分开缓存策略
   var HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now|realtime)\.json$/;
 
@@ -94,6 +97,13 @@ PATCH = r"""
       if (REMOTE_ONLY.test(p)) return null;
       return _orig(p);
     });
+  };
+
+  // 分钟级数据专用: 远端 + no-store, 失败不兜底本地 (避免读到几分钟前的旧值)
+  var _origMinute = window.fetchJSON;
+  window.fetchJSONMinute = function (p) {
+    return _fetchRemote(GH_RAW + p, 8000)
+      .catch(function () { return _fetchRemote(GC_RAW + p, 8000); });
   };
 
   console.log('[data_origin] 已切换为 GitHub 优先 / 本地兜底');
