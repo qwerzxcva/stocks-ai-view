@@ -286,6 +286,40 @@ SOURCES = [
                  "A股项目暂不需要, 保留作海外情绪参考",
     },
     {
+        "id": "douyin_hot_search",
+        "name": "抖音热搜榜",
+        "url": "https://aweme.snssdk.com/aweme/v1/hot/search/list/",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "实时", 
+        "method": "GET",
+        "encoding": "utf-8",
+        "ua_mobile": True,
+        "fields": "trending_list[].word / sentence_id / video_count / hot_value / active_time",
+        "provides": ["latest.json:social.douyin_hot", "hot_impact.json (主题参考)"],
+        "notes": "公开零鉴权 JSON; 需移动端 UA (iPhone/Android), 桌面 UA 偶尔返回空; "
+                 "hot_value 有时为 0 (实测), 排序时用 video_count 兜底; "
+                 "sentence_id 是唯一稳定去重键; 本次实测 30+ 条热搜",
+    },
+    {
+        "id": "eastmoney_fund_pingzhong",
+        "name": "东财基金重仓股持仓 (pingzhongdata JS)",
+        "url": "https://fund.eastmoney.com/pingzhongdata/{code}.js?v={ts}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "收盘后更新",
+        "encoding": "utf-8",
+        "fields": "fS_name / fS_code / fund_Rate / fund_sourceRate / fund_minsg / stockCodes / ishb",
+        "provides": ["latest.json:fund_rank (扩展持仓字段)"],
+        "notes": "返回 JS 变量 (非 JSON), 用正则 r'var (\\w+) = ([^;]+);' 解析; "
+                 "stockCodes 是前10大重仓股代码列表; "
+                 ".aspx FundJZ/FundGS 接口本地 WAF 403, 但此 JS 接口完全可用; "
+                 "v 参数 = Unix timestamp 秒, 用于缓存控制; "
+                 "每次 CI 运行前需先查最新 ts",
+    },
+    {
         "id": "sec_edgar",
         "name": "SEC EDGAR 财报 XBRL",
         "url": "https://data.sec.gov/submissions/{cik}.json",
@@ -441,6 +475,30 @@ SOURCES = [
         "freq": "unknown",
         "provides": [],
         "notes": "TCP 连接超时, 需国内IP",
+    },
+    {
+        "id": "xiaohongshu_hot",
+        "name": "小红书热门话题",
+        "url": "https://edith.xiaohongshu.com/api/sns/web/v1/search/hot",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "minute",
+        "provides": [],
+        "notes": "所有可猜测 API 路径均 404; 主站为 React SPA, 内容需浏览器渲染; "
+                 "2026-10-13 实测 edith.xiaohongshu.com/api/sns/web/v1/search/hot → 404, "
+                 "所有 /feed, /search/* 路径同样 404; 无法零凭据 HTTP 接入",
+    },
+    {
+        "id": "xueqiu_hot",
+        "name": "雪球热门股",
+        "url": "https://xueqiu.com/v5/statuses/hot/stock_list.json",
+        "auth": "cookie",
+        "status": "blocked",
+        "freq": "minute",
+        "fields": "热门股票列表 (需 xq_a_token)",
+        "provides": [],
+        "notes": "无 cookie 时返回 400 / 302 反爬 JS; 需 xq_a_token cookie 认证; "
+                 "容器内无法获取有效 cookie; 考虑替代: 东方财富股吧热帖 / 同花顺热榜",
     },
 
     # ============ 本地/仓内数据源 ============

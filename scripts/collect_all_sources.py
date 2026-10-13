@@ -59,6 +59,8 @@ SOURCE_PRIORITY = {
     "alpha_vantage": 45,
     "yahoo_finance": 30,          # 限流不稳定, 最低
     "eastmoney_kline": 65,
+    "douyin_hot_search": 45,       # 社交媒体情绪, 参考性数据
+    "eastmoney_fund_pingzhong": 55,  # 基金重仓股, 补充东财排行
 }
 
 
@@ -386,6 +388,114 @@ def fetch_fund_rank(top=50):
     return out, {"source": "eastmoney_fund_rank", "n": len(out)}
 
 
+def fetch_douyin_hot():
+    """抖音热搜榜 → 按 sentence_id 主键
+
+    返回: 当前抖音热门搜索词, 可用于市场情绪/题材参考
+    接口: 公开零鉴权, 需移动端 UA
+    """
+    url = "https://aweme.snssdk.com/aweme/v1/hot/search/list/"
+    b = _http(url, timeout=15, headers={
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148",
+        "Referer": "https://www.douyin.com/",
+    })
+    out = []
+    if not b:
+        return out, {"source": "douyin_hot_search", "n": 0, "error": "empty response"}
+    try:
+        d = json.loads(b.decode("utf-8", "replace"))
+        data = d.get("data", {})
+        active_time = data.get("active_time", "")
+        items = data.get("trending_list", [])
+        for it in items:
+            word = it.get("word", "")
+            sid = it.get("sentence_id", "")
+            if not word or not sid:
+                continue
+            out.append({
+                "_key": sid,
+                "_src": "douyin_hot_search",
+                "word": word,
+                "sentence_id": sid,
+                "video_count": it.get("video_count", 0),
+                "hot_value": it.get("hot_value", 0),
+                "active_time": active_time,
+            })
+        return out, {"source": "douyin_hot_search", "n": len(out),
+                     "active_time": active_time}
+    except Exception as e:
+        return out, {"source": "douyin_hot_search", "n": 0,
+                    "error": f"{type(e).__name__}: {e}"}
+
+
+def fetch_fund_pingzhong(codes):
+    """东财基金持仓股 (pingzhongdata JS) → 按 fund_code 主键
+
+    扩展东财基金排行榜字段, 获取前10大重仓股代码列表。
+    codes: 基金代码列表 (str), 默认从 fund_rank 取前10只
+    """
+    if not codes:
+        # 若未指定则从基金排行结果取前10只股票/混合基金 (持仓可解析的)
+        try:
+            fr, _ = fetch_fund_rank(top=30)
+            codes = [r["code"] for r in fr
+                     if r.get("code") and not any(
+                         k in r.get("name", "") for k in ("纯硄", "货币", "指数增强"))][:10]
+        except Exception:
+            return [], {"source": "eastmoney_fund_pingzhong", "n": 0, "error": "no fund codes"}
+
+    import time as _time
+    out = []
+    for code in codes[:20]:  # 最多20只, 避免过多请求
+        ts = int(_time.time())
+        url = f"https://fund.eastmoney.com/pingzhongdata/{code}.js?v={ts}"
+        b = _http(url, timeout=12, headers={"Referer": "https://fund.eastmoney.com/"})
+        if not b:
+            continue
+        try:
+            text = b.decode("utf-8", "replace")
+            # 解析 JS 变量: var fS_name = "xxx";
+            import re as _re
+            vars_map = {}
+            for m in _re.finditer(r'var\s+(\w+)\s*=\s*([^;]+);', text):
+                name, val = m.group(1), m.group(2).strip()
+                # 安全解析: 尝试 int/float/bool/list, 否则保留字符串
+                try:
+                    val = json.loads(val) if val.startswith(('[', '{', '"')) else \
+                          (int(val) if val.lstrip('-').isdigit() else (float(val) if _re.match(r'^[-+]?\d+\.\d*$', val) else val.strip('"')))
+                except Exception:
+                    pass
+                vars_map[name] = val
+            stock_codes = vars_map.get("stockCodes", [])
+            if isinstance(stock_codes, str):
+                stock_codes = [c.strip() for c in stock_codes.split(",") if c.strip()]
+            # stockCodes 是 7 位字符串 (6位代码 + 1位校验后缀), 如 "6882001" → bare="688200"
+            holdings = []
+            for raw in stock_codes[:10]:
+                if len(raw) >= 6:
+                    bare = raw[:6]
+                    if bare.startswith(("60", "68", "90")):
+                        holdings.append("sh" + bare)
+                    elif bare.startswith(("43", "83", "87", "88")):
+                        holdings.append("bj" + bare)
+                    else:
+                        holdings.append("sz" + bare)
+            out.append({
+                "_key": code, "_src": "eastmoney_fund_pingzhong",
+                "fund_code": code,
+                "fund_name": vars_map.get("fS_name", ""),
+                "fund_rate": _f(vars_map.get("fund_Rate", 0)),
+                "fund_source_rate": _f(vars_map.get("fund_sourceRate", 0)),
+                "fund_minsg": _f(vars_map.get("fund_minsg", 0)),
+                "holdings": holdings,
+            })
+            _time.sleep(0.1)  # 限速
+        except Exception as e:
+            out.append({"_key": code, "_src": "eastmoney_fund_pingzhong",
+                       "fund_code": code, "error": f"{type(e).__name__}: {e}"})
+    return out, {"source": "eastmoney_fund_pingzhong", "n": len(out)}
+
+
 # 源 → fetcher 映射
 FETCHERS = {
     "quote": [
@@ -402,9 +512,11 @@ FETCHERS = {
     ],
     "news": [
         ("sina_news", lambda ctx: fetch_sina_news()),
+        ("douyin_hot", lambda ctx: fetch_douyin_hot()),
     ],
     "fund": [
         ("eastmoney_fund_rank", lambda ctx: fetch_fund_rank()),
+        ("eastmoney_fund_pingzhong", lambda ctx: fetch_fund_pingzhong(ctx.get("fund_codes"))),
     ],
 }
 
