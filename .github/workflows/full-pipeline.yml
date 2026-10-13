@@ -132,6 +132,10 @@ jobs:
       - name: Signal auditor
         run: python3 scripts/signal_auditor.py || echo "auditor skipped (no decision)"
 
+      # ── 6c4. 优势挖掘 (找优点: 指标/环境/维度 的统计显著优势) ──
+      - name: Edge miner
+        run: python3 scripts/edge_miner.py || echo "edge_miner skipped"
+
       # ── 6d. 引擎兜底 (Space 未激活时, GitHub 侧跑轻量引擎链) ──
       # 主算力在 GitCode Space; 若 Space 未跑 (无 GC_TOKEN/未激活),
       # 这里跑一遍轻量引擎, 保证网站永远有最新评分/决策/估值。
@@ -194,7 +198,7 @@ jobs:
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/ban_prob_balanced.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/ban_prob_balanced.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json data/ban_prob.json"
           git fetch origin main
           git reset --soft origin/main
           git add -A $FILES
