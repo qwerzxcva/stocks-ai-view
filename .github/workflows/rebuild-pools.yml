@@ -114,6 +114,12 @@ jobs:
             python3 scripts/collect_market_extras.py --merge data/latest.json || true
           fi
 
+      # 4b) 打板概率 (实证统计: 次日涨停率/炸板率/期望收益 + 因子分层)
+      - name: Build ban_prob
+        run: |
+          python3 scripts/ban_prob.py --out data/ban_prob.json || true
+          python3 -c "import json;d=json.load(open('data/ban_prob.json'));print('  events:',d['sample']['n_zt_events'],'| 首板次日涨停率:',d['base']['by_lianban']['首板']['zt_next_rate'],'%')" || true
+
       # 4) 数据瘦身
       - name: Slim latest.json
         run: |
