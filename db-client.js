@@ -91,7 +91,11 @@
     },
 
     // ── overseas ──
-    overseas: function () { return get(REPOS.market + 'overseas/indices.json', 60000); },
+    overseas: function () { return get(REPOS.market + 'overseas/live.json', 60000); },
+    overseasImpact: function () { return get(REPOS.market + 'overseas/impact.json', 120000); },
+    overseasNews: function () { return get(REPOS.market + 'overseas/news.json', 300000); },
+    overseasSentiment: function () { return get(REPOS.market + 'overseas/sentiment.json', 300000); },
+    overseasOvernight: function () { return get(REPOS.market + 'overseas/overnight.json', 300000); },
     usStocks: function () { return get(REPOS.market + 'overseas/us_stocks.json', 300000); },
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 

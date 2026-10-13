@@ -7,18 +7,21 @@
 
 ## 一、执行摘要（按严重度排序）
 
-| # | 发现 | 严重度 | 证据 |
-|---|---|---|---|
-| 1 | **3 个引擎 K 线列错位**（open 冒充 close），导致历史预测信号偏乐观 | 🔴 P0 | `backfill_predictions.py:78`、`multidim_engine.py:164,333-336`、`rps_rotation.py:57`；已修，1日胜率 43.8%→40.3% |
-| 2 | **样本利用率 0.03%**：底层 207万行/668天/4万涨停样本，实际验证只用 600 个信号 | 🔴 P0 | `backfill_predictions.py` 默认 `--days 12 --limit 300` |
-| 3 | **打板概率样本极度失衡**：99.7% 集中在首板（n=20081），4板+ 样本 n<10，概率是噪声 | 🔴 P0 | `data/ban_prob.json` by_lianban |
-| 4 | **engine_v5 无权重、无特征重要性闭环**：17 指标等权投票，特征重要性算出来了却没回写权重 | 🟠 P1 | `engine_v5.py:350` `w = weights or {}` 默认等权 |
-| 5 | **walkforward 是空壳**：只输出 fold 定义，没有 IS/OOS 指标结果 | 🟠 P1 | `walkforward.py` 输出仅 `folds/n_folds` |
-| 6 | **optimizer/loss_attribution/patterns/factor_lib 未接入 CI**：脚本存在但从不运行 | 🟠 P1 | `.github/workflows/full-pipeline.yml` 无这些步骤 |
-| 7 | **场景推股只有 2 级**（全球情绪 3 档 + 周期偏空收紧），无牛/熊/震荡/极端四象限差异化 | 🟠 P1 | `ai_pick_v4.py` 硬规则静态阈值 |
-| 8 | **周期接入有 bug**：`cycle skip: 'str' object has no attribute 'get'` | 🟡 P2 | `ai_pick_v4.py` cycle.json 解析 |
-| 9 | **rps_250/rps_120 为 null**：bulk K 线历史不足 250 日（且列错位加剧） | 🟡 P2 | `data/rps_rotation.json` |
-| 10 | **缺 9 类引擎**（详见第三节）：风险管理、组合优化、异常检测、归因闭环、样本均衡、场景引擎、数据验证引擎、审核引擎、优势挖掘引擎 | 🟠 P1 | 全仓 grep 无对应实现 |
+> 修复状态更新于 2026-10-14 当日：✅=已修 🚧=进行中 ⬜=未修
+
+| # | 发现 | 严重度 | 状态 | 证据 |
+|---|---|---|---|---|
+| 1 | **3 个引擎 K 线列错位**（open 冒充 close），导致历史预测信号偏乐观 | 🔴 P0 | ✅ 已修 | `backfill_predictions.py:78`、`multidim_engine.py:164,333-336`、`rps_rotation.py:57`；已修，1日胜率 43.8%→40.3% |
+| 2 | **样本利用率 0.03%**：底层 207万行/668天/4万涨停样本，实际验证只用 600 个信号 | 🔴 P0 | 🚧 全量回溯中 | `backfill_predictions.py` 默认 `--days 12 --limit 300`；已启动 `--days 700 --limit 4000`（280/668） |
+| 3 | **打板概率样本极度失衡**：99.7% 集中在首板（n=20081），4板+ 样本 n<10，概率是噪声 | 🔴 P0 | ✅ 已修 | 新增 `sample_balancer.py`（EB 收缩 k=50 + 层级先验）；4连板 50%(n=4) → 21.86% 置信0.07 |
+| 4 | **engine_v5 无权重、无特征重要性闭环**：17 指标等权投票，特征重要性算出来了却没回写权重 | 🟠 P1 | ✅ 已修 | 新增 `weight_calibrator.py`；结论：17 指标 0 个有效、7 个反向，量化印证技术面应降级 |
+| 5 | **walkforward 是空壳**：只输出 fold 定义，没有 IS/OOS 指标结果 | 🟠 P1 | ⬜ 未修 | `walkforward.py` 输出仅 `folds/n_folds` |
+| 6 | **optimizer/loss_attribution/patterns/factor_lib 未接入 CI**：脚本存在但从不运行 | 🟠 P1 | ⬜ 未修 | `.github/workflows/full-pipeline.yml` 无这些步骤 |
+| 7 | **场景推股只有 2 级**（全球情绪 3 档 + 周期偏空收紧），无牛/熊/震荡/极端四象限差异化 | 🟠 P1 | ✅ 已修 | 新增 `scenario_engine.py`（四象限 + 场景权重 + 硬规则 + 禁止行为）+ 前端「场景推股」tab |
+| 8 | **周期接入有 bug**：`cycle skip: 'str' object has no attribute 'get'` | 🟡 P2 | ✅ 已修 | `ai_pick_v4.py` cycle.json 的 macro_signals 是 dict 不是 list |
+| 9 | **rps_250/rps_120 为 null**：bulk K 线历史不足 250 日（且列错位加剧） | 🟡 P2 | ✅ 已修 | 列错位修复 + stockdb 全史导入 |
+| 10 | **缺 9 类引擎**（详见第三节）：风险管理、组合优化、异常检测、归因闭环、样本均衡、场景引擎、数据验证引擎、审核引擎、优势挖掘引擎 | 🟠 P1 | 🔶 部分修复 | 已补：样本均衡/场景/数值验证/权重校准；仍缺：风险管理/组合优化/异常检测/归因闭环/优势挖掘/信号审核 |
+| 11 | **数值脏数据未被拦截**：price=116050（东财厘单位）、chg_pct=223、年度涨跌幅误用字段名 | 🟠 P2 | ✅ 已修 | 新增 `numeric_validator.py`（25 字段域 + 量纲分流）；修 `fetch_pool` 阈值 100→1000、`realtime_minute` ±35% clamp |
 
 ---
 
