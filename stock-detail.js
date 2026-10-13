@@ -71,10 +71,19 @@
 
   function fetchMinute(code) {
     var p = prefixed(code);
-    return jget('https://web.ifzq.gtimg.cn/appstock/app/day/query?code=' + p)
+    return jget('https://web.ifzq.gtimg.cn/appstock/app/minute/query?code=' + p)
       .then(function (d) {
         var node = (d && d.data && d.data[p]) || {};
-        var arr = (node.data || {}).data || node.data || [];
+        // 实测结构: data[p].data.data = ['0930 1287.00 201 25868700.00', ...]
+        // 兼容: data[p].data 直接是数组的情况
+        var arr = [];
+        if (Array.isArray(node.data)) {
+          arr = node.data;
+        } else if (node.data && Array.isArray(node.data.data)) {
+          arr = node.data.data;
+        } else if (Array.isArray(node.data)) {
+          arr = node.data;
+        }
         return arr.map(function (row) {
           var f = String(row).split(' ');
           return { t: f[0], price: +f[1], vol: +f[2], amt: +f[3] };
@@ -83,13 +92,16 @@
   }
 
   function fetchQuote(code) {
-    return jget('https://qt.gtimg.cn/q=' + prefixed(code)).then(function (d) {
-      var p = (d && d[prefixed(code)]) ? d[prefixed(code)].split('~') : [];
-      if (p.length < 40) return null;
+    var p = prefixed(code);
+    return jget('https://qt.gtimg.cn/q=' + p).then(function (d) {
+      // 腾讯返回 key 形如 v_sh600519
+      var raw = (d && (d['v_' + p] || d[p])) || '';
+      var f = String(raw).split('~');
+      if (f.length < 40) return null;
       return {
-        code: code, name: p[1], price: +p[3], prev_close: +p[4], open: +p[5],
-        high: +p[33], low: +p[34], chg_pct: +p[32], turnover: +p[38],
-        pe: +p[39], mktcap: (+p[44] || 0) * 1e8, pb: +p[46], time: p[30]
+        code: code, name: f[1], price: +f[3], prev_close: +f[4], open: +f[5],
+        high: +f[33], low: +f[34], chg_pct: +f[32], turnover: +f[38],
+        pe: +f[39], mktcap: (+f[44] || 0) * 1e8, pb: +f[46], time: f[30]
       };
     });
   }
