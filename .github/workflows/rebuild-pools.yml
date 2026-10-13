@@ -125,6 +125,13 @@ jobs:
           python3 scripts/ban_prob.py --out data/ban_prob.json || true
           python3 -c "import json;d=json.load(open('data/ban_prob.json'));print('  events:',d['sample']['n_zt_events'],'| 首板次日涨停率:',d['base']['by_lianban']['首板']['zt_next_rate'],'%')" || true
 
+      # 4c) 搜索索引 (快照 → 全量股票/ETF; 兜底走 latest.json)
+      - name: Build search index
+        env:
+          STOCKS_LIVE_MARKET: ${{ github.workspace }}/data-live/market
+        run: |
+          python3 scripts/build_search_index.py || echo "search_index build failed, keeping old"
+
       # 4) 数据瘦身
       - name: Slim latest.json
         run: |

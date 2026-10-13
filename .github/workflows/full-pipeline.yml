@@ -75,6 +75,18 @@ jobs:
       - name: Query benchmark
         run: python3 scripts/db_layer.py --bench 2>&1 | tee /tmp/bench.txt
 
+      # ── 4b. 保存合并去重数据到 GitHub (供前端/查询/后续分析使用) ──
+      - name: Save merged sources to data/
+        run: |
+          # 拷贝到 data/ 下, 由 commit 步骤统一推送
+          cp /tmp/collected.json data/all_sources.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/all_sources.json'))
+          s = d['summary']
+          print(f"data/all_sources.json: raw={s['total_raw']} merged={s['total_merged']} groups={list(s['groups'].keys())}")
+          PY
+
       # ── 5. 引擎 v5 多指标共振 ──
       - name: Engine v5 scoring
         run: |
@@ -108,7 +120,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json
+          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -119,7 +131,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json
+            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json
             git commit -m "pipeline: $ts" 2>/dev/null || true
             git push origin main
           }

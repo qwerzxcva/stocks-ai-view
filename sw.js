@@ -4,7 +4,7 @@
 //   - data/*.json: network-first, 失败回退缓存 (数据新鲜优先)
 //     * 例外: index_kline.json / search_index.json 等大文件走 stale-while-revalidate
 //   - 跨域请求 (腾讯行情等): 不走 SW, 由 realtime.js 直连
-const CACHE = 'stocks-ai-view-v9';   // v9: ban_pick 个股级打板判断, 强制重装
+const CACHE = 'stocks-ai-view-v10';   // v10: 搜索定位修复 (symResults 改为 wrapper 内 relative+absolute)
 const SHELL = ['./', './index.html', './realtime.js', './sw.js',
                './data/latest.json'];
 

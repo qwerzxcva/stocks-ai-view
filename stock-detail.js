@@ -3,7 +3,7 @@
 // 数据源 (全部实测可达, 且 Access-Control-Allow-Origin: * 可跨域直连):
 //   日K(qfq前复权)  web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={code},day,,,{n},qfq
 //   日K(不复权)     web.ifzq.gtimg.cn/appstock/app/kline/kline?param={code},day,,,{n}
-//   分时(1min)      web.ifzq.gtimg.cn/appstock/app/day/query?code={code}
+//   分时(1min)      web.ifzq.gtimg.cn/appstock/app/minute/query?code={code}
 //   资金流(分档)    push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid={mkt}.{bare}&lmt={n}&klt=101
 //   实时快照        qt.gtimg.cn/q={code}
 //

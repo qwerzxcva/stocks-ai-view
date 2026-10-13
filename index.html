@@ -159,8 +159,10 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span class="upd" id="updTime">⏳ 加载中…</span>
   <span id="rtStatus" title="浏览器直连腾讯行情, 60s 刷新" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">实时 --:--</span>
   <a id="rtLink" href="#" target="_blank" rel="noopener" style="display:none;margin-left:8px;padding:2px 10px;border-radius:12px;background:rgba(63,185,80,.15);border:1px solid var(--dn);color:var(--dn);font-size:10px;font-weight:700;text-decoration:none">⚡ 实时站</a>
-  <input id="symSearch" placeholder="🔍 搜股票/ETF (代码或名称)" autocomplete="off" style="margin-left:8px;padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
-  <div id="symResults" style="display:none;position:absolute;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;margin-top:2px;width:280px;font-size:11px"></div>
+  <div style="position:relative;margin-left:8px">
+    <input id="symSearch" placeholder="🔍 搜股票/ETF (代码或名称)" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
+    <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
+  </div>
 <span id="rtDown" style="display:none;margin-left:8px;font-size:9px;color:var(--tx3)">实时站离线</span>
 </div>
 <div class="kpis" id="kpis"></div>
@@ -791,12 +793,12 @@ async function renderPools(d){
   const banKpis = document.getElementById('banKpis');
   const banBody = document.getElementById('banBody');
   const bp = window._banPick || {};
-  const picks = (bp.picks && bp.picks.length) ? bp.picks : null;
-  if(picks){
+  const bpPicks = (bp.picks && bp.picks.length) ? bp.picks : null;
+  if(bpPicks){
     const cnt = bp.counts || {};
     const vCol = {'可打':'var(--up)','观察':'var(--amber)','回避':'var(--dn)'};
     const vOrder = {'可打':0,'观察':1,'回避':2,'无K线':3};
-    const sorted = picks.slice().sort((a,b)=>(vOrder[a.verdict]-vOrder[b.verdict])||(b.score-a.score));
+    const sorted = bpPicks.slice().sort((a,b)=>(vOrder[a.verdict]-vOrder[b.verdict])||(b.score-a.score));
     banKpis.innerHTML = [
       `<div class="pool-kpi-item"><div class="v up">${cnt['可打']||0}</div><div class="n">可打</div></div>`,
       `<div class="pool-kpi-item"><div class="v" style="color:var(--amber)">${cnt['观察']||0}</div><div class="n">观察</div></div>`,

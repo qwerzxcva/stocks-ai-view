@@ -65,6 +65,17 @@ jobs:
       - name: Build enrich.json
         run: python3 scripts/build_enrich.py || true
 
+      # 全源并发采集 + 合并去重 → data/all_sources.json (盘中每 10 分钟刷新)
+      - name: Collect all sources + merge dedup
+        run: |
+          python3 scripts/collect_all_sources.py --out data/all_sources.json --workers 8 || true
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/all_sources.json'))
+          s = d['summary']
+          print(f"all_sources: raw={s['total_raw']} merged={s['total_merged']} ts={s['ts'][:16]}")
+          PY
+
       # AI 推股 (17指标共振, 盘中实时更新)
       - name: Build AI picks
         run: |
@@ -98,7 +109,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json
+          git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json data/all_sources.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -109,7 +120,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json
+            git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json data/all_sources.json
             git commit -m "hot-impact: $ts" 2>/dev/null || true
             git push origin main
           }
