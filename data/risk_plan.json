@@ -1,0 +1,162 @@
+{
+  "ts": "2026-10-14T05:33:15+08:00",
+  "engine": "risk_engine v1 (风险预算/波动率平价/集中度控制)",
+  "n_positions": 12,
+  "total_position": 0.6,
+  "total_position_pct": "60.0%",
+  "scenario_cap": 0.6,
+  "capped_by_scenario": true,
+  "total_risk_budget": 0.06,
+  "risk_per_trade": 0.005,
+  "portfolio_vol_estimate": 0.4709,
+  "limits": {
+    "max_single": 0.25,
+    "max_sector": 0.4
+  },
+  "plan": [
+    {
+      "code": "300760",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0939,
+      "position_pct": "9.4%",
+      "annual_vol": 0.255,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "002860",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0364,
+      "position_pct": "3.6%",
+      "annual_vol": 0.659,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "600026",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0368,
+      "position_pct": "3.7%",
+      "annual_vol": 0.653,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "688156",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0279,
+      "position_pct": "2.8%",
+      "annual_vol": 0.86,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "601118",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0258,
+      "position_pct": "2.6%",
+      "annual_vol": 0.927,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "601127",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0472,
+      "position_pct": "4.7%",
+      "annual_vol": 0.508,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "600737",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0284,
+      "position_pct": "2.8%",
+      "annual_vol": 0.844,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "300182",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0469,
+      "position_pct": "4.7%",
+      "annual_vol": 0.512,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "603067",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0367,
+      "position_pct": "3.7%",
+      "annual_vol": 0.655,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "300413",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0232,
+      "position_pct": "2.3%",
+      "annual_vol": 1.034,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "603099",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.0448,
+      "position_pct": "4.5%",
+      "annual_vol": 0.536,
+      "risk_contribution": 0.0394,
+      "stop_loss": null,
+      "target": null
+    },
+    {
+      "code": "601998",
+      "name": "",
+      "industry": null,
+      "suggested_position": 0.152,
+      "position_pct": "15.2%",
+      "annual_vol": 0.15,
+      "risk_contribution": 0.0375,
+      "stop_loss": null,
+      "target": null
+    }
+  ],
+  "sector_allocation": [
+    {
+      "industry": "unknown",
+      "position": 0.9868,
+      "msg": "行业 unknown 合计 98.7% (> 40% 上限)"
+    }
+  ],
+  "meta": {
+    "method": "仓位 = 风险预算/年化波动率 (风险平价); 同行业>2只降权0.7; 单票≤25% 单行业≤40%",
+    "correlation_note": "未算两两相关 (需协方差矩阵), 用行业近似",
+    "caveat": "风险预算是统计建议, 不构成投资建议"
+  }
+}

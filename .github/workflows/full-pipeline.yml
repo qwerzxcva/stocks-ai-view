@@ -153,13 +153,50 @@ jobs:
       # ── 6d. 引擎兜底 (Space 未激活时, GitHub 侧跑轻量引擎链) ──
       # 主算力在 GitCode Space; 若 Space 未跑 (无 GC_TOKEN/未激活),
       # 这里跑一遍轻量引擎, 保证网站永远有最新评分/决策/估值。
-      - name: Engine fallback (light chain)
+      # ── 6e. 引擎兜底链 (Space 未激活时, Actions 自己跑全套) ──────
+      # 主算力设计在 GitCode Space (1000 核时/月)。但 Space 需要人工在网页
+      # 激活并选服务器配置; 未激活时 space-pull 拉不到任何产出, 网站就会
+      # 一直是旧数据。所以这里放一份**完整**引擎链作兜底:
+      #   · Space 已激活 → space-pull 拉回更新鲜的产出, 覆盖这里的
+      #   · Space 未激活 → 这里的产出就是网站的数据源
+      # 两个工作流写同一批文件, 但都在自己 commit 前 fetch+reset --soft,
+      # 后跑的覆盖先跑的, 不会写坏。
+      #
+      # 与 Space ENGINE_CHAIN 保持同一套脚本/参数 (单一事实源 = scripts/)。
+      # 单个引擎失败不阻断后面 (|| echo), 也不让整个 job 失败。
+      - name: Engine chain (fallback when Space inactive)
         run: |
+          set +e
+          echo "--- tier 0: valuation + market phase ---"
           python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
-          python3 scripts/multidim_engine.py --out data/multidim.json --limit 200 || echo "multidim skipped"
+          python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
+          echo "--- tier 1: technical + picks + rotation ---"
+          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
+          python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
+          python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
+          echo "--- tier 2: factors + decision + limit-up audit + patterns ---"
+          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || echo "multidim skipped"
           python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
-          python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
+          python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
+          python3 scripts/ban_pick.py --out data/ban_pick.json || echo "ban_pick skipped"
+          python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns skipped"
+          echo "--- tier 3: backtest + reflection + winrate ---"
+          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --slip-pct 0.03 || echo "kline_sim skipped"
+          python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out data/reflect_latest.json || echo "reflect skipped"
+          python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate skipped"
+          echo "--- tier 4: features + sample balance + loss attribution ---"
+          python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib skipped"
+          python3 scripts/sample_balancer.py --in data/ban_prob.json --out data/sample_balance.json || echo "balancer skipped"
+          python3 scripts/loss_attribution.py || echo "loss_attribution skipped (no pick ledger)"
+          echo "--- tier 5: calibration + audit + self-improvement ---"
+          python3 scripts/weight_calibrator.py || echo "calibrator skipped"
+          python3 scripts/edge_miner.py || echo "edge_miner skipped"
+          python3 scripts/numeric_validator.py --out data/validation_report.json || echo "validator skipped"
           python3 scripts/scenario_engine.py || echo "scenario skipped"
+          python3 scripts/signal_auditor.py || echo "auditor skipped"
+          python3 scripts/anomaly_detector.py || echo "anomaly skipped"
+          python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
+          echo "--- engine chain done ---"
 
       # ── 7. 数据校验 (采集侧) ──
       - name: Audit collected data

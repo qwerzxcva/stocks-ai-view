@@ -254,6 +254,8 @@ def main():
     ap.add_argument("--out", default=os.path.join(DATA_DIR, "kline_sim.json"))
     ap.add_argument("--days", default="1,3,5,10", help="持有期列表, 逗号分隔")
     ap.add_argument("--max-pos", type=int, default=20, help="最大持仓数 (按 score 取前 N)")
+    ap.add_argument("--max-signals", type=int, default=3000,
+                    help="最多模拟多少信号 (全量回溯后信号数万, 全算太慢; 按 score 取前 N)")
     ap.add_argument("--slip-pct", type=float, default=0.03, help="单边滑点 %% (默认 0.03)")
     ap.add_argument("--limit-up", action="store_true", help="启用涨跌停限制 (触板不买/封板顺延)")
     ap.add_argument("--source", default="multi_v4,ai_picks", help="选股来源, 逗号分隔; 含 predictions 则读 data/predictions/ 历史预测快照")
@@ -266,6 +268,11 @@ def main():
     signals, src_meta = load_signals(DATA_DIR, sources)
     if not signals:
         print("[kline_sim] 无信号 (各来源 picks/buy 为空或文件缺失)", file=sys.stderr)
+    # 全量回溯后信号数万, 按 score 截断再模拟 (统计上取头部信号已足够)
+    if len(signals) > args.max_signals:
+        signals.sort(key=lambda s: -s.get("score", 0))
+        print(f"[kline_sim] 信号 {len(signals)} → 截断至 {args.max_signals} (按 score)", flush=True)
+        signals = signals[: args.max_signals]
     codes = sorted({s["code"] for s in signals})
     kl, n_rows = load_klines(codes) if codes else ({}, 0)
 
