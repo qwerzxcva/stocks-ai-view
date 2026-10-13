@@ -183,23 +183,39 @@ def main():
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--by-liquidity", action="store_true",
                     help="按成交额降序处理 (需要最近快照)")
+    ap.add_argument("--codes", default="",
+                    help="逗号分隔的裸码列表, 只处理这些 code (定向补K线, 忽略 universe/min_days)")
     args = ap.parse_args()
 
-    uni = load_universe()
-    if not uni:
-        print(f"[expand] universe 不存在: {UNIVERSE}", file=sys.stderr)
-        return 1
-
-    if args.by_liquidity:
-        liq = snapshot_liquidity()
-        uni.sort(key=lambda x: -liq.get(x["code"][2:], 0))
-
-    have = existing_coverage(args.min_days) | existing_expand_codes()
-    todo = [x for x in uni if x["code"] not in have]
-    if args.limit:
-        todo = todo[: args.limit]
-    print(f"[expand] universe={len(uni)} 跳过已覆盖={len(have)} 本轮处理={len(todo)} "
-          f"days={args.days} workers={args.workers}", flush=True)
+    # 定向模式: 直接抓指定 code (带交易所前缀归一化)
+    if args.codes.strip():
+        def _pref(c):
+            c = c.strip().zfill(6)
+            if not c.isdigit():
+                return c  # 已带前缀
+            if c[0] in "69":
+                return f"sh{c}"
+            if c[0] in "03":
+                return f"sz{c}"
+            return f"bj{c}"
+        targets = [{"code": _pref(c)} for c in args.codes.split(",") if c.strip()]
+        have = set()
+        todo = [t for t in targets if t["code"] not in have]
+        print(f"[expand] 定向模式: 处理 {len(todo)} 只指定 code", flush=True)
+    else:
+        uni = load_universe()
+        if not uni:
+            print(f"[expand] universe 不存在: {UNIVERSE}", file=sys.stderr)
+            return 1
+        if args.by_liquidity:
+            liq = snapshot_liquidity()
+            uni.sort(key=lambda x: -liq.get(x["code"][2:], 0))
+        have = existing_coverage(args.min_days) | existing_expand_codes()
+        todo = [x for x in uni if x["code"] not in have]
+        if args.limit:
+            todo = todo[: args.limit]
+        print(f"[expand] universe={len(uni)} 跳过已覆盖={len(have)} 本轮处理={len(todo)} "
+              f"days={args.days} workers={args.workers}", flush=True)
 
     fresh = open(OUT, "a", encoding="utf-8") if os.path.exists(OUT) else open(OUT, "w", encoding="utf-8")
     if not os.path.exists(OUT):
