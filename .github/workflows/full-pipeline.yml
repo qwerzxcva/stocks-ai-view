@@ -91,6 +91,16 @@ jobs:
           print(f"data/all_sources.json: raw={s['total_raw']} merged={s['total_merged']} groups={list(s['groups'].keys())}")
           PY
 
+      # ── 4b. 生成 24h 热点资讯流 (前端 news_digest.json) ─────────
+      # 仓库里此前没有任何脚本生成 news_digest.json, 只有消费方
+      # (index.html renderNews), 导致该面板永远停在最后一次本地手跑的时间
+      # (线上实测 2026-10-13 08:30, 20 小时不更新)。
+      # 必须在 Collect all sources 之后: 输入是 all_sources.json 的 news 组。
+      - name: Build news digest
+        run: |
+          python3 scripts/build_news_digest.py --keep-hours 24 || \
+            echo "::warning::news_digest 生成失败, 保留上一版"
+
       # ── 5. 预测快照持久化 ─────────────────────────────────────
       # 复盘闭环的时间基准: 今天存, 明天验证 1 日, 后天验证 3 日…
       # 文件名必须是 engine_v5_<date>.json — reflect_engine 用
@@ -208,7 +218,7 @@ jobs:
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
           # 采集侧产物白名单 (引擎产出由 space-pull.yml 负责)
-          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob.json data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json"
+          FILES="data/sources_registry.json data/all_sources.json data/news_digest.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob.json data/ban_prob_balanced.json data/validation_report.json data/scenario.json data/engine_weights.json data/weights_history.json data/signal_audit.json data/edge_report.json data/anomaly_report.json data/multidim.json data/decision.json data/self_reflect.json data/valuation.json"
           # 只保留真实存在的路径, 避免 add 不存在的文件导致 fatal
           EXIST=""
           for f in $FILES; do

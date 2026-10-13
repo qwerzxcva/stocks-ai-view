@@ -316,15 +316,24 @@ def fetch_tv_ranking(limit=20):
     return out, {"source": "tencent_mktHs", "n": len(out)}
 
 
-def fetch_sina_news(limit=30):
-    """新浪快讯 → 按 title hash 主键"""
-    url = "https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=20"
-    b = _http(url, timeout=12, headers={"Referer": "https://finance.sina.com.cn/"})
+def fetch_sina_news(limit=50):
+    """新浪财经7x24快讯 → 按 title hash 主键
+
+    必须带 zhibo_id: 缺省时接口返回 {"code":11,"msg":"zhibo_id missing"},
+    feed 为空, 曾经导致 news_digest 长期为 0 条 (2026-10-14 定位)。
+    zhibo_id=152 是「财经滚动」直播流, 实测有实时数据。
+    """
     out = []
-    if b:
+    for zhibo_id in ("152", "153"):
+        url = ("https://zhibo.sina.com.cn/api/zhibo/feed?page=1&page_size=20"
+               f"&zhibo_id={zhibo_id}")
+        b = _http(url, timeout=12, headers={"Referer": "https://finance.sina.com.cn/"})
+        if not b:
+            continue
         try:
             d = json.loads(b.decode("utf-8"))
-            for item in ((d.get("result") or {}).get("data") or {}).get("feed", {}).get("list", [])[:limit]:
+            feed = ((d.get("result") or {}).get("data") or {}).get("feed", {})
+            for item in (feed.get("list") or [])[:limit]:
                 title = str(item.get("rich_text", "") or "").strip()
                 if not title:
                     continue
@@ -336,6 +345,8 @@ def fetch_sina_news(limit=30):
                 })
         except Exception:
             pass
+        if out:
+            break
     return out, {"source": "sina_news", "n": len(out)}
 
 
