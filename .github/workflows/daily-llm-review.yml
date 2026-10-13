@@ -74,6 +74,16 @@ jobs:
           open(f"review/{__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}.md","w").write(md)
           print("llm review done", flush=True)
           PYEOF
+      - name: Sync before commit
+        run: |
+          git fetch origin main
+          git stash push -u -m "generated" -- data/ 2>/dev/null || true
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || { git stash pop; exit 1; }
+          fi
+          git stash pop 2>/dev/null || true
+
       - name: Commit & push
         run: |
           git config user.name "ai-bot"

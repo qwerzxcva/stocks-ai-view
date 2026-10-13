@@ -66,6 +66,16 @@ jobs:
           echo "--- 日报预览 ---"
           head -30 data/daily_brief.md 2>/dev/null || echo "(no md)"
 
+      - name: Sync before commit
+        run: |
+          git fetch origin main
+          git stash push -u -m "generated" -- data/ai_picks.json data/daily_brief.json data/daily_brief.md 2>/dev/null || true
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || { git stash pop; exit 1; }
+          fi
+          git stash pop 2>/dev/null || true
+
       - name: Commit & push
         run: |
           git config user.name "brief-bot"
@@ -74,4 +84,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
             git commit -m "brief: $ts (盘前日报: 分析+推股+胜率验证+热点)" && \
-            git -c http.version=HTTP/1.1 push origin main; }
+            git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }

@@ -131,6 +131,16 @@ jobs:
             fi
           done
 
+      - name: Sync before commit
+        run: |
+          git fetch origin main
+          git stash push -u -m "generated" -- data/ 2>/dev/null || true
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || { git stash pop; exit 1; }
+          fi
+          git stash pop 2>/dev/null || true
+
       - name: Commit & push
         run: |
           git config user.name "pool-bot"
@@ -139,4 +149,4 @@ jobs:
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           git diff --quiet --cached HEAD && echo "no changes" || {
             git commit -m "pools: rebuild $ts (板块池+周期池+低位池+市场增量)" && \
-            git -c http.version=HTTP/1.1 push origin main; }
+            git -c http.version=HTTP/1.1 push origin main || { git pull --rebase origin main && git push origin main; }

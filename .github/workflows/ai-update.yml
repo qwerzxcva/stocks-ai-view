@@ -26,6 +26,16 @@ jobs:
           python-version: '3.x'
       - name: Run AI screener
         run: python3 scripts/ai_screener.py --out data/latest.json
+      - name: Sync before commit
+        run: |
+          git fetch origin main
+          git stash push -u -m "generated" -- data/ 2>/dev/null || true
+          if ! git merge --ff-only origin/main 2>/dev/null; then
+            echo "behind remote, rebasing"
+            git rebase origin/main || { git stash pop; exit 1; }
+          fi
+          git stash pop 2>/dev/null || true
+
       - name: Commit & push
         run: |
           git config user.name "stocks-ai-bot"
