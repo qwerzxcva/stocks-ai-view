@@ -57,7 +57,16 @@ jobs:
       # 1. 先刷新 AI 推股 (保证日报里的推股是最新的)
       - name: Build AI picks
         run: |
+          python3 scripts/update_klines_recent.py --days 3 --limit 2500 --workers 12 || true
           python3 scripts/build_ai_picks.py --out data/ai_picks.json --limit 3000 || true
+          echo "ai_picks: $(python3 -c "import json;print(len(json.load(open('data/ai_picks.json'))['picks']))" 2>/dev/null || echo 0) 只"
+
+      # 1b. 补生成日报依赖 (cycle_deep 等由 rebuild-pools 生成, 可能还没跑)
+      - name: Ensure brief dependencies
+        run: |
+          python3 scripts/rebuild_pools.py --out-dir data || true
+          python3 scripts/cycle_deep.py --out data/cycle_deep.json || true
+          echo "deps ready: $(ls data/cycle_deep.json data/cycle.json data/hot_impact.json 2>/dev/null | wc -l)/3"
 
       # 2. 生成盘前/盘后日报 (脚本内部会判断是否交易时段, 盘中直接跳过)
       - name: Build daily brief
