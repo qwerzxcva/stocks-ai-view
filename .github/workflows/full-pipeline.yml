@@ -1,12 +1,19 @@
-# 全数据源采集 + 数据库 + 引擎 + 复盘 一体化工作流
-# 交易日盘中多次运行 (CST 09:50 / 10:50 / 11:50 / 13:50 / 14:50)
-# 步骤:
-#   1. sources_registry 实测源状态 (记录到 meta)
-#   2. collect_all_sources 并发采集全部可用源, 合并去重
-#   3. db_layer 导入 DuckDB (索引+分区)
-#   4. 查询压测, 输出性能基线
-#   5. engine_v5 多指标共振评分
-#   6. reflect_engine 复盘历史预测 (有未来数据时)
+# full-pipeline — GitHub Actions 侧只做「采集 + 持久化 + 触发」
+# 交易日盘中 5 次 (CST 09:50 / 10:50 / 11:50 / 13:50 / 14:50)
+#
+# 2026-10-14 职责重划 (用户要求: 算法与引擎全部在云端跑通整套流程):
+#   Actions (本工作流) : 采集 → 合并去重 → DuckDB → 预测快照落盘 → push
+#   GitCode Space     : 拉数据 → 跑 10 个引擎 → 产出回推 (见 space-pull.yml)
+#
+# 为什么把计算搬走:
+#   - Actions 有 6h/次上限与每月 2000 分钟额度, 37 步全跑既慢又容易超时
+#   - Space 有独立 1000 核时/月额度, 常驻不占 Actions 配额
+#   - 引擎代码唯一事实源是 scripts/, Space 运行时从 GitHub raw 拉取
+#
+# 本工作流保留在 Actions 的原因:
+#   - collect_all_sources 要多个出口 IP 采国内源 (容器内被墙的源)
+#   - DuckDB 导入/压测是采集侧的质量门, 不是业务计算
+#   - data/predictions/ 快照必须由 Actions 落盘 (复盘闭环的时间基准)
 name: full-pipeline
 on:
   schedule:
@@ -30,7 +37,6 @@ jobs:
         run: |
           git fetch origin main
           git merge --ff-only origin/main || echo "already up to date"
-
 
       - name: Checkout kline repo (sparse)
         uses: actions/checkout@v4
@@ -65,20 +71,18 @@ jobs:
         run: |
           python3 scripts/collect_all_sources.py --out /tmp/collected.json --workers 8
 
-      # ── 3. 数据库导入 ──
+      # ── 3. 数据库导入 (采集侧质量门) ──
       - name: Init DB + load
         run: |
           python3 scripts/db_layer.py --init
           python3 scripts/db_layer.py --load /tmp/collected.json
 
-      # ── 4. 查询压测 ──
       - name: Query benchmark
         run: python3 scripts/db_layer.py --bench 2>&1 | tee /tmp/bench.txt
 
-      # ── 4b. 保存合并去重数据到 GitHub (供前端/查询/后续分析使用) ──
+      # ── 4. 合并去重结果落盘 (供前端查询 + Space 引擎消费) ──
       - name: Save merged sources to data/
         run: |
-          # 拷贝到 data/ 下, 由 commit 步骤统一推送
           cp /tmp/collected.json data/all_sources.json
           python3 - <<'PY'
           import json
@@ -87,131 +91,68 @@ jobs:
           print(f"data/all_sources.json: raw={s['total_raw']} merged={s['total_merged']} groups={list(s['groups'].keys())}")
           PY
 
-      # ── 5. 引擎 v5 多指标共振 ──
-      - name: Engine v5 scoring
-        run: |
-          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 400 || true
-
-      # ── 5b. 持久化预测快照 (复盘闭环的关键: 今天存, 明天验证 1日, 后天验证 3日…) ──
+      # ── 5. 预测快照持久化 ─────────────────────────────────────
+      # 复盘闭环的时间基准: 今天存, 明天验证 1 日, 后天验证 3 日…
+      # 文件名必须是 engine_v5_<date>.json — reflect_engine 用
+      #   glob('engine_v5*.json') 匹配, kline_sim 用
+      #   glob('engine_v5_*.json') 匹配, 改名会让两边都读不到。
+      # 快照由 Space 引擎链产出 engine_v5.json 后, 由本工作流拷贝而来;
+      # 若 Space 尚未产出, 则用采集行情构造一个最小快照 (保住时间基准)。
       - name: Persist prediction snapshot
         run: |
           mkdir -p data/predictions
           ts=$(TZ=Asia/Shanghai date +%Y-%m-%d)
-          cp data/engine_v5.json "data/predictions/engine_v5_${ts}.json" || true
-          echo "已存预测快照 data/predictions/engine_v5_${ts}.json (共 $(ls data/predictions | wc -l) 份)"
+          if [ -f data/engine_v5.json ]; then
+            # Space 已算出当日评分 → 直接快照 (复盘要的 top/votes 都在)
+            cp data/engine_v5.json "data/predictions/engine_v5_${ts}.json"
+            echo "prediction snapshot <- engine_v5.json ($(ls -la data/engine_v5.json | awk '{print $5}') bytes)"
+          else
+            echo "::notice::engine_v5.json 尚未生成 (Space 未跑), 本次不建快照"
+          fi
+          echo "predictions/: $(ls data/predictions | wc -l) 份"
 
-      # ── 6. 复盘 (对 data/predictions/ 全部历史快照做前向验证, 多持有期样本随时间累积) ──
-      - name: Reflect on past predictions
-        run: |
-          python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out data/reflect_latest.json || echo "reflect: 样本不足, 跳过"
-
-      # ── 6b. K线模拟回测 + 胜率矩阵 (基于已持久化的预测与 bulk K线) ──
-      - name: Kline simulation + winrate matrix
-        run: |
-          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --slip-pct 0.03 || true
-          python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate_matrix: reflect_latest 样本不足, 跳过"
-
-      # ── 6c. 多维因子引擎 (9维: 技术/资金/高低位/基本面/板块/市场/情绪/周期/消息) ──
-      - name: Multidim factor engine
-        run: |
-          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || true
-
-      # ── 6d. 策略决策引擎 (多维因子 → 可执行决策卡) ──
-      - name: Decision engine
-        run: |
-          python3 scripts/decision_engine.py --out data/decision.json || true
-          python3 scripts/decision_engine.py --out data/decision_card_$(TZ=Asia/Shanghai date +%Y%m%d).json || true
-
-      # ── 6e. 自我反思与总括改进 (证据驱动) ──
-      - name: Self reflect
-        run: |
-          python3 scripts/self_reflect.py --out data/self_reflect.json || true
-          python3 scripts/audit_data.py > data/audit_report.txt 2>&1 || true
-
-      # ── 6f. 全球指标 (离岸人民币/美元指数, 供前端读) ──
+      # ── 6. 全局 FX (轻量, 前端常驻展示) ──
       - name: Global FX
-        run: |
-          python3 scripts/build_global_fx.py --out data/global_fx.json || true
+        run: python3 scripts/build_global_fx.py --out data/global_fx.json || true
 
-      # ── 6g. GitCode AI 每日复盘 (消耗 GitCode 每月 AI 额度, DeepSeek-V4-Flash) ──
-      - name: GitCode AI review
+      # ── 6b. 样本均衡 (EB 收缩: 修复连板层级 99.7% 样本集中首板) ──
+      - name: Sample balancer
+        run: python3 scripts/sample_balancer.py --write-back || echo "balancer skipped (no ban_prob)"
+
+      # ── 7. 数据校验 (采集侧) ──
+      - name: Audit collected data
+        run: |
+          python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
+
+      # ── 8. 触发 Space 跑引擎链 ────────────────────────────────
+      # Space 的 auto_sync_loop 每 30 分钟会自己拉取; 这里额外 curl /health
+      # 一是保活 (防 30 分钟休眠), 二是让本次新采集的数据尽快被引擎消费。
+      - name: Wake Space engine
+        continue-on-error: true
         env:
-          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
         run: |
-          python3 scripts/gitcode_ai_review.py || echo "ai_review: GitCode AI 不可用, 保留规则引擎复盘"
+          if [ -z "$GC_TOKEN" ]; then
+            echo "::notice::GC_TOKEN 未配置, Space 触发器跳过 (引擎仍按自身 30 分钟节奏跑)"
+            exit 0
+          fi
+          # Space 运行地址: GitCode Space 详情页可查。未配置时静默跳过。
+          SPACE_URL="${SPACE_URL:-}"
+          if [ -z "$SPACE_URL" ]; then
+            echo "::notice::SPACE_URL 未配置, 跳过主动唤醒 (等 Space 30 分钟自动拉取)"
+            exit 0
+          fi
+          curl -sf --max-time 15 "$SPACE_URL/health" >/dev/null 2>&1 \
+            && echo "Space health OK" || echo "::warning::Space health 失败 (不影响采集)"
 
-      # ── 6h. GitCode 引擎适配集 (walkforward/rps/market_phase/patterns/factor_lib/cyq/predict/pick/moneyflow/global/strategy) ──
-      # 依赖: kline-repo bulk (步骤2已 link) + 6b kline_sim + 6f global_fx; 均在 kline bulk 之后
-      - name: Walk-forward fold plan
-        run: |
-          python3 scripts/walkforward.py --out data/walkforward.json || true
-
-      - name: RPS rotation
-        run: |
-          python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps: bulk 不可用, 跳过"
-
-      - name: Market phase (bulk 涨停结构自算)
-        run: |
-          python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase: bulk 不可用, 跳过"
-
-      - name: Pattern smoke (停机坪/高而窄旗形/回踩年线/无大幅回撤)
-        run: |
-          python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns: bulk 不可用, 跳过"
-
-      - name: Factor lib smoke (29因子)
-        run: |
-          python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib: bulk 不可用, 跳过"
-
-      - name: CYQ chip distribution smoke
-        run: |
-          python3 scripts/cyq.py --out data/cyq_smoke.json || echo "cyq: bulk 不可用, 跳过"
-
-      - name: Next-day probability (predict_algo)
-        run: |
-          python3 scripts/predict_algo.py --local --out data/predict_algo.json || echo "predict: 无指数K线, 跳过"
-
-      - name: Limit-up pick algo (B规则统计驱动)
-        run: |
-          python3 scripts/pick_algo.py --top 20 --out data/pick_algo.json || echo "pick_algo: bulk 不可用, 跳过"
-
-      - name: Theme to stocks (hot_impact 题材 → 60日动量)
-        run: |
-          python3 scripts/theme_to_stocks.py --out data/theme_to_stocks.json || echo "theme_to_stocks: 缺热点题材/kline, 跳过"
-
-      - name: Moneyflow scan (新浪主力净流入)
-        run: |
-          python3 scripts/moneyflow_scan.py --out data/moneyflow/latest.json || echo "moneyflow: 无关注票, 跳过"
-
-      - name: Global kline + panel (腾讯/新浪全球资产)
-        run: |
-          python3 scripts/global_kline.py --out data/global_kline.json || true
-          python3 scripts/global_panel.py --out-dir data/global || echo "global_panel: 海外源不可达, 跳过"
-
-      - name: Strategy card (B规则候选)
-        run: |
-          python3 scripts/strategy_card.py --out data/strategy_card.json || echo "strategy_card: bulk 不可用, 跳过"
-
-      - name: Intraday signal (无分钟线则空信号)
-        run: |
-          python3 scripts/intraday_signal.py --out data/intraday_signal.json || true
-
-      - name: Engine fusion (多引擎加权, 需在 phase/kline_sim/global 之后)
-        run: |
-          python3 scripts/engine_fusion.py --out data/engine_fusion.json || echo "engine_fusion: 输入缺失, 跳过"
-
-      # ── 6h. 实际价值估值 (四法合成, 注入所有股池) ──
-      - name: Valuation engine (intrinsic value)
-        run: |
-          python3 scripts/valuation_engine.py --inject || echo "valuation: 快照缺失, 跳过"
-
-      # ── 7. 采集摘要 ──
+      # ── 9. 采集摘要 ──
       - name: Summary
         run: |
           python3 - <<'PY'
           import json
           d = json.load(open('/tmp/collected.json'))
           s = d['summary']
-          print(f"## 全管道采集摘要")
+          print('## full-pipeline 采集摘要 (计算引擎已移至 GitCode Space)')
           print(f"- 源: {s['registry']}")
           print(f"- 原始 {s['total_raw']} → 合并 {s['total_merged']} (去重 {s['dedup_removed']})")
           print(f"- 冲突 {s['conflicts']} 个, 错误 {len(s['errors'])} 个")
@@ -220,25 +161,29 @@ jobs:
               print(f"  - {g}: {v['raw']} → {v['merged']}")
           PY
 
+      # ── 10. 提交 ──────────────────────────────────────────────
+      # 只提交采集侧产物。引擎产出 (engine_v5/multidim/decision/reflect/
+      # kline_sim/self_reflect/valuation/…) 由 space-pull.yml 拉回后提交,
+      # 两个工作流写不同的文件, 不会互相覆盖。
       - name: Commit & push
         run: |
           git config user.name "pipeline-bot"
           git config user.email "741059079@qq.com"
+          FILES="data/sources_registry.json data/all_sources.json data/predictions data/global_fx.json data/audit_data_report.txt data/ban_prob_balanced.json"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/valuation.json data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
+          git add -A $FILES
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
           else
-            git commit -m "pipeline: $ts"
+            git commit -m "pipeline(collect): $ts"
           fi
           git push origin main || {
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/sources_registry.json data/engine_v5.json data/reflect_latest.json data/all_sources.json data/predictions data/kline_sim.json data/winrate_matrix.json data/multidim.json data/audit_data_report.txt data/decision.json data/self_reflect.json data/global_fx.json data/ai_review.md data/ai_review.json data/gitcode_review data/valuation.json data/walkforward.json data/rps_rotation.json data/market_phase.json data/patterns_smoke.json data/factor_smoke.json data/cyq_smoke.json data/predict_algo.json data/pick_algo.json data/theme_to_stocks.json data/moneyflow data/global_kline.json data/global data/strategy_card.json data/intraday_signal.json data/engine_fusion.json
-            git commit -m "pipeline: $ts" 2>/dev/null || true
+            git add -A $FILES
+            git commit -m "pipeline(collect): $ts" 2>/dev/null || true
             git push origin main
           }
-

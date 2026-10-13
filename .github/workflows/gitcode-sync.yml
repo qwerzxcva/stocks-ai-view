@@ -142,57 +142,59 @@ jobs:
           fi
 
       # ─────────────────────────────────────────────────────────
-      # 步骤 C: GitHub scripts/*.py → GitCode engines/
-      #   保持两侧脚本同步 (含新增与更新)
+      # 步骤 C: GitHub scripts/*.py → GitCode Space 触发引擎同步
+      #   2026-10-14 改: 不再把 108 个脚本整体镜像到 engines/ (与 Space 的
+      #   运行时 GitHub raw 拉取重复, 且镜像曾滞后导致 Space 跑旧代码)。
+      #   Space 的 sync_engines() 每次跑链前从 GitHub raw 拉脚本, GitHub
+      #   scripts/ 是唯一事实源。这里只 push 一个版本戳, 供 Space 面板展示。
       # ─────────────────────────────────────────────────────────
-      - name: Step C - mirror scripts/ to GitCode engines/
+      - name: Step C - stamp engine version for Space
         if: env.GC_SKIP != '1'
         run: |
           ts=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')
-          wt=".gc-worktree"
-          rm -rf "$wt"
-          mkdir -p "$wt"
-          git worktree add --detach "$wt" gitcode/main
+          sha=$(git rev-parse --short HEAD)
+          n_scripts=$(ls scripts/*.py 2>/dev/null | wc -l)
+          mkdir -p /tmp/space-stamp
+          cat > /tmp/space-stamp/engine_version.json <<JSON
+          {
+            "source": "github:qwerzxcva/stocks-ai-view",
+            "commit": "$sha",
+            "scripts": $n_scripts,
+            "stamped_at": "$ts",
+            "note": "Space pulls scripts from GitHub raw at runtime; this file is a version stamp only"
+          }
+          JSON
+          echo "引擎版本戳: commit=$sha scripts=$n_scripts"
 
-          mkdir -p "$wt/engines"
-          n_new=0; n_upd=0; n_data=0
-          for f in scripts/*.py; do
-            [ -e "$f" ] || continue
-            cp "$f" "$wt/engines/$(basename "$f")"
-            if git cat-file -e "gitcode/main:engines/$(basename "$f")" 2>/dev/null; then
-              n_upd=$((n_upd + 1))
+          git remote add space "https://x-access-token:${GC_TOKEN}@gitcode.com/jiegengxiangjianxue/stocks-ai-space.git" 2>/dev/null || \
+            git remote set-url space "https://x-access-token:${GC_TOKEN}@gitcode.com/jiegengxiangjianxue/stocks-ai-space.git"
+          if git fetch space main 2>/dev/null; then
+            wt=".space-worktree"
+            rm -rf "$wt"
+            git worktree add --detach "$wt" space/main 2>/dev/null || {
+              echo "::warning::worktree 失败, 跳过版本戳推送"; git worktree prune; exit 0;
+            }
+            mkdir -p "$wt"
+            cp /tmp/space-stamp/engine_version.json "$wt/engine_version.json"
+            cd "$wt"
+            git add engine_version.json
+            if git diff --cached --quiet HEAD; then
+              echo "版本戳无变化"
             else
-              n_new=$((n_new + 1))
+              git -c user.name="stocks-sync-bot" -c user.email="3576982374@qq.com" \
+                commit -m "stamp(engine): $sha ($n_scripts scripts) $ts" || true
+              if ! git push space HEAD:main --force-with-lease; then
+                echo "::warning::版本戳 push 被拒绝 (Space 侧分叉), 不影响引擎运行"
+              else
+                echo "✅ 步骤 C 完成: 版本戳已推送 Space"
+              fi
             fi
-          done
-          for f in data/*.json; do
-            [ -e "$f" ] || continue
-            cp "$f" "$wt/data/$(basename "$f")"
-            n_data=$((n_data + 1))
-          done
-
-          cd "$wt"
-          git add -A engines/ data/
-          if git diff --cached --quiet HEAD; then
-            echo "no script changes to mirror (GitCode engines/ 已是最新)"
+            cd - > /dev/null
+            git worktree remove --force "$wt" 2>/dev/null || true
+            git worktree prune
           else
-            git config user.name "stocks-sync-bot"
-            git config user.email "3576982374@qq.com"
-            git commit -m "mirror(scripts): $ts (GitHub → GitCode 引擎同步)
-
-            engines: +$n_new 新增 / ~$n_upd 覆盖 · data: $n_data 个 json" || true
-            if ! git push gitcode HEAD:main --force-with-lease; then
-              echo "::warning::push 被拒绝 (GitCode 侧分叉), fetch + merge -X ours 后重试"
-              git fetch gitcode main || true
-              git merge --no-edit gitcode/main -X ours || true
-              git push gitcode HEAD:main --force-with-lease || \
-                echo "::error::步骤 C 失败: scripts/ 未同步到 GitCode"
-            fi
-            echo "✅ 步骤 C 完成: engines +$n_new / ~$n_upd, data $n_data"
+            echo "::warning::Space 仓 fetch 失败, 跳过版本戳 (引擎仍会从 GitHub raw 拉取)"
           fi
-          cd - > /dev/null
-          git worktree remove --force "$wt"
-          git worktree prune
 
       # ─────────────────────────────────────────────────────────
       # 步骤 D: GitCode 云容器产出的分析结果 → GitHub data/gitcode_review/

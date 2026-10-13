@@ -37,6 +37,8 @@ def main():
     ap.add_argument("--days", type=int, default=15, help="回溯多少个交易日")
     ap.add_argument("--limit", type=int, default=300,
                     help="每天最多评多少只股票 (按最新成交额排序, 0=全部)")
+    ap.add_argument("--top-per-day", type=int, default=50,
+                    help="每天写入快照的 top N 条 (reflect 只验证这些)")
     ap.add_argument("--out-dir", default=os.path.join(AI_VIEW_DATA, "predictions"))
     args = ap.parse_args()
 
@@ -104,7 +106,7 @@ def main():
             "n_scored": len(results),
             "indicators": 17,
             "formula": "score = 50 + 50 * (Σ w·vote·strength / Σ w) * (0.6 + 0.4*共振率)",
-            "top": results[:50],
+            "top": results[: args.top_per_day],
             "meta": {
                 "backfilled": True,
                 "asof": asof,
@@ -114,7 +116,7 @@ def main():
         }
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(payload, f, ensure_ascii=False)
-        print(f"[backfill] {asof}: {len(results)} 只评分, top50 已存 "
+        print(f"[backfill] {asof}: {len(results)} 只评分, top{args.top_per_day} 已存 "
               f"(最高 {results[0]['score']:.1f} {results[0]['code']})", flush=True)
 
     print(f"[backfill] 完成 → {args.out_dir} (共 {len(dates)} 天)")

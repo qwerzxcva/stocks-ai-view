@@ -253,17 +253,19 @@ def main():
         g["suggest"] = f"global skip: {e}"
 
     # 周期位置接入 (cycle.json 偏空→收紧)
+    # 注意: cycle.json 的 macro_signals 是 dict {symbol: {...}}, 不是 list
     cyc_note = ""
     try:
         cp = os.path.join(AI_VIEW_DATA, "cycle.json")
         if os.path.exists(cp):
             cd = json.load(open(cp, encoding="utf-8"))
-            sigs = cd.get("macro_signals") or []
-            bear = sum(1 for s in sigs if str(s.get("phase", "")).lower() in
+            sigs = cd.get("macro_signals") or {}
+            items = list(sigs.values()) if isinstance(sigs, dict) else (sigs or [])
+            bear = sum(1 for s in items if str(s.get("phase", "")).lower() in
                        ("downtrend", "bear", "偏空"))
-            if sigs and bear >= len(sigs) / 2:
+            if items and bear >= len(items) / 2:
                 cand = [c for c in cand if c["pos240"] < 0.45]
-                cyc_note = "周期偏空: 收紧至240日位<45%"
+                cyc_note = f"周期偏空({bear}/{len(items)}指数): 收紧至240日位<45%"
                 print(f"[ai_pick_v4] {cyc_note} → {len(cand)} 只")
     except Exception as e:
         cyc_note = f"cycle skip: {e}"

@@ -61,15 +61,21 @@ jobs:
           fi
 
           # Space 产出文件 → GitHub data/ (覆盖旧数据)
+          # 产出名与 data/ 目标名一一对应: 引擎写 <name>.json, 前端读 data/<name>.json
           n=0
           for f in $(git ls-tree -r --name-only space/main | grep '^analysis_out/.*\.json$'); do
             base=$(basename "$f")
+            # space_run.json 是运行摘要, 不是前端数据; 放 data/ 会被当成业务数据
+            if [ "$base" = "space_run.json" ]; then
+              continue
+            fi
             git show "space/main:$f" > "data/$base" 2>/dev/null || continue
             echo "  <- $base"
             n=$((n+1))
           done
           # 引擎日志也带一份 (便于排查)
           git show "space/main:analysis_out/engine.log" > data/space_engine.log 2>/dev/null || true
+          git show "space/main:analysis_out/space_run.json" > data/space_run.json 2>/dev/null || true
           echo "共拉取 $n 个产出文件"
 
       - name: Commit and push
