@@ -9,12 +9,17 @@ db_layer.py — DuckDB 数据库层 (索引 + 分区 + 查询优化 + 并发压�
   - 可直接读 Parquet/CSV, 也能被 Python/pandas/BI 工具共用
 
 Schema 设计 (按查询模式反推):
-  quotes         日行情快照     分区: trade_date      索引: (code, trade_date)
-  kline_daily    日K (qfq)      分区: year           索引: (code, date)
-  events         龙虎榜/大宗     分区: trade_date     索引: (code, trade_date), (type)
+  quotes         日行情快照     隐式分区: trade_date (DuckDB zone maps, 非显式 PARTITION BY)   索引: (code, trade_date)
+  kline_daily    日K (qfq)      隐式分区: year           索引: (code, date)
+  events         龙虎榜/大宗     隐式分区: trade_date     索引: (code, trade_date), (type), (trade_date, deal_amt)
   margin         两融余额       索引: date (UNIQUE)
-  pools          池子/板块评分   分区: date           索引: (kind, date)
+  pools          池子/板块评分   隐式分区: date           索引: (kind, date)
   sources_log    采集溯源日志    索引: (ts, source)
+  -- v2 扩展 (2026-10-13): 公告/新闻/基金净值/财务摘要
+  announcements  公告 (按 ann_date 分区)
+  news_items     新闻快讯
+  fund_nav       基金/ETF 净值
+  financial_summary  财务摘要
 
 用法:
   python3 db_layer.py --init                  # 建库建表
@@ -116,6 +121,64 @@ CREATE TABLE IF NOT EXISTS sources_log (
     elapsed  DOUBLE,
     status   VARCHAR
 );
+
+-- ── v2 扩展表 (2026-10-13) ─────────────────────────────────────────
+
+-- 公告 (东财 np-ann / 巨潮 / 交易所)
+CREATE TABLE IF NOT EXISTS announcements (
+    code        VARCHAR,
+    name        VARCHAR,
+    title       VARCHAR,
+    ann_date    VARCHAR,   -- YYYY-MM-DD
+    ann_type    VARCHAR,   -- 业绩预告/定期报告/临时公告
+    url         VARCHAR,
+    source      VARCHAR,   -- 采集源标识
+    ts          VARCHAR
+);
+
+-- 新闻快讯 (7x24 多源合并)
+CREATE TABLE IF NOT EXISTS news_items (
+    title       VARCHAR,
+    content     TEXT,
+    source      VARCHAR,   -- sina/em/douyin/remote_news
+    pub_time    VARCHAR,   -- ISO 8601
+    url         VARCHAR,
+    ts          VARCHAR
+);
+
+-- 基金/ETF 净值
+CREATE TABLE IF NOT EXISTS fund_nav (
+    fund_code   VARCHAR,
+    fund_name   VARCHAR,
+    date        VARCHAR,
+    nav         DOUBLE,
+    cum_nav     DOUBLE,
+    change_pct  DOUBLE,
+    scale_yi    DOUBLE,   -- 规模(亿)
+    ts          VARCHAR
+);
+
+-- 基金重仓股 (pingzhongdata 解析结果)
+CREATE TABLE IF NOT EXISTS fund_rebalance (
+    fund_code    VARCHAR,
+    report_date  VARCHAR,   -- 季度末日期
+    stock_code   VARCHAR,
+    stock_name   VARCHAR,
+    ratio        DOUBLE,   -- 持股比例%
+    ts           VARCHAR
+);
+
+-- 财务摘要 (同花顺 stock_financial_abstract_new_ths)
+CREATE TABLE IF NOT EXISTS financial_summary (
+    code          VARCHAR,
+    report_date   VARCHAR,   -- 报告期 YYYY-MM-DD
+    report_name   VARCHAR,   -- 如 "2026一季报"
+    metric_name   VARCHAR,   -- 如 "index_weighted_avg_roe"
+    value         VARCHAR,
+    yoy           VARCHAR,
+    mom           VARCHAR,
+    ts            VARCHAR
+);
 """
 
 INDEXES = [
@@ -129,6 +192,19 @@ INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_events_deal ON events(type, trade_date, deal_amt)",
     "CREATE INDEX IF NOT EXISTS idx_pools_kind_date ON pools(kind, date)",
     "CREATE INDEX IF NOT EXISTS idx_sources_log_ts ON sources_log(ts)",
+    # ── v2 新增索引 (2026-10-13) ─────────────────────────────────────
+    # 覆盖索引: 补齐缺失的 ORDER BY 扫描列
+    "CREATE INDEX IF NOT EXISTS idx_quotes_chg_cover ON quotes(trade_date, chg_pct, code, name, price)",
+    "CREATE INDEX IF NOT EXISTS idx_quotes_pe_pb_cover ON quotes(trade_date, pe, pb, code, name)",
+    "CREATE INDEX IF NOT EXISTS idx_events_deal_cover ON events(trade_date, deal_amt, code, name, type)",
+    # 新表索引
+    "CREATE INDEX IF NOT EXISTS idx_ann_date ON announcements(ann_date)",
+    "CREATE INDEX IF NOT EXISTS idx_ann_code ON announcements(code, ann_date)",
+    "CREATE INDEX IF NOT EXISTS idx_news_ts ON news_items(ts)",
+    "CREATE INDEX IF NOT EXISTS idx_news_source ON news_items(source, ts)",
+    "CREATE INDEX IF NOT EXISTS idx_fund_nav_code ON fund_nav(fund_code, date)",
+    "CREATE INDEX IF NOT EXISTS idx_fund_rebal_code ON fund_rebalance(fund_code, report_date)",
+    "CREATE INDEX IF NOT EXISTS idx_fin_code_period ON financial_summary(code, report_date)",
 ]
 
 
@@ -202,6 +278,66 @@ def load_margin(con, records):
         except Exception:
             pass
     return n
+
+
+# ─── v2 新增加载函数 (2026-10-13) ───────────────────────────────────────────
+def load_announcements(con, records):
+    """records: list of dict with code/name/title/ann_date/ann_type/url/source."""
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    rows = [(r.get("code"), r.get("name"), r.get("title"),
+             r.get("ann_date"), r.get("ann_type"), r.get("url"),
+             r.get("source", ""), ts) for r in records]
+    if rows:
+        con.executemany(
+            "INSERT INTO announcements VALUES (?,?,?,?,?,?,?,?)", rows)
+    return len(rows)
+
+
+def load_news_items(con, records):
+    """records: list of dict with title/content/source/pub_time/url."""
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    rows = [(r.get("title"), r.get("content"), r.get("source", ""),
+             r.get("pub_time"), r.get("url"), ts) for r in records]
+    if rows:
+        con.executemany(
+            "INSERT INTO news_items VALUES (?,?,?,?,?,?)", rows)
+    return len(rows)
+
+
+def load_fund_nav(con, records):
+    """records: list of dict with fund_code/fund_name/date/nav/cum_nav/change_pct/scale_yi."""
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    rows = [(r.get("fund_code"), r.get("fund_name"), r.get("date"),
+             r.get("nav"), r.get("cum_nav"), r.get("change_pct"),
+             r.get("scale_yi"), ts) for r in records]
+    if rows:
+        con.executemany(
+            "INSERT INTO fund_nav VALUES (?,?,?,?,?,?,?,?)", rows)
+    return len(rows)
+
+
+def load_fund_rebalance(con, records):
+    """records: list of dict with fund_code/report_date/stock_code/stock_name/ratio."""
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    rows = [(r.get("fund_code"), r.get("report_date"),
+             r.get("stock_code"), r.get("stock_name"), r.get("ratio"), ts)
+            for r in records]
+    if rows:
+        con.executemany(
+            "INSERT INTO fund_rebalance VALUES (?,?,?,?,?,?)", rows)
+    return len(rows)
+
+
+def load_financial_summary(con, records):
+    """records: list of dict with code/report_date/report_name/metric_name/value/yoy/mom."""
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    rows = [(r.get("code"), r.get("report_date"), r.get("report_name"),
+             r.get("metric_name"), r.get("value"), r.get("yoy"), r.get("mom"), ts)
+            for r in records]
+    if rows:
+        con.executemany(
+            "INSERT INTO financial_summary VALUES (?,?,?,?,?,?,?,?)", rows)
+    return len(rows)
 
 
 def load_from_collect(json_path, path=None):
