@@ -1,10 +1,10 @@
 {
   "date": "2026-10-13",
   "market_phase": null,
-  "total_sectors": 32,
+  "total_sectors": 100,
   "tier1_count": 7,
   "tier2_count": 25,
-  "tier3_count": 0,
+  "tier3_count": 68,
   "tier_down_count": 0,
   "tier1": [
     {
@@ -365,7 +365,7 @@
   "tier_down": [],
   "meta": {
     "source": "腾讯证券 proxy.finance.qq.com mktHs/rank",
-    "ts": "2026-10-13T20:46:32.795678+08:00",
+    "ts": "2026-10-13T23:16:07.136491+08:00",
     "freq": "实时 (盘中随行情更新, 收盘后定格)",
     "grading": "tier1=当日涨幅≥2%且5日>0; tier2=当日≥1%或5日≥3%; tier_down=当日≤-2%; 其余 tier3",
     "fields": {
@@ -376,72 +376,6 @@
       "leader_pct": "领涨股涨跌幅 %"
     },
     "caveat": "腾讯行业分类口径与申万/东财行业不同, 板块数量约100个; 不含主力资金净流入字段 (该源不提供)",
-    "rebuilt": "rebuild_pools.py (原 sector_pool.json 因远端写入错位, 内容为 cycle_v2/2026-10-09, 已重建)",
-    "deduped_at": "2026-10-13T20:58:40+08:00",
-    "dedup_note": "移除 0 条 Ⅱ/Ⅲ 分级重复",
-    "count_fixed": [
-      "tier3_count: 68 → 0"
-    ]
-  },
-  "provenance": {
-    "stamped_at": "2026-10-13T21:00:03+08:00",
-    "stamped_by": "data_audit.py",
-    "fields": {
-      "date": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "market_phase": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "total_sectors": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier1_count": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier2_count": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier3_count": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier_down_count": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier1": {
-        "source": "tv_screener + local_kline",
-        "confidence": "medium",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier2": {
-        "source": "tv_screener + local_kline",
-        "confidence": "medium",
-        "snapshot_ts": "2026-10-13"
-      },
-      "tier_down": {
-        "source": "tv_screener + local_kline",
-        "confidence": "medium",
-        "snapshot_ts": "2026-10-13"
-      },
-      "meta": {
-        "source": "unknown",
-        "confidence": "unknown",
-        "snapshot_ts": "2026-10-13"
-      }
-    }
+    "rebuilt": "rebuild_pools.py (原 sector_pool.json 因远端写入错位, 内容为 cycle_v2/2026-10-09, 已重建)"
   }
 }
