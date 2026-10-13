@@ -354,7 +354,7 @@ const _etagCache=new Map();
 async function fetchJSON(p){try{
   // 高频数据 (盘中30分钟更新) 不用 If-None-Match, 避免 ETag 304 命中时
   // 拿到会话内的旧缓存; SW 也已把这些文件改为 network-first。
-  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|flow_divergence)\.json$/.test(p);
+  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|flow_divergence|market_now)\.json$/.test(p);
   const hdr={};
   const et=_etagCache.get(p);
   if(et && !HOT)hdr['If-None-Match']=et;
@@ -1078,6 +1078,18 @@ async function render(){
   ]);
   window._lastD = d; if(txRendered===false && document.querySelector('.c-tab[data-c="5"].active')) renderTencent(d);
   if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
+  // 实时行情优先: market_now.json 是每10分钟刷新的独立文件,
+  // 不被远端 sync 覆盖 (远端只覆盖 latest.json)
+  const mn=await fetchJSON('data/market_now.json');
+  if(mn&&mn.market){
+    d.market=mn.market;
+    if(mn.limit_up_pool&&mn.limit_up_pool.length)d.limit_up_pool=mn.limit_up_pool;
+    if(mn.limit_down_pool)d.limit_down_pool=mn.limit_down_pool;
+    if(mn.themes&&mn.themes.length)d.themes=mn.themes;
+    if(mn.ths_strong)d.ths_strong=mn.ths_strong;
+    if(mn.tx_sector_ranking)d.westock={sector_ranking:{date:mn.date,data:mn.tx_sector_ranking}};
+    window._realtimeTs=mn.ts;
+  }
   // 用独立池子文件覆盖 latest.json 里的 pools (若独立文件有效)
   if(d && typeof d==='object'){
     d.pools = d.pools || {};
@@ -1090,7 +1102,7 @@ async function render(){
       d.index_kline = ik.indices.sh000001;
     }
   }
-  const ts=new Date(d.ts).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
+  const ts=new Date((window._realtimeTs||d.ts)).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
   document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
   document.getElementById('algoBadge').textContent=(d.meta||{}).algo||'tsp';
   renderKpis(d.market);

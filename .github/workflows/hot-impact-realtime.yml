@@ -55,14 +55,11 @@ jobs:
       - name: Run hot_impact
         run: python3 scripts/hot_impact.py --out-dir data
 
-      # 实时刷新 market 块 (涨停/跌停/炸板/涨跌家数/成交额/两融/指数)
-      # 关键: 必须在远端 sync 之后跑, 否则会被覆盖回旧快照
-      - name: Refresh market realtime
+      # 实时行情 → 独立文件 market_now.json (不碰 latest.json, 避免与远端 sync 冲突)
+      - name: Build market_now.json
         run: |
-          if [ -f data/latest.json ]; then
-            python3 scripts/collect_market_extras.py --merge data/latest.json || true
-            python3 -c "import json;m=json.load(open('data/latest.json'))['market'];print('  涨停',m['limit_up'],'跌停',m['limit_down'],'炸板',m['broken'],'涨',m['advance'],'跌',m['decline'])" || true
-          fi
+          python3 scripts/build_market_now.py --out data/market_now.json || true
+          python3 -c "import json;m=json.load(open('data/market_now.json'))['market'];print('  涨停',m['limit_up'],'跌停',m['limit_down'],'炸板',m['broken'],'涨',m['advance'],'跌',m['decline'])" || true
 
       # 强势股/龙虎榜/大宗交易 → 独立 enrich.json (盘中同步刷新)
       - name: Build enrich.json
@@ -101,7 +98,7 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json
+          git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
           if git diff --quiet --cached HEAD; then
             echo "no changes"
@@ -112,7 +109,7 @@ jobs:
             echo "push raced, retrying after reset"
             git fetch origin main
             git reset --soft origin/main
-            git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json
+            git add -A data/hot_impact.json data/hot_impact.md data/enrich.json data/ai_picks.json data/market_now.json data/ban_prob.json data/flow_divergence.json
             git commit -m "hot-impact: $ts" 2>/dev/null || true
             git push origin main
           }
