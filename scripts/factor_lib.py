@@ -1,15 +1,31 @@
 #!/usr/bin/env python3
 # ═══ 来源: GitCode dufuwuxin/stock-system · algorithms/factor_lib.py ═══
 # 上游 commit: 175984648d3d · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
-# 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (补 __main__ 冒烟入口, 原为纯库无 main 导致直接运行静默退出)
 """
 因子库 v1 (参考 tick-stock-panel factors/registry 移植, pandas版)
   每个因子: (id, 中文, 组, 计算函数df->Series)
   用于 scan_local 打分增强 + 周期规律归因
+
+冒烟: python3 factor_lib.py [--bulk DIR] [--code sz000610] [--out data/factor_smoke.json]
 """
 from __future__ import annotations
+import argparse
+import json
+import os
+import sys
+
 import pandas as pd
 import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import BULK, AI_VIEW_DATA as DATA_DIR
+except Exception:
+    BULK = os.path.join(os.path.dirname(os.path.dirname(HERE)), "stocks-data-kline", "data", "bulk")
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 
 def _roll(s, n, fn):
@@ -134,3 +150,53 @@ def latest_snapshot(df: pd.DataFrame) -> dict:
     last = full.iloc[-1]
     return {fid: (None if pd.isna(last[fid]) else round(float(last[fid]), 4))
             for fid, _, _, _ in FACTORS}
+
+
+def load_one(bulk_dir: str, code: str) -> pd.DataFrame:
+    """从 bulk day_qfq_*.csv 读单票日K (分隔符 '|' 或 ',' 自动识别)。"""
+    import glob
+    rows = []
+    for p in sorted(glob.glob(os.path.join(bulk_dir, "day_qfq_*.csv"))):
+        with open(p, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("|") if "|" in line else line.split(",")
+                if len(parts) < 6 or parts[0] != code:
+                    continue
+                try:
+                    rows.append((parts[1], float(parts[2]), float(parts[3]),
+                                 float(parts[4]), float(parts[5]), float(parts[6])))
+                except ValueError:
+                    continue
+        if rows:
+            break
+    if not rows:
+        raise ValueError(f"bulk 中找不到 {code}")
+    rows.sort(key=lambda x: x[0])
+    return pd.DataFrame(rows, columns=["date", "open", "close", "high", "low", "volume"])
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser(description="因子库冒烟")
+    ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
+    ap.add_argument("--code", default="sz000610", help="测试股票代码")
+    ap.add_argument("--out", default=None, help="可选: 落盘 JSON")
+    args = ap.parse_args()
+
+    bulk = args.bulk or BULK
+    df = load_one(bulk, args.code)
+    snap = latest_snapshot(df)
+    n_ok = sum(1 for v in snap.values() if v is not None)
+    print(f"{args.code}: {len(df)} 根, 因子 {n_ok}/{len(snap)} 个非空")
+    for fid, label, group, _ in FACTORS:
+        print(f"  {fid:22s} {label:14s} [{group}] = {snap[fid]}")
+    if args.out:
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        with open(args.out, "w", encoding="utf-8") as f:
+            json.dump({"ts": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+                       "code": args.code, "bars": len(df),
+                       "date": df.date.iloc[-1], "factors": snap},
+                      f, ensure_ascii=False, indent=1)
+        print("->", args.out)

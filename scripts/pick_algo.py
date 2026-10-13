@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # ═══ 来源: GitCode dufuwuxin/stock-system · algorithms/pick_algo.py ═══
 # 上游 commit: 3a25369b013c · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
-# 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (数据源 t1 云端分片 → 本地 BULK bulk CSV; --out 落盘 data/pick_algo.json)
 """
 选股算法 v1 — 打板统计学驱动（qwerzxcva/stocks-algo）
 依据: stocks/docs/limitup-stats.md 实测统计 (168,368 首板样本, 2022-07~2026-10)
@@ -16,9 +16,24 @@
 输出: 候选打分列表 (score 0-100)
 """
 from __future__ import annotations
-import csv, io, json, os, urllib.request
+import argparse
+import csv
+import io
+import json
+import os
+import sys
+import urllib.request
 from dataclasses import dataclass, field
 from datetime import date
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import BULK, AI_VIEW_DATA as DATA_DIR
+except Exception:
+    BULK = os.path.join(os.path.dirname(os.path.dirname(HERE)), "stocks-data-kline", "data", "bulk")
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 TOKEN = os.environ.get("GH_TOKEN", "")
 RAW = "https://raw.githubusercontent.com/qwerzxcva/t1/main"
@@ -80,7 +95,6 @@ def fetch_universe() -> list[str]:
 def is_zt(row) -> bool:
     """收盘封死涨停: close>=high*0.999 (实测口径)"""
     return row["close"] >= row["high"] * 0.999
-
 def streak_height(rows: list[dict]) -> int:
     """当前连板高度 (以最新一根为 today)"""
     h = 0
@@ -279,20 +293,37 @@ def _score_one(code, rows, env_ok, env_up_ratio, _seen=None):
         pass
     return None
 
-if __name__ == "__main__":
-    import sys
-    # 单票调试: python3 pick_algo.py sh601975
-    if len(sys.argv) > 1:
-        code = sys.argv[1]
-        rows = fetch_day_csv(code)
-        c = score_limitup(code, rows, env_ok=True)
-        print(json.dumps({"code": code, "score": c.score, "checks": c.checks,
-                          "reasons": c.reasons, "height": streak_height(rows),
-                          "last": rows[-1]}, ensure_ascii=False, indent=2))
-    else:
-        print("用法: python3 pick_algo.py <code>  或 import scan()")
-
 # ── 本地文件模式 (Actions/离线用): 零网络 ─────────────────
+def load_bulk_rows(bulk_dir: str = None) -> dict:
+    """读本地 bulk day_qfq_*.csv → {code: [row,...]} 升序 (与上游 t1 分片同结构)。"""
+    import glob
+    bulk_dir = bulk_dir or BULK
+    out = {}
+    for p in sorted(glob.glob(os.path.join(bulk_dir, "day_qfq_*.csv"))):
+        with open(p, encoding="utf-8", errors="ignore") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                parts = line.split("|") if "|" in line else line.split(",")
+                if len(parts) < 6:
+                    continue
+                code = parts[0]
+                if not code.startswith(("sh60", "sz00")):   # 主板硬约束
+                    continue
+                try:
+                    d = parts[1]
+                    d = (d[:4] + "-" + d[4:6] + "-" + d[6:8]) if len(d) == 8 and "-" not in d else d
+                    out.setdefault(code, []).append({
+                        "date": d, "open": float(parts[2]), "close": float(parts[3]),
+                        "high": float(parts[4]), "low": float(parts[5]), "volume": float(parts[6])})
+                except ValueError:
+                    continue
+    for c in out:
+        out[c].sort(key=lambda r: r["date"])
+    return out
+
+
 def scan_local(shard_dir: str = "/tmp/stocks_shards", min_score: float = 55,
                top_n: int = 20, env_up_ratio: float | None = None,
                ztpool_today: int = 300, ztpool_20avg: float = 300.0) -> list[dict]:
@@ -329,3 +360,59 @@ def scan_local(shard_dir: str = "/tmp/stocks_shards", min_score: float = 55,
                 results.append(c)
     results.sort(key=lambda x: -x["score"])
     return results[:top_n]
+
+
+def scan_bulk(bulk_dir: str = None, min_score: float = 55, top_n: int = 20,
+              env_up_ratio: float | None = None, ztpool_today: int = 300,
+              ztpool_20avg: float = 300.0) -> list[dict]:
+    """本项目数据源: paths.BULK 的 day_qfq_*.csv (替代上游 t1 云端分片), 零网络。"""
+    env_ok = env_gate(ztpool_today, ztpool_20avg)
+    rows_by_code = load_bulk_rows(bulk_dir)
+    results = []
+    for code, rows in rows_by_code.items():
+        if len(rows) < 25:
+            continue
+        c = _score_one(code, rows, env_ok, env_up_ratio)
+        if c:
+            results.append(c)
+    results.sort(key=lambda x: -x["score"])
+    return results[:top_n]
+
+
+def main():
+    ap = argparse.ArgumentParser(description="打板选股算法 (统计驱动)")
+    ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
+    ap.add_argument("--top", type=int, default=20)
+    ap.add_argument("--min-score", type=float, default=55)
+    ap.add_argument("--up-ratio", type=float, default=None, help="大盘上涨占比 0-1")
+    ap.add_argument("--zt-today", type=int, default=300, help="当日涨停家数 (环境闸门)")
+    ap.add_argument("--zt-20avg", type=float, default=300.0, help="涨停家数20日均值 (环境闸门)")
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "pick_algo.json"))
+    args = ap.parse_args()
+
+    res = scan_bulk(args.bulk, min_score=args.min_score, top_n=args.top,
+                    env_up_ratio=args.up_ratio, ztpool_today=args.zt_today,
+                    ztpool_20avg=args.zt_20avg)
+    payload = {"ts": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+               "source": f"bulk day_qfq ({os.path.basename(args.bulk or BULK)})",
+               "env": {"zt_today": args.zt_today, "zt_20avg": args.zt_20avg,
+                       "up_ratio": args.up_ratio,
+                       "env_ok": env_gate(args.zt_today, args.zt_20avg)},
+               "min_score": args.min_score,
+               "n": len(res),
+               "picks": res,
+               "stats_ref": "PROMOTE/NEXTRET 常量来自 qwerzxcva/stocks-algo 实测统计 (168,368 首板样本)",
+               "note": "算法逻辑与上游一致, 仅数据源换成本地 bulk; 不构成投资建议"}
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    print(f"[pick_algo] {len(res)} 只候选 (min_score={args.min_score})")
+    for p in res[:10]:
+        print(f"  {p['code']} score={p['score']} height={p['checks'].get('height')} "
+              f"vr={p['checks'].get('vol_ratio')} | {' / '.join(p['reasons'][:2])}")
+    print("->", args.out)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

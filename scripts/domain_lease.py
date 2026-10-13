@@ -65,6 +65,10 @@ DOMAINS = {
     "sector": "板块/行业/概念",
     "algo": "算法/因子/回测 (无外部接口)",
     "paid_api": "付费 API 调研 (Tushare/问财/iTick 等)",
+    # ── 2026-10-13 新增 ──
+    "level2": "Level2 逐笔/盘口/主力资金 (每分钟买卖数据)",
+    "adjusted_full": "全市场复权数据 (qfq/hfq 批量)",
+    "github_research": "GitHub 开源算法/引擎/架构调研",
 }
 
 LEASE_TTL_H = 24  # 认领有效期

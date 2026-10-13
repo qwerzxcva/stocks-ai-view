@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # ═══ 来源: GitCode dufuwuxin/stock-system · algorithms/predict_algo.py ═══
 # 上游 commit: 3e623ca669eb · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
-# 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (指数K线本地回退 data/adjusted/index_full.json; --out 落盘 data/predict_algo.json)
 """
 预测算法 v1 — 多因子合成的次日涨跌概率模型 (qwerzxcva/stocks-algo)
 
@@ -21,8 +21,23 @@
 输出: {"p_up": 0.xx, "expected_move": ±0.xx%, "confidence": 中/低, "drivers": [...]}
 """
 from __future__ import annotations
-import json, math, os, urllib.request
+import argparse
+import json
+import math
+import os
+import sys
+import urllib.request
 from datetime import datetime
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+
+try:
+    from paths import AI_VIEW_DATA as DATA_DIR
+except Exception:
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
+
+LOCAL_INDEX = os.path.join(DATA_DIR, "adjusted", "index_full.json")
 
 TOKEN = os.environ.get("GH_TOKEN", "")
 RAW = "https://raw.githubusercontent.com/qwerzxcva/t1/main"
@@ -46,8 +61,16 @@ def fetch_index_daily(code="sh000001"):
         try:
             txt = _get(f"https://api.github.com/repos/qwerzxcva/t1/contents/data/index/history/{code}.txt")
         except Exception:
-            txt = _get(f"{RAW}/data/index/history/{code}.txt")
+            try:
+                txt = _get(f"{RAW}/data/index/history/{code}.txt")
+            except Exception:
+                # 云端不可用 → 本地指数全史兜底 (collect_adjusted.py 产出)
+                return load_index_local(code)
         open(fp, "w").write(txt)
+    return _parse_index_txt(txt)
+
+
+def _parse_index_txt(txt):
     rows = []
     for line in txt.splitlines():
         if line.startswith("#") or "|" not in line:
@@ -56,6 +79,19 @@ def fetch_index_daily(code="sh000001"):
         if len(f) >= 7:
             rows.append({"date": f[1], "close": float(f[3])})
     return rows
+
+
+def load_index_local(code="sh000001"):
+    """本地指数全史 (data/adjusted/index_full.json, collect_adjusted.py 产出) — 断网/无token兜底。"""
+    if not os.path.exists(LOCAL_INDEX):
+        return []
+    try:
+        d = json.load(open(LOCAL_INDEX, encoding="utf-8"))
+        node = (d.get("indices") or {}).get(code) or {}
+        return [{"date": b[0], "close": float(b[2])} for b in (node.get("bars") or [])]
+    except Exception:
+        return []
+
 
 def fetch_market_breadth_today() -> float | None:
     """今日主板上涨占比(从 data-live 云端快照, 可选)"""
@@ -67,12 +103,31 @@ def fetch_market_breadth_today() -> float | None:
     except Exception:
         return None
 
+
+def breadth_local() -> float | None:
+    """本地市场宽度: market_now.json 的 advance/(advance+decline)。"""
+    p = os.path.join(DATA_DIR, "market_now.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        m = (json.load(open(p, encoding="utf-8")).get("market") or {})
+        adv, dec = m.get("advance", 0), m.get("decline", 0)
+        tot = adv + dec
+        return adv / tot if tot else None
+    except Exception:
+        return None
+
 def logistic(x: float) -> float:
     return 1 / (1 + math.exp(-x))
 
 def predict(target_date: str | None = None, up_ratio: float | None = None,
-            zt_count: int | None = None, stock_height: int | None = None) -> dict:
-    rows = fetch_index_daily()
+            zt_count: int | None = None, stock_height: int | None = None,
+            index_rows: list | None = None) -> dict:
+    rows = index_rows or fetch_index_daily()
+    if not rows:
+        rows = load_index_local()
+    if not rows:
+        raise ValueError("无指数日K数据 (云端 t1 与本地 data/adjusted/index_full.json 均不可用)")
     rets = [rows[i]["close"]/rows[i-1]["close"]-1 for i in range(1, len(rows))]
     last = rows[-1]
     dt = datetime.strptime(target_date or last["date"], "%Y-%m-%d")
@@ -110,7 +165,7 @@ def predict(target_date: str | None = None, up_ratio: float | None = None,
 
     # f4 宽度
     if up_ratio is None:
-        up_ratio = fetch_market_breadth_today()
+        up_ratio = fetch_market_breadth_today() or breadth_local()
     if up_ratio is not None:
         if up_ratio > 0.8:
             logit += 0.12; drivers.append("昨日普涨(>80%)→次日惯性(+)")
@@ -136,6 +191,7 @@ def predict(target_date: str | None = None, up_ratio: float | None = None,
 
     return {
         "for_date": str(dt.date()) if hasattr(dt, "date") else target_date,
+        "index_last": last["date"], "index_bars": len(rows),
         "p_up": round(p_up, 3),
         "expected_move_pct": round(exp_move, 2),
         "confidence": "低" if abs(p_up - 0.5) < 0.05 else ("中" if abs(p_up - 0.5) < 0.12 else "高"),
@@ -143,10 +199,32 @@ def predict(target_date: str | None = None, up_ratio: float | None = None,
         "disclaimer": "历史频率合成, 非保证; 置信<中时不作为仓位依据",
     }
 
+
+def main():
+    ap = argparse.ArgumentParser(description="次日涨跌概率模型 (多因子合成)")
+    ap.add_argument("--date", default=None, help="目标日期 YYYY-MM-DD (默认指数最新交易日)")
+    ap.add_argument("--up-ratio", type=float, default=None, help="大盘上涨占比 0-1")
+    ap.add_argument("--zt-count", type=int, default=None, help="当日涨停家数")
+    ap.add_argument("--index", default="sh000001", help="指数代码")
+    ap.add_argument("--local", action="store_true", help="只用本地指数K线 (data/adjusted/index_full.json), 不请求云端")
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "predict_algo.json"))
+    args = ap.parse_args()
+
+    rows = load_index_local(args.index) if args.local else (fetch_index_daily(args.index) or load_index_local(args.index))
+    if not rows:
+        print("[predict] 无指数K线: 云端 t1 与本地 index_full.json 均不可用", file=sys.stderr)
+        return 1
+    src = "local index_full.json" if args.local or not rows else "github t1"
+    res = predict(args.date, args.up_ratio, args.zt_count, index_rows=rows)
+    res["index_code"] = args.index
+    res["source"] = src
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(res, f, ensure_ascii=False, indent=1)
+    print(json.dumps(res, ensure_ascii=False, indent=2))
+    print("->", args.out)
+    return 0
+
+
 if __name__ == "__main__":
-    import sys
-    args = sys.argv[1:]
-    dt = args[0] if args and "-" in args[0] else None
-    ur = float(args[1]) if len(args) > 1 and args[1].replace(".","").isdigit() else None
-    zt = int(args[2]) if len(args) > 2 and args[2].isdigit() else None
-    print(json.dumps(predict(dt, ur, zt), ensure_ascii=False, indent=2))
+    sys.exit(main())

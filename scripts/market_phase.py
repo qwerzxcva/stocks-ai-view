@@ -2,6 +2,7 @@
 # ═══ 来源: GitCode dufuwuxin/stock-system · algorithms/market_phase.py ═══
 # 上游 commit: 656e3275f404 · 拉取时间: 2026-10-13 22:11 · 工具: scripts/sync_gitcode.py --pull-engines
 # 该文件由 GitCode 侧维护 (云容器/上游引擎), GitHub 仅作镜像; 如需改动请同步回上游。
+# 适配: 2026-10-13 路径规范 (补 __main__ 冒烟入口, 原为纯库无 main 导致直接运行静默退出)
 """
 市场阶段机 (参考 tick-stock-panel market_phase 移植, 本地轻量版)
   输入: 每日 {date, 首板数, 2板+数, 最高连板, 晋级率, 封板率}
@@ -9,6 +10,14 @@
   数据源: 本地日线全量(自算涨停) 或 t13涨停池
 """
 from __future__ import annotations
+import argparse
+import json
+import os
+import sys
+from datetime import datetime
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
 
 PHASES = {"ice": "冰点", "ignite": "启动", "rally": "主升", "climax": "高潮", "ebb": "退潮", "repair": "修复"}
 
@@ -115,3 +124,26 @@ def from_daily_klines(kline_getter, dates):
                     "promo": (promo_ok / pool) if pool >= PROMO_MIN_POOL else None, "seal": None})
         prev_zt = today_zt
     return out
+
+
+if __name__ == "__main__":
+    # 冒烟: 纯算法库, 用一组合成梯队跑通 classify
+    ap = argparse.ArgumentParser(description="市场阶段机 (算法库冒烟)")
+    ap.add_argument("--out", default=None, help="可选: 落盘 JSON")
+    args = ap.parse_args()
+
+    demo = []
+    for i, (fb, ge2, h, pr) in enumerate([(180, 20, 3, 0.18), (60, 4, 2, 0.12), (30, 3, 1, 0.10),
+                                          (220, 40, 5, 0.28), (150, 18, 4, 0.25), (40, 2, 1, 0.08),
+                                          (12, 1, 1, 0.05), (25, 2, 1, 0.09), (80, 10, 3, 0.20)]):
+        demo.append({"date": f"2026-10-0{i+1}", "first_board": fb, "ge2": ge2,
+                     "height": h, "promo": pr, "seal": 0.5})
+    labels = classify(demo)
+    print("阶段序列:", list(zip([d["date"] for d in demo], labels)))
+    if args.out:
+        os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+        with open(args.out, "w", encoding="utf-8") as f:
+            json.dump({"ts": datetime.now().isoformat(timespec="seconds"),
+                       "daily": demo, "phases": labels,
+                       "labels": PHASES}, f, ensure_ascii=False, indent=1)
+        print("->", args.out)
