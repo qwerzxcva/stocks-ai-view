@@ -354,7 +354,7 @@ const _etagCache=new Map();
 async function fetchJSON(p){try{
   // 高频数据 (盘中30分钟更新) 不用 If-None-Match, 避免 ETag 304 命中时
   // 拿到会话内的旧缓存; SW 也已把这些文件改为 network-first。
-  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|flow_divergence|market_now)\.json$/.test(p);
+  const HOT = /(hot_impact|latest|enrich|ai_picks|daily_brief|engine_v5|cycle_deep|ban_prob|ban_pick|flow_divergence|market_now)\.json$/.test(p);
   const hdr={};
   const et=_etagCache.get(p);
   if(et && !HOT)hdr['If-None-Match']=et;
@@ -787,49 +787,59 @@ async function renderPools(d){
   const pools = d.pools || {};
   const picks = d.picks || [];
   
-  // ---- 打板池 (实证概率: 次日涨停率/炸板率/期望收益) ----
+  // ---- 打板池 (ban_pick: 个股级可打/观察/回避) ----
   const banKpis = document.getElementById('banKpis');
   const banBody = document.getElementById('banBody');
-  const bp = window._banProb || {};
-  const bpBase = bp.base || {};
-  const bpByLb = bpBase.by_lianban || {};
-  if(picks.length){
-    const maxLB = Math.max(...picks.map(p=>p.lianban||1));
-    const byLB = {};
-    picks.forEach(p => { const k=p.lianban>=2?p.lianban+'板':'首板'; (byLB[k]=byLB[k]||[]).push(p); });
-    // 全样本首板次日涨停率
-    const firstLB = bpByLb['首板'] || {};
-    const topLB = bpByLb[maxLB+'连板'] || bpByLb['6连板'] || firstLB;
+  const bp = window._banPick || {};
+  const picks = (bp.picks && bp.picks.length) ? bp.picks : null;
+  if(picks){
+    const cnt = bp.counts || {};
+    const vCol = {'可打':'var(--up)','观察':'var(--amber)','回避':'var(--dn)'};
+    const vOrder = {'可打':0,'观察':1,'回避':2,'无K线':3};
+    const sorted = picks.slice().sort((a,b)=>(vOrder[a.verdict]-vOrder[b.verdict])||(b.score-a.score));
     banKpis.innerHTML = [
-      `<div class="pool-kpi-item"><div class="v up">${picks.length}</div><div class="n">候选总数</div></div>`,
-      `<div class="pool-kpi-item"><div class="v" style="color:var(--amber)">${maxLB}</div><div class="n">最高连板</div></div>`,
-      `<div class="pool-kpi-item"><div class="v up">${firstLB.zt_next_rate!=null?firstLB.zt_next_rate+'%':'—'}</div><div class="n">首板次日涨停率</div></div>`,
-      `<div class="pool-kpi-item"><div class="v up">${topLB.zt_next_rate!=null?topLB.zt_next_rate+'%':'—'}</div><div class="n">${maxLB}板次日涨停率</div></div>`,
+      `<div class="pool-kpi-item"><div class="v up">${cnt['可打']||0}</div><div class="n">可打</div></div>`,
+      `<div class="pool-kpi-item"><div class="v" style="color:var(--amber)">${cnt['观察']||0}</div><div class="n">观察</div></div>`,
+      `<div class="pool-kpi-item"><div class="v dn">${cnt['回避']||0}</div><div class="n">回避</div></div>`,
+      `<div class="pool-kpi-item"><div class="v">${bp.n_zt||picks.length}</div><div class="n">今日涨停</div></div>`,
     ].join('');
     let rows='';
-    for(const tier of ['9板','8板','7板','6板','5板','4板','3板','2板','首板']){
-      const sp = byLB[tier];
-      if(!sp) continue;
-      const lbN = tier==='首板'?1:parseInt(tier);
-      const key = lbN>1?(Math.min(lbN,6)+'连板'):'首板';
-      const st = bpByLb[key] || {};
-      const pZt = st.zt_next_rate, pZb = st.zhaban_next_rate, eRet = st.ret_next_avg;
-      const pCol = pZt==null?'fl':(pZt>=40?'up':pZt>=25?'amber':'fl');
-      rows += `<tr style="background:rgba(137,87,229,.06)"><td colspan="9" style="font-size:10px;padding:2px 8px;color:var(--accent)">▶ ${tier} · ${sp.length}只 · 历史次日涨停率 <b class="${pCol}">${pZt!=null?pZt+'%':'—'}</b> · 炸板率 ${pZb!=null?pZb+'%':'—'} · 期望收益 ${eRet!=null?eRet+'%':'—'} (n=${st.n_samples||'?'})</td></tr>`;
-      sp.slice(0,5).forEach(s=>{
-        const col = pZt==null?'fl':(pZt>=40?'up':pZt>=25?'amber':'fl');
-        rows += `<tr>
-          <td>${s.code}</td><td><b>${s.name}</b></td><td>${fmt(s.price)}</td>
-          <td>${s.lianban>=2?'<span class="bdg up">'+s.lianban+'板</span>':'<span class="bdg fl">首板</span>'}</td>
-          <td class="fl">${fmtTime(s.zt_time)}</td>
-          <td>${s.rps5??'—'}</td><td>${s.rps20??'—'}</td>
-          <td>${s.theme_hit?'<span class="hot">★</span>':'<span class="fl">—</span>'}</td>
-          <td style="font-weight:700;color:${col}">${pZt!=null?pZt+'%':'—'}</td>
-        </tr>`;
-      });
-    }
-    banBody.innerHTML = `<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>连板</th><th>首封</th><th>RPS5</th><th>RPS20</th><th>热点</th><th>次日涨停概率</th></tr></thead><tbody>${rows}</tbody></table>`+
-      (bp.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">概率口径: 基于本地 ${bp.sample?bp.sample.n_stocks:''} 只 × ${bp.sample?bp.sample.n_zt_events:''} 个涨停事件实证统计 · 数据源: 腾讯前复权日K<br>涨停定义: ${bp.meta.zt_def||''}<br>${bp.meta.caveat||''}</div>`:'');
+    let lastV='';
+    sorted.forEach(s=>{
+      if(s.verdict!==lastV){
+        lastV=s.verdict;
+        const vc=vCol[s.verdict]||'var(--tx2)';
+        rows+=`<tr style="background:rgba(137,87,229,.06)"><td colspan="8" style="font-size:10px;padding:2px 8px;color:${vc};font-weight:700">▶ ${s.verdict} · ${cnt[s.verdict]||0}只</td></tr>`;
+      }
+      const pzt=s.p_zt_next, pzb=s.p_zhaban_next, er=s.exp_ret_next;
+      rows+=`<tr>
+        <td>${s.code}</td><td><b>${(s.name||'')}</b></td>
+        <td>${s.lianban>=2?'<span class="bdg up">'+s.lianban+'板</span>':'<span class="bdg fl">首板</span>'}</td>
+        <td>${fmt(s.close)}</td>
+        <td class="${s.chg_pct>=0?'up':'dn'}">${(s.chg_pct||0).toFixed(2)}%</td>
+        <td style="font-weight:700;color:${pzt==null?'fl':pzt>=25?'var(--up)':pzt>=18?'var(--amber)':'var(--dn)'}">${pzt!=null?pzt+'%':'—'}</td>
+        <td class="${pzb==null?'fl':pzb<16?'up':pzb<22?'amber':'dn'}">${pzb!=null?pzb+'%':'—'}</td>
+        <td class="fl">${er!=null?er+'%':'—'}</td>
+      </tr>`;
+    });
+    banBody.innerHTML=`<table class="pool-table"><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>现价</th><th>涨%</th><th>次日涨停率</th><th>次日炸板率</th><th>期望收益</th></tr></thead><tbody>${rows}</tbody></table>`+
+      (bp.meta?`<div class="fl" style="padding:6px 10px;font-size:9px;line-height:1.5">`+
+       `判定: ${bp.meta.verdict_rules||''}<br>`+
+       `价值分: ${bp.meta.score_formula||''}<br>`+
+       `概率来源: ${bp.meta.source||''} (基于历史${(window._banProb&&window._banProb.sample?window._banProb.sample.n_zt_events:7920)}个涨停事件)<br>`+
+       `${bp.meta.caveat||''}</div>`:'');
+  } else if(picks===null && window._banProb){
+    // 回退: 用 ban_prob 的连板分层概率
+    const bpBase=(window._banProb.base||{}).by_lianban||{};
+    banKpis.innerHTML=[`<div class="pool-kpi-item"><div class="v">${window._banProb.sample?window._banProb.sample.n_zt_events:0}</div><div class="n">涨停事件样本</div></div>`];
+    let rows='';
+    Object.keys(bpBase).sort((a,b)=>(bpBase[b].n_samples-bpBase[a].n_samples)).forEach(k=>{
+      const s=bpBase[k];
+      rows+=`<tr><td><b>${k}</b></td><td>${s.n_samples}</td>
+        <td class="up">${s.zt_next_rate}%</td><td class="dn">${s.zhaban_next_rate}%</td>
+        <td>${s.ret_next_avg}%</td><td class="fl">${s.ret_next_win_rate}%</td></tr>`;
+    });
+    banBody.innerHTML='<table class="pool-table"><thead><tr><th>类型</th><th>样本</th><th>次日涨停率</th><th>次日炸板率</th><th>期望收益</th><th>收涨率</th></tr></thead><tbody>'+rows+'</tbody></table>';
   } else {
     banKpis.innerHTML=''; banBody.innerHTML='<div class="no-data">暂无打板数据</div>';
   }
@@ -1137,6 +1147,8 @@ async function render(){
   window._cdData=cd; if(cd)renderCycleDeep(cd);
   const bpj=await fetchJSON('data/ban_prob.json');
   window._banProb=bpj;
+  const bpk=await fetchJSON('data/ban_pick.json');
+  window._banPick=bpk;
   const fd=await fetchJSON('data/flow_divergence.json');
   window._fdData=fd; if(fd)renderFlowDivergence(fd);
   const db=await fetchJSON('data/daily_brief.json');
