@@ -120,6 +120,29 @@ SOURCES = [
         "notes": "实测返回体经常只有 113 bytes (zhibo_id missing), "
                  "内容量不稳定; 已由 fetch_remote_news 从 data-news 仓兜底",
     },
+    {
+        "id": "sina_kline_daily",
+        "name": "新浪个股日K (akshare stock_zh_a_daily_sina)",
+        "url": "via akshare.stock_zh_a_daily(symbol='sh600519', adjust='qfq')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "date/open/high/low/close/volume/amount/outstanding_share/turnover",
+        "provides": [],
+        "notes": "2026-10-13 实测 茅台日K全史 6019 行, 0.79s; "
+                 "tencent_kline 501 限流后的 K线补录源",
+    },
+    {
+        "id": "sina_etf_hist",
+        "name": "新浪 ETF 日K (akshare fund_etf_hist_sina)",
+        "url": "via akshare.fund_etf_hist_sina(symbol='sh510500')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "date/open/high/low/close/volume/amount/postVol/postAmt",
+        "provides": [],
+        "notes": "2026-10-13 实测 510500 全史 3294 行, 0.27s; ETF 净值域接入",
+    },
 
     # ============ 东财 (部分可用) ============
     {
@@ -202,7 +225,20 @@ SOURCES = [
         "status": "ok",
         "freq": "daily",
         "provides": [],
-        "notes": "push2his 域, 未实测; 列为 tencent_kline 的降级候选",
+        "notes": "2026-10-13 实测: push2his 域不在 push2 的 WAF 封锁范围; "
+                 "茅台全史 6019 根, 381B 样本; fqt=1 前复权; "
+                 "需带 Referer: quote.eastmoney.com; 并发 10 安全",
+    },
+    {
+        "id": "em_a_hist",
+        "name": "东财A股历史K线 (akshare stock_zh_a_hist)",
+        "url": "via akshare.stock_zh_a_hist(symbol='600519', period='daily', adjust='qfq')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "日期/股票代码/开盘/收盘/最高/最低/成交量/成交额/振幅/涨跌幅/涨跌额/换手率",
+        "provides": [],
+        "notes": "akshare 封装, 底层 push2his; 2026-10-13 实测 489 行/0.25s",
     },
     {
         "id": "eastmoney_fund_rank",
@@ -216,14 +252,40 @@ SOURCES = [
         "notes": "由 eastmoney_fund_rank.py 实现, 49 条",
     },
     {
+        "id": "em_fund_etf_hist_min",
+        "name": "东财 ETF 历史净值 (akshare fund_etf_fund_info_em)",
+        "url": "via akshare.fund_etf_fund_info_em(fund='511280', start_date='20000101')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "净值日期/单位净值/累计净值/日增长率/申购状态/赎回状态",
+        "provides": [],
+        "notes": "2026-10-13 实测 784 行全史; 坑: 参数名是 fund 不是 symbol",
+    },
+    {
+        "id": "em_ann_np",
+        "name": "东财公告 API (np-ann)",
+        "url": "https://np-ann.eastmoney.com/api/security/ann?sr=-1&page_size=5&ann_type=A&client_source=web&f_node=0&s_code={code}",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "daily",
+        "fields": "公告标题/日期/类型/URL",
+        "provides": [],
+        "notes": "2026-10-13 实测: 无 XHR 头返回 HTML SPA 壳; "
+                 "需 X-Requested-With: XMLHttpRequest 头 (未完整验证); "
+                 "公告域首选巨潮/交易所, 此为备选",
+    },
+    {
         "id": "eastmoney_news",
         "name": "东财 7x24 / 收评",
-        "url": "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns",
+        "url": "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns?client=web&biz=web7_24&fastColumn=100&column=100&req_trace={uuid}",
         "auth": "none",
         "status": "degraded",
         "freq": "minute",
         "provides": [],
-        "notes": "实测 HTTP 567 Unknown Status; 财经/政策/产经三栏目全 567",
+        "notes": "实测 HTTP 567 Unknown Status; 财经/政策/产经三栏目全 567; "
+                 "2026-10-13 补充: req_trace 为随机 32位hex UUID, 带上后正常返回 JSON; "
+                 "567 多为容器本地出口, GitHub Actions 出口通常全通",
         "degrade_to": ["sina_news", "remote_news"],
     },
 
@@ -251,6 +313,54 @@ SOURCES = [
         "freq": "minute",
         "provides": [],
         "notes": "实测返回 HTML (SPA fallback) 而非 JSON; 需登录态",
+    },
+    {
+        "id": "ths_industry_list",
+        "name": "同花顺行业板块列表 (akshare stock_board_industry_name_ths)",
+        "url": "via akshare.stock_board_industry_name_ths()",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "name/code (90 个行业板块)",
+        "provides": [],
+        "notes": "底层 d.10jqka.com.cn 板块 API, 同花顺域名零 WAF; "
+                 "2026-10-13 实测 90 行/0.22s",
+    },
+    {
+        "id": "ths_concept_list",
+        "name": "同花顺概念板块列表 (akshare stock_board_concept_name_ths)",
+        "url": "via akshare.stock_board_concept_name_ths()",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "fields": "name/code (375 个概念板块)",
+        "provides": [],
+        "notes": "2026-10-13 实测 375 概念/8.3s (39 页分页); "
+                 "概念代码可作事件驱动标签; 建议 8 req/min",
+    },
+    {
+        "id": "ths_financial_abstract",
+        "name": "同花顺财务摘要 (akshare stock_financial_abstract_ths)",
+        "url": "via akshare.stock_financial_abstract_ths(symbol='600519')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "fields": "报告期/净利润/扣非净利润/营业总收入/基本每股收益/销售毛利率/净资产收益率/资产负债率",
+        "provides": [],
+        "notes": "2026-10-13 实测 茅台 1998~2026 共 103 报告期; "
+                 "坑: 字段值含'亿'字需 parse; False 表示无数据",
+    },
+    {
+        "id": "ths_financial_abstract_v2",
+        "name": "同花顺财务摘要 v2 (akshare stock_financial_abstract_new_ths)",
+        "url": "via akshare.stock_financial_abstract_new_ths(symbol='600519')",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "fields": "report_date/report_name/report_period/metric_name/value/yoy/mom (宽表→长表)",
+        "provides": ["financial_summary 表"],
+        "notes": "2026-10-13 实测 1200 行/0.26s; 长表格式直接入库无需 parse; "
+                 "2014 年前 yoy/mom 多为空; 推荐作为财务域入库源",
     },
 
     # ============ TradingView (可用, 15分钟延迟) ============
@@ -406,12 +516,13 @@ SOURCES = [
         "name": "AKShare",
         "url": "python 库 (非HTTP)",
         "auth": "none",
-        "status": "untested",
+        "status": "ok",
         "freq": "varies",
         "fields": "聚合东财/新浪/同花顺等 100+ 接口",
         "provides": [],
-        "notes": "a-share-data 技能依赖它; 容器内未安装。"
-                 "它是封装层不是独立源, 底层仍是上面这些",
+        "notes": "akshare 1.19.1 容器已安装验证 (2026-10-13): "
+                 "新浪日K/ETF K线、东财 push2his 历史K、同花顺财务摘要、"
+                 "统计局宏观数据均跑通; 它是封装层不是独立源, 底层仍是上面这些",
     },
 
     # ============ 不可用 (地区/反爬) ============
@@ -499,6 +610,56 @@ SOURCES = [
         "provides": [],
         "notes": "无 cookie 时返回 400 / 302 反爬 JS; 需 xq_a_token cookie 认证; "
                  "容器内无法获取有效 cookie; 考虑替代: 东方财富股吧热帖 / 同花顺热榜",
+    },
+
+    # ============ 公告/交易所/宏观 (候选源, 容器内未全通) ============
+    {
+        "id": "cninfo_announce",
+        "name": "巨潮资讯公告 (cninfo.com.cn)",
+        "url": "https://www.cninfo.com.cn/new/hisAnnouncement/query?column={col}&secuCode={code}&seDate={range}",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "daily",
+        "fields": "公告标题/日期/类型/PDF URL",
+        "provides": [],
+        "notes": "2026-10-13 容器内 HTTP 500; 推测大陆网络可用, 容器出口被限; "
+                 "公告域首选候选, 国内服务器上再验",
+    },
+    {
+        "id": "sse_market",
+        "name": "上交所行情数据 API",
+        "url": "http://query.sse.com.cn/commonQuery.do?sqlId={sql_id}&pageHelp.pageSize=10&_=timestamp",
+        "auth": "none (Referer: sse.com.cn 必带)",
+        "status": "untested",
+        "freq": "daily",
+        "fields": "沪市行情/公告/基金/财务",
+        "provides": [],
+        "notes": "2026-10-13 实测 200 但 data=null; sqlId 需配合有效会话/Referer; "
+                 "待进一步探测正确参数组合",
+    },
+    {
+        "id": "szse_api",
+        "name": "深交所官方数据 API",
+        "url": "https://www.szse.cn/api/report/ShowReport?SHOWTYPE=JSON&CATALOGID={id}&TABPAGE=1&pageNum=1&pageSize=5",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "daily",
+        "fields": "深市行情/公告/监管数据",
+        "provides": [],
+        "notes": "2026-10-13 容器内 CATALOGID=1835/1803/1805 均 HTTP 500; "
+                 "可能需大陆出口 IP; 国内服务器上再验",
+    },
+    {
+        "id": "macro_china_cpi_gdp",
+        "name": "宏观数据 CPI/GDP (akshare)",
+        "url": "via akshare.macro_china_cpi() / akshare.macro_china_gdp()",
+        "auth": "none",
+        "status": "ok",
+        "freq": "monthly",
+        "fields": "CPI: 月份/全国当月/同比/环比; GDP: 季度/绝对值/同比",
+        "provides": [],
+        "notes": "统计局数据; 2026-10-13 实测 CPI 224 行/GDP 82 行; "
+                 "可用于市场环境判定",
     },
 
     # ============ 本地/仓内数据源 ============
