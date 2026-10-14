@@ -1,0 +1,76 @@
+# 主力资金实时采集 — 盘中每 2 分钟一次 (与其他采集错峰)
+#
+# 为什么单独一个 workflow: full-pipeline 每 5 分钟跑 26 个引擎 (约 3-5 分钟),
+# 资金流只需要 1 个采集脚本 (<10s), 值得更高频率。
+# 三仓错峰: A 仓落 mod5=2, B 落 mod5=4, C 落 mod5=0, 所以这个 cron 用
+# mod5=3 的分钟位 (1,6,11,...) 填补空隙, 全站有效粒度仍是 2 分钟。
+name: moneyflow-realtime
+
+on:
+  schedule:
+    # UTC 1,2,3,5,6,7 时 = CST 09:00-15:00, 分钟位 mod5=3
+    - cron: '3,8,13,18,23,28,33,38,43,48,53,58 1,2,3,5,6,7 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: moneyflow-realtime
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 资金流只需要标准库, 但 collect_moneyflow 会 import paths,
+      # 而 paths 只依赖标准库, 所以不需要装依赖。
+      - name: Collect moneyflow
+        run: |
+          python3 scripts/collect_moneyflow.py --top 20 --out data/moneyflow.json \
+            || echo "::warning::moneyflow 采集失败 (东财 WAF?), 保留上一版"
+
+      - name: Report
+        run: |
+          python3 - <<'PY'
+          import json, os
+          p = "data/moneyflow.json"
+          if not os.path.exists(p):
+              print("no moneyflow.json")
+              raise SystemExit(0)
+          d = json.load(open(p, encoding="utf-8"))
+          print("ts:", d.get("ts"))
+          print("indices:", len(d.get("indices") or []))
+          for x in (d.get("indices") or [])[:3]:
+              print("  %s 主力净额 %.2f亿 (%s%%)" % (
+                  x.get("name"), (x.get("main_net") or 0) / 1e8, x.get("main_net_pct")))
+          st = d.get("stocks") or {}
+          print("stocks:", len(st))
+          ti = d.get("top_inflow") or []
+          to = d.get("top_outflow") or []
+          print("净流入:", ", ".join("%s %.2f亿" % (r["code"], r["main_net"] / 1e8) for r in ti[:3]))
+          print("净流出:", ", ".join("%s %.2f亿" % (r["code"], r["main_net"] / 1e8) for r in to[:3]))
+          PY
+
+      - name: Commit and push
+        run: |
+          python3 scripts/git_push_retry.py --msg "moneyflow: realtime main-force flow" \
+            data/moneyflow.json \
+            --protect data/moneyflow.json
