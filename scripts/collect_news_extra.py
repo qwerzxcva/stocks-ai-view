@@ -153,41 +153,71 @@ def fetch_zaobao_detail_time(url):
     return m.group(1) if m else ""
 
 
-# ─── 2. 华尔街见闻 lives (零鉴权 JSON) ───────────────────────
+# ─── 2. 华尔街见闻 lives (零鉴权 JSON, 多频道) ───────────────────
+WSCN_CHANNELS = ["a-stock-channel", "us-stock-channel", "hk-stock-channel"]
+
+
 def fetch_wallstcn(limit=30):
     """api-one.wallstcn.com/apiv1/content/lives — 实测可用, 零鉴权。
-    带 importance 分级, 可按频道翻页。"""
-    url = ("https://api-one.wallstcn.com/apiv1/content/lives"
-           "?channel=global-channel&limit=%d" % limit)
-    body = get(url, referer="https://wallstreetcn.com/")
-    if not body:
-        return []
-    try:
-        d = json.loads(body)
-    except Exception:
-        return []
-    items = ((d.get("data") or {}).get("items")) or []
+
+    多频道: a-stock / us-stock / hk-stock (global 与 tech 实测超时或空)。
+    字段极丰富: symbols(关联股票代码) / related_themes(关联题材) /
+    fund_codes / is_calendar / score — 能直接关联到个股的舆情源。
+    next_cursor 可翻页。
+    """
     out = []
-    for it in items:
-        title = strip_tags(it.get("title") or "")
-        content = strip_tags((it.get("content") or ""))[:200]
-        if not title and not content:
+    for ch in WSCN_CHANNELS:
+        url = ("https://api-one.wallstcn.com/apiv1/content/lives"
+               "?channel=%s&limit=%d" % (ch, limit))
+        body = get(url, referer="https://wallstreetcn.com/", verbose=True)
+        if not body:
             continue
-        ts = it.get("display_time") or it.get("created_at")
-        out.append({
-            "title": title or content[:60],
-            "summary": content,
-            "url": ("https://wallstreetcn.com/live/%s" % it.get("id")
-                    if it.get("id") else ""),
-            "source": "wallstreetcn",
-            "time": (datetime.fromtimestamp(ts, CST).isoformat(timespec="seconds")
-                     if isinstance(ts, (int, float)) else str(ts or "")),
-            "importance": it.get("importance"),
-        })
+        try:
+            d = json.loads(body)
+        except Exception:
+            continue
+        for it in ((d.get("data") or {}).get("items")) or []:
+            title = strip_tags(it.get("title") or "")
+            content = strip_tags(it.get("content") or "")[:200]
+            if not title and not content:
+                continue
+            ts = it.get("display_time") or it.get("created_at")
+            syms = it.get("symbols") or []
+            codes = []
+            for s in syms:
+                if isinstance(s, dict):
+                    c = s.get("code") or s.get("symbol")
+                    if c:
+                        codes.append(str(c))
+                elif s:
+                    codes.append(str(s))
+            # related_themes 是 [{id,title,key,...}] dict; symbols 在快讯流里
+            # 实测为空, 所以关联维度靠 themes
+            themes = []
+            for t in (it.get("related_themes") or [])[:5]:
+                if isinstance(t, dict):
+                    tt = t.get("title")
+                    if tt:
+                        themes.append(str(tt))
+                elif t:
+                    themes.append(str(t))
+            out.append({
+                "title": title or content[:60],
+                "summary": content,
+                "url": ("https://wallstreetcn.com/live/%s" % it.get("id")
+                        if it.get("id") else ""),
+                "source": "wallstreetcn",
+                "channel": ch,
+                "time": (datetime.fromtimestamp(ts, CST).isoformat(timespec="seconds")
+                         if isinstance(ts, (int, float)) else str(ts or "")),
+                "codes": codes,
+                "themes": themes,
+                "is_calendar": bool(it.get("is_calendar")),
+            })
     return out
 
 
-# ─── 3. 财联社电报 v1 (需算签, 逆向中) ───────────────────────
+# ─── 3. 财联社电报 (已逆向: /api/cache + sign=md5(sha1)) ───────
 def fetch_cls(limit=20):
     """财联社电报。
 
