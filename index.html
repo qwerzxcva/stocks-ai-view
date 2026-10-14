@@ -1969,8 +1969,9 @@ document.addEventListener('click', e=>{
     }
     if(!hits.length){box.style.display='none';return;}
     box.innerHTML=hits.map(([s,v])=>'<div class="sr" data-s="'+s+'" style="padding:4px 8px;cursor:pointer;display:flex;justify-content:space-between;border-bottom:1px solid var(--bd)">'+
-      '<span><b>'+v.n+'</b> <span style="color:var(--tx3)">'+s+(v.t==='etf'?' ·ETF':'')+'</span></span>'+
-      '<span style="color:'+(v.chg>=0?'var(--up)':'var(--dn)')+'">'+v.p+' '+(v.chg>0?'+':'')+v.chg+'%</span></div>').join('');
+      '<span><b>'+(v.n||s)+'</b> <span style="color:var(--tx3)">'+s+(v.t==='etf'?' ·ETF':'')+'</span></span>'+
+      (v.p!=null?'<span style="color:'+(v.chg>=0?'var(--up)':'var(--dn)')+'">'+v.p+' '+(v.chg>0?'+':'')+v.chg+'%</span>':'')+
+      '</div>').join('');
     box.style.display='block';
     box.querySelectorAll('.sr').forEach(el=>el.onclick=()=>showDetail(el.dataset.s));
   });
