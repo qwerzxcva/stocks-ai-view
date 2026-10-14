@@ -28,6 +28,6 @@ jobs:
         run: python3 scripts/ai_screener.py --out data/latest.json
       - name: Commit & push
         run: |
-          python3 scripts/git_push_retry.py --msg "ai-data" \
+          python3 scripts/git_push_retry.py --msg "ai-data" --dir data \
+            --user stocks-ai-bot \
             --protect data/latest.json --protect data/index_kline.json
-              --user stocks-ai-bot --dir data

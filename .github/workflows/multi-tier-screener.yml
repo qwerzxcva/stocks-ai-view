@@ -38,6 +38,6 @@ jobs:
           python3 scripts/multi_screener.py --out-dir . --rounds 3 --top 30 --llm ghc
       - name: Commit & push
         run: |
-          python3 scripts/git_push_retry.py --msg "screener" \
+          python3 scripts/git_push_retry.py --msg "screener" --dir data \
+            --user screener-bot \
             --protect data/multi_v4.json
-              --user screener-bot --dir data
