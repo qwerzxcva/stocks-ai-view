@@ -1,0 +1,173 @@
+# 分片采集 — 三账号错峰 (GitHub Actions)
+#
+# 背景: GitHub-hosted runner 全在 Azure, 出口是数据中心段, 国内金融源
+# (东财 push2/同花顺/雪球) 对这类 IP 一律按爬虫对待, 且按 IP 计数。
+# 三个账号 = 三个独立出口 IP, 按源分片后单 IP 请求量降到 1/3,
+# 且某个 IP 被封不影响其他分片。
+#
+# 分片定义见 scripts/sources_registry.py 的 SHARDS:
+#   a (43) 主力稳定: 腾讯/新浪/集思璐/东财非push2域/海外/本地
+#   b (8)  东财 push2 实时系 (最易被封, 独立 IP)
+#   c (18) 交易所官方/同花顺/需 key
+#   d (10) 需大陆出口 IP (只应在 GitCode Space 跑, 本 workflow 不跑)
+#   e (6)  akshare/baostock 库
+#
+# 本文件是三账号共用的模板, 通过 repository 守卫 + 环境变量 SHARD 区分:
+#   A 仓 (qwerzxcva)  → shard a + e, cron mod5=2
+#   B 仓 (镜像)        → shard b,     cron mod5=4
+#   C 仓 (镜像)        → shard c,     cron mod5=0
+# 部署到 B/C 仓时把 SHARD 和 cron 改掉 (见 scripts/deploy_mirror.py)
+name: shard-collect
+
+on:
+  schedule:
+    # A 仓: mod5=2 (与 moneyflow-realtime 的 mod5=3 错开)
+    # 部署到 B 仓改 mod5=4, C 仓改 mod5=0
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 1,2,3,5,6,7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      shard:
+        description: '覆盖默认分片 (留空用仓默认)'
+        default: ''
+      workers:
+        description: '并发数'
+        default: '6'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shard-collect
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+      # 分片: A 仓默认 a+e (主力稳定 + 本地库, 不碰 push2)
+      # B 仓部署时改成 b, C 仓改成 c
+      SHARD: ${{ github.event.inputs.shard || 'a' }}
+      SHARD_EXTRA: ${{ github.event.inputs.shard || 'e' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -q duckdb numpy pandas
+
+      # ── 分片采集 ────────────────────────────────────────────
+      # 每个 shard 独立输出文件 data/shard_<x>.json, 互不覆盖
+      # (4 个节点写不同文件, merge 时无冲突; 前端按需读)
+      - name: Collect shard ${{ env.SHARD }}
+        run: |
+          echo "=== shard: $SHARD (+$SHARD_EXTRA) ==="
+          python3 scripts/collect_all_sources.py \
+            --out /tmp/shard_main.json \
+            --shard "$SHARD" \
+            --workers ${{ github.event.inputs.workers || '6' }} \
+            || echo "::warning::shard $SHARD 采集有失败, 保留已采部分"
+
+          if [ "$SHARD_EXTRA" != "$SHARD" ]; then
+            python3 scripts/collect_all_sources.py \
+              --out /tmp/shard_extra.json \
+              --shard "$SHARD_EXTRA" \
+              --workers 4 \
+              || echo "::warning::shard $SHARD_EXTRA 采集有失败"
+          fi
+
+      # ── 转成分片文件 (带 shard 元数据) ──────────────────────
+      - name: Write shard outputs
+        run: |
+          python3 - <<'PY'
+          import json, os, shutil
+          shard = os.environ["SHARD"]
+          extra = os.environ.get("SHARD_EXTRA", "")
+          repo = os.environ.get("GITHUB_REPOSITORY", "")
+          os.makedirs("data", exist_ok=True)
+          for src, tag in (("/tmp/shard_main.json", shard),
+                           ("/tmp/shard_extra.json", extra)):
+              if not os.path.exists(src):
+                  continue
+              try:
+                  d = json.load(open(src, encoding="utf-8"))
+              except Exception as e:
+                  print("skip %s: %s" % (src, e))
+                  continue
+              # 记录是哪个仓/哪个分片产的, 便于审计与前端选择
+              d["shard_meta"] = {
+                  "shard": tag,
+                  "repo": repo,
+                  "generated": d.get("summary", {}).get("generated"),
+              }
+              out = "data/shard_%s.json" % tag
+              with open(out, "w", encoding="utf-8") as f:
+                  json.dump(d, f, ensure_ascii=False)
+              print("wrote %s (%d bytes)" % (out, os.path.getsize(out)))
+          PY
+
+      # ── 新闻补充源 (早报 SSR + 华尔街见闻 JSON) ──────────────
+      - name: Collect extra news
+        run: |
+          python3 scripts/collect_news_extra.py --out data/news_extra.json --limit 30 \
+            || echo "::warning::news_extra 采集失败, 保留上一版"
+
+      - name: Summary
+        run: |
+          python3 - <<'PY'
+          import json, os
+          for f in sorted(os.listdir("data")):
+              if f.startswith("shard_") and f.endswith(".json"):
+                  d = json.load(open("data/" + f, encoding="utf-8"))
+                  s = d.get("summary") or {}
+                  meta = d.get("shard_meta") or {}
+                  print("%s <- %s shard=%s raw=%s merged=%s err=%s" % (
+                      f, meta.get("repo"), meta.get("shard"),
+                      s.get("total_raw"), s.get("total_merged"),
+                      len(s.get("errors") or [])))
+          ne = "data/news_extra.json"
+          if os.path.exists(ne):
+              d = json.load(open(ne, encoding="utf-8"))
+              print("news_extra: %d 条 %s" % (d.get("n_items"), d.get("per_source")))
+          PY
+
+      - name: Summary
+        run: |
+          python3 - <<'PY'
+          import json, os
+          p = "data/news_extra.json"
+          if not os.path.exists(p):
+              print("no news_extra.json")
+              raise SystemExit(0)
+          d = json.load(open(p, encoding="utf-8"))
+          print("ts:", d.get("ts"))
+          print("per_source:", d.get("per_source"))
+          for it in (d.get("items") or [])[:5]:
+              print("  [%s] %s" % (it.get("source"), (it.get("title") or "")[:60]))
+          PY
+
+      # ── 提交 (只提交自己分片的文件, 不碰别人的) ──────────────
+      - name: Commit and push
+        run: |
+          git config user.name "shard-collect-bot"
+          git config user.email "3576982374@qq.com"
+          FILES="data/shard_${SHARD}.json data/news_extra.json"
+          if [ "$SHARD_EXTRA" != "$SHARD" ]; then
+            FILES="$FILES data/shard_${SHARD_EXTRA}.json"
+          fi
+          python3 scripts/git_push_retry.py \
+            --msg "shard(${SHARD}): collect $(TZ=Asia/Shanghai date '+%m-%d %H:%M')" \
+            $FILES \
+            --protect $FILES
