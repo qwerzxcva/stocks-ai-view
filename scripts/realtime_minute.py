@@ -108,7 +108,7 @@ FIELD_MAP = {
 }
 
 
-def fetch_market_snapshot(max_pages=32):
+def fetch_market_snapshot(max_pages=30):
     """全市场实时快照 (分页, pz=100/页)。
 
     域降级: push2delay 在海外出口 (GitHub runner) 上偶发只返回前几页
@@ -122,16 +122,19 @@ def fetch_market_snapshot(max_pages=32):
                  f"?pn={page}&pz=200&po=1&np=1"
                  "&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
                  f"&fields={FIELDS}&fid=f3")
-            # 单页重试: 东财会直接断开连接 (RemoteDisconnected) 而不是
-            # 返回错误码, 不重试就会静默少采几页。
+            # 单页重试: 东财限流有两种表现 — 直接断开连接
+            # (RemoteDisconnected), 或返回 200 但 diff 为空。两者都要重试,
+            # 否则会静默少采几页 (实测 2026-10-14: 只拿到 500/5923)。
             d = None
             for attempt in range(PAGE_RETRIES):
-                d = _get(u, EM_REF, retries=1)
-                if d and not d.get("__error__"):
+                cand = _get(u, EM_REF, retries=1)
+                if cand and not cand.get("__error__") and \
+                        (cand.get("data") or {}).get("diff"):
+                    d = cand
                     break
-                time.sleep(1.0 + attempt)
-            if not d or d.get("__error__"):
-                print(f"[realtime_minute] {host} p{page} 连续失败, 停止翻页",
+                time.sleep(1.5 * (attempt + 1))
+            if d is None:
+                print(f"[realtime_minute] {host} p{page} 连续 {PAGE_RETRIES} 次空/失败",
                       file=sys.stderr)
                 break
             data = d.get("data") or {}
@@ -142,7 +145,9 @@ def fetch_market_snapshot(max_pages=32):
             rows_.extend(batch)
             if total_ and len(rows_) >= total_:
                 break
-            time.sleep(1.0 / QPS_EM)
+            # 页间隔 1.5s: 东财对连续翻页的软限流是"返回空 diff"而非报错,
+            # 间隔太短会持续踩到 (QPS=2 + pz=200 实测仍只在第 3 页被掐)。
+            time.sleep(1.5)
         return rows_, total_
 
     all_rows, total = _collect("push2delay.eastmoney.com")

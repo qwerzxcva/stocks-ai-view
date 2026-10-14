@@ -32,7 +32,7 @@ concurrency:
 jobs:
   minute:
     runs-on: ubuntu-latest
-    timeout-minutes: 6          # 一轮约 90 秒, 6 分钟足够容错
+    timeout-minutes: 8          # 30 页 x 1.5s 间隔 + 重试, 最坏约 3.5 分钟
     env:
       TZ: Asia/Shanghai
     steps:
