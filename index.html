@@ -10,9 +10,10 @@
 <link rel="preconnect" href="https://web.ifzq.gtimg.cn">
 <style>
 :root{
-  --bg:#0a0d14;--panel:#11161f;--panel2:#171e2b;--border:#1e2738;--border2:#263044;
-  --tx:#e6edf3;--tx2:#8b949e;--tx3:#586069;
-  --up:#f85149;--dn:#3fb950;--accent:#8957e5;--amber:#d29922;--blue:#58a6ff;
+  /* 白色主题 (2026-10-15, 用户要求向 QuantPlay 学习改白底) */
+  --bg:#f6f8fa;--panel:#ffffff;--panel2:#f0f3f7;--border:#d8dee6;--border2:#c9d2dc;
+  --tx:#1f2328;--tx2:#57606a;--tx3:#8b949e;
+  --up:#d1242f;--dn:#1a7f37;--accent:#6639ba;--amber:#9a6700;--blue:#0969da;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden}
@@ -1496,20 +1497,56 @@ function renderPools(){
 function renderNewsFlow(){
   const box=document.getElementById('newsFlowBox');
   if(!box) return;
-  const d=(window._data||{}).news_extra||{};
+  const g=window._data||{};
+  const d=g.news_extra||{};
+  const hot=g.hot_news||{};
   const sub=document.getElementById('newsSub');
-  if(sub) sub.textContent=(d.n_items||0)+' 条 · '+_t(d.ts);
-  if(!d.items||!d.items.length){ box.innerHTML='<div class="no-data">暂无资讯</div>'; return; }
+  const n1=(d.items||[]).length, n2=(hot.items||[]).length;
+  if(sub) sub.textContent='财经资讯 '+n1+' · 全平台热点 '+n2+' · '+_t(d.ts||hot.ts);
   const srcName={cls:'财联社',wallstreetcn:'华尔街见闻',zaobao:'联合早报'};
   const srcCol={cls:'var(--up)',wallstreetcn:'var(--accent)',zaobao:'var(--amber)'};
-  let h='<div class="chips" style="margin-bottom:6px">';
-  Object.entries(d.per_source||{}).forEach(([k,v])=>{
-    h+='<span class="chip" style="color:'+(srcCol[k]||'var(--tx2)')+'">'+_esc2(srcName[k]||k)+' <b>'+v+'</b></span>';
-  });
-  h+='</div>';
-  h+='<div style="font-size:11px;line-height:1.6">';
-  d.items.slice(0,80).forEach(it=>{
-    const t=_t(it.time);
+  let h='';
+
+  // ── 第一区: Newsnow 全平台热点 (15源) ──────────────────────
+  if(hot.items&&hot.items.length){
+    h+='<div class="hd" style="border-top:none;padding:6px 0">全平台热点 <span class="sub">'+_esc2(hot.n_sources_ok)+' 个平台 · '+_t(hot.ts)+'</span></div>';
+    // 财经相关分组优先 (TrendRadar 式频率词分组)
+    const grp=hot.groups||{};
+    if(Object.keys(grp).length){
+      h+='<div class="fl" style="font-size:10px;margin:2px 0 4px">财经相关分组 (频率词匹配):</div>';
+      h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
+      Object.entries(grp).forEach(([k,st])=>{
+        h+='<span class="bdg" style="background:rgba(102,57,186,.14);color:var(--accent)">'
+          +_esc2(k)+' <b>'+st.count+'</b></span>';
+      });
+      h+='</div>';
+      // 每组列前 3 条
+      Object.entries(grp).forEach(([k,st])=>{
+        h+='<div class="fl" style="font-size:10px;margin:4px 0 2px">'+_esc2(k)+' TOP:</div>';
+        h+='<ul style="font-size:11px;line-height:1.6;margin:0 0 4px 16px;padding:0">';
+        st.top.slice(0,3).forEach(t=>{ h+='<li>'+_esc2(t)+'</li>'; });
+        h+='</ul>';
+      });
+    }
+    // 各平台条数
+    h+='<div class="chips" style="margin:6px 0">';
+    Object.entries(hot.sources_ok||{}).length&&Object.entries((hot.items||[]).reduce((a,x)=>{a[x.source]=(a[x.source]||0)+1;return a},{})).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
+      h+='<span class="chip">'+_esc2(k)+' <b>'+v+'</b></span>';
+    });
+    h+='</div>';
+  }
+
+  // ── 第二区: 财经资讯流 (财联社/见闻/早报) ──────────────────
+  if(d.items&&d.items.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">财经资讯流 <span class="sub">'+n1+' 条</span></div>';
+    h+='<div class="chips" style="margin-bottom:6px">';
+    Object.entries(d.per_source||{}).forEach(([k,v])=>{
+      h+='<span class="chip" style="color:'+(srcCol[k]||'var(--tx2)')+'">'+_esc2(srcName[k]||k)+' <b>'+v+'</b></span>';
+    });
+    h+='</div>';
+    h+='<div style="font-size:11px;line-height:1.6">';
+    d.items.slice(0,60).forEach(it=>{
+      const t=_t(it.time);
     h+='<div style="padding:4px 0;border-bottom:1px solid var(--border)">'
       +'<span style="color:'+(srcCol[it.source]||'var(--tx3)')+';font-size:10px">['+_esc2(srcName[it.source]||it.source)+']</span> '
       +'<span class="fl" style="font-size:9px">'+_esc2(t)+'</span><br>'
@@ -1519,6 +1556,9 @@ function renderNewsFlow(){
       +'</div>';
   });
   h+='</div>';
+  }
+  if(!h){ box.innerHTML='<div class="no-data">暂无资讯</div>'; return; }
+  h+='<div class="fl" style="padding:8px 0 2px;font-size:9px">Research reference only, not investment advice.</div>';
   box.innerHTML=h;
 }
 
@@ -2015,6 +2055,7 @@ const SOURCES = [
   'data/moneyflow.json',       // 主力资金实时
   'data/global_markets.json',  // 全球各大股市实时
   'data/news_extra.json',      // 实时热点资讯 (财联社/见闻/早报)
+  'data/hot_news.json',        // Newsnow 聚合热点 (15平台)
   'data/daily_brief.json',     // 盘前日报
   'data/news_digest.json',     // 24h 资讯流
   'data/enrich.json',          // 强势股/龙虎榜/大宗
@@ -2144,6 +2185,7 @@ async function render(){
   window._mfData = g.moneyflow;      if(g.moneyflow && mfRendered)      renderMoneyFlow(g.moneyflow);
   window._gmData = g.global_markets; if(g.global_markets && gmRendered) renderGlobalMarkets(g.global_markets);
   window._newsData = g.news_extra;   if(g.news_extra && nfRendered)      renderNewsFlow();
+  window._hotData = g.hot_news;       if(g.hot_news && nfRendered)       renderNewsFlow();
   if(g.daily_brief) renderDailyBrief(g.daily_brief);
   window._engineV5 = g.engine_v5;
   window._multidim = g.multidim;
