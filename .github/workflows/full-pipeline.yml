@@ -274,42 +274,20 @@ jobs:
       #   曾导致每次 pipeline 都在最后一步崩掉, 采集成果全部丢失
       #   (2026-10-13 20:57 与 2026-10-14 05:12 两次 run 均因此失败)。
       - name: Commit & push
+        # 复用 scripts/git_push_retry.py: fetch+reset+add+commit+push,
+        # push 失败退避 5/10/20/40s 重试最多 5 次。仓库有 6+ 个 bot 同时推
+        # main, 单次重试在高峰期不够 — 曾出现工作流 success 但数据从未上台。
         run: |
-          git config user.name "pipeline-bot"
-          git config user.email "741059079@qq.com"
-          # 采集侧 + 引擎兜底产出白名单 (引擎产出若 Space 已跑则由 space-pull 覆盖)
-          FILES="data/sources_registry.json data/all_sources.json data/news_digest.json data/predictions data/global_fx.json data/audit_data_report.txt data/valuation.json data/market_phase.json data/engine_v5.json data/ai_pick_v4.json data/rps_rotation.json data/multidim.json data/decision.json data/ban_prob.json data/ban_prob_balanced.json data/ban_pick.json data/patterns_smoke.json data/kline_sim.json data/reflect_latest.json data/winrate_matrix.json data/walkforward.json data/factor_smoke.json data/sample_balance.json data/loss_attribution.json data/engine_weights.json data/weights_history.json data/edge_report.json data/validation_report.json data/scenario.json data/signal_audit.json data/self_reflect.json data/risk_plan.json data/portfolio_plan.json data/anomaly_report.json"
-          # 只保留真实存在的路径, 避免 add 不存在的文件导致 fatal
-          EXIST=""
-          for f in $FILES; do
-            if [ -e "$f" ]; then EXIST="$EXIST $f"; else echo "skip (not generated): $f"; fi
-          done
-          echo "staging:$EXIST"
-          git fetch origin main
-          git reset --soft origin/main
-          # shellcheck disable=SC2086
-          git add -A -- $EXIST
-          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          # 并发 push 退避重试: 仓库有多个 bot 同时推 main (pipeline-bot /
-          # stocks-sync-bot / cloud-bot / brief-bot / space-pull-bot),
-          # 单次重试在高峰期不够, 曾让整个 job 以 exit 1 失败、本轮采集全丢。
-          # 最多 5 次, 每次退避 5/10/20/40 秒; 仍失败则明确告警但不 fail job
-          # (数据已算完, 下一轮 10 分钟后的 cron 会带上)。
-          pushed=0
-          for i in 1 2 3 4 5; do
-            git fetch origin main
-            git reset --soft origin/main
-            # shellcheck disable=SC2086
-            git add -A -- $EXIST
-            if git diff --cached --quiet HEAD; then echo "no changes"; pushed=1; break; fi
-            git commit -m "pipeline(collect): $ts" 2>/dev/null || true
-            if git push origin main 2>/tmp/push_err.txt; then
-              echo "pushed on attempt $i"; pushed=1; break
-            fi
-            echo "::warning::push attempt $i failed: $(tail -1 /tmp/push_err.txt)"
-            sleep $((5 * (2 ** (i - 1))))
-          done
-          if [ "$pushed" -ne 1 ]; then
-            echo "::error::5 次 push 均失败, 本轮数据未上报 (下轮 cron 会重试)"
-            exit 1
-          fi
+          python3 scripts/git_push_retry.py --msg "pipeline(collect)" \
+            data/sources_registry.json data/all_sources.json data/news_digest.json \
+            data/predictions data/global_fx.json data/audit_data_report.txt \
+            data/valuation.json data/market_phase.json data/engine_v5.json \
+            data/ai_pick_v4.json data/rps_rotation.json data/multidim.json \
+            data/decision.json data/ban_prob.json data/ban_prob_balanced.json \
+            data/ban_pick.json data/patterns_smoke.json data/kline_sim.json \
+            data/reflect_latest.json data/winrate_matrix.json data/walkforward.json \
+            data/factor_smoke.json data/sample_balance.json data/loss_attribution.json \
+            data/engine_weights.json data/weights_history.json data/edge_report.json \
+            data/validation_report.json data/scenario.json data/signal_audit.json \
+            data/self_reflect.json data/risk_plan.json data/portfolio_plan.json \
+            data/anomaly_report.json

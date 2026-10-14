@@ -85,26 +85,8 @@ jobs:
       - name: Commit & push
         if: inputs.push != 'false'
         run: |
-          git config user.name "minute-bot"
-          git config user.email "741059079@qq.com"
-          git fetch origin main
-          git reset --soft origin/main
-          git add data/realtime_minute.json data/market/ 2>/dev/null || true
-          ts=$(TZ=Asia/Shanghai date '+%m-%d %H:%M')
-          if git diff --quiet --cached HEAD; then
-            echo "no changes"
-          else
-            git commit -m "minute: $ts"
-          fi
-          git push origin main || {
-            echo "push raced, retrying"
-            git fetch origin main
-            git reset --soft origin/main
-            git add data/realtime_minute.json data/market/ 2>/dev/null || true
-            git commit -m "minute: $ts" 2>/dev/null || true
-            git push origin main
-          }
-
+          python3 scripts/git_push_retry.py --msg "minute" \
+              --user minute-bot --dir data
       - name: Summary
         run: |
           {

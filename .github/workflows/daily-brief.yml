@@ -77,23 +77,6 @@ jobs:
 
       - name: Commit & push
         run: |
-          git config user.name "brief-bot"
-          git config user.email "741059079@qq.com"
-          git fetch origin main
-          git reset --soft origin/main
-          git add -A data/ai_picks.json data/daily_brief.json data/daily_brief.md
-          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --quiet --cached HEAD; then
-            echo "no changes"
-          else
-            git commit -m "brief: $ts"
-          fi
-          git push origin main || {
-            echo "push raced, retrying after reset"
-            git fetch origin main
-            git reset --soft origin/main
-            git add -A data/ai_picks.json data/daily_brief.json data/daily_brief.md
-            git commit -m "brief: $ts" 2>/dev/null || true
-            git push origin main
-          }
+          python3 scripts/git_push_retry.py --msg "brief" --user brief-bot \
+            data/ai_picks.json data/daily_brief.json data/daily_brief.md
 

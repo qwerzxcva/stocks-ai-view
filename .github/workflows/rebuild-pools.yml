@@ -151,23 +151,5 @@ jobs:
 
       - name: Commit & push
         run: |
-          git config user.name "pool-bot"
-          git config user.email "741059079@qq.com"
-          git fetch origin main
-          git reset --soft origin/main
-          git add -A data/
-          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --quiet --cached HEAD; then
-            echo "no changes"
-          else
-            git commit -m "pools: $ts"
-          fi
-          git push origin main || {
-            echo "push raced, retrying after reset"
-            git fetch origin main
-            git reset --soft origin/main
-            git add -A data/
-            git commit -m "pools: $ts" 2>/dev/null || true
-            git push origin main
-          }
+          python3 scripts/git_push_retry.py --msg "pools" --user pool-bot --dir data
 

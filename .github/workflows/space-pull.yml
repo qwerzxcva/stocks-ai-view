@@ -80,18 +80,5 @@ jobs:
 
       - name: Commit and push
         run: |
-          git config user.name "space-pull-bot"
-          git config user.email "3576982374@qq.com"
-          git add -A data/
-          if git diff --cached --quiet HEAD; then
-            echo "no changes (Space 产出与本地一致)"
-          else
-            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-            git commit -m "space: pull GitCode Space engine output $ts"
-            git fetch origin main
-            git rebase origin/main 2>/dev/null || git merge origin/main
-            git push origin main || {
-              echo "push raced, retry"
-              git pull --rebase origin main && git push origin main || echo "::warning::push failed"
-            }
-          fi
+          python3 scripts/git_push_retry.py --msg "space: pull GitCode Space engine output" \
+            --user space-pull-bot --dir data

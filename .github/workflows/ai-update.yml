@@ -28,23 +28,5 @@ jobs:
         run: python3 scripts/ai_screener.py --out data/latest.json
       - name: Commit & push
         run: |
-          git config user.name "stocks-ai-bot"
-          git config user.email "41888888888+stocks-ai-bot@users.noreply.github.com"
-          git add -A
-          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --quiet --cached HEAD; then
-            echo "no changes"
-          else
-            git commit -m "ai-data $ts"
-          fi
-          git fetch origin main
-          if ! git merge --ff-only origin/main 2>/dev/null; then
-            echo "behind remote, rebasing"
-            git rebase origin/main || {
-              for f in .; do
-                git checkout --theirs "$f" 2>/dev/null && git add "$f" 2>/dev/null || true
-              done
-              git rebase --continue || git rebase --abort
-            }
-          fi
-          git push origin main || git pull --rebase origin main
+          python3 scripts/git_push_retry.py --msg "ai-data" \
+              --user stocks-ai-bot --dir data
