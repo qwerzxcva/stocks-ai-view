@@ -117,9 +117,14 @@ jobs:
 
       # 4) 市场增量数据 (跌停数修正/涨跌家数/两融/龙虎榜等同花顺东财)
       #    用 --merge 就地合并, 保留远端系统的其他模块
+      #    先取远端最新的 latest.json 再 merge: 本 run checkout 到的可能是
+      #    旧版, 基于旧版合并会把 ai-update 刚推的新数据冲掉
+      #    (2026-10-14 实测: pools 把 ai-update 13:46 的 latest.json 覆盖回 10:49)
       - name: Merge market extras
         run: |
           if [ -f data/latest.json ]; then
+            git fetch origin main --quiet
+            git checkout origin/main -- data/latest.json || true
             python3 scripts/collect_market_extras.py --merge data/latest.json || true
           fi
 
