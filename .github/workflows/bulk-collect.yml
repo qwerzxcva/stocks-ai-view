@@ -1,0 +1,157 @@
+# 大批量历史数据补齐 — 三账号分片并行 (GitHub Actions)
+#
+# 背景: 用户要求把「上市至今」的全历史数据补齐, 且用三个 GitHub 账号
+# 同时大批量获取。三个账号 = 三个独立出口 IP, 按 code 哈希分片后
+# 各跑 1/3, 既并行加速又避免单 IP 被限流。
+#
+# 分片: bulk_collect.py 用 md5(code) % 3 稳定分片 (跨仓一致)
+#   A 仓 shard 0 (~1319 只)   cron mod5=2
+#   B 仓 shard 1 (~1360 只)   cron mod5=4
+#   C 仓 shard 2 (~1318 只)   cron mod5=0
+#
+# 数据源: 新浪 getKLineData datalen=10000 (上市至今全历史, 实测茅台 6020 根)
+#         腾讯 fqkline 有 640 根硬上限, 不用作全历史
+#         KlineShare 看板 realtime (免 key, 当前快照)
+#
+# 断点续传: --resume 跳过本地已有数据的股票, 可反复跑直到全覆盖
+name: bulk-collect
+
+on:
+  schedule:
+    # A 仓: 每周六 CST 03:00 (UTC 周六 19:00) — 与 kline-backfill-full 错开 30 分钟
+    # B/C 仓部署时改成各自的分钟位 (实际是每周一次, 分钟位只影响首次触发)
+    - cron: '0 19 * * 6'
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: '采集类型'
+        default: 'kline'
+        type: choice
+        options: [kline, realtime, universe]
+      shard:
+        description: '分片号 (留空用仓默认)'
+        default: ''
+      resume:
+        description: '断点续传 (跳过已有)'
+        default: 'true'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bulk-collect
+  cancel-in-progress: false
+
+jobs:
+  bulk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330     # Actions 上限 6h, 留余量
+    env:
+      TZ: Asia/Shanghai
+      KIND: ${{ github.event.inputs.kind || 'kline' }}
+      # 分片: A 仓默认 0; B 仓部署时改 1, C 仓改 2
+      SHARD_IDX: ${{ github.event.inputs.shard || '0' }}
+      RESUME: ${{ github.event.inputs.resume || 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      # K 线数据在独立仓, 要 sparse checkout 才能增量写
+      - name: Checkout kline repo (full)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kline-repo
+          fetch-depth: 0
+
+      - name: Link kline bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          echo "bulk 文件: $(ls ../stocks-data-kline/data/bulk/ 2>/dev/null | wc -l)"
+          du -sh ../stocks-data-kline/data/bulk/ 2>/dev/null || true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ── 1. 覆盖报告 (前) ──────────────────────────────────────
+      - name: Coverage before
+        run: |
+          python3 - <<'PY'
+          import glob, os
+          from collections import defaultdict
+          BULK = "../stocks-data-kline/data/bulk"
+          by = defaultdict(dict)
+          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+              comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
+              with open(p, encoding="utf-8", errors="replace") as f:
+                  for line in f:
+                      if line.startswith("#") or "|" not in line:
+                          continue
+                      h, _, r = line.partition("|")
+                      code = h[2:] if h[:2] in ("sh","sz","bj") else h
+                      parts = (r.strip().split(",") if (comma or "," in r)
+                               else r.strip().split("|"))
+                      if len(parts) >= 4:
+                          by[code][parts[0]] = True
+          cs = sorted(len(v) for v in by.values())
+          n = len(cs)
+          print("股票数: %d" % n)
+          if n:
+              print("根数 min=%d median=%d max=%d" % (cs[0], cs[n//2], cs[-1]))
+          PY
+
+      # ── 2. 大批量采集 (本仓分片) ──────────────────────────────
+      - name: Bulk collect shard ${{ env.SHARD_IDX }}
+        run: |
+          RESUME_FLAG=""
+          if [ "$RESUME" = "true" ]; then RESUME_FLAG="--resume"; fi
+          echo "kind=$KIND shard=$SHARD_IDX resume=$RESUME"
+          python3 scripts/bulk_collect.py \
+            --kind "$KIND" \
+            --shard "$SHARD_IDX" \
+            --n-shards 3 \
+            --sleep 0.4 \
+            $RESUME_FLAG \
+            --out "data/bulk_${KIND}_${SHARD_IDX}.json" \
+            || echo "::warning::bulk_collect 部分失败, 保留已拉部分"
+
+      # ── 3. 推回 K 线仓 ────────────────────────────────────────
+      - name: Push kline bulk
+        if: env.KIND == 'kline'
+        working-directory: kline-repo
+        run: |
+          git config user.name "bulk-collect-bot"
+          git config user.email "3576982374@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add -A data/bulk/
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          if git diff --quiet --cached HEAD; then
+            echo "no kline changes"
+          else
+            git commit -m "kline: bulk backfill shard $SHARD_IDX ($ts)"
+            git push origin HEAD:main || echo "::warning::K线仓 push 失败 (并发), 下次重试"
+          fi
+
+      # ── 4. 主仓记版本戳 ───────────────────────────────────────
+      - name: Stamp and push
+        run: |
+          git config user.name "bulk-collect-bot"
+          git config user.email "3576982374@qq.com"
+          git add "data/bulk_${KIND}_${SHARD_IDX}.json" 2>/dev/null || true
+          if git diff --cached --quiet HEAD; then
+            echo "nothing to commit"
+          else
+            git commit -m "bulk(${KIND}) shard ${SHARD_IDX}: $(TZ=Asia/Shanghai date '+%m-%d %H:%M')"
+            git push origin HEAD:main || echo "::warning::push 失败, 下次重试"
+          fi
