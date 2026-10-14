@@ -229,6 +229,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="8">策略决策</button>
       <button class="c-tab" data-c="9">场景推股</button>
       <button class="c-tab" data-c="10">海外实时</button>
+      <button class="c-tab" data-c="11">因子引擎</button>
+      <button class="c-tab" data-c="12">复盘验证</button>
+      <button class="c-tab" data-c="13">质量审查</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">多维评分 · 点击行看K线/资金流</span></div>
@@ -335,6 +338,45 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <div id="ovSentiment"><div class="fl">加载中…</div></div>
         <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">环球资讯流</div>
         <div id="ovNews"><div class="fl">加载中…</div></div>
+      </div>
+    </div>
+    <div class="card c-card" data-ci="11" style="display:none">
+      <div class="hd">🧮 因子引擎 <span class="sub" id="feSub">17指标共振 · 9维因子 · RPS轮动 · 权重校准</span></div>
+      <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <div class="hd" style="border-top:none;padding:6px 0">引擎 v5 共振评分 <span class="sub" id="v5Sub"></span></div>
+        <div id="engineV5Box"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">多维因子 (9维) <span class="sub" id="mdSub"></span></div>
+        <div id="multidimBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">RPS 相对强度轮动 <span class="sub" id="rpsSub"></span></div>
+        <div id="rpsBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">权重校准 (特征重要性 → 权重) <span class="sub" id="wtSub"></span></div>
+        <div id="weightsBox"><div class="fl">加载中…</div></div>
+      </div>
+    </div>
+    <div class="card c-card" data-ci="12" style="display:none">
+      <div class="hd">🔬 复盘验证 <span class="sub" id="rvSub">历史预测前向验证 · 胜率矩阵 · 样本均衡</span></div>
+      <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <div class="hd" style="border-top:none;padding:6px 0">复盘 (多持有期前向验证) <span class="sub" id="rfSub"></span></div>
+        <div id="reflectBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">胜率矩阵 (持有期 × 市场阶段) <span class="sub">Wilson 95% CI</span></div>
+        <div id="winrateBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">K线模拟回测 <span class="sub" id="ksSub"></span></div>
+        <div id="klineSimBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">样本均衡 (经验贝叶斯收缩) <span class="sub" id="sbSub"></span></div>
+        <div id="sampleBalanceBox"><div class="fl">加载中…</div></div>
+      </div>
+    </div>
+    <div class="card c-card" data-ci="13" style="display:none">
+      <div class="hd">🔍 质量审查 <span class="sub" id="qaSub">找优点 · 找缺点 · 异常 · 数据校验</span></div>
+      <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <div class="hd" style="border-top:none;padding:6px 0">优势挖掘 (哪些维度真有区分度) <span class="sub" id="emSub"></span></div>
+        <div id="edgeBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">异常检测 (因子失效早期预警) <span class="sub" id="adSub"></span></div>
+        <div id="anomalyBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">信号审核 (发布前检查) <span class="sub" id="saSub"></span></div>
+        <div id="signalAuditBox"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">数值校验 (越界/脏值) <span class="sub" id="nvSub"></span></div>
+        <div id="validationBox"><div class="fl">加载中…</div></div>
       </div>
     </div>
   </div>
@@ -1286,6 +1328,257 @@ function renderDailyBrief(d){
   }).join('');
 }
 
+
+/* ══════════════════════════════════════════════════════════════
+   新增 tab: 因子引擎 / 复盘验证 / 质量审查
+   数据全部来自 window._data (render() 一次性并行拉取后缓存),
+   所以这三个 tab 的渲染不需要再发请求 — 切过去即时可画。
+   ══════════════════════════════════════════════════════════════ */
+
+// 通用: 无数据时的占位
+function _empty(id, why){
+  const el = document.getElementById(id);
+  if(el) el.innerHTML = '<div class="fl" style="padding:12px;text-align:center;font-size:10px">'+
+    (why || '暂无数据')+'</div>';
+  return false;
+}
+function _rows(cols, rows){
+  return '<table><thead><tr>'+cols.map(c=>'<th>'+c+'</th>').join('')+
+    '</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+
+    '</tr>').join('')+'</tbody></table>';
+}
+
+/* ─── tab 11: 因子引擎 ─── */
+let feRendered = false;
+function renderFactorEngines(){
+  feRendered = true;
+  const g = window._data || {};
+
+  // 引擎 v5: 17 指标共振评分
+  const v5 = g.engine_v5;
+  if(v5 && v5.top && v5.top.length){
+    const s = document.getElementById('v5Sub');
+    if(s) s.textContent = '扫描 '+v5.n_scanned+' · 达标 '+v5.n_scored+' · '+String(v5.ts||'').slice(5,16);
+    document.getElementById('engineV5Box').innerHTML =
+      _rows(['代码','名称','评分','共振度','多/空/中','K线数','日期'],
+        v5.top.slice(0,30).map(t=>[
+          t.code, t.name||'—', '<b style="color:'+(t.score>=70?'var(--dn)':'var(--tx)')+'">'+t.score.toFixed(1)+'</b>',
+          (t.resonance*100).toFixed(0)+'%',
+          '<span class="up">'+t.bull+'</span>/<span class="dn">'+t.bear+'</span>/'+t.neutral,
+          t.bars, t.date
+        ]));
+  } else _empty('engineV5Box', 'engine_v5.json 无数据 (Space 未跑或样本不足)');
+
+  // 多维因子: 9 维
+  const md = g.multidim;
+  if(md && md.top && md.top.length){
+    const s = document.getElementById('mdSub');
+    if(s) s.textContent = 'TOP '+md.top.length+' · '+String(md.ts||'').slice(5,16);
+    const w = md.weights || {};
+    document.getElementById('multidimBox').innerHTML =
+      '<div class="fl" style="font-size:9px;margin-bottom:4px">权重: '+
+        Object.keys(w).map(k=>k+'='+w[k]).join(' · ')+'</div>'+
+      _rows(['代码','名称','综合']+Object.keys(w).slice(0,9),
+        md.top.slice(0,25).map(t=>{
+          const dims = t.dims || {};
+          return [t.code, t.name||'—',
+            '<b>'+Number(t.composite||0).toFixed(1)+'</b>'].concat(
+            Object.keys(w).slice(0,9).map(k=>Number(dims[k]||0).toFixed(0)));
+        }));
+  } else _empty('multidimBox', 'multidim.json 无数据');
+
+  // RPS 轮动
+  const rps = g.rps_rotation;
+  if(rps && rps.top && rps.top.length){
+    const s = document.getElementById('rpsSub');
+    if(s) s.textContent = '全市场 '+rps.n_universe+' 只 · '+String(rps.date||'');
+    document.getElementById('rpsBox').innerHTML =
+      _rows(['代码','名称','RPS20','RPS50','RPS120','RPS250','最新日期'],
+        rps.top.slice(0,30).map(t=>[
+          t.code, t.name||'—',
+          Number(t.rps_20||0).toFixed(1),
+          Number(t.rps_50||0).toFixed(1),
+          Number(t.rps_120||0).toFixed(1),
+          Number(t.rps_250||0).toFixed(1),
+          t.date||'—'
+        ]));
+  } else _empty('rpsBox', 'rps_rotation.json 无数据');
+
+  // 权重校准
+  const wt = g.engine_weights;
+  if(wt && wt.weights && Object.keys(wt.weights).length){
+    const s = document.getElementById('wtSub');
+    if(s) s.textContent = String(wt.source||'')+' · '+String(wt.ts||'').slice(5,16);
+    const reasons = wt.reasons || {};
+    document.getElementById('weightsBox').innerHTML =
+      _rows(['指标','权重','校准理由'],
+        Object.keys(wt.weights).map(k=>[
+          k, Number(wt.weights[k]).toFixed(3),
+          '<span class="fl" style="font-size:9px">'+(reasons[k]||'样本不足, 保持等权')+'</span>'
+        ]));
+  } else _empty('weightsBox', 'engine_weights.json 无数据');
+}
+
+/* ─── tab 12: 复盘验证 ─── */
+let rvRendered = false;
+function renderReview(){
+  rvRendered = true;
+  const g = window._data || {};
+
+  // 复盘: 多持有期
+  const rf = g.reflect_latest;
+  if(rf && rf.analysis && rf.analysis.overall){
+    const s = document.getElementById('rfSub');
+    if(s) s.textContent = rf.n_records+' 条验证 · '+rf.n_pred_files+' 个预测快照 · '+String(rf.ts||'').slice(5,16);
+    const ov = rf.analysis.overall;
+    document.getElementById('reflectBox').innerHTML =
+      _rows(['持有期','样本','原始胜率','看多胜率','看空胜率','平均收益'],
+        Object.keys(ov).map(h=>{
+          const r = ov[h] || {};
+          const pct = v => (v==null?'—':Number(v).toFixed(1)+'%');
+          return [h+' 日', r.n||0, pct(r.raw_win_rate), pct(r.bull_win_rate),
+                  pct(r.bear_win_rate), pct(r.avg_ret_pct)];
+        })) +
+      (rf.analysis.indicators ?
+        '<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">指标质量排名</div>'+
+        _rows(['指标','质量分','看多胜率','样本','95% CI'],
+          (rf.analysis.ranked||[]).slice(0,12).map(r=>[
+            r.indicator, Number(r.quality||0).toFixed(1),
+            Number(r.bull_win_rate||0).toFixed(1)+'%',
+            r.bull_n||r.n||0,
+            (r.bull_win_rate_ci||[]).map(x=>x==null?'—':x.toFixed(1)+'%').join(' ~ ')
+          ])) : '');
+  } else _empty('reflectBox', 'reflect_latest.json 无数据 (预测历史不足)');
+
+  // 胜率矩阵
+  const wm = g.winrate_matrix;
+  if(wm && wm.horizons){
+    document.getElementById('winrateBox').innerHTML =
+      _rows(['持有期','整体胜率','平均收益','样本','牛市胜率','熊市胜率','可信度'],
+        Object.keys(wm.horizons).map(h=>{
+          const r = wm.horizons[h] || {};
+          const pct = v => (v==null?'—':(v*100).toFixed(1)+'%');
+          return [h+' 日', pct(r.overall),
+            (r.avg_ret_pct==null?'—':Number(r.avg_ret_pct).toFixed(2)+'%'),
+            r.n||0, pct((r.by_regime||{}).bull), pct((r.by_regime||{}).bear),
+            r.sufficient?'✓ 充足':'⚠ 不足'];
+        })) +
+      '<div class="fl" style="font-size:9px;margin-top:4px">'+((wm.meta||{}).evidence||'')+'</div>';
+  } else _empty('winrateBox', 'winrate_matrix.json 无数据');
+
+  // K线模拟
+  const ks = g.kline_sim;
+  if(ks){
+    const s = document.getElementById('ksSub');
+    if(s) s.textContent = '信号 '+ks.n_signals_total+' · 可模拟 '+ks.n_simulated+' · 持仓 '+ks.n_held+' · '+String(ks.ts||'').slice(5,16);
+    const bh = ks.by_horizon || ks.horizons || {};
+    document.getElementById('klineSimBox').innerHTML =
+      _rows(['持有期','样本','胜率','平均收益'],
+        Object.keys(bh).map(h=>{
+          const r = bh[h] || {};
+          return [h+' 日', r.n||0,
+            (r.win_rate==null?'—':(r.win_rate*100).toFixed(1)+'%'),
+            (r.avg_ret_pct==null?'—':Number(r.avg_ret_pct).toFixed(2)+'%')];
+        }));
+  } else _empty('klineSimBox', 'kline_sim.json 无数据');
+
+  // 样本均衡
+  const sb = g.sample_balance;
+  if(sb){
+    const s = document.getElementById('sbSub');
+    if(s) s.textContent = String(sb.method||'')+' · k='+sb.k+' · '+String(sb.ts||'').slice(5,16);
+    const rows = [];
+    const layers = sb.by_lianban || sb.layers || {};
+    Object.keys(layers).forEach(k=>{
+      const r = layers[k] || {};
+      rows.push([k+' 板', r.n||0,
+        (r.raw_rate==null?'—':(r.raw_rate*100).toFixed(1)+'%'),
+        (r.shrunk_rate==null?'—':(r.shrunk_rate*100).toFixed(1)+'%'),
+        r.shrunk_toward_prior?'→ 向先验收缩':'—']);
+    });
+    document.getElementById('sampleBalanceBox').innerHTML = rows.length ?
+      _rows(['层级','样本','原始率','收缩后','方向'], rows) :
+      '<div class="fl" style="padding:12px;text-align:center;font-size:10px">无分层数据</div>';
+  } else _empty('sampleBalanceBox', 'sample_balance.json 无数据');
+}
+
+/* ─── tab 13: 质量审查 ─── */
+let qaRendered = false;
+function renderQA(){
+  qaRendered = true;
+  const g = window._data || {};
+
+  // 优势挖掘
+  const em = g.edge_report;
+  if(em){
+    const s = document.getElementById('emSub');
+    if(s) s.textContent = (em.n_edges||0)+' 条发现 · '+String(em.ts||'').slice(5,16);
+    const edges = em.edges || [];
+    document.getElementById('edgeBox').innerHTML = edges.length ?
+      _rows(['维度','发现'],
+        edges.slice(0,15).map(e=>[
+          '<b>'+(e.dim||e.dimension||'—')+'</b>',
+          '<span class="fl" style="font-size:9px">'+(e.note||e.finding||e.desc||'')+'</span>'
+        ])) :
+      '<div class="fl" style="padding:12px;text-align:center;font-size:10px">无优势发现</div>';
+  } else _empty('edgeBox', 'edge_report.json 无数据');
+
+  // 异常检测
+  const ad = g.anomaly_report;
+  if(ad){
+    const s = document.getElementById('adSub');
+    if(s) s.textContent = 'K线覆盖 '+ad.kline_coverage+' · 异常 '+(ad.n_issues||0)+' 个 · '+String(ad.ts||'').slice(5,16);
+    const issues = ad.issues || [];
+    document.getElementById('anomalyBox').innerHTML =
+      '<div class="fl" style="font-size:9px;margin-bottom:4px">critical='+
+        ((ad.by_severity||{}).critical||0)+' · warning='+((ad.by_severity||{}).warning||0)+'</div>'+
+      (issues.length ?
+        _rows(['严重度','类型','标的','说明'],
+          issues.slice(0,20).map(i=>[
+            i.severity==='critical'?'<b class="dn">critical</b>':'warning',
+            i.kind||i.type||'—', i.code||i.symbol||'—',
+            '<span class="fl" style="font-size:9px">'+(i.detail||i.msg||'')+'</span>'
+          ])) :
+        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出异常</div>');
+  } else _empty('anomalyBox', 'anomaly_report.json 无数据');
+
+  // 信号审核
+  const sa = g.signal_audit;
+  if(sa){
+    const s = document.getElementById('saSub');
+    if(s) s.textContent = '审核 '+sa.n_cards+' 张 · 拦截 '+sa.n_blocked+' · 警告 '+sa.n_warned+' · '+String(sa.ts||'').slice(5,16);
+    const blocked = sa.blocked || [], warned = sa.warned || [];
+    document.getElementById('signalAuditBox').innerHTML =
+      (blocked.length ?
+        '<div class="hd" style="border-top:none;padding:6px 0">已拦截</div>'+
+        _rows(['标的','原因'], blocked.map(b=>[b.code||'—','<span class="dn">'+(b.reason||'')+'</span>'])) : '')+
+      (warned.length ?
+        '<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">警告</div>'+
+        _rows(['标的','原因'], warned.map(b=>[b.code||'—','<span style="color:var(--amber)">'+(b.reason||'')+'</span>'])) : '')+
+      (!blocked.length && !warned.length ?
+        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">全部通过, 无拦截无警告</div>' : '');
+  } else _empty('signalAuditBox', 'signal_audit.json 无数据');
+
+  // 数值校验
+  const nv = g.validation_report;
+  if(nv){
+    const s = document.getElementById('nvSub');
+    if(s) s.textContent = '检查 '+nv.n_files+' 个文件 · 问题 '+(nv.n_issues||0)+' 个 · '+String(nv.ts||'').slice(5,16);
+    const issues = nv.issues || [];
+    document.getElementById('validationBox').innerHTML =
+      '<div class="fl" style="font-size:9px;margin-bottom:4px">critical='+
+        ((nv.by_severity||{}).critical||0)+' · warning='+((nv.by_severity||{}).warning||0)+'</div>'+
+      (issues.length ?
+        _rows(['严重度','文件','字段','问题'],
+          issues.slice(0,20).map(i=>[
+            i.severity==='critical'?'<b class="dn">critical</b>':'warning',
+            i.file||'—', i.field||i.path||'—',
+            '<span class="fl" style="font-size:9px">'+(i.msg||i.detail||'')+'</span>'
+          ])) :
+        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出脏值</div>');
+  } else _empty('validationBox', 'validation_report.json 无数据');
+}
+
 /* ─── Tencent (westock) tab ─── */
 let txActive = false;
 function renderTencent(d){
@@ -1320,147 +1613,173 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='8' && !decRendered){ decRendered=true; renderDecision(window._decData||null); }
   if(b.dataset.c==='10' && window.Overseas){ window.Overseas.render(); }
   if(b.dataset.c==='9' && !scenRendered){ scenRendered=true; renderScenario(window._scenData||null); }
+  // 新增三个 tab 首次切入时懒渲染 (数据已在 render() 里并行拉好)
+  if(b.dataset.c==='11' && !feRendered){ renderFactorEngines(); }
+  if(b.dataset.c==='12' && !rvRendered){ renderReview(); }
+  if(b.dataset.c==='13' && !qaRendered){ renderQA(); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 
+// ─── 数据源清单 (单一事实来源) ──────────────────────────────────
+// 每个条目: [路径, 说明]。render() 一次性并行拉全部, 不再串行 await。
+// 新增数据源只需在这里加一行 + 在 consume() 里消费, 不必改 render。
+const SOURCES = [
+  'data/latest.json',          // 主快照 (ai_screener 产出)
+  'data/hot_impact.json',      // 热点推演
+  'data/cycle.json',           // 周期池
+  'data/sector_pool.json',     // 板块池
+  'data/lowpool.json',         // 低位池
+  'data/market_now.json',      // 实时行情 (每5分钟)
+  'data/realtime_minute.json', // 分钟级 (每3分钟)
+  'data/cycle_deep.json',      // 周期深析 (周一重建)
+  'data/ban_prob.json',        // 打板概率
+  'data/ban_pick.json',        // 打板个股判断
+  'data/flow_divergence.json', // 资金流背离
+  'data/decision.json',        // 决策卡
+  'data/scenario.json',        // 场景化推股
+  'data/daily_brief.json',     // 盘前日报
+  'data/news_digest.json',     // 24h 资讯流
+  'data/enrich.json',          // 强势股/龙虎榜/大宗
+  'data/index_kline.json',     // 指数K线
+  'data/ai_pick_v4.json',      // AI 推荐 v4
+  'data/ai_picks.json',        // AI 推荐 (旧)
+  'data/kline_sim.json',       // K线模拟
+  'data/engine_v5.json',       // 引擎 v5 评分
+  'data/multidim.json',        // 多维因子
+  'data/reflect_latest.json',  // 复盘
+  'data/winrate_matrix.json',  // 胜率矩阵
+  'data/valuation.json',       // 估值
+  'data/self_reflect.json',    // 自我反思
+  'data/ai_review.json',       // AI 复盘
+  'data/market_phase.json',    // 市场相位
+  'data/rps_rotation.json',    // RPS 轮动
+  'data/sample_balance.json',  // 样本均衡
+  'data/global_fx.json',       // 全球汇率
+  'data/all_sources.json'      // 全源合并 (溯源)
+];
+
 async function render(){
-  // 并行拉取, 消除串行 waterfall (原来先 latest 再 hot_impact 再 pools)
-  // 池子用独立文件优先: rebuild_pools.py 重建的版本带 source/ts/口径 元数据,
-  // 且不受远端 local realtime sync 覆盖 latest.json 的影响
-  const [d,hi,cyc,sec,low]=await fetchAll([
-    'data/latest.json','data/hot_impact.json',
-    'data/cycle.json','data/sector_pool.json','data/lowpool.json'
-  ]);
+  // 一次并行拉全部数据源, 取代原先 15+ 次串行 await。
+  // 失败的文件返回 null, 由各 renderXxx 自行判空, 互不影响。
+  const R = await fetchAll(SOURCES);
+  const g = {};
+  SOURCES.forEach((p, i) => { g[p.replace('data/', '').replace('.json', '')] = R[i]; });
+  const d = g.latest;
   window._lastD = d;
-  if(!d){document.getElementById('updTime').textContent='⚠️ 数据加载失败';return}
-  // 实时行情优先: market_now.json 是每10分钟刷新的独立文件,
-  // 不被远端 sync 覆盖 (远端只覆盖 latest.json)
-  const mn=await fetchJSON('data/market_now.json');
-  if(mn&&mn.market){
-    d.market=mn.market;
-    if(mn.limit_up_pool&&mn.limit_up_pool.length)d.limit_up_pool=mn.limit_up_pool;
-    if(mn.limit_down_pool)d.limit_down_pool=mn.limit_down_pool;
-    if(mn.themes&&mn.themes.length)d.themes=mn.themes;
-    if(mn.ths_strong)d.ths_strong=mn.ths_strong;
-    if(mn.tx_sector_ranking)d.westock={sector_ranking:{date:mn.date,data:mn.tx_sector_ranking}};
-    window._realtimeTs=mn.ts;
+  window._data = g;
+  if(!d){ document.getElementById('updTime').textContent='⚠️ 数据加载失败'; return; }
+
+  // ── 实时行情覆盖: market_now 优先于 latest, realtime_minute 最细 ──
+  const mn = g.market_now, rm = g.realtime_minute;
+  if(mn && mn.market){
+    d.market = mn.market;
+    if(mn.limit_up_pool && mn.limit_up_pool.length) d.limit_up_pool = mn.limit_up_pool;
+    if(mn.limit_down_pool) d.limit_down_pool = mn.limit_down_pool;
+    if(mn.themes && mn.themes.length) d.themes = mn.themes;
+    if(mn.ths_strong) d.ths_strong = mn.ths_strong;
+    if(mn.tx_sector_ranking) d.westock = {sector_ranking:{date:mn.date, data:mn.tx_sector_ranking}};
+    window._realtimeTs = mn.ts;
   }
-  // 分钟级实时 (2026-10-14): realtime_minute.json 由云服务器常驻采集,
-  // 交易时段每 60 秒更新 → 覆盖 market_now 的 summary (更细: 含成交额/主力净流入)
-  const rm=await fetchJSON('data/realtime_minute.json');
-  if(rm&&rm.summary){
-    d.market=d.market||{};
-    d.market.advance=rm.summary.advance;
-    d.market.decline=rm.summary.decline;
-    d.market.flat=rm.summary.flat;
-    d.market.limit_up=rm.summary.limit_up_ge10;
-    d.market.limit_down=rm.summary['limit_down_le-10'];
-    d.market.total_amount_yi=rm.summary.total_amount_yi;
-    d.market.main_net_inflow_yi=rm.summary.main_net_inflow_yi;
-    d.market.n_stocks=rm.summary.n_stocks;
-    window._realtimeTs=rm.timestamp;
-    // 页面顶部显示分钟级时间戳 + 数据源
-    const ut=document.getElementById('updTime');
-    if(ut){
-      const t=new Date(rm.timestamp);
-      const hh=String(t.getHours()).padStart(2,'0');
-      const mm=String(t.getMinutes()).padStart(2,'0');
-      ut.textContent=`⚡ ${hh}:${mm} 分钟级 (${rm.market_total||rm.summary.n_stocks}只)`;
-      ut.title=`数据时间: ${rm.timestamp}\n来源: ${rm.source}\n成交额: ${rm.summary.total_amount_yi}亿\n主力净流入: ${rm.summary.main_net_inflow_yi}亿`;
-    }
+  if(rm && rm.summary){
+    d.market = d.market || {};
+    d.market.advance = rm.summary.advance;
+    d.market.decline = rm.summary.decline;
+    d.market.flat = rm.summary.flat;
+    d.market.limit_up = rm.summary.limit_up_ge10;
+    d.market.limit_down = rm.summary['limit_down_le-10'];
+    d.market.total_amount_yi = rm.summary.total_amount_yi;
+    d.market.main_net_inflow_yi = rm.summary.main_net_inflow_yi;
+    d.market.n_stocks = rm.summary.n_stocks;
+    window._realtimeTs = rm.timestamp;
   }
-  // 腾讯数据 tab: 激活后每次 render 都用最新数据重渲染
-  // (修复时序 bug: 原实现在 market_now 覆盖 westock 之前就渲染, 导致点早了 tab 永远空白)
-  if(txActive) renderTencent(d);
-  // 用独立池子文件覆盖 latest.json 里的 pools (若独立文件有效)
-  if(d && typeof d==='object'){
-    d.pools = d.pools || {};
-    if(cyc && cyc.macro_signals) d.pools.cycle = cyc;
-    if(sec && sec.tier1 !== undefined) d.pools.sector_pool = sec;
-    if(low && low.strong !== undefined) d.pools.lowpool = low;
-    // index_kline 也优先用独立文件
-    const ik = await fetchJSON('data/index_kline.json');
-    if(ik && ik.indices && ik.indices.sh000001){
-      d.index_kline = ik.indices.sh000001;
-    }
+
+  // ── 估值注入: ai_pick_v4 优先, 回退 ai_picks, 最后用 latest 内嵌 ──
+  const v4 = g.ai_pick_v4, apk = g.ai_picks;
+  let pickList = null;
+  if(v4 && v4.picks && v4.picks.length) pickList = v4.picks;
+  else if(apk && apk.picks && apk.picks.length) pickList = apk.picks;
+  if(v4 && v4.valuation && d.ai_picks){
+    d.ai_picks.forEach(p => {
+      const v = v4.valuation[p.code];
+      if(v){ p.intrinsic_value = v.intrinsic_value; p.value_ratio = v.value_ratio;
+             p.valuation_method = v.method; p.valuation_bucket = v.bucket; }
+    });
   }
-  const ts=new Date((window._realtimeTs||d.ts)).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai'});
-  document.getElementById('updTime').textContent='✅ '+ts+' · '+d.market.limit_up+'涨停/'+d.market.limit_down+'跌停';
-  document.getElementById('algoBadge').textContent=(d.meta||{}).algo||'tsp';
-  renderKpis(d.market);
-  renderThsReason(d.ths_reason); renderTdxQc(d.tdx_qiangchou);
-  renderPhase(d.phase);
-  renderCycleV2(d.cycle_v2);
-  renderCloud();
-  renderLadder(d.ladder);
-  renderMainlines(d.mainlines, d.themes);
-  renderThemes(d.themes,document.getElementById('themes'),'themesCount');
-  // AI 推荐已在上面用独立 ai_picks.json 渲染 (避免远端 sync 覆盖 latest.json 后为空)
-  renderZt(d.limit_up_pool);
-  renderFundRank((d.fund_rank&&d.fund_rank.length)?d.fund_rank:((mn&&mn.fund_rank)?mn.fund_rank:[]));
-  // 24h 资讯流: 优先读独立 news_digest.json (233条更全, 不被远端 sync 冲掉),
-  // 回退 latest.json 的 news_recent (可能停在旧快照)
-  const nd=await fetchJSON('data/news_digest.json');
-  let newsList=null;
-  if(nd&&nd.categories){
-    newsList=[];
+
+  // ── K线模拟 / 指数K线: 独立文件优先, 回退 latest 内嵌 ──
+  const ik = g.index_kline;
+  if(ik && ik.indices && Object.keys(ik.indices).length){
+    d.index_kline = ik.indices;
+    if(ik.date) d.index_kline_date = ik.date;
+  }
+
+  // ── 资讯流: news_digest 的 categories 拍平, 回退 latest.news_recent ──
+  const nd = g.news_digest;
+  let newsList = null;
+  if(nd && nd.categories){
+    newsList = [];
     for(const cat in nd.categories){
-      const arr=nd.categories[cat];
-      if(Array.isArray(arr)) arr.forEach(it=>newsList.push(Object.assign({},it,{_cat:cat})));
+      const arr = nd.categories[cat];
+      if(Array.isArray(arr)) arr.forEach(it => newsList.push(Object.assign({}, it, {_cat:cat})));
     }
-    // 按时间倒序 (最新的在前)
-    newsList.sort((a,b)=>String(b.ts||'').localeCompare(String(a.ts||'')));
+    newsList.sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
   }
-  renderNews((newsList&&newsList.length)?newsList:d.news_recent, nd);
+
+  // ── 渲染 (顺序无依赖, 每个函数自己判空) ──
+  const _num = v => (typeof v === 'number' && isFinite(v)) ? v : '—';
+  document.getElementById('updTime').textContent =
+    '✅ ' + (d.ts || '').slice(5, 16).replace('T', ' ') + ' · ' +
+    _num(d.market && d.market.limit_up) + '涨停/' + _num(d.market && d.market.limit_down) + '跌停';
+  renderKpis(d.market);
+  renderPhase(d.phase);
+  renderLadder(d.ladder);
+  renderMainlines(d.mainlines);
+  renderThemes(d.themes, document.getElementById('themes'), 'themesCount');
+  renderZt(d.limit_up_pool);
+  renderFundRank((d.fund_rank && d.fund_rank.length) ? d.fund_rank
+                 : ((mn && mn.fund_rank) ? mn.fund_rank : []));
+  renderNews((newsList && newsList.length) ? newsList : d.news_recent, nd);
   renderSummary(d.summary);
   renderTicker(d);
-  if(hi)renderHotImpactData(hi);
-  if(d.commentary)renderCommentary(d.commentary);
-  // 强势股/龙虎榜/大宗交易: 优先读独立的 enrich.json
-  // (远端 local realtime sync 每10分钟覆盖 latest.json, 会冲掉这三块;
-  //  独立文件不受影响, 缺失时才回退 latest.json 内的旧数据)
-  const en=await fetchJSON('data/enrich.json');
-  const ths=(en&&en.ths_strong&&en.ths_strong.length)?en.ths_strong:(d.ths_strong||[]);
-  const lhb=(en&&en.lhb&&en.lhb.length)?en.lhb:(d.lhb||[]);
-  const bt=(en&&en.blocktrade&&en.blocktrade.length)?en.blocktrade:(d.blocktrade||[]);
-  const em=(en&&en.enrich_meta)?en.enrich_meta:d.enrich_meta;
-  renderThsStrong(ths, em);
-  renderLhb(lhb, em);
-  renderBlocktrade(bt, em);
-  // AI 推荐: 优先 ai_pick_v4 (实测统计驱动+估值), 回退独立 ai_picks.json, 再回退 latest.json
-  // 用原生 fetch + no-store 直取 (绕开 SW/会话缓存, 保证拿到最新注入估值的版本)
-  async function _fresh(path){
-    try{ const r=await fetch(path,{cache:'no-store'}); if(r.ok) return await r.json(); }catch(e){}
-    return null;
-  }
-  let pickList=null;
-  const v4=await _fresh('data/ai_pick_v4.json');
-  if(v4&&v4.picks&&v4.picks.length) pickList=v4.picks;
-  if(!pickList){
-    const apk=await _fresh('data/ai_picks.json');
-    if(apk&&apk.picks&&apk.picks.length) pickList=apk.picks;
-  }
-  renderPicks(pickList||d.ai_picks||[]);
+  if(g.hot_impact) renderHotImpactData(g.hot_impact);
+  if(d.commentary) renderCommentary(d.commentary);
+  // 强势股/龙虎榜/大宗: enrich.json 是独立文件, 不被 latest.json 的远端
+  // sync 覆盖; 缺失或为空时才回退 latest.json 内嵌的旧数据。
+  const en = g.enrich;
+  const em = (en && en.enrich_meta) ? en.enrich_meta : d.enrich_meta;
+  renderThsStrong((en && en.ths_strong && en.ths_strong.length) ? en.ths_strong : (d.ths_strong || []), em);
+  renderLhb((en && en.lhb && en.lhb.length) ? en.lhb : (d.lhb || []), em);
+  renderBlocktrade((en && en.blocktrade && en.blocktrade.length) ? en.blocktrade : (d.blocktrade || []), em);
+  renderTencent(d);
+  renderPicks(pickList || d.ai_picks || []);
   renderVolChart(d.index_kline);
-  const cd=await fetchJSON('data/cycle_deep.json');
-  window._cdData=cd; if(cd)renderCycleDeep(cd);
-  const bpj=await fetchJSON('data/ban_prob.json');
-  window._banProb=bpj;
-  const bpk=await fetchJSON('data/ban_pick.json');
-  window._banPick=bpk;
-  const fd=await fetchJSON('data/flow_divergence.json');
-  window._fdData=fd; if(fd)renderFlowDivergence(fd);
-  const dec=await fetchJSON('data/decision.json');
-  window._decData=dec; if(dec&&decRendered)renderDecision(dec);
-  const scen=await _fresh('data/scenario.json');
-  window._scenData=scen; if(scen&&scenRendered)renderScenario(scen);
-  const db=await fetchJSON('data/daily_brief.json');
-  if(db)renderDailyBrief(db);
+
+  // ── 以下按 tab 懒渲染: 数据先缓存, 用户切到该 tab 才画 ──
+  window._cdData = g.cycle_deep;   if(g.cycle_deep)   renderCycleDeep(g.cycle_deep);
+  window._banProb = g.ban_prob;
+  window._banPick = g.ban_pick;
+  window._fdData = g.flow_divergence; if(g.flow_divergence) renderFlowDivergence(g.flow_divergence);
+  window._decData = g.decision;     if(g.decision && decRendered)     renderDecision(g.decision);
+  window._scenData = g.scenario;    if(g.scenario && scenRendered)    renderScenario(g.scenario);
+  if(g.daily_brief) renderDailyBrief(g.daily_brief);
+  window._engineV5 = g.engine_v5;
+  window._multidim = g.multidim;
+  window._reflect = g.reflect_latest;
+  window._winrate = g.winrate_matrix;
+  window._valuation = g.valuation;
+  window._marketPhase = g.market_phase;
+  window._rps = g.rps_rotation;
+  window._sampleBalance = g.sample_balance;
+  window._klineSim = g.kline_sim;
   renderSelfReflect();
   renderAiReview();
   renderPools(d);
-  _failCount=0;
+  // 已打开过的新 tab: 数据刷新时跟着重画 (未打开则不画, 省开销)
+  if(feRendered) renderFactorEngines();
+  if(rvRendered) renderReview();
+  if(qaRendered) renderQA();
+  _failCount = 0;
 }
 // 轮询: 90s 起步, 连续失败则指数退避到 5min, 恢复后回落
 let _failCount=0;
