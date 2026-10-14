@@ -159,15 +159,20 @@ jobs:
           PY
 
       # ── 提交 (只提交自己分片的文件, 不碰别人的) ──────────────
+      # 注意: git_push_retry 的 --protect 是 append 型, 必须一个路径一个 --protect,
+      # 写成 --protect a b 会被 argparse 当未知参数 (实测 exit 2)。
       - name: Commit and push
         run: |
           git config user.name "shard-collect-bot"
           git config user.email "3576982374@qq.com"
-          FILES="data/shard_${SHARD}.json data/news_extra.json"
+          PROTECT_ARGS=""
+          for f in data/shard_${SHARD}.json data/news_extra.json; do
+            PROTECT_ARGS="$PROTECT_ARGS --protect $f"
+          done
           if [ "$SHARD_EXTRA" != "$SHARD" ]; then
-            FILES="$FILES data/shard_${SHARD_EXTRA}.json"
+            PROTECT_ARGS="$PROTECT_ARGS --protect data/shard_${SHARD_EXTRA}.json"
           fi
           python3 scripts/git_push_retry.py \
             --msg "shard(${SHARD}): collect $(TZ=Asia/Shanghai date '+%m-%d %H:%M')" \
-            $FILES \
-            --protect $FILES
+            data/shard_${SHARD}.json data/news_extra.json \
+            $PROTECT_ARGS
