@@ -312,6 +312,31 @@ SOURCES = [
         "degrade_to": ["cls_telegraph", "wscn_lives"],
     },
     {
+        "id": "tushare_pro",
+        "name": "Tushare Pro (积分制, 覆盖最全)",
+        "url": "https://api.tushare.pro",
+        "auth": "key",
+        "status": "unauth",
+        "freq": "realtime",
+        "delay": "实时 (部分接口需单独权限)",
+        "fields": "A股行情/财务/打板/ETF/指数/公募基金/期货/期权/债券/外汇/港股/美股/"
+                 "宏观/量化因子库/大模型语料",
+        "field_map": {},
+        "encoding": "utf-8",
+        "cors": "unknown",
+        "provides": ["quote", "kline", "financial", "fund", "futures",
+                     "option", "bond", "fx", "hk", "us", "macro",
+                     "news", "research", "factor"],
+        "notes": "2026-10-14 读官方文档 doc_id=340 整理: 接口覆盖极广 — "
+                 "股票(行情/财务/打板/龙虎榜/热榜) / ETF全套 / 指数 / 公募基金(净值/持仓/经理) / "
+                 "期货(日线/实时分钟 rt_fut_min 500次每分钟/持仓排名/仓单) / 期权 / 可转债 / "
+                 "外汇 / 港股 / 美股(含三张财务报表) / 宏观(GDP/CPI/PPI/PMI/社融/Shibor/LPR) / "
+                 "量化因子库 / 大模型语料(国家政策库/券商研报/新闻联播文字稿/"
+                 "上证e互动问答/深证易互动问答)。token 从环境变量 TUSHARE_TOKEN 读, "
+                 "积分制, 部分接口需单独申请权限。是唯一能一站式补齐多市场+另类数据的源。",
+        "degrade_to": [],
+    },
+    {
         "id": "em_push2delay_clist",
         "name": "东财实时行情延迟版 (push2delay, clist 降级第三顺位)",
         "url": "https://push2delay.eastmoney.com/api/qt/clist/get?fs=m:90+t:2&fields=f2,f3,f12,f14",
