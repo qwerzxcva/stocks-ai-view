@@ -195,7 +195,11 @@ def append_bulk(code, rows):
     """增量写 bulk (保持现有竖线格式, 与 kline_sim/engine_v5 兼容)。"""
     if not rows:
         return 0
-    p = os.path.join(BULK, "day_qfq_bulk_%s.csv" % str(code).zfill(6)[:3])
+    # 分片命名与既有 bulk 保持一致 (day_qfq_NN.csv, NN = code 前 2 位),
+    # 否则会分裂成两套分片, 消费方 glob day_qfq_*.csv 时虽能读到,
+    # 但同一 code 的数据可能跨两个文件, 去重要靠 existing_dates() 逐行扫,
+    # 代价随文件数线性增长。
+    p = os.path.join(BULK, "day_qfq_%s.csv" % str(code).zfill(6)[:2])
     os.makedirs(BULK, exist_ok=True)
     have = existing_dates(code)
     new = [r for r in rows if r[0] not in have]
