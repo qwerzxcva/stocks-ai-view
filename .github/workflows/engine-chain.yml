@@ -1,0 +1,214 @@
+# engine-chain.yml — the whole engine chain in one workflow, on the Actions egress.
+#
+# This replaces the GitCode Space as the execution host. Space ran the same
+# chain by pulling engine code from GitHub raw at runtime; Actions checks the
+# code out directly, which is simpler and has no runtime dependency on a second
+# platform. The repo is public, so Actions minutes are free and unmetered.
+#
+# Measured cost: ~6-9 minutes per full run (full-pipeline's own timings), well
+# inside the 6-hour job limit.
+#
+# Ordering: engines run in tier order because each tier consumes the previous
+# tier's output. A missing input skips just that engine (|| echo), never the
+# rest of the chain.
+#
+# Required secret: GH_TOKEN, a PAT with repo scope. It is used to publish the
+# results into jiegengxiangjianxue1/db-market, which is a different repo from
+# this one, so the default GITHUB_TOKEN cannot do it.
+name: engine-chain
+on:
+  schedule:
+    # 09:05 CST weekdays: after the pre-open data lands, before the session
+    - cron: '5 1 * * 1-5'
+    # 15:30 CST weekdays: after the close and the 15:05 settle
+    - cron: '30 7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run regardless of the time window'
+        type: boolean
+        default: false
+permissions:
+  contents: read
+
+concurrency:
+  # one run at a time; the two cron ticks are 6.5h apart, but a manual dispatch
+  # during a scheduled run should queue rather than interleave
+  group: engine-chain
+  cancel-in-progress: false
+
+# The scheduler heartbeat wakes this every 5 minutes, but a full run takes ~2
+# minutes and only means anything twice a day (pre-open and post-close). This
+# guard skips the run outside those windows so the heartbeat does not queue up
+# back-to-back chains all session long.
+# Override with a workflow_dispatch input when you want it to run immediately.
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  engines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Shanghai
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      FORCE_RUN: ${{ inputs.force }}
+    steps:
+      - name: Time window guard
+        run: |
+          # The heartbeat wakes this every 5 min; a full chain only matters
+          # pre-open (08:30-09:30) and post-close (15:05-16:30). Outside those
+          # windows, skip so the heartbeat does not pile up runs all session.
+          if [ "$FORCE_RUN" = "true" ]; then
+            echo "forced run, skipping the window check"; exit 0
+          fi
+          h=$(date +%H); m=$(date +%M); mins=$((10#$h * 60 + 10#$m))
+          dow=$(date +%u)
+          if [ "$dow" -gt 5 ]; then echo "weekend, skipping"; exit 1; fi
+          if [ "$mins" -ge 510 ] && [ "$mins" -le 570 ]; then
+            echo "pre-open window ($h:$m), running"; exit 0
+          fi
+          if [ "$mins" -ge 905 ] && [ "$mins" -le 990 ]; then
+            echo "post-close window ($h:$m), running"; exit 0
+          fi
+          echo "outside the engine window ($h:$m), skipping"; exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      # The engines read bulk kline and the prediction history; both live in
+      # other repos. Sparse-checkout keeps the download small.
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+            meta
+          path: kline-repo
+
+      - name: Link kline bulk + prediction history
+        run: |
+          mkdir -p ../stocks-data-kline
+          cp -r kline-repo/data ../stocks-data-kline/ 2>/dev/null || true
+          cp -r kline-repo/meta ../stocks-data-kline/ 2>/dev/null || true
+          ls ../stocks-data-kline/data/bulk | head -3
+          # the ledger engines need wh/daily; pull it from the warehouse
+          mkdir -p ../stockdb/wh/daily
+          curl -s -H "Authorization: token ${GH_TOKEN}" \
+            "https://api.github.com/repos/jiegengxiangjianxue1/db-market/contents/ledger/daily/2026.parquet" \
+            | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          u=d.get('download_url')
+          if u:
+              open('/tmp/dl.txt','w').write(u)
+              print('daily parquet url ok')
+          else:
+              print('no daily parquet:', d.get('message'))
+          "
+          if [ -f /tmp/dl.txt ]; then
+            curl -s -L -H "Authorization: token ${GH_TOKEN}" "$(cat /tmp/dl.txt)" \
+              -o ../stockdb/wh/daily/2026.parquet
+            ls -la ../stockdb/wh/daily/
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -q requests akshare pandas lxml duckdb
+
+      # ── the chain ──────────────────────────────────────────────
+      - name: Engine chain (tier 0-8)
+        run: |
+          set +e
+          echo "--- tier 0: valuation + market phase ---"
+          python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
+          python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
+
+          echo "--- tier 1: resonance + AI pick + rotation ---"
+          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
+          python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
+          python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
+
+          echo "--- tier 2: factors + decision + limit-up audit ---"
+          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || echo "multidim skipped"
+          python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
+          python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
+          python3 scripts/ban_pick.py --out data/ban_pick.json || echo "ban_pick skipped"
+          python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns skipped"
+          python3 scripts/strategy_card.py || echo "strategy_card skipped"
+          python3 scripts/engine_fusion.py || echo "engine_fusion skipped"
+
+          echo "--- tier 3: backtest + reflection + winrate ---"
+          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --max-signals 3000 || echo "kline_sim skipped"
+          python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out data/reflect_latest.json || echo "reflect skipped"
+          python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate skipped"
+          python3 scripts/walkforward.py --train-days 120 --test-days 20 --step-days 20 --horizon 5 --out data/walkforward.json || echo "walkforward skipped"
+
+          echo "--- tier 4: factors + divergence + balance + attribution ---"
+          python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib skipped"
+          python3 scripts/flow_divergence.py --out data/flow_divergence.json || echo "flow_divergence skipped"
+          python3 scripts/sample_balancer.py --in data/ban_prob.json --out data/ban_prob_balanced.json --write-back || echo "balancer skipped"
+          python3 scripts/loss_attribution.py || echo "loss_attribution skipped"
+          python3 scripts/pick_tracker.py stats || echo "pick_tracker skipped"
+
+          echo "--- tier 5: calibration + edge + self-improvement ---"
+          # v2 replaces the averaged calibrator: it scores bull and bear
+          # separately, which is what exposed that every bull edge is negative
+          python3 scripts/weight_calibrator_v2.py || echo "calibrator_v2 skipped"
+          python3 scripts/edge_miner.py || echo "edge_miner skipped"
+          python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
+
+          echo "--- tier 6: validation + scenario + audit + risk ---"
+          python3 scripts/numeric_validator.py --out data/validation_report.json || echo "validator skipped"
+          python3 scripts/scenario_engine.py || echo "scenario skipped"
+          python3 scripts/signal_auditor.py || echo "auditor skipped"
+          python3 scripts/risk_engine.py || echo "risk skipped"
+
+          echo "--- tier 7: portfolio + anomaly ---"
+          python3 scripts/portfolio_optimizer.py || echo "portfolio skipped"
+          python3 scripts/anomaly_detector.py || echo "anomaly skipped"
+
+          echo "--- tier 8: session review + close review ---"
+          python3 scripts/morning_review.py || echo "morning_review skipped"
+          python3 scripts/review_yesterday.py || echo "review_yesterday skipped"
+          python3 scripts/entry_planner.py || echo "entry_planner skipped"
+          python3 scripts/afternoon_picks.py || echo "afternoon_picks skipped"
+          python3 scripts/stop_analysis.py || echo "stop_analysis skipped"
+          python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
+          python3 scripts/close_review.py || echo "close_review skipped"
+          python3 scripts/archive_review.py || echo "archive_review skipped"
+
+          echo "--- engine chain done ---"
+
+      # ── publish to the warehouse the site reads ──
+      - name: Publish to the data warehouse
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          python3 scripts/sync_reviews.py || echo "sync_reviews failed (check GH_TOKEN)"
+          python3 scripts/sync_repos.py --push || echo "sync_repos skipped"
+
+      - name: Summary
+        run: |
+          echo "engine outputs:"
+          for f in engine_v5 ai_pick_v4 multidim decision ban_pick reflect_latest \
+                   engine_weights loss_attr engine_fusion strategy_card \
+                   close_review stop_analysis entry_plans today_picks; do
+            if [ -f "data/$f.json" ]; then
+              printf "  %-20s %8s bytes\n" "$f.json" "$(stat -c%s data/$f.json)"
+            fi
+          done
+          echo "archive:"
+          wc -l data/review_history.jsonl 2>/dev/null || echo "  no archive"

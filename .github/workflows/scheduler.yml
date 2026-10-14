@@ -39,7 +39,8 @@ jobs:
         run: |
           # 按唤醒顺序排: 先轻量实时, 再重采集+引擎, 最后池子与分析
           # ai-update 负责 latest.json (主快照), 不唤醒它 latest 就一直旧
-          WF="realtime-minute,full-pipeline,hot-impact-realtime,rebuild-pools,cloud-analysis,ai-update"
+          # engine-chain 必须在 full-pipeline 之后: 它消费采集产物
+          WF="realtime-minute,full-pipeline,engine-chain,hot-impact-realtime,rebuild-pools,cloud-analysis,ai-update"
           if [ -n "$ONLY" ]; then WF="$ONLY"; fi
           ok=0; skip=0; fail=0
           IFS=',' read -ra LIST <<< "$WF"

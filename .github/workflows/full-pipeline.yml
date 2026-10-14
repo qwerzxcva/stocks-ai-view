@@ -134,30 +134,11 @@ jobs:
       - name: Global FX
         run: python3 scripts/build_global_fx.py --out data/global_fx.json || true
 
-      # ── 6b. 样本均衡 (EB 收缩: 修复连板层级 99.7% 样本集中首板) ──
-      - name: Sample balancer
-        run: python3 scripts/sample_balancer.py --write-back || echo "balancer skipped (no ban_prob)"
-
-      # ── 6c. 场景化推股 (四象限: 牛/熊/震荡/极端) ──
-      # 轻量 (只读已有 json 重排), GitHub 侧直接跑, 不等 Space
-      - name: Scenario engine
-        run: python3 scripts/scenario_engine.py || echo "scenario skipped (no multidim)"
-
-      # ── 6c2. 权重校准 (特征重要性 → engine_v5 权重, 防过拟合) ──
-      - name: Weight calibrator
-        run: python3 scripts/weight_calibrator.py || echo "calibrator skipped (no reflect)"
-
-      # ── 6c3. 信号审核 (发布前: 逻辑矛盾/数值异常/集中度/翻烧饼) ──
-      - name: Signal auditor
-        run: python3 scripts/signal_auditor.py || echo "auditor skipped (no decision)"
-
-      # ── 6c4. 优势挖掘 (找优点: 指标/环境/维度 的统计显著优势) ──
-      - name: Edge miner
-        run: python3 scripts/edge_miner.py || echo "edge_miner skipped"
-
-      # ── 6c5. 异常检测 (时序/分布: 数据断更/覆盖下跌/分布漂移) ──
-      - name: Anomaly detector
-        run: python3 scripts/anomaly_detector.py || echo "anomaly skipped"
+      # Engine steps (balancer / scenario / calibrator / auditor / edge miner /
+      # anomaly) moved to engine-chain.yml. They were duplicated here, and the
+      # old weight_calibrator overwrote engine_weights.json with the averaged
+      # version that hides the bull/bear edge asymmetry. full-pipeline now only
+      # collects; engine-chain.yml consumes the output right after.
 
       # ── 6d. 引擎计算链 (26 引擎, Actions 一站式跑完) ──────────────
       # 主算力设计在 GitCode Space (1000 核时/月)。但 Space 需要人工在网页
@@ -167,53 +148,10 @@ jobs:
       #   · Space 未激活 → 这里的产出就是网站的数据源
       # 两个工作流写同一批文件, 但都在自己 commit 前 fetch+reset --soft,
       # 后跑的覆盖先跑的, 不会写坏。
-      #
-      # 与 Space ENGINE_CHAIN (/tmp/org-space/app.py) 保持同一套脚本/参数
-      # (单一事实源 = scripts/)。顺序按 tier 依赖:
-      #   tier0 估值/市场阶段 → tier1 共振/AI推荐/RPS → tier2 9维/决策/打板
-      #   → tier3 回测/复盘/胜率/前推 → tier4 因子/样本均衡/归因
-      #   → tier5 校准/反思/优势 → tier6 验证/场景/审核/风险 → tier7 组合/异常
-      # 单个引擎失败不阻断后面 (|| echo), 也不让整个 job 失败。
-      # 本地已全链验证 (2026-10-14): 24 个脚本逐一 exit=0。
-      - name: Engine chain (fallback when Space inactive)
-        run: |
-          set +e
-          echo "--- tier 0: valuation + market phase ---"
-          python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
-          python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
-          echo "--- tier 1: resonance + AI pick + rotation ---"
-          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
-          python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
-          python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
-          echo "--- tier 2: 9-dim factors + decision + limit-up audit ---"
-          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || echo "multidim skipped"
-          python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
-          python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
-          python3 scripts/ban_pick.py --out data/ban_pick.json || echo "ban_pick skipped"
-          python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns skipped"
-          echo "--- tier 3: backtest + reflection + winrate + walkforward ---"
-          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --max-signals 3000 || echo "kline_sim skipped"
-          python3 scripts/reflect_engine.py --pred-dir data/predictions --horizons 1,3,5,10 --out data/reflect_latest.json || echo "reflect skipped"
-          python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate skipped"
-          python3 scripts/walkforward.py --train-days 120 --test-days 20 --step-days 20 --horizon 5 --out data/walkforward.json || echo "walkforward skipped"
-          echo "--- tier 4: factors + sample balance + loss attribution ---"
-          python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib skipped"
-          python3 scripts/flow_divergence.py --out data/flow_divergence.json || echo "flow_divergence skipped"
-          python3 scripts/sample_balancer.py --in data/ban_prob.json --out data/ban_prob_balanced.json --write-back || echo "balancer skipped"
-          python3 scripts/loss_attribution.py || echo "loss_attribution skipped (no pick ledger)"
-          echo "--- tier 5: calibration + self-improvement + edge mining ---"
-          python3 scripts/weight_calibrator.py || echo "calibrator skipped"
-          python3 scripts/edge_miner.py || echo "edge_miner skipped"
-          python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
-          echo "--- tier 6: validation + scenario + signal audit + risk budget ---"
-          python3 scripts/numeric_validator.py --out data/validation_report.json || echo "validator skipped"
-          python3 scripts/scenario_engine.py || echo "scenario skipped"
-          python3 scripts/signal_auditor.py || echo "auditor skipped"
-          python3 scripts/risk_engine.py || echo "risk skipped"
-          echo "--- tier 7: portfolio optimization + anomaly detection ---"
-          python3 scripts/portfolio_optimizer.py || echo "portfolio skipped"
-          python3 scripts/anomaly_detector.py || echo "anomaly skipped"
-          echo "--- engine chain done ---"
+      # The engine chain lives in engine-chain.yml (38 engines, tier 0-8).
+      # It used to be duplicated here with an older tier 0-7 list, and the two
+      # workflows overwrote each other's data/*.json. This workflow now only
+      # collects; engine-chain.yml runs right after and consumes the output.
 
       # ── 6e. 瘦身预测快照 (votes 瘦成 dict, 107M -> 22M, 防仓库膨胀) ──
       - name: Slim prediction snapshots
@@ -260,36 +198,14 @@ jobs:
         # 若不先把远端最新版取回工作区, 本 run 开始时的旧副本会把别的
         # 工作流刚推的新数据覆盖掉 (2026-10-14 实测: ai-update 推的 11:34
         # latest.json 被随后 4 个 run 覆盖回 10:49)。
+        #
+        # 本工作流现在只采集; 引擎产出全部由 engine-chain.yml 负责,
+        # 所以 protect 列表只含采集侧文件 — 把引擎 json 也列进来会让
+        # 本 run 用采集时的旧副本覆盖 engine-chain 刚推的新结果。
         run: |
           python3 scripts/git_push_retry.py --msg "pipeline(collect)" \
             data/sources_registry.json data/all_sources.json data/news_digest.json \
             data/predictions data/global_fx.json data/audit_data_report.txt \
-            data/valuation.json data/market_phase.json data/engine_v5.json \
-            data/ai_pick_v4.json data/rps_rotation.json data/multidim.json \
-            data/decision.json data/ban_prob.json data/ban_prob_balanced.json \
-            data/ban_pick.json data/patterns_smoke.json data/kline_sim.json \
-            data/reflect_latest.json data/winrate_matrix.json data/walkforward.json \
-            data/factor_smoke.json data/sample_balance.json data/loss_attribution.json \
-            data/flow_divergence.json \
-            data/engine_weights.json data/weights_history.json data/edge_report.json \
-            data/validation_report.json data/scenario.json data/signal_audit.json \
-            data/self_reflect.json data/risk_plan.json data/portfolio_plan.json \
-            data/anomaly_report.json \
             --protect data/sources_registry.json --protect data/all_sources.json \
             --protect data/news_digest.json --protect data/predictions \
-            --protect data/global_fx.json --protect data/audit_data_report.txt \
-            --protect data/valuation.json --protect data/market_phase.json \
-            --protect data/engine_v5.json --protect data/ai_pick_v4.json \
-            --protect data/rps_rotation.json --protect data/multidim.json \
-            --protect data/decision.json --protect data/ban_prob.json \
-            --protect data/ban_prob_balanced.json --protect data/ban_pick.json \
-            --protect data/patterns_smoke.json --protect data/kline_sim.json \
-            --protect data/reflect_latest.json --protect data/winrate_matrix.json \
-            --protect data/walkforward.json --protect data/factor_smoke.json \
-            --protect data/sample_balance.json --protect data/loss_attribution.json \
-            --protect data/flow_divergence.json --protect data/engine_weights.json \
-            --protect data/weights_history.json --protect data/edge_report.json \
-            --protect data/validation_report.json --protect data/scenario.json \
-            --protect data/signal_audit.json --protect data/self_reflect.json \
-            --protect data/risk_plan.json --protect data/portfolio_plan.json \
-            --protect data/anomaly_report.json
+            --protect data/global_fx.json --protect data/audit_data_report.txt
