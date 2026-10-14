@@ -45,14 +45,14 @@ def sh(args, check=False):
 
 def stage(paths, dirs, all_changes):
     """只 add 真实存在的路径: git add 不存在的 pathspec 会 fatal (exit 1)。"""
-    exist = [p for p in paths if os.path.exists(p)]
+    exist = [p for p in paths if p and os.path.exists(p)]
     for p in paths:
-        if p not in exist:
+        if p and p not in exist:
             print(f"skip (not generated): {p}")
     for d in dirs:
-        if os.path.isdir(d):
+        if d and os.path.isdir(d):
             exist.append(d)
-        else:
+        elif d:
             print(f"skip (no dir): {d}")
     if all_changes:
         exist.append("-A")
@@ -61,6 +61,28 @@ def stage(paths, dirs, all_changes):
         return False
     sh(["git", "add", "-A", "--"] + exist)
     return True
+
+
+def commit_only(paths, dirs, all_changes, msg):
+    """只提交指定路径, 不把 index 里其他内容带进去。
+
+    为什么必须这样: git add 是增量的, 而 git commit 提交整个 index。
+    refresh_from_remote 里的 git checkout <ref> -- <path> 会同时写 index,
+    于是 index 里混进了本不该由本轮提交的文件, git commit 一并带走
+    (2026-10-14 实测: full-pipeline 提交里出现 realtime_minute.json /
+    market_now.json / enrich.json, 全都不在它的显式列表内, 把别的
+    工作流刚推的新数据覆盖成旧版)。
+
+    做法: git commit -- <paths> 只提交这些路径的已暂存改动。
+    """
+    if all_changes:
+        args = ["git", "commit", "-m", msg]
+    else:
+        targets = [p for p in paths if p] + [d for d in dirs if d]
+        if not targets:
+            return None
+        args = ["git", "commit", "-m", msg, "--"] + targets
+    return sh(args)
 
 
 def staged_paths(paths, dirs, all_changes):
@@ -184,8 +206,8 @@ def main():
             print("no staged changes in our scope (remote already up to date)")
             return 0
         ts = datetime.now(CST).strftime("%Y%m%d_%H%M")
-        r = sh(["git", "commit", "-m", f"{args.msg}: {ts}"])
-        if r.returncode != 0:
+        r = commit_only(args.paths, args.dir, args.all, f"{args.msg}: {ts}")
+        if r is None or r.returncode != 0:
             print(f"commit failed: {r.stderr.strip()[:200]}")
             return 1
         p = sh(["git", "push", "origin", f"HEAD:{args.branch}"])
