@@ -191,42 +191,121 @@
   }
 
   // ─── charts ─────────────────────────────────────────────────
+  // K 线图: 静态 SVG + 十字光标 hover。bars 只带 OHLCV, 所以光标提示里
+  // 的日期/价格/涨跌幅/成交量全部前端从 bars 现算, 不依赖额外接口。
   function renderKlineChart(bars) {
     if (!bars || bars.length < 5) {
       return '<div class="fl" style="font-size:9px;line-height:1.5">' +
         'K线取数失败 (tencent / eastmoney / sina 三级均未返回)<br>' +
         '可能原因: 当前网络到这三个源均被拦截</div>';
     }
-    var W = 460, H = 190, PL = 6, PR = 52, PT = 8, PB = 18;
-    var cw = W - PL - PR, ch = H - PT - PB;
-    var hi = -1e18, lo = 1e18;
-    bars.forEach(function (b) { hi = Math.max(hi, b.high); lo = Math.min(lo, b.low); });
+    var W = 460, H = 210, PL = 6, PR = 52, PT = 8, PB = 18;
+    var VOL_H = 34;                      // 底部成交量带高度
+    var priceH = H - PT - PB - VOL_H - 4;
+    var cw = W - PL - PR;
+    var hi = -1e18, lo = 1e18, vmax = 0;
+    bars.forEach(function (b) {
+      hi = Math.max(hi, b.high); lo = Math.min(lo, b.low);
+      vmax = Math.max(vmax, b.vol || 0);
+    });
     var rng = (hi - lo) || 1;
     var bw = cw / bars.length;
+    var cx = function (i) { return PL + i * bw + bw / 2; };
+    var yP = function (v) { return PT + (hi - v) / rng * priceH; };
+
     var out = '';
-    bars.forEach(function (b, i) {
-      var x = PL + i * bw;
-      var col = b.close >= b.open ? UP : DN;
-      var yO = PT + (hi - b.open) / rng * ch;
-      var yC = PT + (hi - b.close) / rng * ch;
-      out += '<line x1="' + (x + bw / 2).toFixed(1) + '" y1="' + (PT + (hi - b.high) / rng * ch).toFixed(1)
-        + '" x2="' + (x + bw / 2).toFixed(1) + '" y2="' + (PT + (hi - b.low) / rng * ch).toFixed(1)
-        + '" stroke="' + col + '" stroke-width="1"/>';
-      var top = Math.min(yO, yC), h = Math.max(1, Math.abs(yC - yO));
-      out += '<rect x="' + (x + bw * 0.15).toFixed(1) + '" y="' + top.toFixed(1)
-        + '" width="' + (bw * 0.7).toFixed(1) + '" height="' + h.toFixed(1) + '" fill="' + col + '"/>';
-    });
+    // 价格网格 + 右侧刻度
     for (var g = 0; g <= 4; g++) {
-      var v = hi - rng * g / 4, y = PT + ch * g / 4;
+      var v = hi - rng * g / 4, y = PT + priceH * g / 4;
       out += '<line x1="' + PL + '" y1="' + y.toFixed(1) + '" x2="' + (W - PR) + '" y2="' + y.toFixed(1)
         + '" stroke="#1e2738" stroke-width="0.5"/>';
       out += '<text x="' + (W - PR + 4) + '" y="' + (y + 3).toFixed(1) + '" fill="#586069" font-size="8">'
         + v.toFixed(1) + '</text>';
     }
-    out += '<text x="' + PL + '" y="' + (H - 5) + '" fill="#586069" font-size="8">' + bars[0].date.slice(5) + '</text>';
-    out += '<text x="' + (W - PR - 30) + '" y="' + (H - 5) + '" fill="#586069" font-size="8">'
-      + bars[bars.length - 1].date.slice(5) + '</text>';
-    return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:190px;display:block">' + out + '</svg>';
+    // K 线实体 + 影线
+    bars.forEach(function (b, i) {
+      var x = cx(i);
+      var col = b.close >= b.open ? UP : DN;
+      out += '<line x1="' + x.toFixed(1) + '" y1="' + yP(b.high).toFixed(1)
+        + '" x2="' + x.toFixed(1) + '" y2="' + yP(b.low).toFixed(1)
+        + '" stroke="' + col + '" stroke-width="1"/>';
+      var top = Math.min(yP(b.open), yP(b.close));
+      var h = Math.max(1, Math.abs(yP(b.close) - yP(b.open)));
+      out += '<rect x="' + (x - bw * 0.35).toFixed(1) + '" y="' + top.toFixed(1)
+        + '" width="' + (bw * 0.7).toFixed(1) + '" height="' + h.toFixed(1)
+        + '" fill="' + col + '"/>';
+    });
+    // 成交量柱 (与 K 线同色, 贴价格区下方)
+    var volTop = PT + priceH + 6;
+    bars.forEach(function (b, i) {
+      var x = cx(i);
+      var col = b.close >= b.open ? UP : DN;
+      var h = vmax > 0 ? (b.vol || 0) / vmax * VOL_H : 0;
+      if (h < 0.5) h = 0.5;
+      out += '<rect x="' + (x - bw * 0.35).toFixed(1) + '" y="' + (volTop + VOL_H - h).toFixed(1)
+        + '" width="' + (bw * 0.7).toFixed(1) + '" height="' + h.toFixed(1)
+        + '" fill="' + col + '" opacity="0.55"/>';
+    });
+    out += '<text x="' + PL + '" y="' + (volTop - 1).toFixed(1) + '" fill="#586069" font-size="7">量</text>';
+    // 底部日期 (首/中/尾, 不再只有首尾)
+    var marks = [0, Math.floor(bars.length / 2), bars.length - 1];
+    marks.forEach(function (i) {
+      var anchor = i === 0 ? 'start' : (i === bars.length - 1 ? 'end' : 'middle');
+      out += '<text x="' + cx(i).toFixed(1) + '" y="' + (H - 5) + '" fill="#586069" font-size="8"'
+        + ' text-anchor="' + anchor + '">' + (bars[i].date || '').slice(5) + '</text>';
+    });
+    // 十字光标 (默认隐藏, hover 时定位)
+    out += '<g id="kx" style="display:none" pointer-events="none">'
+      + '<line id="kxV" y1="' + PT + '" y2="' + (PT + priceH + 6 + VOL_H) + '" stroke="#7d8590" stroke-width="0.5" stroke-dasharray="2,2"/>'
+      + '<line id="kxH" x1="' + PL + '" x2="' + (W - PR) + '" stroke="#7d8590" stroke-width="0.5" stroke-dasharray="2,2"/>'
+      + '</g>';
+    var svg = '<svg id="klineSvg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:210px;display:block">'
+      + out + '</svg>';
+    return svg + '<div id="klineTip" style="font-size:10px;color:#c9d1d9;min-height:14px;padding:2px 2px 0">'
+      + '移动鼠标查看每日 开/高/低/收 · 涨跌幅 · 成交量</div>';
+  }
+
+  // K 线 hover: 由 renderKlineChart 的 id=kx 十字光标 + id=klineTip 组成
+  function bindKlineHover(bars) {
+    var svg = document.getElementById('klineSvg');
+    if (!svg || !bars || !bars.length) return;
+    var g = svg.querySelector('#kx'), vLine = svg.querySelector('#kxV'), hLine = svg.querySelector('#kxH');
+    var tip = document.getElementById('klineTip');
+    var W = 460, PL = 6, PR = 52, PT = 8, H = 210, VOL_H = 34;
+    var priceH = H - PT - 18 - VOL_H - 4;
+    var cw = W - PL - PR, bw = cw / bars.length;
+    svg.addEventListener('mousemove', function (ev) {
+      var r = svg.getBoundingClientRect();
+      var sx = (ev.clientX - r.left) / r.width * W;
+      var i = Math.floor((sx - PL) / bw);
+      if (i < 0) i = 0;
+      if (i > bars.length - 1) i = bars.length - 1;
+      var b = bars[i];
+      var x = PL + i * bw + bw / 2;
+      g.style.display = 'block';
+      vLine.setAttribute('x1', x); vLine.setAttribute('x2', x);
+      var y = PT + (ev.clientY - r.top) / r.height * H;
+      if (y < PT) y = PT;
+      if (y > PT + priceH + 6 + VOL_H) y = PT + priceH + 6 + VOL_H;
+      hLine.setAttribute('y1', y); hLine.setAttribute('y2', y);
+      if (tip) {
+        var pct = '';
+        if (i > 0 && bars[i - 1].close) {
+          var p = (b.close - bars[i - 1].close) / bars[i - 1].close * 100;
+          pct = ' <span style="color:' + (p >= 0 ? UP : DN) + '">' + (p >= 0 ? '+' : '') + p.toFixed(2) + '%</span>';
+        }
+        var volTxt = b.vol ? (b.vol >= 1e8 ? (b.vol / 1e8).toFixed(2) + '亿手'
+          : b.vol >= 1e4 ? (b.vol / 1e4).toFixed(1) + '万手' : Math.round(b.vol) + '手') : '—';
+        tip.innerHTML = '<b>' + (b.date || '') + '</b> '
+          + '开' + b.open.toFixed(2) + ' 高' + b.high.toFixed(2)
+          + ' 低' + b.low.toFixed(2) + ' 收' + b.close.toFixed(2) + pct
+          + ' <span style="color:#8b949e">量 ' + volTxt + '</span>';
+      }
+    });
+    svg.addEventListener('mouseleave', function () {
+      g.style.display = 'none';
+      if (tip) tip.innerHTML = '移动鼠标查看每日 开/高/低/收 · 涨跌幅 · 成交量';
+    });
   }
 
   function renderFundChart(flows) {
@@ -369,6 +448,7 @@
         h += '<div class="fl" style="font-size:9px;margin-top:4px">Research reference only, not investment advice.</div>';
       }
       det.innerHTML = h;
+      bindKlineHover(bars);
       Array.prototype.forEach.call(det.querySelectorAll('button[data-klt]'), function (btn) {
         btn.onclick = function () {
           curPeriod = btn.dataset.klt;
@@ -376,6 +456,7 @@
           if (box) box.innerHTML = '<span class="fl" style="font-size:9px">Loading...</span>';
           fetchKline(code, 60, curPeriod).then(function (nb) {
             if (box) box.innerHTML = renderKlineChart(nb);
+            bindKlineHover(nb);
             Array.prototype.forEach.call(det.querySelectorAll('button[data-klt]'), function (b2) {
               var on2 = b2.dataset.klt === curPeriod;
               b2.style.border = '1px solid ' + (on2 ? 'var(--accent)' : 'var(--border)');
@@ -393,6 +474,8 @@
     fetchKline: fetchKline,
     fetchFundFlow: fetchFundFlow,
     fetchMinute: fetchMinute,
-    fetchQuote: fetchQuote
+    fetchQuote: fetchQuote,
+    renderKlineChart: renderKlineChart,
+    bindKlineHover: bindKlineHover
   };
 })();
