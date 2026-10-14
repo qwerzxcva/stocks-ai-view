@@ -61,16 +61,20 @@ def _decode(body):
             return ""
 
 
-def get(url, referer=None, timeout=12):
+def get(url, referer=None, timeout=12, verbose=False):
     h = dict(UA)
     if referer:
         h["Referer"] = referer
     try:
         req = urllib.request.Request(url, headers=h)
         with urllib.request.urlopen(req, timeout=timeout) as r:
-            return _decode(r.read())
+            body = r.read()
+        txt = _decode(body)
+        if verbose:
+            print("  [get] %s -> %d 字节 (HTTP %s)" % (url[:60], len(txt), r.status))
+        return txt
     except Exception as e:
-        print("  [%s] %s" % (type(e).__name__, str(e)[:60]))
+        print("  [get] %s -> %s %s" % (url[:60], type(e).__name__, str(e)[:60]))
         return ""
 
 
@@ -89,9 +93,11 @@ def fetch_zaobao(limit=30):
     out = []
     for section in ("news/china", "news/singapore"):
         url = "https://www.zaobao.com/%s" % section
-        html = get(url, referer="https://www.zaobao.com/")
+        html = get(url, referer="https://www.zaobao.com/", verbose=True)
         if not html:
+            print("  [zaobao] %s 返回空 (可能被出口 IP 拦)" % section)
             continue
+        print("  [zaobao] %s HTML %d 字节" % (section, len(html)))
         # SSR 里文章链接形如 /news/china/story20260804-9469069
         # 标题在 <a ...>text</a> 或 aria-label
         seen = set()
