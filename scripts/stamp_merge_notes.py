@@ -35,6 +35,13 @@ NOTES = {
     "data/reflect_latest.json": {
         "resolved_from": "theirs",
         "reason": "64250 records vs 16756 from the same 649 prediction files",
+        "regression_guard": {"n_records_min": 60000},
+    },
+    "data/engine_weights.json": {
+        "resolved_from": "weight_calibrator_v2",
+        "reason": "v2 scores bull and bear separately; the old calibrator "
+                  "averaged them and hid that every bull edge is negative",
+        "regression_guard": {"mean_bear_edge_min": 5.0},
     },
 }
 
@@ -74,11 +81,22 @@ def main():
         try:
             d = json.load(open(full, encoding="utf-8"))
         except Exception:
+            log(f"REGRESSION {path}: unparsable")
             continue
-        nok = sum(1 for p in (d.get("picks") or []) if p.get("p_zt_next") is None)
-        if (d.get("n_zt") or 0) < guard["n_zt_min"] or nok > guard["max_no_kline"]:
-            log(f"REGRESSION {path}: n_zt={d.get('n_zt')} "
-                f"no_kline={nok} (want >={guard['n_zt_min']}, <={guard['max_no_kline']})")
+        bad = []
+        if "n_records_min" in guard and (d.get("n_records") or 0) < guard["n_records_min"]:
+            bad.append(f"n_records={d.get('n_records')} (want >={guard['n_records_min']})")
+        if "n_zt_min" in guard and (d.get("n_zt") or 0) < guard["n_zt_min"]:
+            bad.append(f"n_zt={d.get('n_zt')} (want >={guard['n_zt_min']})")
+        if "max_no_kline" in guard:
+            nok = sum(1 for p in (d.get("picks") or []) if p.get("p_zt_next") is None)
+            if nok > guard["max_no_kline"]:
+                bad.append(f"no_kline={nok} (want <={guard['max_no_kline']})")
+        if "mean_bear_edge_min" in guard and (d.get("mean_bear_edge") or 0) < guard["mean_bear_edge_min"]:
+            bad.append(f"mean_bear_edge={d.get('mean_bear_edge')} "
+                       f"(want >={guard['mean_bear_edge_min']})")
+        if bad:
+            log(f"REGRESSION {path}: " + "; ".join(bad))
 
     if changed:
         r = subprocess.run(["git", "add"] + changed, cwd=REPO)

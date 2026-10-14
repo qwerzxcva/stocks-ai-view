@@ -72,6 +72,10 @@
       return get(REPOS.market + 'sector/' + kind + '_kline/' + bk + '.csv', 600000)
         .then(function (txt) { return api.parseCsv(txt); });
     },
+    // TradingView grouping: the usable membership source when the eastmoney
+    // board endpoint is unreachable.
+    tvGroups: function () { return get(REPOS.market + 'sector/tv_groups.json', 600000); },
+    stockToBoard: function () { return get(REPOS.market + 'sector/stock_to_board.json', 600000); },
 
     // ── overseas ──
     overseas: function () { return get(REPOS.market + 'overseas/live.json', 60000); },

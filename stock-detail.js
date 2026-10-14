@@ -384,10 +384,25 @@
       fetchQuote(code), fetchKline(code, 60, curPeriod),
       fetchFundFlow(code, 30), fetchMinute(code),
       window.DB ? window.DB.stockTechnical(b) : Promise.resolve(null),
-      window.DB ? window.DB.stockQuote(b) : Promise.resolve(null)
+      window.DB ? window.DB.stockQuote(b) : Promise.resolve(null),
+      window.DB ? window.DB.stockToBoard() : Promise.resolve(null)
     ]).then(function (res) {
       var q = res[0], bars = res[1], flows = res[2], mins = res[3], tech = res[4], wh = res[5];
+      var s2b = res[6];
       var h = '';
+      // board membership, so a stock's sector context is visible without
+      // leaving the detail panel
+      var mine = s2b && s2b.stocks ? s2b.stocks[b] : null;
+      if (mine) {
+        var tags = (mine.sector || []).concat(mine.industry || []);
+        if (tags.length) {
+          h += '<div style="margin:3px 0">' + tags.slice(0, 4).map(function (t) {
+            return '<span style="display:inline-block;margin:1px 4px 1px 0;padding:1px 6px;' +
+              'border:1px solid var(--bd);border-radius:8px;color:var(--blue);font-size:9px">' +
+              t + '</span>';
+          }).join('') + '</div>';
+        }
+      }
       if (q) {
         var col = q.chg_pct >= 0 ? 'var(--up)' : 'var(--dn)';
         h += '<b style="font-size:14px">' + q.name + ' (' + q.code + ')</b> ' +

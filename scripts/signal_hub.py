@@ -179,12 +179,42 @@ def tradability(code, q=None):
 def v5_votes(code):
     """engine_v5's indicator votes for one code, from its last output."""
     d = load_json("engine_v5.json") or {}
+    want = bare_of(code)
     for x in (d.get("top") or []):
-        if bare_of(x.get("code")) == bare_of(code):
+        if bare_of(x.get("code")) == want:
             return {"score": x.get("score"), "resonance": x.get("resonance"),
                     "bull": x.get("bull"), "bear": x.get("bear"),
                     "votes": x.get("votes")}
     return None
+
+
+def coverage_report():
+    """Which engine outputs are present and how many rows each carries.
+
+    cross_check() silently returns None for a missing engine, which makes a
+    half-populated warehouse look like a clean "no signal". This surfaces it.
+    """
+    out = {}
+    for name, key, count_of in (
+            ("engine_v5", "top", lambda d: len(d.get("top") or [])),
+            ("ai_pick_v4", "picks", lambda d: len(d.get("picks") or [])),
+            ("ban_pick", "picks", lambda d: len(d.get("picks") or [])),
+            ("reflect_latest", "n_records", lambda d: d.get("n_records")),
+            ("overseas_impact", "bias", lambda d: d.get("bias")),
+            ("entry_plans", "plans", lambda d: len(d.get("plans") or [])),
+            ("close_review", "date", lambda d: d.get("date")),
+    ):
+        d = load_json(f"{name}.json")
+        if not d:
+            out[name] = {"present": False}
+            continue
+        try:
+            n = count_of(d)
+        except Exception:
+            n = None
+        out[name] = {"present": True, "ts": d.get("ts") or d.get("generated_at"),
+                     "count": n}
+    return out
 
 
 def ban_pick_prob(code):
@@ -236,7 +266,12 @@ def cross_check(code):
     'actionable' flag. The point is the contradiction check: a code that
     engine_v5 loves but that is sitting at limit-up is NOT actionable, and a
     code whose T+1 break probability is high is downgraded regardless of score.
+
+    engines_missing lists the engine outputs that were absent, so a
+    half-populated warehouse is visible instead of reading as "no signal".
     """
+    coverage = coverage_report()
+    missing = [k for k, v in coverage.items() if not v.get("present")]
     q = quotes([code]).get(prefixed(code))
     ok, reason, detail = tradability(code, q)
     kl = klines([code]).get(str(code)) or []
@@ -276,6 +311,7 @@ def cross_check(code):
         "overseas_bias": ov["bias"],
         "warnings": warnings,
         "actionable": ok and not warnings,
+        "engines_missing": missing,
     }
 
 
