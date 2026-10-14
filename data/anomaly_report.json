@@ -1,13 +1,22 @@
 {
-  "ts": "2026-10-14T13:28:41+08:00",
+  "ts": "2026-10-14T13:52:20+08:00",
   "engine": "anomaly_detector v1 (时序/分布异常)",
   "kline_coverage": 1677,
-  "n_issues": 0,
+  "n_issues": 1,
   "by_severity": {
-    "critical": 0,
+    "critical": 1,
     "warning": 0
   },
-  "issues": [],
+  "issues": [
+    {
+      "type": "staleness",
+      "file": "latest.json",
+      "age_min": 182.8,
+      "limit_min": 40,
+      "severity": "critical",
+      "msg": "latest.json 183 分钟未更新 (阈值 40min)"
+    }
+  ],
   "checks": [
     "数据断更",
     "K线覆盖率下跌",
