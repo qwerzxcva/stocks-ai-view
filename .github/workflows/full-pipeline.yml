@@ -199,6 +199,7 @@ jobs:
           python3 scripts/walkforward.py --train-days 120 --test-days 20 --step-days 20 --horizon 5 --out data/walkforward.json || echo "walkforward skipped"
           echo "--- tier 4: factors + sample balance + loss attribution ---"
           python3 scripts/factor_lib.py --out data/factor_smoke.json || echo "factor_lib skipped"
+          python3 scripts/flow_divergence.py --out data/flow_divergence.json || echo "flow_divergence skipped"
           python3 scripts/sample_balancer.py --in data/ban_prob.json --out data/ban_prob_balanced.json --write-back || echo "balancer skipped"
           python3 scripts/loss_attribution.py || echo "loss_attribution skipped (no pick ledger)"
           echo "--- tier 5: calibration + self-improvement + edge mining ---"
@@ -287,6 +288,7 @@ jobs:
             data/ban_pick.json data/patterns_smoke.json data/kline_sim.json \
             data/reflect_latest.json data/winrate_matrix.json data/walkforward.json \
             data/factor_smoke.json data/sample_balance.json data/loss_attribution.json \
+            data/flow_divergence.json \
             data/engine_weights.json data/weights_history.json data/edge_report.json \
             data/validation_report.json data/scenario.json data/signal_audit.json \
             data/self_reflect.json data/risk_plan.json data/portfolio_plan.json \
