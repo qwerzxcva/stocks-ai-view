@@ -107,6 +107,70 @@ SNAPSHOT_GLOB = os.path.join(LIVE_MARKET, "snapshot_*.json")
 DUCKDB_PATH = os.environ.get("STOCKS_DB") or os.path.join(LIVE_ROOT, "stocks.duckdb")
 
 
+# ─── bulk kline 文件清单 ─────────────────────────────────────────
+# 大分片在 git 里以 .csv.gz 存放 (54.6MB -> 15.7MB), 而 28 个引擎脚本都
+# glob 'day_qfq_*.csv'。让 glob 同时看到 .csv 与解压后的 .csv.gz。
+
+def bulk_kline_files(bulk_dir=None):
+    """返回 day_qfq_* 的全部可读路径: 原生 .csv 优先, 否则解压 .csv.gz。
+
+    解压产物写到系统临时目录, 不污染仓库工作区。同名 .csv 已存在时
+    直接用它, 避免重复解压。
+    """
+    import glob
+    import gzip
+    import shutil
+    import tempfile
+
+    d = bulk_dir or BULK
+    out = []
+    seen = set()
+    cache = os.path.join(tempfile.gettempdir(), "stocks_bulk_gz")
+    for p in sorted(glob.glob(os.path.join(d, "day_qfq_*.csv"))):
+        if p not in seen:
+            seen.add(p)
+            out.append(p)
+    for gz in sorted(glob.glob(os.path.join(d, "day_qfq_*.csv.gz"))):
+        base = os.path.basename(gz)[:-3]
+        plain = os.path.join(d, base)
+        if plain in seen:
+            continue
+        if os.path.exists(plain):
+            seen.add(plain)
+            out.append(plain)
+            continue
+        os.makedirs(cache, exist_ok=True)
+        target = os.path.join(cache, base)
+        if not os.path.exists(target):
+            with gzip.open(gz, "rb") as fin, open(target, "wb") as fout:
+                shutil.copyfileobj(fin, fout, length=1 << 20)
+        seen.add(target)
+        out.append(target)
+    return out
+
+
+def ensure_bulk_uncompressed(bulk_dir=None):
+    """CI 里跑引擎前调用一次: 把所有 .csv.gz 解压到 bulk 目录旁边。
+
+    返回解压出的文件数。工作区已有同名 .csv 时跳过。
+    """
+    import glob
+    import gzip
+    import shutil
+
+    d = bulk_dir or BULK
+    n = 0
+    for gz in sorted(glob.glob(os.path.join(d, "day_qfq_*.csv.gz"))):
+        plain = os.path.join(d, os.path.basename(gz)[:-3])
+        if os.path.exists(plain):
+            continue
+        with gzip.open(gz, "rb") as fin, open(plain, "wb") as fout:
+            shutil.copyfileobj(fin, fout, length=1 << 20)
+        n += 1
+    return n
+
+
+
 def safe_load_json(path, default=None):
     """安全读 JSON — 多个 workflow 并发写 data/ 时, 裸 json.load 会撞上
     「读到写了一半的文件」而抛 JSONDecodeError (2026-10-14 实测:

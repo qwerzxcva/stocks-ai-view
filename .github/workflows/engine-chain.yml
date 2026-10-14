@@ -116,6 +116,16 @@ jobs:
           cp -r kline-repo/data ../stocks-data-kline/ 2>/dev/null || true
           cp -r kline-repo/meta ../stocks-data-kline/ 2>/dev/null || true
           ls ../stocks-data-kline/data/bulk | head -3
+          # 大分片在 git 里是 .csv.gz (54.6MB -> 15.7MB)。28 个引擎脚本都
+          # glob 'day_qfq_*.csv', 所以这里解压到 bulk 目录, 让 glob 能命中。
+          # 不解压的话 engine_v5 只加载 1677 只而不是 3997 只 (2026-10-15 实测)。
+          python3 -c "
+          import sys; sys.path.insert(0, 'scripts')
+          from paths import ensure_bulk_uncompressed
+          n = ensure_bulk_uncompressed('../stocks-data-kline/data/bulk')
+          print(f'uncompressed {n} gz shards')
+          "
+          ls ../stocks-data-kline/data/bulk | grep -c 'day_qfq'
           # the ledger engines need wh/daily; pull it from the warehouse
           mkdir -p ../stockdb/wh/daily
           curl -s -H "Authorization: token ${GH_TOKEN}" \
