@@ -85,9 +85,9 @@ jobs:
       - name: Commit & push
         if: inputs.push != 'false'
         run: |
-          python3 scripts/git_push_retry.py --msg "minute" \
+          python3 scripts/git_push_retry.py --msg "minute" --dir data \
+            --user minute-bot \
             --protect data/realtime_minute.json --protect data/market/
-              --user minute-bot --dir data
       - name: Summary
         run: |
           {
