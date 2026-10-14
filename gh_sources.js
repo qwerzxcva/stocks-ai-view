@@ -20,8 +20,8 @@
   //        内必有一个仓刚跑完
   var REPOS = [
     { owner: "qwerzxcva", repo: "stocks-ai-view", branch: "main", label: "A" },
-    { owner: "jiegengxiangjianxue", repo: "stocks-ai-view-b", branch: "main", label: "B" },
-    { owner: "dufuwuxin", repo: "stocks-ai-view-c", branch: "main", label: "C" },
+    { owner: "", repo: "", branch: "main", label: "B" },  // 待填
+    { owner: "", repo: "", branch: "main", label: "C" },  // 待填
   ].filter(function (r) { return r.owner && r.repo; });
 
   var RAW = "https://raw.githubusercontent.com";
