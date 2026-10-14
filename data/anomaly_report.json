@@ -1,20 +1,36 @@
 {
-  "ts": "2026-10-14T10:38:17+08:00",
+  "ts": "2026-10-14T11:40:59+08:00",
   "engine": "anomaly_detector v1 (时序/分布异常)",
   "kline_coverage": 1677,
-  "n_issues": 1,
+  "n_issues": 3,
   "by_severity": {
-    "critical": 1,
+    "critical": 3,
     "warning": 0
   },
   "issues": [
     {
       "type": "staleness",
       "file": "latest.json",
-      "age_min": 146.5,
+      "age_min": 51.4,
       "limit_min": 40,
       "severity": "critical",
-      "msg": "latest.json 146 分钟未更新 (阈值 40min)"
+      "msg": "latest.json 51 分钟未更新 (阈值 40min)"
+    },
+    {
+      "type": "staleness",
+      "file": "enrich.json",
+      "age_min": 86.2,
+      "limit_min": 40,
+      "severity": "critical",
+      "msg": "enrich.json 86 分钟未更新 (阈值 40min)"
+    },
+    {
+      "type": "staleness",
+      "file": "market_now.json",
+      "age_min": 86.6,
+      "limit_min": 40,
+      "severity": "critical",
+      "msg": "market_now.json 87 分钟未更新 (阈值 40min)"
     }
   ],
   "checks": [
