@@ -1,19 +1,17 @@
-# full-pipeline — GitHub Actions 侧只做「采集 + 持久化 + 触发」
-# 交易日盘中 5 次 (CST 09:50 / 10:50 / 11:50 / 13:50 / 14:50)
+# full-pipeline — 采集 + 计算全链路 (GitHub Actions 一站式)
 #
-# 2026-10-14 职责重划 (用户要求: 算法与引擎全部在云端跑通整套流程):
-#   Actions (本工作流) : 采集 → 合并去重 → DuckDB → 预测快照落盘 → push
-#   GitCode Space     : 拉数据 → 跑 10 个引擎 → 产出回推 (见 space-pull.yml)
+# 2026-10-14 职责收敛 (用户决定: 停用 GitCode Space, 全迁 GitHub Actions):
+#   Actions (本工作流) : 采集 → 合并去重 → 26 引擎计算 → 产出 → push
+#   GitCode            : 只留 4 个 dataset 仓做零核时归档 (dataset-archive.yml)
 #
-# 为什么把计算搬走:
-#   - Actions 有 6h/次上限与每月 2000 分钟额度, 37 步全跑既慢又容易超时
-#   - Space 有独立 1000 核时/月额度, 常驻不占 Actions 配额
-#   - 引擎代码唯一事实源是 scripts/, Space 运行时从 GitHub raw 拉取
+# 为什么不用 Space:
+#   - Space 30 分钟无 HTTP 访问就休眠, 需人工网页激活, 无法自动开关
+#   - 本仓是公开仓, Actions 免费无限分钟; 单轮实测 60s, 远低于 6h 上限
+#   - 引擎代码唯一事实源是 scripts/, 无跨平台同步分叉问题
 #
 # 本工作流保留在 Actions 的原因:
 #   - collect_all_sources 要多个出口 IP 采国内源 (容器内被墙的源)
-#   - DuckDB 导入/压测是采集侧的质量门, 不是业务计算
-#   - data/predictions/ 快照必须由 Actions 落盘 (复盘闭环的时间基准)
+#   - data/predictions/ 快照由本工作流落盘 (复盘闭环的时间基准)
 name: full-pipeline
 on:
   schedule:
@@ -91,7 +89,7 @@ jobs:
       - name: Query benchmark
         run: python3 scripts/db_layer.py --bench 2>&1 | tee /tmp/bench.txt
 
-      # ── 4. 合并去重结果落盘 (供前端查询 + Space 引擎消费) ──
+      # ── 4. 合并去重结果落盘 (供前端查询 + 引擎消费) ──
       - name: Save merged sources to data/
         run: |
           cp /tmp/collected.json data/all_sources.json
@@ -117,18 +115,18 @@ jobs:
       # 文件名必须是 engine_v5_<date>.json — reflect_engine 用
       #   glob('engine_v5*.json') 匹配, kline_sim 用
       #   glob('engine_v5_*.json') 匹配, 改名会让两边都读不到。
-      # 快照由 Space 引擎链产出 engine_v5.json 后, 由本工作流拷贝而来;
+      # 快照由本工作流的引擎链产出 engine_v5.json 后拷贝而来;
       # 若 Space 尚未产出, 则用采集行情构造一个最小快照 (保住时间基准)。
       - name: Persist prediction snapshot
         run: |
           mkdir -p data/predictions
           ts=$(TZ=Asia/Shanghai date +%Y-%m-%d)
           if [ -f data/engine_v5.json ]; then
-            # Space 已算出当日评分 → 直接快照 (复盘要的 top/votes 都在)
+            # 引擎链已算出当日评分 → 直接快照 (复盘要的 top/votes 都在)
             cp data/engine_v5.json "data/predictions/engine_v5_${ts}.json"
             echo "prediction snapshot <- engine_v5.json ($(ls -la data/engine_v5.json | awk '{print $5}') bytes)"
           else
-            echo "::notice::engine_v5.json 尚未生成 (Space 未跑), 本次不建快照"
+            echo "::notice::engine_v5.json 尚未生成, 本次不建快照"
           fi
           echo "predictions/: $(ls data/predictions | wc -l) 份"
 
@@ -161,7 +159,7 @@ jobs:
       - name: Anomaly detector
         run: python3 scripts/anomaly_detector.py || echo "anomaly skipped"
 
-      # ── 6d. 引擎兜底链 (Space 未激活时, Actions 自己跑全套) ──────
+      # ── 6d. 引擎计算链 (26 引擎, Actions 一站式跑完) ──────────────
       # 主算力设计在 GitCode Space (1000 核时/月)。但 Space 需要人工在网页
       # 激活并选服务器配置; 未激活时 space-pull 拉不到任何产出, 网站就会
       # 一直是旧数据。所以这里放一份**完整**引擎链作兜底:
@@ -228,35 +226,6 @@ jobs:
         run: |
           python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
           python3 scripts/numeric_validator.py --out data/validation_report.json || true
-
-      # ── 8. 保活 + 触发 Space 引擎链 ────────────────────────────
-      # Space 每 30 分钟无 HTTP 访问就休眠。full-pipeline 每 5 分钟跑一轮,
-      # 正好是天然的保活节拍器: 每轮 curl 一遍所有 Space 的 /health。
-      # 多 Space 交叉保活 (组织 A/B/C 各一个) 时, 任一个被 curl 到就不睡。
-      - name: Keep-alive and wake Spaces
-        continue-on-error: true
-        env:
-          SPACE_URL_A: ${{ secrets.SPACE_URL_A }}
-          SPACE_URL_B: ${{ secrets.SPACE_URL_B }}
-          SPACE_URL_C: ${{ secrets.SPACE_URL_C }}
-        run: |
-          alive=0; total=0
-          for u in "$SPACE_URL_A" "$SPACE_URL_B" "$SPACE_URL_C"; do
-            [ -z "$u" ] && continue
-            total=$((total+1))
-            case "$u" in */health) h="$u";; *) h="${u%/}/health";; esac
-            if curl -sf --max-time 15 "$h" >/dev/null 2>&1; then
-              echo "  alive: $h"; alive=$((alive+1))
-            else
-              echo "  unreachable: $h"
-            fi
-          done
-          if [ "$total" -eq 0 ]; then
-            echo "::notice::未配置 SPACE_URL_A/B/C。Space 保活与主动唤醒均跳过,"
-            echo "  引擎由本工作流的兜底链负责 (Actions 每 5 分钟跑全套 22 引擎)。"
-          else
-            echo "Space 保活: $alive/$total 可达 (本工作流 5 分钟一轮, 天然节拍器)"
-          fi
 
       # ── 9. 采集摘要 ──
       - name: Summary

@@ -1,0 +1,143 @@
+# 夜间全量回溯 — 重算力任务迁回 Actions (2026-10-14)
+#
+# 背景: GitCode Space 停用 (30 分钟休眠 + 需人工激活, 无法自动开关)。
+#       原计划放 Space 的长任务 (全量回溯/扩量回测) 迁回 Actions 夜间跑。
+#
+# 为什么放 Actions 没问题:
+#   - 本仓是公开仓, Actions 免费无限分钟, 无每月额度限制
+#   - 单作业上限 6 小时; 全量回溯 (700 天 x 4000 只) 实测约 50 分钟, 余量充足
+#   - 凌晨 2 点跑不占盘中采集时段, 也不会与 full-pipeline (UTC 1-7 时) 抢并发
+#
+# 做什么:
+#   1. backfill_predictions 全量回溯 → data/predictions/ 补历史快照
+#   2. slim_predictions 瘦身 → 防仓库膨胀 (107M → 22M)
+#   3. reflect_engine + kline_sim + winrate_matrix → 用全量样本重算胜率
+#   4. walkforward → 重算 IS/OOS 过拟合判定
+#
+# 触发: 每周六凌晨 (UTC 周六 18:00 = CST 周日 02:00) + 手动
+name: nightly-backfill
+
+on:
+  schedule:
+    - cron: '0 18 * * 6'   # CST 周日 02:00, 周末无盘中任务, 资源充足
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '回溯天数'
+        default: '700'
+      limit:
+        description: '股票数上限 (0=全部)'
+        default: '4000'
+      top_per_day:
+        description: '每日取前 N 只入快照'
+        default: '100'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330   # 5.5 小时, 留 30 分钟余量给 slim + 重算
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      # ── 1. 全量回溯 ────────────────────────────────────────────
+      # 输入: 本地 K 线库由 Actions 每次 checkout 重新生成 (bulk CSV),
+      #       不是从仓库带 —— bulk 太大不入库, 由 expand_kline_coverage 现拉。
+      #       若 bulk 为空, backfill 会提示并跳过, 不影响后续步骤。
+      - name: Full backfill predictions
+        run: |
+          echo "backfill params: days=${{ github.event.inputs.days || '700' }} \
+          limit=${{ github.event.inputs.limit || '4000' }} \
+          top_per_day=${{ github.event.inputs.top_per_day || '100' }}"
+          python3 scripts/backfill_predictions.py \
+            --days "${{ github.event.inputs.days || '700' }}" \
+            --limit "${{ github.event.inputs.limit || '4000' }}" \
+            --top-per-day "${{ github.event.inputs.top_per_day || '100' }}" \
+            || echo "::warning::backfill 失败 (K线库缺失?), 沿用现有快照"
+
+      - name: Report predictions
+        run: |
+          echo "predictions/: $(ls data/predictions 2>/dev/null | wc -l) 份"
+          du -sh data/predictions/ 2>/dev/null || true
+
+      # ── 2. 瘦身 (防仓库膨胀) ───────────────────────────────────
+      - name: Slim prediction snapshots
+        run: |
+          python3 scripts/slim_predictions.py --dir data/predictions || echo "slim skipped"
+          du -sh data/predictions/
+
+      # ── 3. 用全量样本重算 ──────────────────────────────────────
+      - name: Recompute with full samples
+        run: |
+          python3 scripts/reflect_engine.py --pred-dir data/predictions \
+            --horizons 1,3,5,10 --out data/reflect_latest.json || echo "reflect skipped"
+          python3 scripts/winrate_matrix.py --out data/winrate_matrix.json || echo "winrate skipped"
+          python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json \
+            --days 1,3,5,10 --max-signals 3000 || echo "kline_sim skipped"
+          python3 scripts/walkforward.py --train-days 120 --test-days 20 \
+            --step-days 20 --horizon 5 --out data/walkforward.json || echo "walkforward skipped"
+          python3 scripts/weight_calibrator.py || echo "calibrator skipped"
+          python3 scripts/edge_miner.py || echo "edge_miner skipped"
+
+      - name: Summary
+        run: |
+          python3 - <<'PY'
+          import json, os
+          def show(name, keys):
+              p = f"data/{name}"
+              if not os.path.exists(p):
+                  print(f"- {name}: 缺失")
+                  return
+              d = json.load(open(p, encoding="utf-8"))
+              a = d.get("analysis") or {}
+              ov = a.get("overall") or {}
+              print(f"- {name}: n={d.get('n_records')} 1日胜率={ov.get('bull_win_rate')}")
+          show("reflect_latest.json", None)
+          wf = "data/walkforward.json"
+          if os.path.exists(wf):
+              d = json.load(open(wf, encoding="utf-8"))
+              print(f"- walkforward: folds={d.get('n_folds')} "
+                    f"IS={d.get('mean_is_win')} OOS={d.get('mean_oos_win')} "
+                    f"decay={d.get('oos_vs_is_decay')} {d.get('verdict')}")
+          n = len(os.listdir("data/predictions")) if os.path.isdir("data/predictions") else 0
+          print(f"- predictions 快照: {n} 份")
+          PY
+
+      # ── 4. 提交 ────────────────────────────────────────────────
+      - name: Commit and push
+        run: |
+          git config user.name "backfill-bot"
+          git config user.email "3576982374@qq.com"
+          FILES="data/predictions data/reflect_latest.json data/winrate_matrix.json \
+                 data/kline_sim.json data/walkforward.json data/engine_weights.json \
+                 data/weights_history.json data/edge_report.json"
+          git fetch origin main
+          git reset --soft origin/main
+          git add -A $FILES
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "backfill: nightly full recompute ($ts)"
+            git push origin HEAD:main || echo "::warning::push 失败 (可能并发), 下次重试"
+          fi

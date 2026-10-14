@@ -426,6 +426,14 @@ const _jsonCache=new Map();
 let dataOrigin='cloud';
 function _showDataOrigin(){}
 async function fetchJSON(p){try{
+  // 多账号仓降级: 配了 B/C 仓时取 ts 最新的那个 (单仓 cron 最快 5 分钟,
+  // 三仓错峰 = 2 分钟粒度); 未配则走原路径 (同源 fetch)
+  if(globalThis.GHSources && globalThis.GHSources.REPOS && globalThis.GHSources.REPOS.length>1){
+    try{
+      const r=await globalThis.GHSources.fetchMulti(p);
+      if(r&&r.data!=null)return r.data;
+    }catch(_e){}
+  }
   const r=await fetch(p,{cache:'no-store'});
   if(r.ok)return await r.json();
   return null;
@@ -1986,6 +1994,7 @@ document.addEventListener('click', e=>{
 <script src="realtime.js" defer></script>
 <script src="db-client.js" defer></script>
 <script src="overseas.js" defer></script>
+<script src="gh_sources.js"></script>
 <script src="data_origin_patch.js"></script>
 <script src="stock-detail.js" defer></script>
 </body>

@@ -92,6 +92,28 @@ def has_our_changes(scope):
     return False
 
 
+def refresh_from_remote(paths, dirs, all_changes, branch, protect):
+    """把远端最新版 checkout 到工作区, 但跳过 protect 里的路径。
+
+    为什么必须这一步: 6 个工作流同时推 main, 每个都在 run 开始时 checkout。
+    若 A 在 11:34 推了新的 latest.json, B 的工作区里仍是 10:49 的旧副本,
+    B 直接 add 就会把 A 的新版覆盖回旧版 (2026-10-14 实测: ai-update 推的
+    11:34 版本被随后 4 个 run 覆盖成 10:49)。
+
+    protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。调用方通过
+    --protect 传入 (可多次)。其余路径一律以远端为准。
+    """
+    protect = set(protect or [])
+    if all_changes:
+        want = ['.']
+    else:
+        want = [p for p in paths if p] + [d for d in dirs if d]
+    for w in want:
+        if w in protect or any(w.startswith(p.rstrip('/') + '/') for p in protect):
+            continue
+        sh(["git", "checkout", f"origin/{branch}", "--", w])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--msg", required=True, help="commit message")
@@ -101,6 +123,8 @@ def main():
     ap.add_argument("--branch", default="main")
     ap.add_argument("--user", default="pipeline-bot")
     ap.add_argument("--email", default="741059079@qq.com")
+    ap.add_argument("--protect", action="append", default=[],
+                    help="本轮刚生成、不许被远端旧版覆盖的路径 (可多次)")
     args = ap.parse_args()
 
     sh(["git", "config", "user.name", args.user])
@@ -109,6 +133,10 @@ def main():
     for i in range(1, MAX_TRIES + 1):
         sh(["git", "fetch", "origin", args.branch])
         sh(["git", "reset", "--soft", f"origin/{args.branch}"])
+        # 关键: 先把远端最新版取回工作区, 防止用本 run 开始时的旧副本
+        # 覆盖其他工作流刚推送的新数据。
+        refresh_from_remote(args.paths, args.dir, args.all, args.branch,
+                             args.protect)
         if not stage(args.paths, args.dir, args.all):
             print("no changes to push")
             return 0

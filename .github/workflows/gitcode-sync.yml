@@ -1,17 +1,19 @@
-# GitHub ↔ GitCode 双向实时同步
+# GitHub ↔ GitCode 同步 (2026-10-14 收敛: Space 已停用)
 #
-# 分工: GitHub = CI + Pages + 数据采集主链路 (Actions)
-#       GitCode = 数据镜像 + 云容器算力 + engines/ 25个补充引擎 (无 Actions API, 404)
+# 分工: GitHub = Actions 计算 + Pages + 数据采集主链路 (唯一计算入口)
+#       GitCode = 数据镜像 + dataset 归档仓 (零核时) + 云容器 AI 复盘输入
 #
-# 三条链路:
+# 剩余链路:
 #   步骤 A  GitHub → GitCode  : data/*.json 数据镜像      (30min + push 触发)
 #   步骤 B  GitCode → GitHub  : engines/ 新引擎回流 scripts/ 并 commit 回 GitHub
-#   步骤 C  GitHub → GitCode  : scripts/*.py → engines/   保持两侧脚本同步
+#   步骤 D  GitCode → GitHub  : analysis/review_input 产出 → data/gitcode_review/
+#
+# 已停用: 原步骤 C (Space 版本戳) 随 Space 弃用删除; space-pull.yml 已删除。
 #
 # 冲突策略: GitCode 侧历史可能与 GitHub 分叉 (双平台各自提交),
 #           push 一律 --force-with-lease, 失败先 fetch + merge -X ours 再重试。
 # 依赖: secrets.GC_TOKEN (GitCode PAT, 需 read_api + write_repository)。
-#       未配置时三个步骤都 warning 跳过并 exit 0, 不 fail 工作流。
+#       未配置时各步骤都 warning 跳过并 exit 0, 不 fail 工作流。
 name: gitcode-sync
 
 on:
@@ -148,57 +150,6 @@ jobs:
       #   Space 的 sync_engines() 每次跑链前从 GitHub raw 拉脚本, GitHub
       #   scripts/ 是唯一事实源。这里只 push 一个版本戳, 供 Space 面板展示。
       # ─────────────────────────────────────────────────────────
-      - name: Step C - stamp engine version for Space
-        if: env.GC_SKIP != '1'
-        run: |
-          ts=$(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')
-          sha=$(git rev-parse --short HEAD)
-          n_scripts=$(ls scripts/*.py 2>/dev/null | wc -l)
-          mkdir -p /tmp/space-stamp
-          cat > /tmp/space-stamp/engine_version.json <<JSON
-          {
-            "source": "github:qwerzxcva/stocks-ai-view",
-            "commit": "$sha",
-            "scripts": $n_scripts,
-            "stamped_at": "$ts",
-            "note": "Space pulls scripts from GitHub raw at runtime; this file is a version stamp only"
-          }
-          JSON
-          echo "引擎版本戳: commit=$sha scripts=$n_scripts"
-
-          git remote add space "https://x-access-token:${GC_TOKEN}@gitcode.com/jiegengxiangjianxue/stocks-ai-space.git" 2>/dev/null || \
-            git remote set-url space "https://x-access-token:${GC_TOKEN}@gitcode.com/jiegengxiangjianxue/stocks-ai-space.git"
-          if git fetch space main 2>/dev/null; then
-            wt=".space-worktree"
-            rm -rf "$wt"
-            git worktree add --detach "$wt" space/main 2>/dev/null || {
-              echo "::warning::worktree 失败, 跳过版本戳推送"; git worktree prune; exit 0;
-            }
-            mkdir -p "$wt"
-            cp /tmp/space-stamp/engine_version.json "$wt/engine_version.json"
-            cd "$wt"
-            git add engine_version.json
-            if git diff --cached --quiet HEAD; then
-              echo "版本戳无变化"
-            else
-              git -c user.name="stocks-sync-bot" -c user.email="3576982374@qq.com" \
-                commit -m "stamp(engine): $sha ($n_scripts scripts) $ts" || true
-              if ! git push space HEAD:main --force-with-lease; then
-                echo "::warning::版本戳 push 被拒绝 (Space 侧分叉), 不影响引擎运行"
-              else
-                echo "✅ 步骤 C 完成: 版本戳已推送 Space"
-              fi
-            fi
-            cd - > /dev/null
-            git worktree remove --force "$wt" 2>/dev/null || true
-            git worktree prune
-          else
-            echo "::warning::Space 仓 fetch 失败, 跳过版本戳 (引擎仍会从 GitHub raw 拉取)"
-          fi
-
-      # ─────────────────────────────────────────────────────────
-      # 步骤 D: GitCode 云容器产出的分析结果 → GitHub data/gitcode_review/
-      #   (保留原有反向链路: GitCode AI 复盘输入回供 GitHub Actions LLM 复盘)
       # ─────────────────────────────────────────────────────────
       - name: Step D - pull cloud analysis output from GitCode
         if: env.GC_SKIP != '1'
