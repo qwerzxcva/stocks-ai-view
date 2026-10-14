@@ -134,6 +134,14 @@ jobs:
           python3 scripts/collect_hotnews.py --out data/hot_news.json \
             || echo "::warning::hot_news 采集失败, 保留上一版"
 
+      # ── 热点→股票影响映射 (news_impact) ──────────────────────
+      - name: News impact mapping
+        run: |
+          python3 scripts/build_news_maps.py || echo "::warning::maps 构建失败"
+          python3 scripts/news_impact.py --in data/hot_news.json \
+            --news data/news_extra.json --out data/news_impact.json \
+            || echo "::warning::news_impact 失败, 保留上一版"
+
       # ── 全球各大股市实时 (15指数, 含休市状态与情绪) ───────────
       - name: Collect global markets
         run: |
@@ -190,7 +198,7 @@ jobs:
           git config user.name "shard-collect-bot"
           git config user.email "3576982374@qq.com"
           PROTECT_ARGS=""
-          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json; do
+          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json; do
             PROTECT_ARGS="$PROTECT_ARGS --protect $f"
           done
           if [ "$SHARD_EXTRA" != "$SHARD" ]; then
@@ -198,5 +206,5 @@ jobs:
           fi
           python3 scripts/git_push_retry.py \
             --msg "shard(${SHARD}): collect $(TZ=Asia/Shanghai date '+%m-%d %H:%M')" \
-            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json \
+            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json \
             $PROTECT_ARGS
