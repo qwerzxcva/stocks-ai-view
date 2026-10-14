@@ -14,6 +14,11 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+# 并发控制: 心跳每 5 分钟触发一次, 不设组会出现两轮同时写 data/ 互相覆盖。
+# 实时场景下新一轮顶掉旧轮更有价值。
+concurrency:
+  group: hot-impact-realtime
+  cancel-in-progress: true
 jobs:
   derive:
     runs-on: ubuntu-latest

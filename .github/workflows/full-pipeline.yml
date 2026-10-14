@@ -24,12 +24,13 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
-# 同一工作流不重叠: cron 10 分钟一次, 而一轮完整链路 (采集+26引擎) 实测
-# 最长 ~20 分钟, 不设并发组会出现两轮同时写 data/ 并互相覆盖。
-# cancel-in-progress=false: 让先跑的那轮跑完, 避免白跑一半。
+# 并发控制: 一轮完整链路 (采集 ~12s + 22 引擎) 实测 59 秒, 而心跳每 5 分钟
+# 触发一次, 正常不会重叠。万一某轮变慢, cancel-in-progress=true 让新一轮
+# 顶掉旧轮 — 实时数据场景下"最新的那轮"比"跑完旧轮"更有价值, 且旧的
+# 写了半份 data/ 反而更糟。
 concurrency:
   group: full-pipeline
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   pipeline:
     runs-on: ubuntu-latest

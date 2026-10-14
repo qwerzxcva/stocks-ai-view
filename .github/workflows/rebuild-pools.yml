@@ -13,6 +13,10 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+# 并发控制: 心跳每 5 分钟触发一次, 不设组会出现两轮同时写 data/ 互相覆盖。
+concurrency:
+  group: rebuild-pools
+  cancel-in-progress: true
 jobs:
   rebuild:
     runs-on: ubuntu-latest

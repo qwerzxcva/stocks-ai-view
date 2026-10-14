@@ -1,0 +1,62 @@
+# 数据流水线心跳 — 用单一 cron 点级联唤醒所有下游工作流
+#
+# 背景: GitHub Actions 的 schedule 对本仓库出现静默停跑 (full-pipeline
+# 跑 9 次后停 2 小时, cloud-analysis 停 2.7 小时, realtime-minute 创建后
+# 从未触发)。三个工作流 state 都是 active, 无 queued/in_progress 堆积,
+# 排除 concurrency 锁死与被禁用。仓库每小时 80+ 个 cron 触发点, schedule
+# 侧有软限流。
+#
+# 方案: cron 只保留这一个触发点 (每 5 分钟), 由它用 workflow_dispatch
+# 级联唤醒下游。心跳自身极轻 (只调 GitHub API), 下游仍受各自
+# concurrency group 保护不会重叠。下游的 cron 保留作兜底。
+name: scheduler
+on:
+  schedule:
+    # 交易时段每 5 分钟 (UTC 1,2,3,5,6,7 的 :02/:07/:12/... = CST 09:02-15:57)
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 1,2,3,5,6,7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      only:
+        description: '只唤醒指定工作流 (逗号分隔), 留空唤醒全部'
+        required: false
+        default: ''
+permissions:
+  actions: write
+  contents: read
+concurrency:
+  # 心跳自身不重叠: 慢网络时上一轮没结束就跳过下一轮
+  group: scheduler
+  cancel-in-progress: false
+jobs:
+  beat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wake downstream workflows
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ONLY: ${{ inputs.only }}
+        run: |
+          # 按唤醒顺序排: 先轻量实时, 再重采集+引擎, 最后池子与分析
+          WF="realtime-minute,full-pipeline,hot-impact-realtime,rebuild-pools,cloud-analysis"
+          if [ -n "$ONLY" ]; then WF="$ONLY"; fi
+          ok=0; skip=0; fail=0
+          IFS=',' read -ra LIST <<< "$WF"
+          for w in "${LIST[@]}"; do
+            w=$(echo "$w" | xargs)   # 去首尾空格
+            [ -z "$w" ] && continue
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X POST \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/${w}.yml/dispatches" \
+              -d "{\"ref\":\"${GITHUB_REF_NAME}\"}")
+            case "$code" in
+              204) echo "  woke $w"; ok=$((ok+1)) ;;
+              404) echo "  $w: 工作流不存在, 跳过"; skip=$((skip+1)) ;;
+              *)   echo "  $w: dispatch 失败 (http=$code)"; fail=$((fail+1)) ;;
+            esac
+          done
+          echo "scheduler: woke=$ok skipped=$skip failed=$fail"
+          # 心跳本身失败不应让 job 红 (下游有自己的 cron 兜底)
+          [ "$fail" -gt 0 ] && exit 1
+          exit 0
