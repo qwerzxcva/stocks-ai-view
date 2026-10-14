@@ -1,14 +1,20 @@
 {
-  "ts": "2026-10-14T12:48:00+08:00",
+  "ts": "2026-10-14T13:28:44+08:00",
   "engine": "numeric_validator v1",
-  "n_files": 68,
-  "n_issues": 4,
+  "n_files": 69,
+  "n_issues": 5,
   "by_severity": {
-    "critical": 2,
+    "critical": 3,
     "warning": 2,
     "info": 0
   },
   "issues": [
+    {
+      "file": "afternoon_picks.json",
+      "field": "morning_summary.limit_up",
+      "severity": "critical",
+      "msg": "非数值类型 dict: {'n': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.59}"
+    },
     {
       "file": "all_sources.json",
       "field": "data.fund[0].ret_3m",
