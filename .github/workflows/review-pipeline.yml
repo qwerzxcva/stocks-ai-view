@@ -1,0 +1,122 @@
+# review-pipeline.yml — run the review chain and publish to the data warehouse.
+#
+# Why this exists: close_review / stop_analysis / weight_calibrator_v2 /
+# archive_review were only ever run by hand, so the dashboard's review tab and
+# history table read stale or missing data. This workflow runs them on a
+# schedule after the close and pushes the results to jiegengxiangjianxue1/
+# db-market, which is where the dashboard already reads them.
+#
+# Secrets: GH_TOKEN must be a PAT with write access to the db-market repo.
+# The default GITHUB_TOKEN cannot write to another repo.
+#
+# Not part of the 5-minute scheduler heartbeat: this run takes ~5-10 minutes
+# (network-bound quote fetches) and only means anything after the close, so it
+# runs on its own cron plus manual dispatch.
+name: review-pipeline
+on:
+  schedule:
+    # 15:20 CST on weekdays: after the 15:00 close and the 15:05 settle
+    - cron: '20 7 * * 1-5'
+    # 09:00 CST weekdays: morning session review with live prices
+    - cron: '0 1 * * 1-5'
+  workflow_dispatch: {}
+permissions:
+  contents: read
+
+concurrency:
+  # one at a time; a slow run should not stack up behind the next cron tick
+  group: review-pipeline
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      TZ: Asia/Shanghai
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - name: Checkout kline repo (sparse, kline only)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+            meta
+          path: kline-repo
+
+      - name: Link kline bulk
+        run: |
+          mkdir -p ../stocks-data-kline
+          cp -r kline-repo/data ../stocks-data-kline/ 2>/dev/null || true
+          cp -r kline-repo/meta ../stocks-data-kline/ 2>/dev/null || true
+          ls ../stocks-data-kline/data/bulk | head -3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -q requests akshare pandas lxml duckdb
+
+      # ── 1. session reviews (need live quotes) ──
+      - name: Morning / afternoon review
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: |
+          python3 scripts/morning_review.py || echo "morning_review skipped"
+          python3 scripts/afternoon_picks.py || echo "afternoon_picks skipped"
+
+      # ── 2. yesterday's picks vs today ──
+      - name: Yesterday vs today
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: python3 scripts/review_yesterday.py || echo "review_yesterday skipped"
+
+      # ── 3. entry plans (needs today_picks) ──
+      - name: Entry plans
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: python3 scripts/entry_planner.py || echo "entry_planner skipped"
+
+      # ── 4. what a hard stop would have done ──
+      - name: Stop analysis
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: python3 scripts/stop_analysis.py || echo "stop_analysis skipped"
+
+      # ── 5. consolidate + close review ──
+      - name: Today picks + close review
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: |
+          python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
+          python3 scripts/close_review.py || echo "close_review skipped"
+
+      # ── 6. archive the closed day + push everything to the warehouse ──
+      - name: Archive and publish
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/../stocks-data-kline/data/bulk
+        run: |
+          python3 scripts/archive_review.py || echo "archive_review skipped"
+          python3 scripts/sync_reviews.py --push || echo "sync_reviews skipped"
+
+      - name: Summary
+        run: |
+          for f in close_review stop_analysis engine_weights review_history; do
+            if [ -f "data/$f.json" ]; then
+              echo "== data/$f.json =="
+              head -c 400 "data/$f.json"; echo
+            fi
+          done

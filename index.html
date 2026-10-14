@@ -230,9 +230,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="9">场景推股</button>
       <button class="c-tab" data-c="10">海外实时</button>
       <button class="c-tab" data-c="11">因子引擎</button>
-      <button class="c-tab" data-c="12">复盘验证</button>
+      <button class="c-tab" data-c="12">指标回溯</button>
       <button class="c-tab" data-c="13">质量审查</button>
-      <button class="c-tab" data-c="14">推股复盘</button>
+      <button class="c-tab" data-c="14">每日复盘</button>
       <button class="c-tab" data-c="15">主力资金</button>
     </div>
     <div class="card c-card" data-ci="0">
@@ -382,7 +382,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
     <div class="card c-card" data-ci="14" style="display:none">
-      <div class="hd">推股复盘 <span class="sub">上午实际表现 · 下午可执行 · 昨日对账</span></div>
+      <div class="hd">每日复盘 <span class="sub">昨日对账 · 上午实际 · 下午可执行 · 历史归档</span></div>
       <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="hd" style="border-top:none;padding:6px 0">昨日推股 · 今日对账 <span class="sub">已收盘事实</span></div>
         <div id="pkYesterday"><div class="fl">加载中…</div></div>
@@ -1689,6 +1689,9 @@ function renderReview(){
 
 /* ─── tab 13: 质量审查 ─── */
 let qaRendered = false;
+let ovRendered = false;
+let pkRendered = false;
+let mfRendered = false;
 function renderQA(){
   const g = window._data || {};
 
@@ -1822,6 +1825,9 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='11' && !feRendered){ feRendered=true; _safe(renderFactorEngines,'engineV5'); }
   if(b.dataset.c==='12' && !rvRendered){ rvRendered=true; _safe(renderReview,'reflect'); }
   if(b.dataset.c==='13' && !qaRendered){ qaRendered=true; _safe(renderQA,'edge'); }
+  if(b.dataset.c==='10' && window.Overseas){ ovRendered=true; _safe(()=>window.Overseas.render(),'overseas'); }
+  if(b.dataset.c==='14' && window.Picks){ pkRendered=true; _safe(()=>window.Picks.render(),'picks'); }
+  if(b.dataset.c==='15'){ mfRendered=true; if(typeof renderMoneyFlow==='function') _safe(renderMoneyFlow,'moneyflow'); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -1988,6 +1994,12 @@ async function render(){
   if(feRendered) _safe(renderFactorEngines,'engineV5');
   if(rvRendered) _safe(renderReview,'reflect');
   if(qaRendered) _safe(renderQA,'edge');
+  // overseas / daily review / moneyflow panels only rendered on click before,
+  // so they went stale the moment the tab was opened. Same rule: redraw only
+  // when the tab has been opened at least once.
+  if(ovRendered && window.Overseas) _safe(()=>window.Overseas.render(),'overseas');
+  if(pkRendered && window.Picks) _safe(()=>window.Picks.render(),'picks');
+  if(mfRendered && typeof renderMoneyFlow==='function') _safe(renderMoneyFlow,'moneyflow');
   _failCount = 0;
 }
 // 轮询: 90s 起步, 连续失败则指数退避到 5min, 恢复后回落
