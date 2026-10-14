@@ -64,7 +64,10 @@ DEFAULT_OUT = os.path.join(AI_VIEW, "data", "realtime_minute.json")
 TRADING = [(9 * 60 + 25, 11 * 60 + 30), (13 * 60 + 0, 15 * 60 + 0)]
 
 # 限流 (与 rate_limit.py 对齐)
-QPS_EM = 10.0
+# 东财限流实测 (2026-10-14): QPS=10 时连续请求会被 RemoteDisconnected
+# (服务端直接断开), 表现为只采到前几页。降到 2 QPS + 单页重试。
+QPS_EM = 2.0
+PAGE_RETRIES = 3
 
 
 def _now():
@@ -105,25 +108,51 @@ FIELD_MAP = {
 }
 
 
-def fetch_market_snapshot(max_pages=60):
-    """全市场实时快照 (分页, pz=100/页)。"""
-    all_rows = []
-    total = None
-    for page in range(1, max_pages + 1):
-        u = ("https://push2delay.eastmoney.com/api/qt/clist/get"
-             f"?pn={page}&pz=100&po=1&np=1"
-             "&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
-             f"&fields={FIELDS}&fid=f3")
-        d = _get(u, EM_REF)
-        data = d.get("data") or {}
-        total = data.get("total") or total
-        batch = data.get("diff") or []
-        if not batch:
-            break
-        all_rows.extend(batch)
-        if total and len(all_rows) >= total:
-            break
-        time.sleep(1.0 / QPS_EM)
+def fetch_market_snapshot(max_pages=32):
+    """全市场实时快照 (分页, pz=100/页)。
+
+    域降级: push2delay 在海外出口 (GitHub runner) 上偶发只返回前几页
+    (实测 2026-10-14: 只有 200 只, 第 3 页起 diff 为空), 此时自动切
+    push2his 重采, 两个域的 fs/fields 完全一致。
+    """
+    def _collect(host):
+        rows_, total_ = [], None
+        for page in range(1, max_pages + 1):
+            u = (f"https://{host}/api/qt/clist/get"
+                 f"?pn={page}&pz=200&po=1&np=1"
+                 "&fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
+                 f"&fields={FIELDS}&fid=f3")
+            # 单页重试: 东财会直接断开连接 (RemoteDisconnected) 而不是
+            # 返回错误码, 不重试就会静默少采几页。
+            d = None
+            for attempt in range(PAGE_RETRIES):
+                d = _get(u, EM_REF, retries=1)
+                if d and not d.get("__error__"):
+                    break
+                time.sleep(1.0 + attempt)
+            if not d or d.get("__error__"):
+                print(f"[realtime_minute] {host} p{page} 连续失败, 停止翻页",
+                      file=sys.stderr)
+                break
+            data = d.get("data") or {}
+            total_ = data.get("total") or total_
+            batch = data.get("diff") or []
+            if not batch:
+                break
+            rows_.extend(batch)
+            if total_ and len(rows_) >= total_:
+                break
+            time.sleep(1.0 / QPS_EM)
+        return rows_, total_
+
+    all_rows, total = _collect("push2delay.eastmoney.com")
+    # 页数够但明显缺量 → 换域重采 (total 已知时以它为准判断)
+    if total and len(all_rows) < min(total, 3000):
+        alt, alt_total = _collect("push2his.eastmoney.com")
+        if len(alt) > len(all_rows):
+            print(f"[realtime_minute] push2delay 只返回 {len(all_rows)}/{total}, "
+                  f"改用 push2his 得 {len(alt)}", file=sys.stderr)
+            all_rows, total = alt, alt_total or total
     rows = []
     for it in all_rows:
         r = {}
