@@ -103,15 +103,54 @@ def refresh_from_remote(paths, dirs, all_changes, branch, protect):
     protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。调用方通过
     --protect 传入 (可多次)。其余路径一律以远端为准。
     """
-    protect = set(protect or [])
+def refresh_from_remote(paths, dirs, all_changes, branch, protect):
+    """把远端最新版 checkout 到工作区, 然后恢复 protect 里的文件。
+
+    为什么必须这一步: 6 个工作流同时推 main, 每个都在 run 开始时 checkout。
+    若 A 在 11:34 推了新的 latest.json, B 的工作区里仍是 10:49 的旧副本,
+    B 直接 add 就会把 A 的新版覆盖回旧版 (2026-10-14 实测: ai-update 推的
+    11:34 版本被随后 4 个 run 覆盖成 10:49)。
+
+    protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。因为调用方常用
+    --dir data 这种粗粒度路径, 而 protect 是具体文件, 单靠"跳过匹配项"
+    挡不住目录级 checkout (data/ 会把 data/realtime_minute.json 一并覆盖)。
+    所以顺序是: 先按请求 checkout, 再把 protect 文件从暂存区恢复回工作区。
+    """
+    protect = [p for p in (protect or []) if p]
     if all_changes:
         want = ['.']
     else:
         want = [p for p in paths if p] + [d for d in dirs if d]
+    if not want:
+        return
+    # 1) 备份 protect 路径的内容 (不能靠暂存区: git checkout <ref> -- <path>
+    #    在路径规格匹配时会把 index 一并重置, 暂存区也保不住)
+    backup = {}
+    for p in protect:
+        if os.path.isfile(p):
+            try:
+                with open(p, 'rb') as f:
+                    backup[p] = f.read()
+            except OSError:
+                pass
+        elif os.path.isdir(p):
+            base = p.rstrip('/')
+            for root, _dirs, files in os.walk(base):
+                for fn in files:
+                    fp = os.path.join(root, fn)
+                    try:
+                        with open(fp, 'rb') as f:
+                            backup[fp] = f.read()
+                    except OSError:
+                        pass
+    # 2) 取回远端最新版 (目录级 checkout 会冲掉工作区)
     for w in want:
-        if w in protect or any(w.startswith(p.rstrip('/') + '/') for p in protect):
-            continue
         sh(["git", "checkout", f"origin/{branch}", "--", w])
+    # 3) 把本轮成果写回去
+    for p, content in backup.items():
+        os.makedirs(os.path.dirname(os.path.abspath(p)), exist_ok=True)
+        with open(p, 'wb') as f:
+            f.write(content)
 
 
 def main():
