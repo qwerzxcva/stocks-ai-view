@@ -1214,9 +1214,11 @@ function renderScenario(d){
   box.innerHTML=h;
 }
 // 主力资金渲染 (moneyflow.json)
-// 兼容两种历史结构:
-//   A. collect_moneyflow v1: {indices, stocks:{code:{...}}, top_inflow, top_outflow} 单位元
-//   B. 旧版: {flows:{code:{net_main_wan, r0_wan, turnover_wan, net3_wan, ...}}} 单位万元
+// 兼容三种历史结构:
+//   A. 初版: {indices, stocks:{code:{main_net_today,main_net_5d(数值),minute_series}}, top_inflow, top_outflow}
+//   B. 旧版: {flows:{code:{net_main_wan, r0_wan, turnover_wan, net3_wan}}} 单位万元
+//   C. collect_moneyflow v2: {index_flow, sector_flow, stocks:{code:{main_net_today,
+//      main_net_5d(数组!), daily_series, minute_delta}}, top_inflow, top_outflow, realtime, reason}
 function fmtYi(v){
   if(v==null||isNaN(v))return '—';
   var a=Math.abs(v);
@@ -1224,14 +1226,28 @@ function fmtYi(v){
   if(a>=1e4)return (v/1e4).toFixed(1)+'万';
   return Math.round(v)+'';
 }
+// main_net_5d 可能是数值(初版)或数组(v2); 数组取和
+function sum5d(v){
+  if(v==null)return null;
+  if(Array.isArray(v)){var s=0;v.forEach(function(x){if(typeof x==='number')s+=x});return s;}
+  return typeof v==='number'?v:null;
+}
 function renderMoneyFlow(d){
   const box=document.getElementById('moneyflowBox');
   if(!box) return;
   if(!d){box.innerHTML='<div class="no-data">暂无资金数据</div>';return}
   const esc=s=>String(s==null?'—':s);
   const sub=document.getElementById('mfSub');
-  if(sub&&d.ts) sub.textContent=(d.ts||'').replace('T',' ').slice(5,16)+' · '+esc(d.source);
+  if(sub&&d.ts){
+    var rt=d.realtime===false?' · 非实时(降级源)':'';
+    sub.textContent=(d.ts||'').replace('T',' ').slice(5,16)+rt+' · '+esc(d.source);
+  }
   let h='';
+  // 降级提示: v2 的 reason 记录了每个源失败原因
+  if(d.reason&&d.source&&d.source.indexOf('dc_')>=0){
+    h+='<div class="fl" style="font-size:9px;padding:2px 0 6px;line-height:1.5;color:var(--amber)">'
+      +'⚠️ push2 实时源不可达, 已降级到 datacenter (数据可能滞后一日)<br>'+esc(d.reason).slice(0,180)+'</div>';
+  }
   // ── 结构 B (旧版 flows) ──
   if(d.flows&&!d.stocks){
     const arr=Object.keys(d.flows).map(function(code){
@@ -1261,15 +1277,29 @@ function renderMoneyFlow(d){
     box.innerHTML=h;
     return;
   }
-  // ── 结构 A (collect_moneyflow v1) ──
-  const idx=(d.indices||[]);
+  // ── 结构 A / C (stocks) ──
+  // 大盘: A 用 indices, C 用 index_flow
+  const idx=(d.indices||d.index_flow||[]);
   if(idx.length){
     h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
     idx.forEach(x=>{
       const c=x.main_net>=0?'var(--up)':'var(--dn)';
+      var ratio=x.main_net_pct!=null?x.main_net_pct:x.main_net_ratio;
+      var ratioTxt=(ratio==null||isNaN(ratio))?'':('('+(ratio>=0?'+':'')+Number(ratio).toFixed(2)+'%)');
       h+='<span class="bdg" style="background:rgba(137,87,229,.14);color:var(--tx2)">'
         +esc(x.name)+' <b style="color:'+c+'">'+fmtYi(x.main_net)+'</b>'
-        +' <span class="fl">('+(x.main_net_pct>=0?'+':'')+esc(x.main_net_pct)+'%)</span></span>';
+        +' <span class="fl">'+ratioTxt+'</span></span>';
+    });
+    h+='</div>';
+  }
+  // 板块资金流 (v2 新增)
+  const sec=(d.sector_flow||[]);
+  if(sec.length){
+    h+='<div class="fl" style="font-size:9px;margin:2px 0 4px">板块主力净额 TOP</div>';
+    h+='<div class="chips" style="margin-bottom:6px">';
+    sec.slice(0,12).forEach(function(x){
+      const c=x.main_net>=0?'var(--up)':'var(--dn)';
+      h+='<span class="chip">'+esc(x.name)+' <b style="color:'+c+'">'+fmtYi(x.main_net)+'</b></span>';
     });
     h+='</div>';
   }
@@ -1278,19 +1308,23 @@ function renderMoneyFlow(d){
   const codes=Object.keys(st);
   if(codes.length){
     h+='<div class="fl" style="font-size:9px;margin:2px 0 4px">个股主力净额 (实时累计)</div>';
-    h+='<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>主力净额</th><th>主力占比</th><th>5日累计</th><th>最新分钟</th></tr></thead><tbody>';
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>主力净额</th><th>5日累计</th><th>最新分钟</th></tr></thead><tbody>';
     codes.slice(0,30).forEach(code=>{
       const s=st[code]||{};
       const c=(s.main_net_today||0)>=0?'var(--up)':'var(--dn)';
-      const ms=s.minute_series||[];
-      const lastMin=ms.length?ms[ms.length-1]:null;
+      // 分钟序列: v2 用 minute_delta (每分钟净流入, diff 后)
+      var ms=s.minute_series||s.minute_delta||[];
+      var lastMin=ms.length?ms[ms.length-1]:null;
+      var lastTxt='—';
+      if(lastMin){ lastTxt=esc(lastMin.time||'')+' '+fmtYi(lastMin.main_net!=null?lastMin.main_net:lastMin.delta); }
+      else if((s.daily_series||[]).length){ var ds=s.daily_series[s.daily_series.length-1]; lastTxt=esc(ds.date)+' 日级'; }
+      var px=(s.close!=null?s.close:(s.price!=null?s.price:null));
       h+='<tr class="clk" data-code="'+esc(code)+'">'
-        +'<td>'+esc(code)+'</td><td><b>'+esc(s.name)+'</b></td>'
-        +'<td>'+esc(s.price)+'</td>'
+        +'<td>'+esc(code)+'</td><td><b>'+esc(s.name||code)+'</b></td>'
+        +'<td>'+esc(px)+'</td>'
         +'<td style="color:'+c+';font-weight:700">'+fmtYi(s.main_net_today)+'</td>'
-        +'<td style="color:'+c+'">'+(s.main_net_pct!=null?(s.main_net_pct>0?'+':'')+esc(s.main_net_pct)+'%':'—')+'</td>'
-        +'<td style="color:'+((s.main_net_5d||0)>=0?'var(--up)':'var(--dn)')+'">'+fmtYi(s.main_net_5d)+'</td>'
-        +'<td class="fl" style="font-size:9px">'+(lastMin?esc(lastMin.time)+' '+fmtYi(lastMin.main_net):'—')+'</td></tr>';
+        +'<td style="color:'+((sum5d(s.main_net_5d)||0)>=0?'var(--up)':'var(--dn)')+'">'+fmtYi(sum5d(s.main_net_5d))+'</td>'
+        +'<td class="fl" style="font-size:9px">'+lastTxt+'</td></tr>';
     });
     h+='</tbody></table>';
   }

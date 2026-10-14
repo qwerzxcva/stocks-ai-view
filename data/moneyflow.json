@@ -1,27 +1,152 @@
 {
-  "ts": "2026-10-14T14:10:00+08:00",
-  "engine": "collect_moneyflow v1",
-  "source": "eastmoney push2his",
-  "n_codes": 6,
-  "indices": [
-    {"code": "000001", "name": "上证指数", "price": 3766.58, "chg_pct": -0.67, "main_net": -9500460288.0, "main_net_pct": -1.83},
-    {"code": "399001", "name": "深证成指", "price": 12155.12, "chg_pct": -1.61, "main_net": -9590123776.0, "main_net_pct": -1.65},
-    {"code": "000688", "name": "科创50", "price": 1392.9, "chg_pct": -2.4, "main_net": -1575845632.0, "main_net_pct": -3.9}
-  ],
-  "stocks": {
-    "600519": {"name": "贵州茅台", "price": 1283.46, "main_net_today": 64859887.0, "main_net_pct": 1.3, "main_net_5d": 825506800.0,
-      "minute_series": [{"time": "2026-10-14 14:04", "main_net": 64000000.0}, {"time": "2026-10-14 14:05", "main_net": 64859887.0}]},
-    "000001": {"name": "平安银行", "price": 11.5, "main_net_today": -1362739.0, "main_net_pct": -0.12, "main_net_5d": -173329513.0,
-      "minute_series": [{"time": "2026-10-14 14:05", "main_net": -1362739.0}]},
-    "600036": {"name": "招商银行", "price": 38.2, "main_net_today": 125000000.0, "main_net_pct": 2.1, "main_net_5d": 300000000.0,
-      "minute_series": [{"time": "2026-10-14 14:05", "main_net": 125000000.0}]}
+ "ts": "2026-10-14T15:41:51+08:00",
+ "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
+ "realtime": true,
+ "stocks": {
+  "600519": {
+   "code": "600519",
+   "name": null,
+   "main_net_today": 27504096.0,
+   "main_net_5d": [
+    27504096.0
+   ],
+   "minute_series": [],
+   "minute_delta": [],
+   "daily_series": [
+    {
+     "date": "2026-10-14",
+     "main_net": 27504096.0,
+     "xlarge_net": 28699456.0,
+     "large_net": -1195360.0,
+     "close": 1286.0,
+     "chg_pct": 0.8714
+    }
+   ],
+   "source": "dc_stock_flow",
+   "reason": "东财 push2 不可用, 降级为上一交易日数据"
+  }
+ },
+ "top_inflow": [
+  {
+   "code": "600121",
+   "name": "郑州煤电",
+   "main_net": 546642002.0,
+   "close": 5.86,
+   "chg_pct": 9.9437,
+   "date": "2026-10-14"
   },
-  "top_inflow": [
-    {"code": "600036", "name": "招商银行", "main_net": 125000000.0},
-    {"code": "600519", "name": "贵州茅台", "main_net": 64859887.0}
-  ],
-  "top_outflow": [
-    {"code": "000001", "name": "平安银行", "main_net": -1362739.0}
-  ],
-  "meta": {"fields": "klines = 时间,主力净额,超大单,大单,中单,小单 (元)", "units": "元"}
+  {
+   "code": "002463",
+   "name": "沪电股份",
+   "main_net": 393319072.0,
+   "close": 115.0,
+   "chg_pct": -0.7765,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "601857",
+   "name": "中国石油",
+   "main_net": 358792192.0,
+   "close": 12.55,
+   "chg_pct": 2.449,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "603598",
+   "name": "引力传媒",
+   "main_net": 346457784.0,
+   "close": 21.91,
+   "chg_pct": 9.99,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "000601",
+   "name": "韶能股份",
+   "main_net": 337784230.0,
+   "close": 6.82,
+   "chg_pct": 10.0,
+   "date": "2026-10-14"
+  }
+ ],
+ "top_outflow": [
+  {
+   "code": "300308",
+   "name": "中际旭创",
+   "main_net": -1713503568.0,
+   "close": 692.9,
+   "chg_pct": -5.7279,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "300502",
+   "name": "新易盛",
+   "main_net": -1479868272.0,
+   "close": 330.8,
+   "chg_pct": -5.8355,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "300750",
+   "name": "宁德时代",
+   "main_net": -1131946400.0,
+   "close": 280.12,
+   "chg_pct": -3.1062,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "601138",
+   "name": "工业富联",
+   "main_net": -1085004896.0,
+   "close": 48.8,
+   "chg_pct": -6.6743,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "300394",
+   "name": "天孚通信",
+   "main_net": -912365040.0,
+   "close": 229.0,
+   "chg_pct": -7.1747,
+   "date": "2026-10-14"
+  }
+ ],
+ "index_flow": [],
+ "sector_flow": [
+  {
+   "code": "BK0459",
+   "name": "元件",
+   "main_net": 1276924143.0,
+   "main_net_ratio": 1.415161566948,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "BK1250",
+   "name": "煤炭开采",
+   "main_net": 730387200.0,
+   "main_net_ratio": 5.5190047282,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "BK1221",
+   "name": "数字媒体",
+   "main_net": 717498413.0,
+   "main_net_ratio": 3.742609498919,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "BK0428",
+   "name": "电力",
+   "main_net": 696598426.0,
+   "main_net_ratio": 2.162245277885,
+   "date": "2026-10-14"
+  },
+  {
+   "code": "BK1274",
+   "name": "炼化及贸易",
+   "main_net": 617727023.0,
+   "main_net_ratio": 7.372956060836,
+   "date": "2026-10-14"
+  }
+ ],
+ "reason": "em_fflow_minute(600519): RemoteDisconnected: Remote end closed connection without response; em_fflow_daily(600519): RemoteDisconnected: Remote end closed connection without response; em_fflow_rank(in): RemoteDisconnected: Remote end closed connection without response; em_fflow_rank(out): RemoteDisconnected: Remote end closed connection without response; em_index_flow: RemoteDisconnected: Remote end closed connection without response; em_sector_flow: RemoteDisconnected: Remote end closed connection without response"
 }
