@@ -35,13 +35,37 @@ jobs:
           git fetch origin main
           git merge --ff-only origin/main || echo "already up to date"
 
-      # ── 保活: curl Space /health (防 30 分钟休眠, 实现 24h 不间断) ──
-      - name: Keep-alive Space
+      # ── 保活: curl 各 Space 的 /health (防 30 分钟休眠) ──────────
+      # GitCode 无 Spaces API, 运行地址只能从 Space 详情页拿, 所以做成
+      # 可配置: GitHub Secrets 里加 SPACE_URL_A / _B / _C (多个用逗号分隔
+      # 或分开配), 每轮全部 curl 一次即交叉保活。
+      # 注意: 原先 curl 的是仓库网页 (gitcode.com/<org>/<repo>), 那不是
+      # Space 运行实例, 对休眠判定毫无作用 — 这也是 Space 一直没人管的原因。
+      - name: Keep-alive Spaces
         continue-on-error: true
+        env:
+          SPACE_URL_A: ${{ secrets.SPACE_URL_A }}
+          SPACE_URL_B: ${{ secrets.SPACE_URL_B }}
+          SPACE_URL_C: ${{ secrets.SPACE_URL_C }}
         run: |
-          echo "curl GitCode Space 保活"
-          curl -sf --max-time 15 "https://gitcode.com/jiegengxiangjianxue/stocks-ai-space" >/dev/null 2>&1 ||
-            echo "Space 地址待启动后确认"
+          alive=0; total=0
+          for u in "$SPACE_URL_A" "$SPACE_URL_B" "$SPACE_URL_C"; do
+            [ -z "$u" ] && continue
+            total=$((total+1))
+            # 兼容用户填带 /health 或不带的两种形式
+            case "$u" in */health) h="$u";; *) h="${u%/}/health";; esac
+            if curl -sf --max-time 15 "$h" >/dev/null 2>&1; then
+              echo "  alive: $h"; alive=$((alive+1))
+            else
+              echo "  unreachable: $h"
+            fi
+          done
+          if [ "$total" -eq 0 ]; then
+            echo "::notice::未配置 SPACE_URL_A/B/C, 跳过保活 (在 Settings -> Secrets 添加)"
+          else
+            echo "Space 保活: $alive/$total 可达"
+          fi
+
 
       # ── 从 GitCode 组织 Space 拉引擎产出 ──
       - name: Fetch Space analysis_out

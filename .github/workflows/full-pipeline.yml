@@ -228,26 +228,34 @@ jobs:
           python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
           python3 scripts/numeric_validator.py --out data/validation_report.json || true
 
-      # ── 8. 触发 Space 跑引擎链 ────────────────────────────────
-      # Space 的 auto_sync_loop 每 30 分钟会自己拉取; 这里额外 curl /health
-      # 一是保活 (防 30 分钟休眠), 二是让本次新采集的数据尽快被引擎消费。
-      - name: Wake Space engine
+      # ── 8. 保活 + 触发 Space 引擎链 ────────────────────────────
+      # Space 每 30 分钟无 HTTP 访问就休眠。full-pipeline 每 5 分钟跑一轮,
+      # 正好是天然的保活节拍器: 每轮 curl 一遍所有 Space 的 /health。
+      # 多 Space 交叉保活 (组织 A/B/C 各一个) 时, 任一个被 curl 到就不睡。
+      - name: Keep-alive and wake Spaces
         continue-on-error: true
         env:
-          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+          SPACE_URL_A: ${{ secrets.SPACE_URL_A }}
+          SPACE_URL_B: ${{ secrets.SPACE_URL_B }}
+          SPACE_URL_C: ${{ secrets.SPACE_URL_C }}
         run: |
-          if [ -z "$GC_TOKEN" ]; then
-            echo "::notice::GC_TOKEN 未配置, Space 触发器跳过 (引擎仍按自身 30 分钟节奏跑)"
-            exit 0
+          alive=0; total=0
+          for u in "$SPACE_URL_A" "$SPACE_URL_B" "$SPACE_URL_C"; do
+            [ -z "$u" ] && continue
+            total=$((total+1))
+            case "$u" in */health) h="$u";; *) h="${u%/}/health";; esac
+            if curl -sf --max-time 15 "$h" >/dev/null 2>&1; then
+              echo "  alive: $h"; alive=$((alive+1))
+            else
+              echo "  unreachable: $h"
+            fi
+          done
+          if [ "$total" -eq 0 ]; then
+            echo "::notice::未配置 SPACE_URL_A/B/C。Space 保活与主动唤醒均跳过,"
+            echo "  引擎由本工作流的兜底链负责 (Actions 每 5 分钟跑全套 22 引擎)。"
+          else
+            echo "Space 保活: $alive/$total 可达 (本工作流 5 分钟一轮, 天然节拍器)"
           fi
-          # Space 运行地址: GitCode Space 详情页可查。未配置时静默跳过。
-          SPACE_URL="${SPACE_URL:-}"
-          if [ -z "$SPACE_URL" ]; then
-            echo "::notice::SPACE_URL 未配置, 跳过主动唤醒 (等 Space 30 分钟自动拉取)"
-            exit 0
-          fi
-          curl -sf --max-time 15 "$SPACE_URL/health" >/dev/null 2>&1 \
-            && echo "Space health OK" || echo "::warning::Space health 失败 (不影响采集)"
 
       # ── 9. 采集摘要 ──
       - name: Summary
