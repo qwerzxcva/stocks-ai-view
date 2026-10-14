@@ -148,6 +148,13 @@ jobs:
           python3 scripts/collect_global_markets.py --out data/global_markets.json \
             || echo "::warning::global_markets 采集失败, 保留上一版"
 
+      # ── 全球 K 线历史 (美股/港股增量构建, 腾讯+东财双源) ─────
+      - name: Collect global kline
+        run: |
+          python3 scripts/collect_global_kline.py --markets us,hk --count 640 \
+            --out data/global_kline.json \
+            || echo "::warning::global_kline 采集失败, 保留上一版"
+
       # ── KlineShare 看板免 key 实时 (破甲逆向成果) ──────────────
       # hq.klineshare.cn/api/* 全免鉴权; realtime 给 OHLC+成交额,
       # plates 给全市场板块。realtime 每只间隔 1.2s (看板限流严)。
@@ -198,7 +205,7 @@ jobs:
           git config user.name "shard-collect-bot"
           git config user.email "3576982374@qq.com"
           PROTECT_ARGS=""
-          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json; do
+          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json data/global_kline.json; do
             PROTECT_ARGS="$PROTECT_ARGS --protect $f"
           done
           if [ "$SHARD_EXTRA" != "$SHARD" ]; then
@@ -206,5 +213,5 @@ jobs:
           fi
           python3 scripts/git_push_retry.py \
             --msg "shard(${SHARD}): collect $(TZ=Asia/Shanghai date '+%m-%d %H:%M')" \
-            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json \
+            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json data/global_kline.json \
             $PROTECT_ARGS
