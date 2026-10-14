@@ -111,8 +111,11 @@ jobs:
       - name: Commit & push
         run: |
           python3 scripts/git_push_retry.py --msg "hot-impact" --user hot-bot \
-            --protect data/hot_impact.json --protect data/hot_impact.md --protect data/enrich.json --protect data/ai_picks.json --protect data/market_now.json --protect data/ban_prob.json --protect data/flow_divergence.json --protect data/all_sources.json
             data/hot_impact.json data/hot_impact.md data/enrich.json \
             data/ai_picks.json data/market_now.json data/ban_prob.json \
-            data/flow_divergence.json data/all_sources.json
+            data/flow_divergence.json data/all_sources.json \
+            --protect data/hot_impact.json --protect data/hot_impact.md \
+            --protect data/enrich.json --protect data/ai_picks.json \
+            --protect data/market_now.json --protect data/ban_prob.json \
+            --protect data/flow_divergence.json --protect data/all_sources.json
 
