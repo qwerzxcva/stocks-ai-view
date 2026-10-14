@@ -79,6 +79,13 @@
     overseasNews: function () { return get(REPOS.market + 'overseas/news.json', 300000); },
     overseasSentiment: function () { return get(REPOS.market + 'overseas/sentiment.json', 300000); },
     overseasOvernight: function () { return get(REPOS.market + 'overseas/overnight.json', 300000); },
+
+    // ── picks, per session ──
+    todayPicks: function () { return get(REPOS.market + 'market/today_picks.json', 120000); },
+    morningReview: function () { return get(REPOS.market + 'market/morning_review.json', 120000); },
+    afternoonPicks: function () { return get(REPOS.market + 'market/afternoon_picks.json', 120000); },
+    entryPlans: function () { return get(REPOS.market + 'market/entry_plans.json', 120000); },
+    yesterdayReview: function () { return get(REPOS.market + 'market/review_today.json', 120000); },
     usStocks: function () { return get(REPOS.market + 'overseas/us_stocks.json', 300000); },
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 

@@ -232,6 +232,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="11">因子引擎</button>
       <button class="c-tab" data-c="12">复盘验证</button>
       <button class="c-tab" data-c="13">质量审查</button>
+      <button class="c-tab" data-c="14">推股复盘</button>
     </div>
     <div class="card c-card" data-ci="0">
       <div class="hd">AI 推荐标的 <span class="sub">多维评分 · 点击行看K线/资金流</span></div>
@@ -377,6 +378,17 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <div id="signalAuditBox"><div class="fl">加载中…</div></div>
         <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">数值校验 (越界/脏值) <span class="sub" id="nvSub"></span></div>
         <div id="validationBox"><div class="fl">加载中…</div></div>
+      </div>
+    </div>
+    <div class="card c-card" data-ci="14" style="display:none">
+      <div class="hd">推股复盘 <span class="sub">上午实际表现 · 下午可执行 · 昨日对账</span></div>
+      <div style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <div class="hd" style="border-top:none;padding:6px 0">昨日推股 · 今日对账 <span class="sub">已收盘事实</span></div>
+        <div id="pkYesterday"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">上午推股 · 实际表现 <span class="sub">盘中已发生</span></div>
+        <div id="pkMorning"><div class="fl">加载中…</div></div>
+        <div class="hd" style="border-top:1px solid var(--border);padding:6px 0">下午可执行 <span class="sub">含买点/止损/理由</span></div>
+        <div id="pkAfternoon"><div class="fl">加载中…</div></div>
       </div>
     </div>
   </div>
@@ -1658,6 +1670,7 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='7' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
   if(b.dataset.c==='8' && !decRendered){ decRendered=true; renderDecision(window._decData||null); }
   if(b.dataset.c==='10' && window.Overseas){ window.Overseas.render(); }
+  if(b.dataset.c==='14' && window.Picks){ window.Picks.render(); }
   if(b.dataset.c==='9' && !scenRendered){ scenRendered=true; renderScenario(window._scenData||null); }
   // 新增三个 tab 首次切入时懒渲染 (数据已在 render() 里并行拉好)
   if(b.dataset.c==='11' && !feRendered){ feRendered=true; _safe(renderFactorEngines,'engineV5'); }
@@ -1994,6 +2007,7 @@ document.addEventListener('click', e=>{
 <script src="realtime.js" defer></script>
 <script src="db-client.js" defer></script>
 <script src="overseas.js" defer></script>
+<script src="picks.js" defer></script>
 <script src="gh_sources.js"></script>
 <script src="data_origin_patch.js"></script>
 <script src="stock-detail.js" defer></script>
