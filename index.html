@@ -1387,21 +1387,22 @@ function renderFactorEngines(){
         }));
   } else _empty('multidimBox', 'multidim.json 无数据');
 
-  // RPS 轮动
+  // RPS 轮动 (字段是 symbol / strong_score, 不是 code / score)
   const rps = g.rps_rotation;
   if(rps && rps.top && rps.top.length){
     const s = document.getElementById('rpsSub');
     if(s) s.textContent = '全市场 '+rps.n_universe+' 只 · '+String(rps.date||'');
     document.getElementById('rpsBox').innerHTML =
-      _rows(['代码','名称','RPS20','RPS50','RPS120','RPS250','最新日期'],
+      _rows(['代码','强度分','RPS20','RPS60','RPS120','RPS250'],
         rps.top.slice(0,30).map(t=>[
-          t.code, t.name||'—',
+          t.symbol||t.code||'—',
+          Number(t.strong_score||0).toFixed(1),
           Number(t.rps_20||0).toFixed(1),
-          Number(t.rps_50||0).toFixed(1),
-          Number(t.rps_120||0).toFixed(1),
-          Number(t.rps_250||0).toFixed(1),
-          t.date||'—'
-        ]));
+          Number(t.rps_60||0).toFixed(1),
+          t.rps_120==null?'—':Number(t.rps_120).toFixed(1),
+          t.rps_250==null?'—':Number(t.rps_250).toFixed(1)
+        ])) +
+      '<div class="fl" style="font-size:9px;margin-top:4px">'+(rps.note||'')+'</div>';
   } else _empty('rpsBox', 'rps_rotation.json 无数据');
 
   // 权重校准
@@ -1466,20 +1467,27 @@ function renderReview(){
       '<div class="fl" style="font-size:9px;margin-top:4px">'+((wm.meta||{}).evidence||'')+'</div>';
   } else _empty('winrateBox', 'winrate_matrix.json 无数据');
 
-  // K线模拟
+  // K线模拟 (by_horizon 是 dict; overall 是总览)
   const ks = g.kline_sim;
   if(ks){
     const s = document.getElementById('ksSub');
     if(s) s.textContent = '信号 '+ks.n_signals_total+' · 可模拟 '+ks.n_simulated+' · 持仓 '+ks.n_held+' · '+String(ks.ts||'').slice(5,16);
-    const bh = ks.by_horizon || ks.horizons || {};
-    document.getElementById('klineSimBox').innerHTML =
-      _rows(['持有期','样本','胜率','平均收益'],
-        Object.keys(bh).map(h=>{
-          const r = bh[h] || {};
-          return [h+' 日', r.n||0,
-            (r.win_rate==null?'—':(r.win_rate*100).toFixed(1)+'%'),
-            (r.avg_ret_pct==null?'—':Number(r.avg_ret_pct).toFixed(2)+'%')];
-        }));
+    const bh = ks.by_horizon || {};
+    const ov = ks.overall || {};
+    let h = '';
+    if(ov && Object.keys(ov).length){
+      h += '<div class="fl" style="font-size:9px;margin-bottom:4px">整体: '+
+        Object.keys(ov).map(k=>k+'='+ov[k]).join(' · ')+'</div>';
+    }
+    h += _rows(['持有期','样本','胜率','平均收益'],
+      Object.keys(bh).map(k=>{
+        const r = bh[k] || {};
+        return [k+' 日', r.n||0,
+          (r.win_rate==null?'—':(r.win_rate*100).toFixed(1)+'%'),
+          (r.avg_ret_pct==null?'—':Number(r.avg_ret_pct).toFixed(2)+'%')];
+      }));
+    if(ks.note) h += '<div class="fl" style="font-size:9px;margin-top:4px">'+ks.note+'</div>';
+    document.getElementById('klineSimBox').innerHTML = h;
   } else _empty('klineSimBox', 'kline_sim.json 无数据');
 
   // 样本均衡
@@ -1508,74 +1516,93 @@ function renderQA(){
   qaRendered = true;
   const g = window._data || {};
 
-  // 优势挖掘
+  // 优势挖掘 (字段: name / action / confidence)
   const em = g.edge_report;
   if(em){
     const s = document.getElementById('emSub');
     if(s) s.textContent = (em.n_edges||0)+' 条发现 · '+String(em.ts||'').slice(5,16);
     const edges = em.edges || [];
     document.getElementById('edgeBox').innerHTML = edges.length ?
-      _rows(['维度','发现'],
-        edges.slice(0,15).map(e=>[
-          '<b>'+(e.dim||e.dimension||'—')+'</b>',
-          '<span class="fl" style="font-size:9px">'+(e.note||e.finding||e.desc||'')+'</span>'
+      _rows(['类型','维度','均分','样本','置信度','发现'],
+        edges.slice(0,20).map(e=>[
+          e.type||'—',
+          '<b>'+(e.name||'—')+'</b>',
+          e.top_avg==null?'—':Number(e.top_avg).toFixed(1),
+          e.n||0,
+          e.confidence||'—',
+          '<span class="fl" style="font-size:9px">'+(e.action||'')+'</span>'
         ])) :
       '<div class="fl" style="padding:12px;text-align:center;font-size:10px">无优势发现</div>';
   } else _empty('edgeBox', 'edge_report.json 无数据');
 
-  // 异常检测
+  // 异常检测 (checks 是检查项名称数组; issues 为空表示未检出)
   const ad = g.anomaly_report;
   if(ad){
     const s = document.getElementById('adSub');
     if(s) s.textContent = 'K线覆盖 '+ad.kline_coverage+' · 异常 '+(ad.n_issues||0)+' 个 · '+String(ad.ts||'').slice(5,16);
     const issues = ad.issues || [];
-    document.getElementById('anomalyBox').innerHTML =
-      '<div class="fl" style="font-size:9px;margin-bottom:4px">critical='+
-        ((ad.by_severity||{}).critical||0)+' · warning='+((ad.by_severity||{}).warning||0)+'</div>'+
-      (issues.length ?
-        _rows(['严重度','类型','标的','说明'],
-          issues.slice(0,20).map(i=>[
-            i.severity==='critical'?'<b class="dn">critical</b>':'warning',
-            i.kind||i.type||'—', i.code||i.symbol||'—',
-            '<span class="fl" style="font-size:9px">'+(i.detail||i.msg||'')+'</span>'
-          ])) :
-        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出异常</div>');
+    const checks = ad.checks || [];
+    let h = '<div class="fl" style="font-size:9px;margin-bottom:4px">检查项: '+
+      (checks.length ? checks.join(' · ') : '—')+' · critical='+
+      ((ad.by_severity||{}).critical||0)+' · warning='+((ad.by_severity||{}).warning||0)+'</div>';
+    h += issues.length ?
+      _rows(['严重度','类型','标的','说明'],
+        issues.slice(0,20).map(i=>[
+          i.severity==='critical'?'<b class="dn">critical</b>':'warning',
+          i.kind||i.type||'—', i.code||i.symbol||'—',
+          '<span class="fl" style="font-size:9px">'+(i.detail||i.msg||'')+'</span>'
+        ])) :
+      '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出异常</div>';
+    document.getElementById('anomalyBox').innerHTML = h;
   } else _empty('anomalyBox', 'anomaly_report.json 无数据');
 
-  // 信号审核
+  // 信号审核 (blocked/warned 是数组; checks 是检查项概况)
   const sa = g.signal_audit;
   if(sa){
     const s = document.getElementById('saSub');
     if(s) s.textContent = '审核 '+sa.n_cards+' 张 · 拦截 '+sa.n_blocked+' · 警告 '+sa.n_warned+' · '+String(sa.ts||'').slice(5,16);
     const blocked = sa.blocked || [], warned = sa.warned || [];
-    document.getElementById('signalAuditBox').innerHTML =
-      (blocked.length ?
-        '<div class="hd" style="border-top:none;padding:6px 0">已拦截</div>'+
-        _rows(['标的','原因'], blocked.map(b=>[b.code||'—','<span class="dn">'+(b.reason||'')+'</span>'])) : '')+
-      (warned.length ?
-        '<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">警告</div>'+
-        _rows(['标的','原因'], warned.map(b=>[b.code||'—','<span style="color:var(--amber)">'+(b.reason||'')+'</span>'])) : '')+
-      (!blocked.length && !warned.length ?
-        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">全部通过, 无拦截无警告</div>' : '');
+    const checks = sa.checks || [];
+    let h = '';
+    if(checks.length){
+      h += '<div class="fl" style="font-size:9px;margin-bottom:4px">检查项: '+
+        checks.map(c=>{
+          const ok = (c.n_blocked||0) === 0 && (c.n_warned||0) === 0;
+          return (c.name||c.rule||'?')+(ok?' ✓':' ⚠'+(c.n_blocked||c.n_warned));
+        }).join(' · ')+'</div>';
+    }
+    if(blocked.length){
+      h += '<div class="hd" style="border-top:none;padding:6px 0">已拦截</div>'+
+        _rows(['标的','原因'], blocked.map(b=>[b.code||'—','<span class="dn">'+(b.reason||'')+'</span>']));
+    }
+    if(warned.length){
+      h += '<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">警告</div>'+
+        _rows(['标的','原因'], warned.map(b=>[b.code||'—','<span style="color:var(--amber)">'+(b.reason||'')+'</span>']));
+    }
+    if(!blocked.length && !warned.length){
+      h += '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">全部通过, 无拦截无警告</div>';
+    }
+    document.getElementById('signalAuditBox').innerHTML = h;
   } else _empty('signalAuditBox', 'signal_audit.json 无数据');
 
-  // 数值校验
+  // 数值校验 (issues 元素: file / field / severity / msg)
   const nv = g.validation_report;
   if(nv){
     const s = document.getElementById('nvSub');
     if(s) s.textContent = '检查 '+nv.n_files+' 个文件 · 问题 '+(nv.n_issues||0)+' 个 · '+String(nv.ts||'').slice(5,16);
     const issues = nv.issues || [];
-    document.getElementById('validationBox').innerHTML =
-      '<div class="fl" style="font-size:9px;margin-bottom:4px">critical='+
-        ((nv.by_severity||{}).critical||0)+' · warning='+((nv.by_severity||{}).warning||0)+'</div>'+
-      (issues.length ?
-        _rows(['严重度','文件','字段','问题'],
-          issues.slice(0,20).map(i=>[
-            i.severity==='critical'?'<b class="dn">critical</b>':'warning',
-            i.file||'—', i.field||i.path||'—',
-            '<span class="fl" style="font-size:9px">'+(i.msg||i.detail||'')+'</span>'
-          ])) :
-        '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出脏值</div>');
+    let h = '<div class="fl" style="font-size:9px;margin-bottom:4px">critical='+
+      ((nv.by_severity||{}).critical||0)+' · warning='+((nv.by_severity||{}).warning||0)+'</div>';
+    h += issues.length ?
+      _rows(['严重度','文件','字段','问题'],
+        issues.slice(0,20).map(i=>[
+          i.severity==='critical'?'<b class="dn">critical</b>':'warning',
+          i.file||'—', i.field||i.path||'—',
+          '<span class="fl" style="font-size:9px">'+(i.msg||i.detail||'')+'</span>'
+        ])) :
+      '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--dn)">未检出脏值</div>';
+    if(nv.caveat) h += '<div class="fl" style="font-size:9px;margin-top:4px">'+nv.caveat+'</div>';
+    document.getElementById('validationBox').innerHTML = h;
   } else _empty('validationBox', 'validation_report.json 无数据');
 }
 
