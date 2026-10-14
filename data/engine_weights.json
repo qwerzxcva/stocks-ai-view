@@ -1,204 +1,212 @@
 {
- "generated_at": "2026-10-14T17:18:47+08:00",
- "engine": "weight_calibrator_v2",
- "source": "reflect_latest.json",
- "n_records": 64250,
- "min_n": 5000,
- "bull": [
-  {
-   "indicator": "SuperTrend",
-   "n": 60862,
-   "win_rate": 43.8,
-   "edge": -6.2,
-   "raw": 0.0,
-   "weight": 0.0
+  "ts": "2026-10-14T19:48:45+08:00",
+  "engine": "weight_calibrator v1 (特征重要性 → 权重)",
+  "source": "reflect_latest.json by_indicator (多持有期胜率+Wilson CI)",
+  "method": {
+    "min_n": 30,
+    "min_ci_lo": 50.0,
+    "cap": [
+      0.6,
+      1.5
+    ],
+    "normalize": "mean=1.0, cap [0.6,1.5]",
+    "anti_overfit": "只用 CI 下限>50% 的指标加权; 样本<30 不动"
   },
-  {
-   "indicator": "MA5/MA20",
-   "n": 60019,
-   "win_rate": 43.7,
-   "edge": -6.3,
-   "raw": 0.0,
-   "weight": 0.0
+  "weights": {
+    "SuperTrend": 1.0,
+    "MA5/MA20": 1.0,
+    "RSI": 1.0,
+    "MACD": 1.0,
+    "KDJ(RSV)": 1.0,
+    "BOLL/Keltner": 0.6,
+    "Donchian20": 1.0,
+    "CMO": 0.6,
+    "Vortex": 1.0,
+    "UltimateOsc": 1.0,
+    "Choppiness": 0.6,
+    "HullMA": 1.0,
+    "ElderForce": 1.0,
+    "ConnorsRSI": 1.0,
+    "A/D Line": 1.0,
+    "Pivot": 1.0,
+    "VWMA": 1.0
   },
-  {
-   "indicator": "RSI",
-   "n": 12461,
-   "win_rate": 42.6,
-   "edge": -7.4,
-   "raw": 0.0,
-   "weight": 0.0
+  "reasons": {
+    "SuperTrend": {
+      "quality": 47.1,
+      "n": 16682,
+      "ci_lo": 39.98,
+      "weight": 1.0,
+      "reason": "质量47 噪声区 → 等权",
+      "bull_win": 40.8,
+      "bear_win": 53.5,
+      "weight_final": 1.0
+    },
+    "MA5/MA20": {
+      "quality": 47.0,
+      "n": 16115,
+      "ci_lo": 40.3,
+      "weight": 1.0,
+      "reason": "质量47 噪声区 → 等权",
+      "bull_win": 41.1,
+      "bear_win": 52.8,
+      "weight_final": 1.0
+    },
+    "RSI": {
+      "quality": 48.5,
+      "n": 9030,
+      "ci_lo": 38.67,
+      "weight": 1.0,
+      "reason": "质量48 噪声区 → 等权",
+      "bull_win": 40.0,
+      "bear_win": 56.9,
+      "weight_final": 1.0
+    },
+    "MACD": {
+      "quality": 47.6,
+      "n": 16682,
+      "ci_lo": 40.02,
+      "weight": 1.0,
+      "reason": "质量48 噪声区 → 等权",
+      "bull_win": 40.8,
+      "bear_win": 54.5,
+      "weight_final": 1.0
+    },
+    "KDJ(RSV)": {
+      "quality": 48.8,
+      "n": 16682,
+      "ci_lo": 40.51,
+      "weight": 1.0,
+      "reason": "质量49 噪声区 → 等权",
+      "bull_win": 41.3,
+      "bear_win": 56.2,
+      "weight_final": 1.0
+    },
+    "BOLL/Keltner": {
+      "quality": 43.6,
+      "n": 13205,
+      "ci_lo": 40.93,
+      "weight": 0.6,
+      "reason": "质量44 反向/无效 → 降权",
+      "bull_win": 41.8,
+      "bear_win": 45.4,
+      "weight_final": 0.6
+    },
+    "Donchian20": {
+      "quality": 48.5,
+      "n": 6517,
+      "ci_lo": 41.25,
+      "weight": 1.0,
+      "reason": "质量48 噪声区 → 等权",
+      "bull_win": 42.7,
+      "bear_win": 54.3,
+      "weight_final": 1.0
+    },
+    "CMO": {
+      "quality": 44.5,
+      "n": 12869,
+      "ci_lo": 40.89,
+      "weight": 0.6,
+      "reason": "质量44 反向/无效 → 降权",
+      "bull_win": 41.8,
+      "bear_win": 47.1,
+      "weight_final": 0.6
+    },
+    "Vortex": {
+      "quality": 46.5,
+      "n": 16682,
+      "ci_lo": 39.76,
+      "weight": 1.0,
+      "reason": "质量46 噪声区 → 等权",
+      "bull_win": 40.6,
+      "bear_win": 52.4,
+      "weight_final": 1.0
+    },
+    "UltimateOsc": {
+      "quality": 48.4,
+      "n": 13469,
+      "ci_lo": 40.23,
+      "weight": 1.0,
+      "reason": "质量48 噪声区 → 等权",
+      "bull_win": 41.1,
+      "bear_win": 55.6,
+      "weight_final": 1.0
+    },
+    "Choppiness": {
+      "quality": 39.5,
+      "n": 5034,
+      "ci_lo": 33.34,
+      "weight": 0.6,
+      "reason": "质量40 反向/无效 → 降权",
+      "bull_win": 42.0,
+      "bear_win": 37.1,
+      "weight_final": 0.6
+    },
+    "HullMA": {
+      "quality": 49.4,
+      "n": 16682,
+      "ci_lo": 40.77,
+      "weight": 1.0,
+      "reason": "质量49 噪声区 → 等权",
+      "bull_win": 41.6,
+      "bear_win": 57.2,
+      "weight_final": 1.0
+    },
+    "ElderForce": {
+      "quality": 47.0,
+      "n": 16682,
+      "ci_lo": 40.1,
+      "weight": 1.0,
+      "reason": "质量47 噪声区 → 等权",
+      "bull_win": 40.9,
+      "bear_win": 53.1,
+      "weight_final": 1.0
+    },
+    "ConnorsRSI": {
+      "quality": 50.2,
+      "n": 6735,
+      "ci_lo": 40.98,
+      "weight": 1.0,
+      "reason": "质量50 噪声区 → 等权",
+      "bull_win": 44.1,
+      "bear_win": 56.2,
+      "weight_final": 1.0
+    },
+    "A/D Line": {
+      "quality": 49.0,
+      "n": 16682,
+      "ci_lo": 40.46,
+      "weight": 1.0,
+      "reason": "质量49 噪声区 → 等权",
+      "bull_win": 41.3,
+      "bear_win": 56.7,
+      "weight_final": 1.0
+    },
+    "Pivot": {
+      "quality": 51.2,
+      "n": 16682,
+      "ci_lo": 41.73,
+      "weight": 1.0,
+      "reason": "质量51 噪声区 → 等权",
+      "bull_win": 42.6,
+      "bear_win": 59.7,
+      "weight_final": 1.0
+    },
+    "VWMA": {
+      "quality": 48.2,
+      "n": 16682,
+      "ci_lo": 40.3,
+      "weight": 1.0,
+      "reason": "质量48 噪声区 → 等权",
+      "bull_win": 41.1,
+      "bear_win": 55.2,
+      "weight_final": 1.0
+    }
   },
-  {
-   "indicator": "MACD",
-   "n": 58922,
-   "win_rate": 43.6,
-   "edge": -6.4,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "KDJ(RSV)",
-   "n": 60504,
-   "win_rate": 43.8,
-   "edge": -6.2,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "BOLL/Keltner",
-   "n": 57575,
-   "win_rate": 44.0,
-   "edge": -6.0,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "Donchian20",
-   "n": 20502,
-   "win_rate": 44.6,
-   "edge": -5.4,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "CMO",
-   "n": 55088,
-   "win_rate": 44.1,
-   "edge": -5.9,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "Vortex",
-   "n": 60894,
-   "win_rate": 43.7,
-   "edge": -6.3,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "UltimateOsc",
-   "n": 53445,
-   "win_rate": 44.2,
-   "edge": -5.8,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "Choppiness",
-   "n": 23634,
-   "win_rate": 44.2,
-   "edge": -5.8,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "HullMA",
-   "n": 53772,
-   "win_rate": 43.8,
-   "edge": -6.2,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "ElderForce",
-   "n": 61946,
-   "win_rate": 43.7,
-   "edge": -6.3,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "A/D Line",
-   "n": 56503,
-   "win_rate": 43.7,
-   "edge": -6.3,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "Pivot",
-   "n": 49825,
-   "win_rate": 43.9,
-   "edge": -6.1,
-   "raw": 0.0,
-   "weight": 0.0
-  },
-  {
-   "indicator": "VWMA",
-   "n": 61178,
-   "win_rate": 43.8,
-   "edge": -6.2,
-   "raw": 0.0,
-   "weight": 0.0
+  "summary": {
+    "n_total": 17,
+    "n_effective": 0,
+    "n_reversed_or_noise": 3,
+    "verdict": "指标有效性弱, 维持等权观察"
   }
- ],
- "bear": [
-  {
-   "indicator": "UltimateOsc",
-   "n": 5435,
-   "win_rate": 60.3,
-   "edge": 10.3,
-   "raw": 10.3,
-   "weight": 0.2418
-  },
-  {
-   "indicator": "RSI",
-   "n": 20686,
-   "win_rate": 57.0,
-   "edge": 7.0,
-   "raw": 7.0,
-   "weight": 0.1643
-  },
-  {
-   "indicator": "HullMA",
-   "n": 10348,
-   "win_rate": 56.8,
-   "edge": 6.8,
-   "raw": 6.8,
-   "weight": 0.1596
-  },
-  {
-   "indicator": "Pivot",
-   "n": 14295,
-   "win_rate": 56.8,
-   "edge": 6.8,
-   "raw": 6.8,
-   "weight": 0.1596
-  },
-  {
-   "indicator": "A/D Line",
-   "n": 7617,
-   "win_rate": 56.2,
-   "edge": 6.2,
-   "raw": 6.2,
-   "weight": 0.1455
-  },
-  {
-   "indicator": "MACD",
-   "n": 5198,
-   "win_rate": 55.5,
-   "edge": 5.5,
-   "raw": 5.5,
-   "weight": 0.1291
-  }
- ],
- "skipped": [
-  {
-   "indicator": "ConnorsRSI",
-   "reason": "bull n=1115 < 5000"
-  }
- ],
- "mean_bull_edge": 0.0,
- "mean_bear_edge": 7.1,
- "usage": "engine_v5.py --weights data/engine_weights.json; the engine still runs with equal weights when the file is absent",
- "disclaimer": "Weights derived from historical records. Past performance does not imply future results.",
- "merge_note": {
-  "resolved_from": "weight_calibrator_v2",
-  "reason": "v2 scores bull and bear separately; the old calibrator averaged them and hid that every bull edge is negative",
-  "regression_guard": {
-   "mean_bear_edge_min": 5.0
-  }
- }
 }

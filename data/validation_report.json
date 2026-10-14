@@ -1,11 +1,11 @@
 {
-  "ts": "2026-10-14T16:07:29+08:00",
+  "ts": "2026-10-14T19:48:49+08:00",
   "engine": "numeric_validator v1",
-  "n_files": 69,
-  "n_issues": 5,
+  "n_files": 74,
+  "n_issues": 8,
   "by_severity": {
-    "critical": 3,
-    "warning": 2,
+    "critical": 4,
+    "warning": 4,
     "info": 0
   },
   "issues": [
@@ -28,10 +28,28 @@
       "msg": "越界 222.19 不在 [-100, 100]"
     },
     {
+      "file": "close_review.json",
+      "field": "morning.by_group.limit_up",
+      "severity": "critical",
+      "msg": "非数值类型 dict: {'n': 17, 'n_up': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.37, 'median_ret_pct': 10.01, 'best': 20.06, '"
+    },
+    {
       "file": "morning_review.json",
       "field": "groups.limit_up",
       "severity": "critical",
       "msg": "非数值类型 dict: {'n': 17, 'n_up': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.59, 'rows': [{'code': '300006', 'name': '莱美药业"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.fund[0].ret_3m",
+      "severity": "warning",
+      "msg": "越界 222.64 不在 [-100, 200]"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.fund[0].ret_1m",
+      "severity": "warning",
+      "msg": "越界 222.19 不在 [-100, 100]"
     },
     {
       "file": "today_picks.json",
