@@ -37,9 +37,11 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ONLY: ${{ inputs.only }}
         run: |
-          # 按唤醒顺序排: 先轻量实时, 再重采集+引擎, 最后池子与分析
-          # ai-update 负责 latest.json (主快照), 不唤醒它 latest 就一直旧
-          # engine-chain 必须在 full-pipeline 之后: 它消费采集产物
+          # 按唤醒顺序排: 先轻量实时, 再重采集, 再引擎 (消费采集产物),
+          # 最后池子/分析/主快照。
+          # ai-update 负责 latest.json (主快照), 不唤醒它 latest 就一直旧。
+          # engine-chain 自带时间窗守卫: 盘中跑 light 档 (四个直连网站的引擎),
+          # 盘前/盘后跑 full 档 (tier 0-8)。不需要额外区分。
           WF="realtime-minute,full-pipeline,engine-chain,hot-impact-realtime,rebuild-pools,cloud-analysis,ai-update"
           if [ -n "$ONLY" ]; then WF="$ONLY"; fi
           ok=0; skip=0; fail=0

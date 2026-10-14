@@ -28,6 +28,11 @@ on:
         description: 'Run regardless of the time window'
         type: boolean
         default: false
+      mode:
+        description: 'Which tier list to run (only used with force)'
+        type: choice
+        options: [full, light]
+        default: full
 permissions:
   contents: read
 
@@ -53,6 +58,7 @@ jobs:
       TZ: Asia/Shanghai
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       FORCE_RUN: ${{ inputs.force }}
+      FORCE_MODE: ${{ inputs.mode }}
     steps:
       - name: Time window guard
         run: |
@@ -60,18 +66,27 @@ jobs:
           # pre-open (08:30-09:30) and post-close (15:05-16:30). Outside those
           # windows, skip so the heartbeat does not pile up runs all session.
           if [ "$FORCE_RUN" = "true" ]; then
+            echo "MODE=${FORCE_MODE:-full}" >> "$GITHUB_ENV"
             echo "forced run, skipping the window check"; exit 0
           fi
           h=$(date +%H); m=$(date +%M); mins=$((10#$h * 60 + 10#$m))
           dow=$(date +%u)
           if [ "$dow" -gt 5 ]; then echo "weekend, skipping"; exit 1; fi
+          # MODE decides which tier list the Engine chain step runs.
+          #   light = the four engines the site reads directly (~65s measured)
+          #   full  = the whole tier 0-8 chain (~6-9 min)
+          #盘中 (09:15-15:10) 与盘前都跑 light; 盘后窗口跑 full。
+          if [ "$mins" -ge 555 ] && [ "$mins" -le 910 ]; then
+            echo "MODE=light" >> "$GITHUB_ENV"; echo "intraday window ($h:$m) -> light"; exit 0
+          fi
           if [ "$mins" -ge 510 ] && [ "$mins" -le 570 ]; then
-            echo "pre-open window ($h:$m), running"; exit 0
+            echo "MODE=full" >> "$GITHUB_ENV"; echo "pre-open window ($h:$m) -> full"; exit 0
           fi
           if [ "$mins" -ge 905 ] && [ "$mins" -le 990 ]; then
-            echo "post-close window ($h:$m), running"; exit 0
+            echo "MODE=full" >> "$GITHUB_ENV"; echo "post-close window ($h:$m) -> full"; exit 0
           fi
-          echo "outside the engine window ($h:$m), skipping"; exit 1
+          echo "MODE=light" >> "$GITHUB_ENV"
+          echo "outside the engine window ($h:$m) -> light"; exit 0
 
       - uses: actions/checkout@v4
         with:
@@ -129,9 +144,23 @@ jobs:
         run: pip install -q requests akshare pandas lxml duckdb
 
       # ── the chain ──────────────────────────────────────────────
-      - name: Engine chain (tier 0-8)
+      - name: Engine chain (tier 0-8 / light)
         run: |
           set +e
+          # MODE=light: 只跑网站直接消费的四个引擎 (实测本地 65s)。
+          #   盘中每 5 分钟一轮, 保证 index.html 的 engine_v5 / decision /
+          #   today_picks / ai_pick_v4 是几分钟内的新结果。
+          # MODE=full: 盘前/盘后跑整条 tier 0-8 链 (~6-9 分钟)。
+          if [ "$MODE" = "light" ]; then
+            echo "--- light tier: engine_v5 / decision / today_picks / ai_pick_v4 ---"
+            python3 scripts/engine_v5.py --out data/engine_v5.json --limit 2000 || echo "engine_v5 skipped"
+            python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
+            python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
+            python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
+            echo "--- light tier done ---"
+          fi
+
+          if [ "$MODE" = "full" ]; then
           echo "--- tier 0: valuation + market phase ---"
           python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
           python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
@@ -191,8 +220,21 @@ jobs:
           python3 scripts/archive_review.py || echo "archive_review skipped"
 
           echo "--- engine chain done ---"
+          fi
 
       # ── publish to the warehouse the site reads ──
+      - name: Publish engine outputs to this repo
+        run: |
+          # 引擎产出必须先推回本仓 (GitHub Pages 的数据源), 再同步到数据仓。
+          # light 档每 5 分钟跑一次, 用 git_push_retry 的 fetch+reset+protect
+          # 避免和另外 6 个 bot 互相覆盖。
+          python3 scripts/git_push_retry.py --msg "engine($MODE)" \
+            data/engine_v5.json data/decision.json data/today_picks.json \
+            data/ai_pick_v4.json \
+            --user engine-bot \
+            --protect data/engine_v5.json --protect data/decision.json \
+            --protect data/today_picks.json --protect data/ai_pick_v4.json
+
       - name: Publish to the data warehouse
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
