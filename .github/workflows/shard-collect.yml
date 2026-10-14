@@ -66,7 +66,11 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install -q duckdb numpy pandas
+        run: |
+          pip install -q duckdb numpy pandas
+          # akshare 用于 sina_kline_daily / em_a_hist 两个 fetcher
+          # (装失败不阻断 — fetcher 会优雅降级)
+          pip install -q akshare || echo "::warning::akshare 装失败, 相关 fetcher 将降级"
 
       # ── 分片采集 ────────────────────────────────────────────
       # 每个 shard 独立输出文件 data/shard_<x>.json, 互不覆盖

@@ -1,0 +1,8 @@
+# akshare 依赖说明
+#
+# fetchers_extra.py 里 sina_kline_daily / em_a_hist 走 akshare 库,
+# 不装的话这两个 fetcher 返回空。CI 需要装。
+#
+# 为什么值得装: akshare 封装了大量国内数据源, 且自带重试与降级,
+# 比自己维护 URL 更稳。
+akshare>=1.14.0
