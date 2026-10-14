@@ -74,14 +74,33 @@ def commit_only(paths, dirs, all_changes, msg):
     工作流刚推的新数据覆盖成旧版)。
 
     做法: git commit -- <paths> 只提交这些路径的已暂存改动。
+
+    路径必须已存在于 index (git 知道它), 否则 git 报
+    "pathspec did not match any file(s) known to git" 并失败 —
+    未生成的可选产出 (如 loss_attribution.json) 必须在这里过滤掉,
+    与 stage() 的过滤保持一致。
     """
     if all_changes:
         args = ["git", "commit", "-m", msg]
     else:
-        targets = [p for p in paths if p] + [d for d in dirs if d]
+        targets = []
+        for p in paths:
+            if p and os.path.exists(p):
+                targets.append(p)
+        for d in dirs:
+            if d and os.path.isdir(d):
+                targets.append(d)
         if not targets:
             return None
-        args = ["git", "commit", "-m", msg, "--"] + targets
+        # 只保留 git 已知的路径, 避免 pathspec 报错
+        known = sh(["git", "ls-files", "--"] + targets).stdout.split()
+        known_set = set(known)
+        # 目录形式 (data/) 没有 ls-files 输出时要保留, 让 git 自己判断
+        keep = [t for t in targets
+                if t in known_set or os.path.isdir(t)]
+        if not keep:
+            return None
+        args = ["git", "commit", "-m", msg, "--"] + keep
     return sh(args)
 
 
