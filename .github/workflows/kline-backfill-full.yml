@@ -1,0 +1,215 @@
+# K 线全量补齐 — 上市至今
+#
+# 背景 (2026-10-14 实测): bulk 里 3997 只股票, 每只中位数仅 121 根日K,
+# 2544 只 (64%) 最早日期在 2026 年 — 因为 expand_kline_coverage.py 的
+# --days 默认只有 120。本工作流把历史深度拉满到「上市至今」。
+#
+# 为什么放 Actions 夜间:
+#   - 公开仓 Actions 免费无限分钟, 单作业上限 6 小时
+#   - 估算: 2947 只覆盖不足 + 约 37 万根缺口; 腾讯源单只约 1-2s,
+#     8 并发下约 2947*1.5/8 ≈ 9 分钟, 余量充足
+#   - 凌晨跑不占盘中采集时段, 也不与 full-pipeline (UTC 1-7 时) 抢并发
+#
+# 数据源优先级 (腾讯优先, 东财兜底):
+#   - 腾讯 fqkline 历史深, 单只能一次拉全部 (count=0 表示从上市开始)
+#   - 东财 push2his 作兜底, 但会被 WAF, 所以只在腾讯失败时试
+name: kline-backfill-full
+
+on:
+  schedule:
+    # 每周六 CST 02:30 (UTC 周六 18:30) — 与 nightly-backfill 错开 30 分钟
+    - cron: '30 18 * * 6'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: '每只拉多少根 (0=上市至今全部)'
+        default: '0'
+      workers:
+        description: '并发数'
+        default: '8'
+      codes:
+        description: '定向补齐的裸码 (逗号分隔, 留空=自动找缺口)'
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kline-backfill-full
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    # 只在主仓跑 (镜像仓会同步本文件, 靠这里跳过, 避免 4 个 IP 同时打腾讯)
+    if: github.repository == 'qwerzxcva/stocks-ai-view'
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - name: Checkout kline repo (full, not sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kline-repo
+          fetch-depth: 0
+
+      - name: Link kline bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          echo "bulk files: $(ls ../stocks-data-kline/data/bulk/ 2>/dev/null | wc -l)"
+          du -sh ../stocks-data-kline/data/bulk/ 2>/dev/null || true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ── 1. 报告补齐前的覆盖状况 ──────────────────────────────
+      - name: Coverage report (before)
+        run: |
+          python3 - <<'PY'
+          import glob, os, json
+          from collections import defaultdict
+          BULK = "../stocks-data-kline/data/bulk"
+          by_code = defaultdict(dict)
+          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+              comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
+              with open(p, encoding="utf-8", errors="replace") as f:
+                  for line in f:
+                      if line.startswith("#") or "|" not in line:
+                          continue
+                      head, _, rest = line.partition("|")
+                      code = head[2:] if head[:2] in ("sh","sz","bj") else head
+                      parts = (rest.strip().split(",") if (comma or "," in rest)
+                               else rest.strip().split("|"))
+                      if len(parts) >= 4:
+                          by_code[code][parts[0]] = True
+          counts = sorted(len(d) for d in by_code.values())
+          n = len(counts)
+          print("股票数: %d" % n)
+          print("根数 min=%d median=%d max=%d" % (counts[0], counts[n//2], counts[-1]))
+          yrs = defaultdict(int)
+          for d in by_code.values():
+              yrs[min(d)[:4]] += 1
+          print("最早日期分布:", dict(sorted(yrs.items())))
+          short = sum(1 for d in by_code.values()
+                      if len(d) < (2026 - int(min(d)[:4]) + 1) * 243 * 0.9)
+          print("覆盖不足 90%%: %d 只" % short)
+          PY
+
+      # ── 2. 全量补齐 ──────────────────────────────────────────
+      # --days 0 = 从上市开始拉全部 (腾讯 count=0 语义)
+      # --min-days 0 = 不跳过任何股票 (增量由脚本内部的日期去重保证)
+      - name: Backfill kline to IPO
+        run: |
+          python3 scripts/expand_kline_coverage.py \
+            --days "${{ github.event.inputs.days || '0' }}" \
+            --min-days 0 \
+            --workers "${{ github.event.inputs.workers || '8' }}" \
+            --codes "${{ github.event.inputs.codes || '' }}" \
+            || echo "::warning::K线补齐部分失败, 保留已拉到的部分"
+
+      # ── 3. 瘦身与格式统一 ────────────────────────────────────
+      - name: Report coverage (after)
+        run: |
+          python3 - <<'PY'
+          import glob, os
+          from collections import defaultdict
+          BULK = "../stocks-data-kline/data/bulk"
+          by_code = defaultdict(dict)
+          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+              comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
+              with open(p, encoding="utf-8", errors="replace") as f:
+                  for line in f:
+                      if line.startswith("#") or "|" not in line:
+                          continue
+                      head, _, rest = line.partition("|")
+                      code = head[2:] if head[:2] in ("sh","sz","bj") else head
+                      parts = (rest.strip().split(",") if (comma or "," in rest)
+                               else rest.strip().split("|"))
+                      if len(parts) >= 4:
+                          by_code[code][parts[0]] = True
+          counts = sorted(len(d) for d in by_code.values())
+          n = len(counts)
+          print("股票数: %d" % n)
+          print("根数 min=%d median=%d max=%d" % (counts[0], counts[n//2], counts[-1]))
+          yrs = defaultdict(int)
+          for d in by_code.values():
+              yrs[min(d)[:4]] += 1
+          print("最早日期分布:", dict(sorted(yrs.items())))
+          short = sum(1 for d in by_code.values()
+                      if len(d) < (2026 - int(min(d)[:4]) + 1) * 243 * 0.9)
+          print("覆盖不足 90%%: %d 只" % short)
+          PY
+          du -sh ../stocks-data-kline/data/bulk/
+
+      # ── 4. 推回 K 线仓 ───────────────────────────────────────
+      # K 线数据进独立仓 ( stocks-data-kline ), 不进主仓 — 主仓只放引擎与产出。
+      # 用 git_push_retry 的 fetch+reset+push 防并发覆盖。
+      - name: Push kline bulk
+        working-directory: kline-repo
+        run: |
+          git config user.name "kline-backfill-bot"
+          git config user.email "3576982374@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add -A data/bulk/
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          if git diff --quiet --cached HEAD; then
+            echo "no kline changes"
+          else
+            git commit -m "kline: backfill to IPO ($ts)"
+            git push origin HEAD:main || echo "::warning::K线仓 push 失败 (可能并发), 下次重试"
+          fi
+
+      # ── 5. 主仓记一个版本戳 (供审计) ─────────────────────────
+      - name: Stamp kline version in main repo
+        run: |
+          python3 - <<'PY'
+          import json, os, glob
+          from collections import defaultdict
+          BULK = "../stocks-data-kline/data/bulk"
+          by_code = defaultdict(dict)
+          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+              comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
+              with open(p, encoding="utf-8", errors="replace") as f:
+                  for line in f:
+                      if line.startswith("#") or "|" not in line:
+                          continue
+                      head, _, rest = line.partition("|")
+                      code = head[2:] if head[:2] in ("sh","sz","bj") else head
+                      parts = (rest.strip().split(",") if (comma or "," in rest)
+                               else rest.strip().split("|"))
+                      if len(parts) >= 4:
+                          by_code[code][parts[0]] = True
+          counts = sorted(len(d) for d in by_code.values())
+          stamp = {
+              "ts": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
+              "engine": "kline-backfill-full",
+              "n_stocks": len(counts),
+              "rows_total": sum(counts),
+              "rows_median": counts[len(counts)//2],
+              "rows_max": counts[-1],
+          }
+          os.makedirs("data", exist_ok=True)
+          with open("data/kline_coverage_stamp.json", "w", encoding="utf-8") as f:
+              json.dump(stamp, f, ensure_ascii=False, indent=1)
+          print("stamp:", stamp)
+          PY
+          git config user.name "kline-backfill-bot"
+          git config user.email "357698079@qq.com"
+          git add data/kline_coverage_stamp.json
+          git diff --quiet --cached HEAD || git commit -m "kline: coverage stamp"
+          git push origin HEAD:main || echo "::warning::主仓 push 失败, 下次重试"

@@ -44,6 +44,9 @@ UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
       "Referer": "https://gu.qq.com/"}
 UA_EM = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
          "Referer": "https://quote.eastmoney.com/"}
+# 新浪的 getKLineData 要求带 Referer, 否则 403
+UA_SINA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
+           "Referer": "https://finance.sina.com.cn/"}
 
 UNIVERSE = os.path.join(BULK, "universe.csv")
 OUT = os.path.join(BULK, "day_qfq_expand.csv")
@@ -155,22 +158,54 @@ def fetch_eastmoney(code, days):
     return rows
 
 
+# ─── 新浪全历史 K 线 (上市至今的首选源) ──────────────────────────
+# 为什么首选: 腾讯 fqkline 的 count 参数有 640 根硬上限 (超过返回空),
+# 东财 push2his 会被 WAF; 新浪 datalen 支持 10000+, 实测茅台一次拿到
+# 6020 根 (2001-08-27 上市日 至今)。
+SINA_KLINE_URL = ("https://money.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+                  "CN_MarketData.getKLineData?symbol={code}&scale=240&ma=no&datalen=10000")
+
+
+def fetch_sina_full(code):
+    """新浪日 K 全历史 (datalen=10000 覆盖 A 股全部上市时长)。
+
+    code 带前缀 (sh600519)。返回 rows [[d,o,c,h,l,v],...]
+    """
+    url = SINA_KLINE_URL.format(code=code)
+    body = urllib.request.urlopen(urllib.request.Request(url, headers=UA_SINA),
+                                  timeout=25).read()
+    d = json.loads(body.decode("utf-8", "replace"))
+    rows = []
+    if isinstance(d, list):
+        for r in d:
+            day = r.get("day")
+            if day and RE_DATE.match(day):
+                rows.append([day, r.get("open"), r.get("close"),
+                             r.get("high"), r.get("low"), r.get("volume")])
+    return rows
+
+
 def fetch_one(item, days, min_days, have):
     code = item["code"]
     if code in have:
         return (code, [], "skip")
-    src = "tencent" if int(code[2:] or 0) % 2 == 0 else "eastmoney"
-    try:
-        rows = (fetch_tencent if src == "tencent" else fetch_eastmoney)(code, days)
-        return (code, rows, src if rows else "empty")
-    except Exception:
-        # 主源失败 → 另一源兜底
-        fb = "eastmoney" if src == "tencent" else "tencent"
+    # 源序: 新浪全历史 (无 640 限制) → 腾讯/东财 (按奇偶分流)
+    # days>0 时是「补最近 N 根」的增量模式, 腾讯 640 内够用, 走快源;
+    # days<=0 是「上市至今」模式, 必须走新浪。
+    order = (["tencent", "eastmoney"] if int(code[2:] or 0) % 2 == 0
+             else ["eastmoney", "tencent"])
+    if days <= 0:
+        order = ["sina_full"] + order
+    fns = {"tencent": fetch_tencent, "eastmoney": fetch_eastmoney,
+           "sina_full": fetch_sina_full}
+    for src in order:
         try:
-            rows = (fetch_eastmoney if fb == "eastmoney" else fetch_tencent)(code, days)
-            return (code, rows, fb + "_fallback" if rows else "empty")
-        except Exception as e:
-            return (code, [], f"fail:{type(e).__name__}")
+            rows = fns[src](code, days) if src != "sina_full" else fns[src](code)
+            if rows:
+                return (code, rows, src)
+        except Exception:
+            continue
+    return (code, [], "fail")
 
 
 def main():
