@@ -133,27 +133,37 @@ def main():
         json.dump(out, f, ensure_ascii=False, indent=1)
 
     # picks.duckdb 对账闭环 (本项目无该库 → 跳过, 不影响候选产出)
-    if os.path.exists(PICKS_DB):
-        try:
-            import duckdb
-            pc = duckdb.connect(PICKS_DB)
-            today = str(datetime.date.today())
-            n = 0
-            for r in rows:
-                ex = pc.execute("SELECT COUNT(*) FROM pick_log WHERE symbol=? AND kind='bcard' AND pick_date=?",
-                                [r["symbol"], today]).fetchone()[0]
-                if not ex:
-                    nid = pc.execute("SELECT COALESCE(MAX(id),0)+1 FROM pick_log").fetchone()[0]
-                    pc.execute("INSERT INTO pick_log VALUES (?,?,?,?,?,?,?,?,NULL,NULL,NULL,NULL,NULL,NULL,0)",
-                               [nid, datetime.datetime.now().isoformat(timespec="seconds"), today,
-                                r["symbol"], "", float(r["close"]), "bcard", "B_5d"])
-                    n += 1
-            pc.close()
-            print(f"bcard落库: {n}票")
-        except Exception as e:
-            print("bcard落库失败:", e)
-    else:
-        print("picks.duckdb 不存在 → 跳过对账落库 (上游闭环依赖, 本项目未建)")
+    # bcard 对账落库: 云端 parquet 是只读的, 先灌进本地可写库再追加
+    try:
+        import duckdb
+        import ledger_store
+        src = ledger_store.connect("pick_log")
+        pc = duckdb.connect(PICKS_DB)
+        pc.execute("""CREATE TABLE IF NOT EXISTS pick_log(
+            id INTEGER PRIMARY KEY, ts TIMESTAMP DEFAULT now(), pick_date VARCHAR,
+            symbol VARCHAR, name VARCHAR, entry_price DOUBLE, kind VARCHAR,
+            rule VARCHAR, next_date VARCHAR, ret_open_close DOUBLE, ret_open_high DOUBLE,
+            ret_open_low DOUBLE, ret_t2 DOUBLE, verdict VARCHAR, settled INTEGER DEFAULT 0)""")
+        if src is not None and ledger_store.has_rows(src) > 0:
+            pc.execute("INSERT INTO pick_log SELECT * FROM read_parquet("
+                       "'" + os.path.join(ledger_store.CACHE,
+                       "pick_log.parquet") + "') "
+                       "WHERE id NOT IN (SELECT id FROM pick_log)")
+        today = str(datetime.date.today())
+        n = 0
+        for r in rows:
+            ex = pc.execute("SELECT COUNT(*) FROM pick_log WHERE symbol=? AND kind='bcard' AND pick_date=?",
+                            [r["symbol"], today]).fetchone()[0]
+            if not ex:
+                nid = pc.execute("SELECT COALESCE(MAX(id),0)+1 FROM pick_log").fetchone()[0]
+                pc.execute("INSERT INTO pick_log VALUES (?,?,?,?,?,?,?,?,NULL,NULL,NULL,NULL,NULL,NULL,0)",
+                           [nid, datetime.datetime.now().isoformat(timespec="seconds"), today,
+                            r["symbol"], "", float(r["close"]), "bcard", "B_5d"])
+                n += 1
+        pc.close()
+        print(f"bcard落库: {n}票")
+    except Exception as e:
+        print("bcard落库失败:", e)
 
     print(f"策略卡: 候选{len(rows)}票, 全球{gs}, trade_ok={gs > -15} → {args.out}")
     for r in rows[:8]:

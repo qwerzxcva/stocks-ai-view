@@ -11,17 +11,29 @@
 输出: data/loss_attr.json + 建议注入ai_pick/decision
 """
 import os
+import sys
 import duckdb, json, datetime, urllib.request
 
 STOCKDB = os.environ.get("STOCKS_STOCKDB") or os.path.join(
     os.path.expanduser("~"), "stockdb")
-OUT = os.path.join(STOCKDB, "data", "loss_attr.json")
-PICKS_DB = os.path.join(STOCKDB, "picks.duckdb")
+HERE = os.path.dirname(os.path.abspath(__file__))
+try:
+    from paths import AI_VIEW_DATA as _AIVD
+except Exception:
+    _AIVD = os.path.join(os.path.dirname(HERE), "data")
+OUT = os.path.join(_AIVD, "loss_attr.json")
+
+# the ledger lives in the cloud warehouse as parquet; ledger_store materialises
+# it into an in-memory DuckDB with the same table name
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import ledger_store
 
 
 def main():
-    if not os.path.exists(PICKS_DB):
-        log_skip = f"picks.duckdb not found at {PICKS_DB}; nothing to attribute"
+    con = ledger_store.connect("pick_log")
+    if con is None or ledger_store.has_rows(con) == 0:
+        log_skip = ("pick ledger unavailable (cloud parquet and local duckdb "
+                    "both empty)")
         print(log_skip)
         try:
             os.makedirs(os.path.dirname(OUT), exist_ok=True)
@@ -32,7 +44,6 @@ def main():
         except Exception:
             pass
         return
-    con = duckdb.connect(PICKS_DB, read_only=True)
     rows = con.execute("""SELECT symbol, ts, entry_price, verdict, ret_open_close
                           FROM pick_log WHERE settled=true AND ret_open_close < 0""").fetchall()
     con.close()

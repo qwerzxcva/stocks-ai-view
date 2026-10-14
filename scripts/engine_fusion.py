@@ -76,12 +76,12 @@ def global_score(missing):
 
 
 def _picks_query(sql):
-    """上游从 picks.duckdb 读对账闭环; 本项目无该库 → 记 missing 返回 None。"""
-    if not os.path.exists(PICKS_DB):
-        return None
+    """上游从 picks.duckdb 读对账闭环; 现从云端 parquet 读 (ledger_store)。"""
     try:
-        import duckdb
-        con = duckdb.connect(PICKS_DB, read_only=True)
+        import ledger_store
+        con = ledger_store.connect("pick_log")
+        if con is None or ledger_store.has_rows(con) == 0:
+            return None
         row = con.execute(sql).fetchone()
         con.close()
         return row
