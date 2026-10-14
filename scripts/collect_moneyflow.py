@@ -118,6 +118,29 @@ def _get(url, ref, retries=3, timeout=5.0, text=False):
     return None, last
 
 
+# ─── 熔断器 ────────────────────────────────────────────────────
+# 东财对高频请求的惩罚是 TLS RST, 继续重试只会延长封锁。连续失败若干次后
+# 本周期直接放弃 push2*, 只走 datacenter 兜底 — 这既省时间也避免加剧封锁。
+_CB = {"fails": 0, "tripped": False, "threshold": 6}
+
+
+def cb_trip():
+    """标记一次 push2 失败; 达到阈值则置熔断。"""
+    _CB["fails"] += 1
+    if _CB["fails"] >= _CB["threshold"]:
+        _CB["tripped"] = True
+
+
+def cb_ok():
+    """一次成功即重置计数 (说明封锁已解除)。"""
+    _CB["fails"] = 0
+    _CB["tripped"] = False
+
+
+def cb_open():
+    return _CB["tripped"]
+
+
 def _get_multi(paths, ref, retries=3, timeout=5.0):
     """同一接口在多个 push2 域上轮询, 任一成功即停。
 
@@ -125,7 +148,12 @@ def _get_multi(paths, ref, retries=3, timeout=5.0):
     拿到数据的概率 (实测: 单域 15 次重试全挂, 换域后 1-3 次即通)。
     三个域并发请求, 避免串行把墙钟时间放大 3 倍 (实测串行 80s+,
     并发约 1/3)。任一域先拿到数据即返回。
+
+    熔断: 连续失败达阈值后直接返回, 不再打 push2 — 继续打只会加剧封锁,
+    且本周期已无望拿到实时数据, 交给 datacenter 兜底更快。
     """
+    if cb_open():
+        return None, "circuit_open (push2 连续失败, 本周期跳过)"
     last = "unknown"
     if len(paths) > 1:
         try:
@@ -135,16 +163,20 @@ def _get_multi(paths, ref, retries=3, timeout=5.0):
                 for f in futs:
                     d, err = f.result()
                     if d is not None:
+                        cb_ok()
                         return d, None
                     last = err
+            cb_trip()
             return None, last
         except Exception:
             pass
     for p in paths:
         d, err = _get(p, ref, retries=retries, timeout=timeout)
         if d is not None:
+            cb_ok()
             return d, None
         last = err
+    cb_trip()
     return None, last
 
 
@@ -156,7 +188,7 @@ def _num(v):
 
 
 # ─── 1. 东财分钟级/日级资金流 ──────────────────────────────
-def fetch_fflow(code, klt=1, lmt=0, retries=8):
+def fetch_fflow(code, klt=1, lmt=0, retries=2):
     """资金流 K 线。klt=1 分钟(当日累计) / 101 日 / 102 周 / 103 月。
 
     返回 (klines, err)。klines 为 [ {time, main_net, small_net, medium_net,
@@ -201,7 +233,7 @@ def minute_deltas(series):
 
 
 # ─── 2. 东财全市场主力净流入/流出排行 ────────────────────────
-def fetch_rank(direction="in", top=20, retries=8):
+def fetch_rank(direction="in", top=20, retries=2):
     """全市场主力净流入排行。direction=in 净流入降序, out 净流出降序。
 
     po=1 → f62 从大到小 (净流入); po=0 → f62 从小到大 (净流出)。
@@ -228,7 +260,7 @@ def fetch_rank(direction="in", top=20, retries=8):
 
 
 # ─── 3. 东财大盘/指数主力净流入 ─────────────────────────────
-def fetch_index_flow(secids=("1.000001", "0.399001"), retries=8):
+def fetch_index_flow(secids=("1.000001", "0.399001"), retries=2):
     """指数/大盘主力净流入。secids 顺序即返回顺序。
 
     注意: ulist.np 的 f43/f48 口径不对 (实测 f43=1013870.58, f48=159.7 是
@@ -252,7 +284,7 @@ def fetch_index_flow(secids=("1.000001", "0.399001"), retries=8):
 
 
 # ─── 4. 东财板块资金流 ─────────────────────────────────────
-def fetch_sector_flow(top=20, retries=8):
+def fetch_sector_flow(top=20, retries=2):
     """行业板块主力净流入排行 (fs=m:90+t:2)。"""
     qs = ("fid=f62&po=1&pz=%d&pn=1&np=1&fltt=2&fs=%s&fields=%s"
           % (top, SECTOR_FS, SECTOR_FIELDS))
@@ -428,7 +460,7 @@ def _stock_slot(c, minute, daily, retries):
     return item, reasons
 
 
-def collect(code=None, top=20, retries=8, include_sector=True):
+def collect(code=None, top=12, retries=2, include_sector=True):
     """采集一次, 返回结构化 dict。任何一级失败都不抛异常, 记 reason。
 
     所有数据源并发执行: push2 单次成功率仅 10-35%, 串行会把墙钟时间
@@ -508,11 +540,34 @@ def collect(code=None, top=20, retries=8, include_sector=True):
             else:
                 reasons.append("dc_board_flow: %s" % err)
 
+    # 数据时效: 全部源都是 dc_ 前缀说明本轮完全降级 (push2 全挂)
+    fully_degraded = bool(sources) and all(s.startswith("dc_") for s in sources)
+    data_dates = set()
+    for s in stocks.values():
+        for r in (s.get("daily_series") or []):
+            if r.get("date"):
+                data_dates.add(r["date"])
+    for r in top_in + top_out:
+        if r.get("date"):
+            data_dates.add(r["date"])
+    today = datetime.now(CST).strftime("%Y-%m-%d")
+    stale_days = None
+    if data_dates:
+        newest = max(data_dates)
+        try:
+            stale_days = (datetime.strptime(today, "%Y-%m-%d")
+                          - datetime.strptime(newest, "%Y-%m-%d")).days
+        except ValueError:
+            stale_days = None
     return {
         "ts": ts,
         "source": ",".join(dict.fromkeys(sources)) or None,
-        "realtime": bool(top_in or any(s.get("main_net_today") is not None
-                                       for s in stocks.values())),
+        "realtime": bool(not fully_degraded and (
+            top_in or any(s.get("main_net_today") is not None for s in stocks.values()))),
+        "fully_degraded": fully_degraded,
+        "data_date": max(data_dates) if data_dates else None,
+        "stale_days": stale_days,
+        "circuit_open": cb_open(),
         "stocks": stocks,
         "top_inflow": top_in,
         "top_outflow": top_out,

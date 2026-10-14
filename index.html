@@ -1247,8 +1247,11 @@ function renderMoneyFlow(d){
   let h='';
   // 降级提示: v2 的 reason 记录了每个源失败原因
   if(d.reason&&d.source&&d.source.indexOf('dc_')>=0){
+    var staleTxt='';
+    if(d.stale_days!=null&&d.stale_days>0) staleTxt=' 数据日期 '+esc(d.data_date)+' (滞后 '+d.stale_days+' 日)';
+    else if(d.data_date) staleTxt=' 数据日期 '+esc(d.data_date);
     h+='<div class="fl" style="font-size:9px;padding:2px 0 6px;line-height:1.5;color:var(--amber)">'
-      +'⚠️ push2 实时源不可达, 已降级到 datacenter (数据可能滞后一日)<br>'+esc(d.reason).slice(0,180)+'</div>';
+      +'⚠️ push2 实时源不可达, 已降级到 datacenter'+staleTxt+'<br>'+esc(d.reason).slice(0,180)+'</div>';
   }
   // ── 结构 B (旧版 flows) ──
   if(d.flows&&!d.stocks){

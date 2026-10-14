@@ -1,9 +1,8 @@
 # 主力资金实时采集 — 盘中每 2 分钟一次 (与其他采集错峰)
 #
-# 为什么单独一个 workflow: full-pipeline 每 5 分钟跑 26 个引擎 (约 3-5 分钟),
-# 资金流只需要 1 个采集脚本 (<10s), 值得更高频率。
-# 三仓错峰: A 仓落 mod5=2, B 落 mod5=4, C 落 mod5=0, 所以这个 cron 用
-# mod5=3 的分钟位 (1,6,11,...) 填补空隙, 全站有效粒度仍是 2 分钟。
+# 只在主仓 (A) 跑。资金流是单值数据, 不需要三仓冗余; 三仓都跑会把对东财
+# 的请求量 x3, 直接触发 WAF 封锁 (2026-10-14 实测: 单仓 2 分钟一轮
+# 已能把 push2 打到 0% 成功率)。
 name: moneyflow-realtime
 
 on:
@@ -21,6 +20,8 @@ concurrency:
 
 jobs:
   collect:
+    # 仓库守卫: 镜像仓 (B/C) 同步本文件后靠这里跳过, 不打东财
+    if: github.repository == 'qwerzxcva/stocks-ai-view'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     env:
@@ -44,7 +45,9 @@ jobs:
       # 而 paths 只依赖标准库, 所以不需要装依赖。
       - name: Collect moneyflow
         run: |
-          python3 scripts/collect_moneyflow.py --top 20 --out data/moneyflow.json \
+          # --top 12: 每只股票 2 个请求 (分钟+日), 12 只 = 24 次 + 4 个全局 = 28 次/轮
+          # 配 retries=2 与熔断器, 单轮最坏 56 次 (原 352 次)
+          python3 scripts/collect_moneyflow.py --top 12 --out data/moneyflow.json \
             || echo "::warning::moneyflow 采集失败 (东财 WAF?), 保留上一版"
 
       - name: Report
