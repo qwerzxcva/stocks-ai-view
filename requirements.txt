@@ -1,0 +1,16 @@
+# stocks-ai-view 依赖
+# GitHub Actions (full-pipeline / nightly-backfill) 与本地开发共用
+# 注意: GitHub Actions 只装这里列出的, 漏一个引擎就崩 (2026-10-14 实测:
+#       缺 numpy/pandas 导致 rps_rotation/patterns/walkforward/factor_lib/
+#       flow_divergence/loss_attribution/anomaly_detector/portfolio_optimizer
+#       8 个引擎 ModuleNotFoundError)
+
+# 数据库 (db_layer 采集侧质量门)
+duckdb>=1.0
+
+# 数值计算: rps_rotation / anomaly_detector 需要 numpy
+numpy>=1.24
+
+# 数据分析: patterns / walkforward / factor_lib / flow_divergence /
+#           loss_attribution / portfolio_optimizer 需要 pandas
+pandas>=2.0

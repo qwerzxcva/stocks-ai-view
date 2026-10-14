@@ -107,6 +107,23 @@ SNAPSHOT_GLOB = os.path.join(LIVE_MARKET, "snapshot_*.json")
 DUCKDB_PATH = os.environ.get("STOCKS_DB") or os.path.join(LIVE_ROOT, "stocks.duckdb")
 
 
+def safe_load_json(path, default=None):
+    """安全读 JSON — 多个 workflow 并发写 data/ 时, 裸 json.load 会撞上
+    「读到写了一半的文件」而抛 JSONDecodeError (2026-10-14 实测:
+    portfolio_optimizer 读 decision.json 时该文件正好被另一个 run 覆写)。
+
+    读失败时返回 default, 让调用方按「数据缺失」处理而不是整个引擎崩掉。
+    """
+    import json
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return default
+    except Exception:
+        return default
+
+
 def describe():
     """打印路径解析结果 (调试用)。"""
     print("paths:")

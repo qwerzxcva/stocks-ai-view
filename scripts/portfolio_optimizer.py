@@ -32,7 +32,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 try:
-    from paths import AI_VIEW_DATA as DATA_DIR, BULK, INDUSTRY_MAP
+    from paths import AI_VIEW_DATA as DATA_DIR, BULK, INDUSTRY_MAP, safe_load_json
 except Exception:
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
     BULK = "/root/workspace/stocks-data-kline/data/bulk"
@@ -240,12 +240,51 @@ def main(argv=None):
         print(f"[port] 无 {risk_path} (先跑 risk_engine.py)")
         return 1
 
-    risk = json.load(open(risk_path, encoding="utf-8"))
-    decision = json.load(open(dec_path, encoding="utf-8")) if os.path.exists(dec_path) else {}
+    risk = safe_load_json(risk_path)
+    if risk is None:
+        print(f"[port] 无 {risk_path} 或读取失败 (先跑 risk_engine.py)")
+        return 1
+    decision = safe_load_json(dec_path, {}) if os.path.exists(dec_path) else {}
+    if not isinstance(decision, dict):
+        decision = {}
     plan = risk.get("plan") or []
     if not plan:
-        print("[port] risk_plan 无持仓计划")
-        return 1
+        # 空持仓不是错误: 常见原因是场景引擎判定 bear/extreme 后硬规则
+        # 把所有候选滤掉了。这种情况输出空计划而非报错, 让 CI 不失败。
+        scen = {}
+        scen_path = os.path.join(DATA_DIR, "scenario.json")
+        if os.path.exists(scen_path):
+            try:
+                scen = json.load(open(scen_path, encoding="utf-8"))
+            except Exception:
+                scen = {}
+        note = risk.get("note") or "无买入信号"
+        reason = (scen.get("scenario") + " 场景硬规则滤掉全部候选"
+                  if scen.get("n_candidates") == 0 else note)
+        out = {
+            "ts": datetime.now(CST).isoformat(timespec="seconds"),
+            "engine": "portfolio_optimizer v1 (空仓)",
+            "n_positions": 0,
+            "weights": {},
+            "weights_detail": [],
+            "sector_exposure": {},
+            "sector_exposure_pct": {},
+            "iterations": 0,
+            "converged": True,
+            "corr_matrix": {},
+            "high_corr_pairs": [],
+            "limits": {"max_single": MAX_SINGLE_POS, "max_sector": MAX_SECTOR_POS},
+            "total_weight": 0,
+            "steps": [],
+            "reason": reason,
+            "meta": {"method": "空仓, 无优化可做",
+                     "caveat": "熊市/极端场景下不持仓是正确的风险控制, 非系统故障"},
+        }
+        os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, indent=2)
+        print(f"[port] 空仓: {reason} (已写空计划, 非错误)")
+        return 0
 
     # 行业: 先取卡片自带 industry, 其余查 INDUSTRY_MAP (decision 与 risk_plan
     # 可能不同步, 故对 plan 里每一只都查一遍映射)

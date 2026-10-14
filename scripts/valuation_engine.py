@@ -56,13 +56,41 @@ W_IND_PE, W_IND_PB, W_DDM, W_MKT = 0.35, 0.25, 0.15, 0.25
 
 
 def load_snapshot():
+    """估值输入: 优先 snapshot_*.json (本地开发), 没有则用 all_sources.json
+    的 quote 组 (Actions 环境没有 snapshot, 但采集产出永远有)。
+
+    返回 {symbol: record} — symbol 带 sh/sz/bj 前缀, 与 snapshot 一致。
+    """
     snaps = sorted(glob.glob(SNAPSHOT_GLOB))
-    if not snaps:
+    if snaps:
+        try:
+            return json.load(open(snaps[-1], encoding="utf-8"))
+        except Exception:
+            pass
+    # 降级: 从 all_sources.json 的 quote 组构造
+    src = os.path.join(AI_VIEW_DATA, "all_sources.json")
+    if not os.path.exists(src):
         return {}
     try:
-        return json.load(open(snaps[-1], encoding="utf-8"))
+        d = json.load(open(src, encoding="utf-8"))
     except Exception:
         return {}
+    out = {}
+    for r in (d.get("data") or {}).get("quote") or []:
+        sym = r.get("symbol") or r.get("code")
+        if not sym:
+            continue
+        out[sym] = {
+            "code": r.get("code"),
+            "name": r.get("name"),
+            "price": r.get("price"),
+            "pe": r.get("pe"),
+            "pb": r.get("pb"),
+            "mktcap": r.get("mktcap"),
+            "floatcap": r.get("floatcap"),
+            "source": "all_sources.quote",
+        }
+    return out
 
 
 def load_industry():

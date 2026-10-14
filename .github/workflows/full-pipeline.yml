@@ -67,8 +67,8 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install duckdb
-        run: pip install duckdb -q
+      - name: Install dependencies
+        run: pip install -q -r requirements.txt
 
       # ── 1. 数据源注册表快照 ──
       - name: Snapshot sources registry
