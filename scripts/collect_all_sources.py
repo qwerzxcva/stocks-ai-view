@@ -540,6 +540,76 @@ FETCHERS = {
     ],
 }
 
+# ─── 外部 fetcher 库 (fetchers_extra 51 个 + fetchers_reverse 3 个) ──
+# 这两个库是按 group 组织的 (REVERSE_FETCHERS) 或散落 f_* 函数;
+# 这里统一按 group 注册, 保持 FETCHERS 结构一致。
+# 注: fetchers_extra 里的 f_* 没有 group 元数据, 用下面的映射表归组。
+FETCHER_GROUPS = {
+    # fetchers_reverse (有 REVERSE_FETCHERS 元数据, 优先)
+    # fetchers_extra 按功能归组:
+    "kline": ["tencent_kline", "eastmoney_kline", "sina_kline_ma",
+              "sina_vip_kline", "sina_kline_daily", "em_a_hist",
+              "tencent_index_history", "local_kline_bulk",
+              "em_fund_etf_hist_min", "em_push2his_kline_DEPRECATED"],
+    "quote": ["sina_hq", "eastmoney_stock_get", "em_quote_snapshot",
+              "em_push2_clist", "em_push2delay_clist", "em_push2his_clist",
+              "em_push2his_etf_onsite", "tv_screener", "industry_map_tv",
+              "local_snapshot", "sina_etf_hist", "tx_tick_detail",
+              "tx_minute", "minute1", "em_tick_details"],
+    "fund": ["jisilu_dividend_rate", "jisilu_lof_index", "jisilu_lof_stock",
+             "jisilu_etf_list", "jisilu_cb_list_new", "jisilu_cb_adjust",
+             "jisilu_cb_delisted", "jisilu_new_stock_apply",
+             "jisilu_new_stock_hkipo", "jisilu_new_stock_sub",
+             "jisilu_new_stock_super", "em_fund_lsjz"],
+    "event": ["eastmoney_zt_pool", "eastmoney_zdfenbu", "ths_strong_stocks",
+              "ths_strong", "ths_industry", "ths_industry_list",
+              "sina_bill_sum", "sina_trans_list", "em_lcpd_report",
+              "em_fflow_history"],
+    "sector": ["ths_concept_list", "ths_financial_abstract",
+               "ths_financial_abstract_v2"],
+    "news": ["sina_news", "eastmoney_news", "em_ann_np", "toutiao_hot",
+             "remote_news", "douyin_hot_search"],
+    "macro": ["coingecko", "sec_edgar", "macro_china_cpi_gdp"],
+}
+
+
+def _register_external_fetchers():
+    """把 fetchers_extra / fetchers_reverse 的 f_* 函数按组注册进 FETCHERS。
+
+    容错: 任一库 import 失败只跳过, 不影响内联的 9 个 fetcher。
+    """
+    registered = 0
+    # fetchers_reverse: 有 REVERSE_FETCHERS 元数据
+    try:
+        import fetchers_reverse as _fr
+        for grp, name, fn in getattr(_fr, "REVERSE_FETCHERS", []):
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_reverse 跳过: %s" % type(e).__name__)
+    # fetchers_extra: 按 FETCHER_GROUPS 归组
+    try:
+        import fetchers_extra as _fe
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, names in FETCHER_GROUPS.items():
+            for name in names:
+                if name in have:
+                    continue
+                fn = getattr(_fe, "f_" + name, None)
+                if fn is None:
+                    continue
+                FETCHERS.setdefault(grp, []).append((name, fn))
+                registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_extra 跳过: %s" % type(e).__name__)
+    return registered
+
+
+_n_ext = _register_external_fetchers()
+if _n_ext:
+    print("[fetchers] 注册 %d 个外部 fetcher, 总计 %d" % (
+        _n_ext, sum(len(v) for v in FETCHERS.values())))
+
 
 # ════════════════════════════════════════════════════════════════
 # 合并去重 + 冲突解决

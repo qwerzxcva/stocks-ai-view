@@ -1697,16 +1697,24 @@ def f_em_ann_np(ctx):
 
 
 def f_eastmoney_news(ctx):
-    """东财 7x24 快讯 (req_trace 随机 UUID; 容器出口常 567)。"""
+    """东财 7x24 快讯。
+
+    2026-10-15 实测: 端点是 /comm/web/getFastNewsList (不是 getNewsByColumns),
+    biz=web_724 (不是 web7_24), 且必须带 Referer: finance.eastmoney.com
+    才算通过风控。此前三个条件全错, 所以一直「列表空」。
+    req_trace 用 uuid4().hex 即可 (服务端实际用自己的 trace, 参数值不校验)。
+    """
     import uuid
-    u = ("https://np-listapi.eastmoney.com/comm/web/getNewsByColumns"
-         f"?client=web&biz=web7_24&fastColumn=100&column=100"
-         f"&req_trace={uuid.uuid4().hex}&pageSize=30&sortEnd=&sortType=0")
-    b = _jhttp(u, timeout=8)
+    u = ("https://np-listapi.eastmoney.com/comm/web/getFastNewsList"
+         "?client=web&biz=web_724&fastColumn=102&sortEnd=&pageSize=30"
+         "&req_trace=%s" % uuid.uuid4().hex)
+    b = _jhttp(u, timeout=8, headers={"Referer": "https://finance.eastmoney.com/"})
     if not b:
-        return [], {"reason": "东财快讯无响应 (容器出口 567, GitHub Actions 通常通)"}
+        return [], {"reason": "东财快讯无响应 (容器出口受限, GitHub Actions 通常通)"}
     try:
-        items = ((json.loads(b.decode("utf-8")).get("data") or {}).get("list")) or []
+        d = json.loads(b.decode("utf-8")).get("data") or {}
+        # 字段名是 fastNewsList (不是 list); code="1" 表示成功
+        items = d.get("fastNewsList") or d.get("list") or []
     except Exception:
         return [], {"reason": "东财快讯非 JSON"}
     if not items:
