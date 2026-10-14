@@ -132,14 +132,91 @@
     box.innerHTML = h;
   }
 
+  // ── history: one row per closed day ──
+  function renderHistory(rows) {
+    var box = el('pkHistory');
+    if (!box) return;
+    if (!rows || !rows.length) {
+      box.innerHTML = '<div class="fl">No archived review yet</div>';
+      return;
+    }
+    rows = rows.slice().sort(function (a, b) {
+      return String(b.date || '').localeCompare(String(a.date || ''));
+    });
+    var n = rows.length;
+    var hits = rows.map(function (r) { return r.hit_rate_buyable_pct; })
+      .filter(function (x) { return x != null; });
+    var avgs = rows.map(function (r) { return r.avg_ret_buyable_pct; })
+      .filter(function (x) { return x != null; });
+    var mean = function (xs) { return xs.length ? xs.reduce(function (a, b) { return a + b; }, 0) / xs.length : null; };
+
+    var h = '<div style="display:flex;flex-wrap:wrap;gap:12px;font-size:11px;margin-bottom:6px">' +
+      '<span>Days <b>' + n + '</b></span>' +
+      '<span>Mean hit <b class="' + col((mean(hits) || 0) - 50) + '">' +
+      (mean(hits) != null ? mean(hits).toFixed(1) + '%' : '-') + '</b></span>' +
+      '<span>Mean avg <b class="' + col(mean(avgs) || 0) + '">' +
+      (mean(avgs) != null ? (mean(avgs) >= 0 ? '+' : '') + mean(avgs).toFixed(2) + '%' : '-') + '</b></span>' +
+      '<span class="fl">buyable picks only (limit-up excluded)</span></div>';
+
+    h += '<table class="pool-table"><thead><tr><th>Date</th><th>Phase</th>' +
+      '<th>n</th><th>Hit (buyable)</th><th>Avg (buyable)</th>' +
+      '<th>Hit (all)</th><th>Avg (all)</th>' +
+      '<th>Score edge</th><th>Stop</th><th>Tgt</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      h += '<tr><td>' + esc(r.date) + '</td>' +
+        '<td class="fl">' + esc(r.market_phase) + '</td>' +
+        '<td>' + esc(r.n_buyable) + '</td>' +
+        '<td class="' + col((r.hit_rate_buyable_pct || 0) - 50) + '">' +
+        (r.hit_rate_buyable_pct != null ? r.hit_rate_buyable_pct + '%' : '-') + '</td>' +
+        '<td class="' + col(r.avg_ret_buyable_pct) + '">' + pct(r.avg_ret_buyable_pct) + '</td>' +
+        '<td class="fl">' + (r.hit_rate_all_pct != null ? r.hit_rate_all_pct + '%' : '-') + '</td>' +
+        '<td class="fl">' + pct(r.avg_ret_all_pct) + '</td>' +
+        '<td class="fl">' + (r.score_edge_pct != null ? (r.score_edge_pct >= 0 ? '+' : '') + r.score_edge_pct : '-') + '</td>' +
+        '<td class="dn">' + esc(r.stop_hit) + '</td>' +
+        '<td class="up">' + esc(r.target_hit) + '</td></tr>';
+    });
+    h += '</tbody></table>';
+
+    // per-group history, which is where a failing group shows up
+    var groups = {};
+    rows.forEach(function (r) {
+      var bg = r.by_group || {};
+      for (var g in bg) {
+        (groups[g] = groups[g] || []).push({ date: r.date, v: bg[g] });
+      }
+    });
+    var gk = Object.keys(groups);
+    if (gk.length) {
+      h += '<div class="fl" style="font-size:9px;margin:8px 0 2px">By group (mean over archived days)</div>';
+      h += '<table class="pool-table"><thead><tr><th>Group</th><th>Days</th>' +
+        '<th>Mean hit</th><th>Mean avg</th></tr></thead><tbody>';
+      gk.forEach(function (g) {
+        var xs = groups[g];
+        var hs = xs.map(function (x) { return x.v.hit_rate_pct; }).filter(function (x) { return x != null; });
+        var as = xs.map(function (x) { return x.v.avg_ret_pct; }).filter(function (x) { return x != null; });
+        h += '<tr><td>' + esc(groupLabel(g)) + '</td><td>' + xs.length + '</td>' +
+          '<td class="' + col((mean(hs) || 0) - 50) + '">' +
+          (mean(hs) != null ? mean(hs).toFixed(1) + '%' : '-') + '</td>' +
+          '<td class="' + col(mean(as) || 0) + '">' +
+          (mean(as) != null ? (mean(as) >= 0 ? '+' : '') + mean(as).toFixed(2) + '%' : '-') + '</td></tr>';
+      });
+      h += '</tbody></table>';
+    }
+    h += '<div class="fl" style="font-size:9px;margin-top:6px">' +
+      'Historical records. Past performance does not imply future results.</div>';
+    box.innerHTML = h;
+  }
+
   async function render() {
     if (!window.DB) return;
     var res = await Promise.allSettled([
-      window.DB.morningReview(), window.DB.afternoonPicks(), window.DB.yesterdayReview()
+      window.DB.morningReview(), window.DB.afternoonPicks(), window.DB.yesterdayReview(),
+      window.DB.reviewHistory()
     ]);
     renderMorning(res[0].status === 'fulfilled' ? res[0].value : null);
     renderAfternoon(res[1].status === 'fulfilled' ? res[1].value : null);
     renderYesterday(res[2].status === 'fulfilled' ? res[2].value : null);
+    renderHistory(res[3].status === 'fulfilled' ? res[3].value : null);
   }
 
   window.Picks = { render: render };

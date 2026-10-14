@@ -86,6 +86,24 @@
     afternoonPicks: function () { return get(REPOS.market + 'market/afternoon_picks.json', 120000); },
     entryPlans: function () { return get(REPOS.market + 'market/entry_plans.json', 120000); },
     yesterdayReview: function () { return get(REPOS.market + 'market/review_today.json', 120000); },
+    closeReview: function () { return get(REPOS.market + 'market/close_review.json', 120000); },
+    stopAnalysis: function () { return get(REPOS.market + 'market/stop_analysis.json', 120000); },
+    engineWeights: function () { return get(REPOS.market + 'market/engine_weights.json', 600000); },
+    // JSONL: one row per closed day
+    reviewHistory: function () {
+      return fetch(REPOS.market + 'market/review_history.jsonl', { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+        .then(function (txt) {
+          var out = [];
+          txt.split('\n').forEach(function (line) {
+            line = line.trim();
+            if (!line) return;
+            try { out.push(JSON.parse(line)); } catch (e) {}
+          });
+          return out;
+        })
+        .catch(function () { return []; });
+    },
     usStocks: function () { return get(REPOS.market + 'overseas/us_stocks.json', 300000); },
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 
