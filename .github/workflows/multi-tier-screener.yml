@@ -39,4 +39,5 @@ jobs:
       - name: Commit & push
         run: |
           python3 scripts/git_push_retry.py --msg "screener" \
+            --protect data/multi_v4.json
               --user screener-bot --dir data

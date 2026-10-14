@@ -45,4 +45,5 @@ jobs:
       - name: Commit & push data
         run: |
           python3 scripts/git_push_retry.py --msg "poll" \
+            --protect data/export/
               --user stocks-bot-realtime --dir data

@@ -256,6 +256,10 @@ jobs:
         # 复用 scripts/git_push_retry.py: fetch+reset+add+commit+push,
         # push 失败退避 5/10/20/40s 重试最多 5 次。仓库有 6+ 个 bot 同时推
         # main, 单次重试在高峰期不够 — 曾出现工作流 success 但数据从未上台。
+        # --protect 列出本轮刚生成的文件: 6 个工作流并发推 main 时,
+        # 若不先把远端最新版取回工作区, 本 run 开始时的旧副本会把别的
+        # 工作流刚推的新数据覆盖掉 (2026-10-14 实测: ai-update 推的 11:34
+        # latest.json 被随后 4 个 run 覆盖回 10:49)。
         run: |
           python3 scripts/git_push_retry.py --msg "pipeline(collect)" \
             data/sources_registry.json data/all_sources.json data/news_digest.json \
@@ -270,4 +274,22 @@ jobs:
             data/engine_weights.json data/weights_history.json data/edge_report.json \
             data/validation_report.json data/scenario.json data/signal_audit.json \
             data/self_reflect.json data/risk_plan.json data/portfolio_plan.json \
-            data/anomaly_report.json
+            data/anomaly_report.json \
+            --protect data/sources_registry.json --protect data/all_sources.json \
+            --protect data/news_digest.json --protect data/predictions \
+            --protect data/global_fx.json --protect data/audit_data_report.txt \
+            --protect data/valuation.json --protect data/market_phase.json \
+            --protect data/engine_v5.json --protect data/ai_pick_v4.json \
+            --protect data/rps_rotation.json --protect data/multidim.json \
+            --protect data/decision.json --protect data/ban_prob.json \
+            --protect data/ban_prob_balanced.json --protect data/ban_pick.json \
+            --protect data/patterns_smoke.json --protect data/kline_sim.json \
+            --protect data/reflect_latest.json --protect data/winrate_matrix.json \
+            --protect data/walkforward.json --protect data/factor_smoke.json \
+            --protect data/sample_balance.json --protect data/loss_attribution.json \
+            --protect data/flow_divergence.json --protect data/engine_weights.json \
+            --protect data/weights_history.json --protect data/edge_report.json \
+            --protect data/validation_report.json --protect data/scenario.json \
+            --protect data/signal_audit.json --protect data/self_reflect.json \
+            --protect data/risk_plan.json --protect data/portfolio_plan.json \
+            --protect data/anomaly_report.json

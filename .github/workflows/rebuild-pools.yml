@@ -155,5 +155,10 @@ jobs:
 
       - name: Commit & push
         run: |
-          python3 scripts/git_push_retry.py --msg "pools" --user pool-bot --dir data
+          python3 scripts/git_push_retry.py --msg "pools" --user pool-bot --dir data \
+            --protect data/sector_pool.json --protect data/cycle.json \
+            --protect data/index_kline.json --protect data/lowpool.json \
+            --protect data/cycle_deep.json --protect data/ban_prob.json \
+            --protect data/enrich.json --protect data/search_index.json \
+            --protect data/latest.json
 

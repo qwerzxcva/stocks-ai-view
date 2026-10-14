@@ -77,4 +77,5 @@ jobs:
       - name: Commit & push
         run: |
           python3 scripts/git_push_retry.py --msg "review" \
+            --protect data/ai_review.json --protect data/ai_review.md
               --user ai-bot --dir data

@@ -78,5 +78,6 @@ jobs:
       - name: Commit & push
         run: |
           python3 scripts/git_push_retry.py --msg "brief" --user brief-bot \
+            --protect data/daily_brief.json --protect data/daily_brief.md --protect data/ai_picks.json
             data/ai_picks.json data/daily_brief.json data/daily_brief.md
 
