@@ -36,7 +36,7 @@ UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120"}
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
-from sources_registry import SOURCES, by_status
+from sources_registry import SOURCES, by_status, shard_ids as shard_ids_for
 from paths import SNAPSHOT_GLOB
 
 # 来源优先级 (冲突时越高越可信): 数字越大优先级越高
@@ -620,7 +620,7 @@ def merge_records(all_records, now=None):
 # ════════════════════════════════════════════════════════════════
 # 主流程
 # ════════════════════════════════════════════════════════════════
-def collect(groups=None, workers=6, codes=None):
+def collect(groups=None, workers=6, codes=None, shard=None):
     now = datetime.now(CST)
     date_str = now.strftime("%Y%m%d")
     date_dash = now.strftime("%Y-%m-%d")
@@ -628,12 +628,17 @@ def collect(groups=None, workers=6, codes=None):
            "codes": codes, "limit": 20}
 
     want = groups or list(FETCHERS.keys())
+    # 分片: 只跑指定 shard 白名单里的源 id (多平台错峰, 避免单 IP 打全部源)
+    shard_ids = set(shard_ids_for(shard)) if shard else None
     tasks = []
     for g in want:
         for name, fn in FETCHERS.get(g, []):
+            if shard_ids is not None and name not in shard_ids:
+                continue
             tasks.append((g, name, fn))
 
-    print(f"[collect] {len(tasks)} 个采集任务, workers={workers}", flush=True)
+    print(f"[collect] {len(tasks)} 个采集任务, workers={workers}"
+          + (f", shard={shard}" if shard else ""), flush=True)
     results = {}
     errors = []
     t0 = time.time()
@@ -677,6 +682,8 @@ def collect(groups=None, workers=6, codes=None):
             "degraded": len(by_status("degraded")),
             "blocked": len(by_status("blocked")),
             "unauth": len(by_status("unauth")),
+            "shard": shard,
+            "shard_sources": len(shard_ids_for(shard)) if shard else None,
         },
         "meta": {
             "pipeline": "collect_all_sources.py (并发采集 + 按主键合并去重 + 溯源)",
@@ -692,11 +699,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--groups", help="逗号分隔: quote,event,sector,news,fund")
+    ap.add_argument("--shard", choices=["a", "b", "c", "d", "e"],
+                    help="只跑指定分片的源 (多平台错峰; a=主力稳定 b=东财push2 "
+                         "c=交易所/同花顺/需key d=需大陆IP e=akshare库)")
     ap.add_argument("--workers", type=int, default=6)
     args = ap.parse_args()
 
     groups = args.groups.split(",") if args.groups else None
-    res = collect(groups=groups, workers=args.workers)
+    res = collect(groups=groups, workers=args.workers, shard=args.shard)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

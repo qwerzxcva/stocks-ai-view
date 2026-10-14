@@ -1110,6 +1110,108 @@ def by_status(status):
     return [s for s in SOURCES if s["status"] == status]
 
 
+# ─── 采集分片 (多平台错峰, 避免同一 IP 打全部源触发风控) ──────────
+# 背景: GitHub-hosted runner 全在 Azure, 出口是数据中心段, 国内金融源
+# (东财/同花顺/雪球) 对这类 IP 一律按爬虫对待 — 东财 push2 约 20 次请求
+# 后必然 TLS RST, 且按 IP 计数。所以 4 个节点各打自己那批, 单 IP 频率
+# 降到 1/4; 某个 IP 被封也不影响其他源。
+#
+# 分片原则:
+#   a = 主力稳定源 (海外/akshare/集思丽/腾讯/新浪)
+#   b = 东财实时系 (push2*, 最容易被封, 单独一个 IP)
+#   c = 交易所官方 + 需 key 的源 (低频高价值)
+#   d = 需大陆出口 IP 的源 (只在 GitCode Space 华为云容器跑)
+SHARDS = {
+    "a": {
+        "label": "主力稳定源 (腾讯/新浪/集思璐/海外/本地)",
+        "ids": [
+            # 腾讯系
+            "tencent_quote", "tencent_kline", "tencent_index_history",
+            "tx_tick_detail", "tx_minute",
+            # 新浪系
+            "sina_hq", "sina_kline_ma", "sina_kline_daily", "sina_etf_hist",
+            "sina_vip_kline", "sina_bill_sum", "sina_trans_list",
+            # 集思璐
+            "jisilu_dividend_rate", "jisilu_lof_index", "jisilu_lof_stock",
+            "jisilu_etf_list", "jisilu_cb_list_new", "jisilu_cb_adjust",
+            "jisilu_cb_delisted", "jisilu_new_stock_apply",
+            "jisilu_new_stock_hkipo", "jisilu_new_stock_sub",
+            "jisilu_new_stock_super",
+            # 东财非 push2 域 (datacenter/fund/push2ex/push2delay 历史)
+            "eastmoney_zt_pool", "eastmoney_zdfenbu", "eastmoney_datacenter",
+            "eastmoney_kline", "eastmoney_fund_rank", "eastmoney_fund_pingzhong",
+            "em_fund_lsjz", "em_lcpd_report",
+            "em_fflow_history", "em_quote_snapshot", "em_tick_details",
+            "sina_news",
+            # 海外 + 宏观 + 本地
+            "coingecko", "sec_edgar", "macro_china_cpi_gdp",
+            "local_kline_bulk", "local_snapshot", "remote_news",
+            "industry_map_tv", "douyin_hot_search", "toutiao_hot",
+        ],
+    },
+    "b": {
+        "label": "东财 push2 实时系 (最易被封, 独立 IP)",
+        "ids": [
+            "em_push2_clist", "em_push2delay_clist", "em_push2his_clist",
+            "em_push2his_etf_onsite", "em_push2his_kline_DEPRECATED",
+            "eastmoney_stock_get", "eastmoney_news", "em_ann_np",
+        ],
+    },
+    "c": {
+        "label": "交易所官方 + 同花顺 + 需 key",
+        "ids": [
+            "sse_market", "szse_api", "cninfo_announce",
+            "ths_strong_stocks", "ths_industry", "ths_industry_list",
+            "ths_concept_list", "ths_financial_abstract",
+            "ths_financial_abstract_v2",
+            "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
+            "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
+        ],
+    },
+    "d": {
+        "label": "需大陆出口 IP (仅 GitCode Space 华为云容器跑)",
+        "ids": [
+            "mootdx", "cninfo_announce", "szse_api", "sse_market",
+            "xueqiu_hot", "xueqiu_anon_token", "xiaohongshu_hot",
+            "cls_cn", "kaipanla", "gitcode_api",
+        ],
+    },
+    "e": {
+        "label": "akshare/baostock 库 (本地 Python 库, 不耗 IP 配额)",
+        "ids": [
+            "akshare", "baostock", "em_a_hist", "em_fund_etf_hist_min",
+            "cn_a_stock_data", "tv_screener",
+        ],
+    },
+}
+
+
+def by_shard(shard):
+    """取某个分片的源 (按 id 白名单, 保持注册表里的顺序)。"""
+    ids = set((SHARDS.get(shard) or {}).get("ids") or [])
+    return [s for s in SOURCES if s["id"] in ids]
+
+
+def shard_of(sid):
+    """反向查: 某个源属于哪个分片 (可能在多个分片, 返回列表)。"""
+    return [k for k, v in SHARDS.items() if sid in set(v["ids"])]
+
+
+def shard_ids(shard):
+    """分片内存在注册表中的源 id (不存在的忽略, 便于容忍注册表变动)。"""
+    want = set((SHARDS.get(shard) or {}).get("ids") or [])
+    return [s["id"] for s in SOURCES if s["id"] in want]
+
+
+def unassigned():
+    """未分片的源 (ok/degraded 但不在任何 shard 里) — 用于发现遗漏。"""
+    assigned = set()
+    for v in SHARDS.values():
+        assigned |= set(v["ids"])
+    return [s["id"] for s in SOURCES
+            if s["id"] not in assigned and s["status"] in ("ok", "degraded")]
+
+
 def resolve(sid):
     """按降级链找第一个可用源 (含自身)。"""
     seen = set()
