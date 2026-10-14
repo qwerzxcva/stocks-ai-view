@@ -1348,10 +1348,21 @@ function _rows(cols, rows){
     '</tr>').join('')+'</tbody></table>';
 }
 
+
+// 单面板异常隔离: 一个 tab 渲染崩了不影响其他 tab, 也不影响主 render()
+function _safe(fn, label){
+  try { fn(); }
+  catch(e){
+    console.error('[tab] ' + label + ' failed:', e);
+    const box = document.getElementById(label + 'Box');
+    if(box) box.innerHTML = '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--up)">'+
+      '渲染异常: ' + String(e && e.message || e).slice(0,80) + '</div>';
+  }
+}
+
 /* ─── tab 11: 因子引擎 ─── */
 let feRendered = false;
 function renderFactorEngines(){
-  feRendered = true;
   const g = window._data || {};
 
   // 引擎 v5: 17 指标共振评分
@@ -1375,15 +1386,17 @@ function renderFactorEngines(){
     const s = document.getElementById('mdSub');
     if(s) s.textContent = 'TOP '+md.top.length+' · '+String(md.ts||'').slice(5,16);
     const w = md.weights || {};
+    // 注意: 数组合并必须用 concat, 用 + 会变成字符串拼接
+    const dimKeys = Object.keys(w).slice(0,9);
     document.getElementById('multidimBox').innerHTML =
       '<div class="fl" style="font-size:9px;margin-bottom:4px">权重: '+
         Object.keys(w).map(k=>k+'='+w[k]).join(' · ')+'</div>'+
-      _rows(['代码','名称','综合']+Object.keys(w).slice(0,9),
+      _rows(['代码','名称','综合'].concat(dimKeys),
         md.top.slice(0,25).map(t=>{
           const dims = t.dims || {};
           return [t.code, t.name||'—',
             '<b>'+Number(t.composite||0).toFixed(1)+'</b>'].concat(
-            Object.keys(w).slice(0,9).map(k=>Number(dims[k]||0).toFixed(0)));
+            dimKeys.map(k=>Number(dims[k]||0).toFixed(0)));
         }));
   } else _empty('multidimBox', 'multidim.json 无数据');
 
@@ -1423,7 +1436,6 @@ function renderFactorEngines(){
 /* ─── tab 12: 复盘验证 ─── */
 let rvRendered = false;
 function renderReview(){
-  rvRendered = true;
   const g = window._data || {};
 
   // 复盘: 多持有期
@@ -1513,7 +1525,6 @@ function renderReview(){
 /* ─── tab 13: 质量审查 ─── */
 let qaRendered = false;
 function renderQA(){
-  qaRendered = true;
   const g = window._data || {};
 
   // 优势挖掘 (字段: name / action / confidence)
@@ -1641,9 +1652,9 @@ document.getElementById('cTabs').addEventListener('click', e=>{
   if(b.dataset.c==='10' && window.Overseas){ window.Overseas.render(); }
   if(b.dataset.c==='9' && !scenRendered){ scenRendered=true; renderScenario(window._scenData||null); }
   // 新增三个 tab 首次切入时懒渲染 (数据已在 render() 里并行拉好)
-  if(b.dataset.c==='11' && !feRendered){ renderFactorEngines(); }
-  if(b.dataset.c==='12' && !rvRendered){ renderReview(); }
-  if(b.dataset.c==='13' && !qaRendered){ renderQA(); }
+  if(b.dataset.c==='11' && !feRendered){ feRendered=true; _safe(renderFactorEngines,'engineV5'); }
+  if(b.dataset.c==='12' && !rvRendered){ rvRendered=true; _safe(renderReview,'reflect'); }
+  if(b.dataset.c==='13' && !qaRendered){ qaRendered=true; _safe(renderQA,'edge'); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -1780,7 +1791,9 @@ async function render(){
   renderBlocktrade((en && en.blocktrade && en.blocktrade.length) ? en.blocktrade : (d.blocktrade || []), em);
   renderTencent(d);
   renderPicks(pickList || d.ai_picks || []);
-  renderVolChart(d.index_kline);
+  // index_kline.json 的 indices 是 dict (sh000001 -> [{date,close,vol}]);
+  // renderVolChart 要数组, 取上证那份
+  renderVolChart(d.index_kline && d.index_kline.sh000001);
 
   // ── 以下按 tab 懒渲染: 数据先缓存, 用户切到该 tab 才画 ──
   window._cdData = g.cycle_deep;   if(g.cycle_deep)   renderCycleDeep(g.cycle_deep);
@@ -1803,9 +1816,9 @@ async function render(){
   renderAiReview();
   renderPools(d);
   // 已打开过的新 tab: 数据刷新时跟着重画 (未打开则不画, 省开销)
-  if(feRendered) renderFactorEngines();
-  if(rvRendered) renderReview();
-  if(qaRendered) renderQA();
+  if(feRendered) _safe(renderFactorEngines,'engineV5');
+  if(rvRendered) _safe(renderReview,'reflect');
+  if(qaRendered) _safe(renderQA,'edge');
   _failCount = 0;
 }
 // 轮询: 90s 起步, 连续失败则指数退避到 5min, 恢复后回落
