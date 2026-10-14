@@ -44,7 +44,19 @@ CST = timezone(timedelta(hours=8))
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120"}
 EM_REF = {"Referer": "https://quote.eastmoney.com/"}
 
-AI_VIEW = os.environ.get("STOCKS_AI_VIEW") or "/root/workspace/stocks-ai-view"
+def _repo_root():
+    """本脚本所在仓库根 (scripts/ 的上一级)。
+
+    不能硬编码 /root/workspace/stocks-ai-view: 在 GitHub runner 上该路径
+    不存在, 写快照会 PermissionError, 而输出文件也会落到错误位置,
+    导致 workflow 读到仓里旧的 realtime_minute.json 就认为"无变化"
+    不提交 (2026-10-14 实测: realtime-minute 连续 success 但数据
+    一直停在 00:43)。
+    """
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+AI_VIEW = os.environ.get("STOCKS_AI_VIEW") or _repo_root()
 SNAP_DIR = os.path.join(AI_VIEW, "data", "market")
 DEFAULT_OUT = os.path.join(AI_VIEW, "data", "realtime_minute.json")
 
