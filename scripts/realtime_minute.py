@@ -97,6 +97,22 @@ def _get(url, ref=None, retries=2, timeout=20):
     return {"__error__": "unknown"}
 
 
+def _get_raw(url, ref=None, retries=2, timeout=20):
+    """取原始文本 (新浪返回的是 JSON 数组但可能带 BOM/非标准头)。"""
+    h = dict(UA)
+    h.update(ref or {})
+    for i in range(retries):
+        try:
+            r = urllib.request.urlopen(urllib.request.Request(url, headers=h),
+                                       timeout=timeout)
+            return r.read().decode("utf-8", "replace")
+        except Exception:
+            if i == retries - 1:
+                return None
+            time.sleep(0.5)
+    return None
+
+
 # ─── 采集: 全市场快照 (push2delay, 绕 WAF) ──────────────────
 FIELDS = ("f12,f14,f2,f3,f4,f5,f6,f7,f8,f9,f10,f17,f20,f21,f62,f184")
 FIELD_MAP = {
@@ -108,12 +124,68 @@ FIELD_MAP = {
 }
 
 
-def fetch_market_snapshot(max_pages=30):
-    """全市场实时快照 (分页, pz=100/页)。
+def _collect_sina(max_pages=60):
+    """新浪全市场兜底 (node=hs_a 覆盖沪深 A 股)。
 
-    域降级: push2delay 在海外出口 (GitHub runner) 上偶发只返回前几页
-    (实测 2026-10-14: 只有 200 只, 第 3 页起 diff 为空), 此时自动切
-    push2his 重采, 两个域的 fs/fields 完全一致。
+    单页 num 上限 100, 故需翻 60 页; 限流门槛与东财不同,
+    东财两个域都被软限流时这条仍可能通 (2026-10-14 实测)。
+    返回已折算成内部口径的 dict 列表。
+    """
+    out = []
+    for page in range(1, max_pages + 1):
+        u = ("https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+             f"Market_Center.getHQNodeData?page={page}&num=100&sort=changepercent"
+             "&asc=0&node=hs_a")
+        b = _get_raw(u, {"Referer": "https://finance.sina.com.cn/"})
+        if not b:
+            break
+        try:
+            arr = json.loads(b)
+        except Exception:
+            break
+        if not arr:
+            break
+        for it in arr:
+            out.append({
+                "code": str(it.get("code") or ""),
+                "name": it.get("name") or "",
+                "price": _f(it.get("trade")),
+                "chg_pct": _f(it.get("changepercent")),
+                "chg_amt": _f(it.get("pricechange")),
+                "open": _f(it.get("open")),
+                "amount": _f(it.get("amount")),
+                "volume_hand": _f(it.get("volume")),
+                "amplitude": _f(it.get("amplitude")),
+                "turnover_rate": _f(it.get("turnoverratio")),
+                "pe_ttm": _f(it.get("per")),
+                "volume_ratio": None,
+                "total_mktcap": None,
+                "float_mktcap": None,
+                "main_net_inflow": None,
+                "main_net_ratio": None,
+                "_src": "sina",
+            })
+        if len(arr) < 100:
+            break
+        time.sleep(0.8)
+    return out
+
+
+def _f(v):
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
+def fetch_market_snapshot(max_pages=30):
+    """全市场实时快照 (分页, pz=200/页)。
+
+    三级降级: push2delay → push2his → 新浪。
+    东财两个域在海外出口 (GitHub runner) 与高频请求下都会软限流 —
+    表现为返回 200 但 diff 为空, 或直接断开连接。新浪
+    vip.stock.finance.sina.com.cn 单页上限 100 只, 限流门槛不同,
+    可作最后兜底 (2026-10-14 实测容器出口可用)。
     """
     def _collect(host):
         rows_, total_ = [], None
@@ -158,6 +230,13 @@ def fetch_market_snapshot(max_pages=30):
             print(f"[realtime_minute] push2delay 只返回 {len(all_rows)}/{total}, "
                   f"改用 push2his 得 {len(alt)}", file=sys.stderr)
             all_rows, total = alt, alt_total or total
+    # 东财两个域都不给量 → 新浪兜底 (单页 100 只, 翻 60 页)
+    if len(all_rows) < 3000:
+        sina = _collect_sina(max_pages=60)
+        if len(sina) > len(all_rows):
+            print(f"[realtime_minute] 东财只返回 {len(all_rows)}, "
+                  f"改用新浪得 {len(sina)}", file=sys.stderr)
+            return len(sina), sina
     rows = []
     for it in all_rows:
         r = {}
