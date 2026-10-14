@@ -1,7 +1,7 @@
 {
-  "ts": "2026-10-14T13:52:18+08:00",
+  "ts": "2026-10-14T14:07:47+08:00",
   "engine": "edge_miner v1 (优势挖掘)",
-  "n_edges": 2,
+  "n_edges": 3,
   "edges": [
     {
       "type": "dim_edge",
@@ -14,13 +14,21 @@
     {
       "type": "dim_edge",
       "name": "高低位",
-      "top_avg": 39.4,
+      "top_avg": 39.3,
       "n": 60,
       "action": "高低位 在推荐票中均分39, 区分度低, 可降低权重或换因子",
       "confidence": "medium"
+    },
+    {
+      "type": "dim_edge",
+      "name": "市场面",
+      "top_avg": 36.2,
+      "n": 60,
+      "action": "市场面 在推荐票中均分36, 区分度低, 可降低权重或换因子",
+      "confidence": "medium"
     }
   ],
-  "summary": "发现 2 个统计显著优势, 见清单。",
+  "summary": "发现 3 个统计显著优势, 见清单。",
   "meta": {
     "min_n": 30,
     "min_ci": 50.0,
