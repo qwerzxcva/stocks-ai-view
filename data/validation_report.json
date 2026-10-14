@@ -1,10 +1,10 @@
 {
-  "ts": "2026-10-14T11:41:02+08:00",
+  "ts": "2026-10-14T12:08:51+08:00",
   "engine": "numeric_validator v1",
-  "n_files": 61,
-  "n_issues": 2,
+  "n_files": 68,
+  "n_issues": 4,
   "by_severity": {
-    "critical": 0,
+    "critical": 2,
     "warning": 2,
     "info": 0
   },
@@ -20,6 +20,18 @@
       "field": "data.fund[0].ret_1m",
       "severity": "warning",
       "msg": "越界 222.19 不在 [-100, 100]"
+    },
+    {
+      "file": "morning_review.json",
+      "field": "groups.limit_up",
+      "severity": "critical",
+      "msg": "非数值类型 dict: {'n': 17, 'n_up': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.59, 'rows': [{'code': '300006', 'name': '莱美药业"
+    },
+    {
+      "file": "today_picks.json",
+      "field": "picks.limit_up",
+      "severity": "critical",
+      "msg": "非数值类型 list: [{'code': '000668', 'name': '荣丰控股', 'lianban': 2, 'p_zt_next': 24.0, 'p_zhaban_next': 6.0, 'prior_gain_5d': "
     }
   ],
   "rules": {
