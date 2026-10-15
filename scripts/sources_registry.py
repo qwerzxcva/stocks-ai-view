@@ -2126,6 +2126,98 @@ SOURCES = [
                  "np-cnlist-api comm/wap/getListInfo (400); "
                  "**不要重复探测这些**",
     },
+
+    # ============ 深交所 (2026-10-16 实测, 替代已 blocked 的 szse_api) ============
+    {
+        "id": "szse_report_a_stock",
+        "name": "深交所A股列表 (szse api/report, 零鉴权)",
+        "url": "https://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1110&TABKEY=tab1&pageno=1&random={r}",
+        "auth": "none (Referer: szse.cn)",
+        "status": "degraded",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "agdm(代码)/agjc(简称, 带HTML链接需剥)/bk(板块 主板/创业板/科创板)/"
+                 "agssrq(上市日期)/agzgb(A股总股本, 亿股)/agltgb(A股流通股本)/sshymc(所属行业 J金融业)/"
+                 "ylbz/sfjybjqcy/gskzjglx",
+        "provides": ["meta/szse_stock_list.json"],
+        "notes": "2026-10-16 实测 200, 21476B; recordcount=2906, pagecount=146, pagesize=20; "
+                 "**翻页参数不生效** — pageno=1/2/3/100 全部返回同样的前 20 条 (平安银行开头), "
+                 "实测 4 个页码都一样, 只能拿首页 20 只; 若要全量需另找入口; "
+                 "random 参数任意浮点数 (防缓存); TABKEY 只 tab1 有数据, tab2/tab3 全空; "
+                 "**agjc 字段含完整 HTML 锚标签** (带 href+u 标签), 需正则剥离; "
+                 "sshymc 是证监会行业门类 'J 金融业' 格式 (带字母前缀); "
+                 "虽只能拿 20 只, 但这是 registry 里 szse_api(blocked) 的可用替代, "
+                 "且板块/上市日期/股本信息比腾讯快照更权威",
+    },
+    {
+        "id": "szse_report_fund_list",
+        "name": "深交所基金列表 (1069 只)",
+        "url": "https://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1105&TABKEY=tab1&random={r}",
+        "auth": "none (Referer: szse.cn)",
+        "status": "degraded",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "sys_key(代码, HTML)/jjjcurl(简称+公告链接, HTML)/jjlb(基金类别 ETF/LOF)/"
+                 "tzlb(投资类别 股票基金)/ssrq(上市日期)/dqgm(当前规模)/glrmc(管理人名称)/cxjqhq(存续期限)",
+        "provides": ["meta/szse_fund_list.json"],
+        "notes": "2026-10-16 实测 200, recordcount=1069; 同样只能拿首页 20 只 (翻页失效); "
+                 "**两个字段都带 HTML** (sys_key 和 jjjcurl 都有锚标签+公告链接), 剥离更麻烦; "
+                 "但 jjjcurl 的公告 URL 是可用的额外价值 (disclosure/fund/notice/index.html?stock=)",
+    },
+    {
+        "id": "szse_report_etf_list",
+        "name": "深交所ETF列表 (756 只, 含净值)",
+        "url": "https://www.szse.cn/api/report/ShowReport/data?SHOWTYPE=JSON&CATALOGID=1945&TABKEY=tab1&random={r}",
+        "auth": "none (Referer: szse.cn)",
+        "status": "degraded",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "sys_key(代码)/kzjcurl(简称+多链接)/zxjjjz(最新基金净值)/nhzs(年内涨势)/"
+                 "dqgm(当前规模)/glrmc(管理人)/cxjqhq(存续期限)",
+        "provides": ["meta/szse_etf_list.json"],
+        "notes": "2026-10-16 实测 200, recordcount=756; **唯一带 zxjjjz 净值的源**; "
+                 "同样翻页失效只能拿 20 只; kzjcurl 含多个锚标签 (行情页+ETF公告+货币公告)",
+    },
+    {
+        "id": "dead_third_batch",
+        "name": "第三批失效端点留档 (富途/财联社/淘股吧/开盘啦/问财/股吧/东财补充)",
+        "url": "-",
+        "auth": "-",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "-",
+        "provides": [],
+        "notes": "2026-10-16 实测, 全部无效, 不要再探测: "
+                 "**富途** futunn.com 5 个 quote-api/news-site-api 路径全返回 404 SPA 页 (10769B); "
+                 "**财联社** v1 签名错误(10012), v2 返回 '小财正在加载中'(50101), "
+                 "nodeapi/api 路径全 404 — 签名算法已变且新路径未找到; "
+                 "**淘股吧** tgb.cn moreHot 返回页脚框架 (94KB, 无热帖数据), api/topic 路径 404; "
+                 "**开盘啦** kaipanla.com api/v1/* 返回 Nuxt SPA HTML (8.6KB), 需登录态; "
+                 "**问财** iwencai.com unifiedwap/v2 返回 200 但 0 字节, urp/v7 403; "
+                 "**东财股吧** guba.eastmoney.com/interface/GetData.aspx 200 但 0 字节; "
+                 "**上交所** query.sse.com.cn getStockListData 返回 success:false 需 jsonCallBack 精确匹配; "
+                 "**新浪** MoneyFlow.ssl_bestsort 与 Market_Center.getHQNodeData 返回 "
+                 "'Service not found' (__ERROR:3); "
+                 "**腾讯** rank/hs/getMoneyRankList 与 getLimitUpList 404, "
+                 "ifzqgtimg fflow/daykline 返回 'No dispatch info found' (code 11); "
+                 "**巨潮** web.cninfo.com.cn DNS 无法解析 (与和讯同样死)",
+    },
+    {
+        "id": "sina_hq_node_count",
+        "name": "新浪 A股总数计数 (零鉴权)",
+        "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeStockCount?node=hs_a",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "A股总数 (纯数字字符串, 无引号)",
+        "provides": ["meta/stock_count.json"],
+        "notes": "2026-10-16 实测 200, 6B, 返回裸字符串 \"5575\" (不是 JSON, 无引号); "
+                 "用来快速确认全市场股票数与雪球 screener 的 count=5000 交叉校验 "
+                 "(5575 vs 5000 差 575, 疑为新股/ST/退市整理期口径差, **未核实**)",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -2224,6 +2316,8 @@ SHARDS = {
             "em_hsf10_capital_structure", "em_hsf10_bonus_financing",
             "em_hsf10_business_analysis", "em_hsf10_operations_required",
             "em_datacenter_dead_reportnames",
+            "szse_report_a_stock", "szse_report_fund_list", "szse_report_etf_list",
+            "dead_third_batch", "sina_hq_node_count",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],
