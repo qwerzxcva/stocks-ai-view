@@ -28,6 +28,7 @@ import argparse
 import os
 import subprocess
 import sys
+import tempfile
 import time
 from datetime import datetime, timezone, timedelta
 
@@ -133,19 +134,8 @@ def has_our_changes(scope):
     return False
 
 
-def refresh_from_remote(paths, dirs, all_changes, branch, protect):
-    """把远端最新版 checkout 到工作区, 但跳过 protect 里的路径。
-
-    为什么必须这一步: 6 个工作流同时推 main, 每个都在 run 开始时 checkout。
-    若 A 在 11:34 推了新的 latest.json, B 的工作区里仍是 10:49 的旧副本,
-    B 直接 add 就会把 A 的新版覆盖回旧版 (2026-10-14 实测: ai-update 推的
-    11:34 版本被随后 4 个 run 覆盖成 10:49)。
-
-    protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。调用方通过
-    --protect 传入 (可多次)。其余路径一律以远端为准。
-    """
 def refresh_from_remote(paths, dirs, all_changes, branch, protect,
-                       base_ref=None):
+                       base_ref=None, stash_dir=None):
     """把远端最新版 checkout 到工作区, 然后恢复 protect 里本轮改过的文件。
 
     为什么必须这一步: 6 个工作流同时推 main, 每个都在 run 开始时 checkout。
@@ -153,7 +143,8 @@ def refresh_from_remote(paths, dirs, all_changes, branch, protect,
     B 直接 add 就会把 A 的新版覆盖回旧版 (2026-10-14 实测: ai-update 推的
     11:34 版本被随后 4 个 run 覆盖成 10:49)。
 
-    protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。因为调用方常用
+    protect = 本轮刚生成、绝不能被远端旧版冲掉的文件。调用方通过
+    --protect 传入 (可多次)。其余路径一律以远端为准。因为调用方常用
     --dir data 这种粗粒度路径, 而 protect 是具体文件, 单靠"跳过匹配项"
     挡不住目录级 checkout (data/ 会把 data/realtime_minute.json 一并覆盖)。
 
@@ -162,6 +153,12 @@ def refresh_from_remote(paths, dirs, all_changes, branch, protect,
     成果, 不该保护 — 否则会把旧副本推上去, 覆盖别人刚推的新版
     (2026-10-14 实测: rebuild-pools 把 ai-update 13:19 的 latest.json
     覆盖回 10:49, 正因如此)。
+
+    stash_dir: 本轮成果的副本目录。判定为「本轮改动」就存一份,
+    后续重试循环直接从 stash 恢复 — 否则第一次循环的目录级 checkout
+    已把工作区冲成远端版, 第二次循环再判永远是「未改动」, 本轮成果
+    再也推不上去 (2026-10-15 实测: AI 复盘 826 字未上线, 12 个 protect
+    文件全部报「本轮未改动」)。
     """
     protect = [p for p in (protect or []) if p]
     if all_changes:
@@ -178,11 +175,14 @@ def refresh_from_remote(paths, dirs, all_changes, branch, protect,
                 with open(p, 'rb') as f:
                     content = f.read()
             except OSError:
+                print(f"protect: {p} 读取失败, 跳过")
                 continue
             base = sh(["git", "show", f"{ref}:{p}"])
             if base.returncode == 0 and base.stdout.encode() == content:
                 print(f"protect: {p} 本轮未改动, 不作为成果保护")
                 continue
+            print(f"protect: {p} 本轮已改动 (工作区{len(content)}B vs base{len(base.stdout)}B), "
+                  f"纳入保护")
             backup[p] = content
         elif os.path.isdir(p):
             base_dir = p.rstrip('/')
@@ -201,8 +201,22 @@ def refresh_from_remote(paths, dirs, all_changes, branch, protect,
     # 取回远端最新版 (目录级 checkout 会冲掉工作区)
     for w in want:
         sh(["git", "checkout", f"origin/{branch}", "--", w])
-    # 把本轮成果写回去
-    for p, content in backup.items():
+    # 把本轮成果写回去 (优先从 stash 恢复, 保证重试循环间不丢失)
+    items = list(backup.items())
+    if stash_dir:
+        for p, content in backup.items():
+            sp = os.path.join(stash_dir, p)
+            os.makedirs(os.path.dirname(os.path.abspath(sp)), exist_ok=True)
+            with open(sp, 'wb') as f:
+                f.write(content)
+        items = []
+        for root, _dirs, files in os.walk(stash_dir):
+            for fn in files:
+                fp = os.path.join(root, fn)
+                rel = os.path.relpath(fp, stash_dir)
+                with open(fp, 'rb') as f:
+                    items.append((rel, f.read()))
+    for p, content in items:
         os.makedirs(os.path.dirname(os.path.abspath(p)), exist_ok=True)
         with open(p, 'wb') as f:
             f.write(content)
@@ -224,17 +238,25 @@ def main():
     sh(["git", "config", "user.name", args.user])
     sh(["git", "config", "user.email", args.email])
 
+    # base_ref 只在第一次循环前取一次。若放循环内, 第一次的
+    # `git reset --soft origin/main` 会把 HEAD 指向 origin/main,
+    # 第二次循环再 rev-parse 拿到的就是 origin/main 而非本 run 的
+    # checkout 基线, 判定基准漂移; 且 refresh_from_remote 已把工作区
+    # 改成远端版, 之后再判永远是「未改动」, 本轮成果再也推不上去。
+    base_ref = sh(["git", "rev-parse", "HEAD"]).stdout.strip() or "HEAD"
+    print(f"push baseline: {base_ref[:12]}")
+
+    # 本轮成果的副本: 防止重试循环里被目录级 checkout 冲掉后判不出改动
+    stash_dir = os.path.join(tempfile.mkdtemp(prefix="push_stash_"), "work")
+    os.makedirs(stash_dir, exist_ok=True)
+
     for i in range(1, MAX_TRIES + 1):
         sh(["git", "fetch", "origin", args.branch])
-        # 本 run 开始时的基线 (checkout 得到的版本), 用于判定 protect 文件
-        # 本轮是否真的被改过。必须在 reset --soft 之前取, 之后 HEAD 就指向
-        # 将要提交的基点了。
-        base_ref = sh(["git", "rev-parse", "HEAD"]).stdout.strip() or "HEAD"
         sh(["git", "reset", "--soft", f"origin/{args.branch}"])
         # 关键: 先把远端最新版取回工作区, 防止用本 run 开始时的旧副本
         # 覆盖其他工作流刚推送的新数据。
         refresh_from_remote(args.paths, args.dir, args.all, args.branch,
-                             args.protect, base_ref)
+                             args.protect, base_ref, stash_dir)
         if not stage(args.paths, args.dir, args.all):
             print("no changes to push")
             return 0
