@@ -13,6 +13,7 @@ import glob
 import json
 import os
 import sys
+import urllib.request
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
@@ -95,30 +96,48 @@ def build_stock_names():
 
 
 def build_industry_stocks():
-    """行业 → 成分股。从 shard_*.json 的 quote 组 (5309 只带 industry) 反查。"""
+    """行业 → 成分股。
+
+    2026-10-16 修: 原实现从 shard_*.json 的 quote.industry 取, 但该字段
+    在快照里大面积缺失 (实测只产出 2 个行业), 导致 news_impact 的行业映射层
+    几乎失效 —— match_stat.industry 长期为 0, 87% 新闻 unmapped。
+
+    现优先用 industry_map_em.json (东财中文行业, 实测 1050 只 / 100 个行业,
+    由 build_industry_map_em.py 产出), shard quote 作补充。
+    """
     items = {}
+    # 主源: industry_map_em (覆盖最全)
+    d = load("industry_map_em.json")
+    if d:
+        m = d.get("map") or {}
+        if isinstance(m, dict):
+            for k, v in m.items():
+                c = str(k).replace("sh", "").replace("sz", "").replace("bj", "")
+                if isinstance(v, str) and v:
+                    items[c] = v
+    # 补充: shard 快照的 quote.industry
     for sp in glob.glob(os.path.join(DATA_DIR, "shard_*.json")):
         try:
-            d = json.load(open(sp, encoding="utf-8"))
+            sd = json.load(open(sp, encoding="utf-8"))
         except Exception:
             continue
-        for r in ((d.get("data") or {}).get("quote") or []):
+        for r in ((sd.get("data") or {}).get("quote") or []):
             code = str(r.get("code") or "").replace("sh", "").replace("sz", "").replace("bj", "")
             ind = r.get("industry")
             if len(code) == 6 and code.isdigit() and ind:
-                items[code] = ind
+                items.setdefault(code, ind)
     if not items:
         return {}
     by_ind = {}
     for c, ind in items.items():
         by_ind.setdefault(ind, []).append(c)
-    # 加上产业链归并 (CHAIN_MAP 的行业键)
+    # 加上产业链归并 (关键词比原来的更宽, 覆盖东财细分行业名)
     chain = {
-        "半导体": ["半导体", "芯片", "集成电路"],
-        "新能源": ["光伏", "电池", "新能源"],
-        "人工智能": ["软件", "互联网", "计算机", "通信设备"],
-        "医药": ["医药", "医疗", "生物"],
-        "金融": ["银行", "保险", "证券"],
+        "半导体": ["半导体", "芯片", "集成电路", "元件", "印制电路板"],
+        "新能源": ["光伏", "电池", "新能源", "电源设备"],
+        "人工智能": ["软件", "互联网", "计算机", "通信", "光学", "电子"],
+        "医药": ["医药", "医疗", "生物", "中药", "化学制药"],
+        "金融": ["银行", "保险", "证券", "多元金融"],
     }
     out = dict(by_ind)
     for chain_name, kws in chain.items():
@@ -132,21 +151,46 @@ def build_industry_stocks():
 
 
 def build_concept_map():
-    """概念 → 成分股。来源: ths_concept_list (只有概念名) + sub_concepts 结构。"""
-    # ths_concept_list 产出在 shard_a.json 的 sector 组
-    sa = load("shard_a.json")
+    """概念板块 → 成分股 (或至少板块名)。
+
+    2026-10-16 修: 原实现读 shard_a.json 的 sector 组, 但 shard_a 实际只有
+    quote/event/news/fund/kline/macro 六组, **没有 sector** —— 所以概念映射
+    恒为空 (实测 concept_map 只有 2 条), news_impact 的 L1 概念层完全失效。
+
+    现改用腾讯板块排行 (proxy.finance.qq.com mktHs/rank, t=01 行业 /
+    t=02 概念), 零鉴权可用, 返回板块名 + 领涨股 (nzg_code)。
+    同花顺成分股接口已 401 (2026-10-15 实测), 拿不到完整成分股时保留板块名,
+    news_impact 会走 L3 名称兜底匹配。
+    """
     concepts = {}
-    if sa:
-        for r in ((sa.get("data") or {}).get("sector") or []):
-            nm = r.get("name") or r.get("concept") or r.get("title")
-            if not nm or len(nm) < 3:
-                continue
-            codes = r.get("codes") or r.get("stocks") or r.get("components")
-            if isinstance(codes, list) and codes:
-                concepts[nm] = [str(c).replace("sh", "").replace("sz", "") for c in codes][:20]
-    # 没有成分股时, 至少保留概念名 (news_impact 会走 L3 兜底)
-    if not concepts:
-        print("[maps] 警告: ths_concept_list 无成分股, 概念映射将退化为仅名称")
+    for t, label in (("01", "行业"), ("02", "概念")):
+        try:
+            url = ("https://proxy.finance.qq.com/ifzqgtimg/appstock/app/mktHs/rank"
+                   f"?l=100&p=1&t={t}/averatio")
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
+                "Referer": "https://gu.qq.com/"})
+            d = json.loads(urllib.request.urlopen(req, timeout=20).read()
+                           .decode("utf-8", "replace"))
+            rows = d.get("data") or []
+            n_with = 0
+            for r in rows:
+                nm = str(r.get("bd_name") or "").strip()
+                if not nm or len(nm) < 3:
+                    continue
+                concepts.setdefault(nm, [])
+                code = str(r.get("nzg_code") or "").replace("sh", "").replace("sz", "")
+                if code and code not in concepts[nm]:
+                    concepts[nm].append(code)
+                    n_with += 1
+            print(f"[maps] 腾讯{label}板块 {len(rows)} 个 (带领涨股 {n_with})",
+                  file=sys.stderr)
+        except Exception as e:
+            print(f"[maps] 腾讯{label}板块排行失败: {type(e).__name__} {e}",
+                  file=sys.stderr)
+    if not any(v for v in concepts.values()):
+        print("[maps] 警告: 板块只拿到名称没有成分股, 概念映射退化为仅名称 "
+              "(news_impact 走 L3 兜底)", file=sys.stderr)
     return concepts
 
 
@@ -156,14 +200,15 @@ def main():
     cons = build_concept_map()
     ts = datetime.now(CST).isoformat(timespec="seconds")
 
-    for fname, obj in (("stock_names.json", names),
-                       ("industry_stocks.json", {"ts": ts, "industries": inds}),
-                       ("concept_map.json", {"ts": ts, "concepts": cons})):
+    for fname, obj, cnt in (("stock_names.json", names, len(names)),
+                             ("industry_stocks.json", {"ts": ts, "industries": inds},
+                              len(inds)),
+                             ("concept_map.json", {"ts": ts, "concepts": cons},
+                              len(cons))):
         p = os.path.join(DATA_DIR, fname)
         with open(p, "w", encoding="utf-8") as f:
             json.dump(obj, f, ensure_ascii=False)
-        n = len(obj) if isinstance(obj, dict) else 0
-        print(f"[maps] {fname}: {n} 条")
+        print(f"[maps] {fname}: {cnt} 条")
 
     print(f"[maps] 个股名 {len(names)} | 行业 {len(inds)} | 概念 {len(cons)}")
     return 0
