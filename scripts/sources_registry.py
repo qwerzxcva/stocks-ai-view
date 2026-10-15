@@ -1204,6 +1204,282 @@ SOURCES = [
         "notes": "由 tv_screener.py --industry-map 生成; "
                  "解决了东财被封后 multi_v5 缺行业映射出0候选的问题",
     },
+
+    # ============ 同花顺 第二批 (2026-10-15 逆向, 全部本容器实测 200) ============
+    # 采集器: scripts/ths_collect.py  |  逆向报告: data/research/ths_reverse_20261015.md
+    {
+        "id": "ths_kline_day",
+        "name": "同花顺日K (d.10jqka v6 line)",
+        "url": "https://d.10jqka.com.cn/v6/line/hs_{code}/01/last.js",
+        "auth": "none (Referer: d.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日K, 收盘定格",
+        "encoding": "gb18030",
+        "fields": "date/open/close/high/low/volume(股)/amount(元)/amplitude/chg_pct/chg/turnover; "
+                 "start=上市日, total=历史总根数, num=本次返回根数",
+        "provides": ["kline/day_ths.csv", "kline/cross_check"],
+        "notes": "JSONP quotebridge_v6_line_{sym}_{cyc}_{scope}; last=最近140根, all=全史(19万B/只); "
+                 "周期码只支持 01=日线 21=月线 (02-20/30 全 404, 周线/分钟线此域不给); "
+                 "code 前缀 hs_=A股通用 sh_=沪 sz_=深 (实测 hs_/sh_ 均 200); "
+                 "顶层无 symbol 包裹 (time 系列才有), 解析时注意; "
+                 "字段 11 位, 第9/10位 chg_pct/chg 历史股为空串, 需自行计算",
+    },
+    {
+        "id": "ths_kline_month",
+        "name": "同花顺月K (d.10jqka v6 line 21)",
+        "url": "https://d.10jqka.com.cn/v6/line/hs_{code}/21/last.js",
+        "auth": "none (Referer: d.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "monthly",
+        "encoding": "gb18030",
+        "fields": "月K 全量返回 (num=total, 中兴通讯 347 根/1997-11 起)",
+        "provides": ["kline/month_ths.csv"],
+        "notes": "last 即全史 (不像日线只给140根); 数据从上市首月开始; "
+                 "早期行含负价格 (未复权原始口径), 需注意与复权源对齐",
+    },
+    {
+        "id": "ths_timeshare",
+        "name": "同花顺分时 (d.10jqka v6 time)",
+        "url": "https://d.10jqka.com.cn/v6/time/hs_{code}/last.js",
+        "auth": "none (Referer: d.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "实时 (盘中)",
+        "encoding": "gb18030",
+        "fields": "每分钟: time/price/cum_volume(股)/avg_price/minute_volume(股); "
+                 "pre=昨收, isTrading, tradeTime",
+        "provides": ["kline/m1_ths.csv", "intraday 校验"],
+        "notes": "实测 242 根/全天 (含 14:57-15:00 尾盘); 序列连续无缺口; "
+                 "顶层结构 {sym:{...}} 与 line 系列不同",
+    },
+    {
+        "id": "ths_finance_benefit",
+        "name": "同花顺利润表 JSON (basic api)",
+        "url": "https://basic.10jqka.com.cn/api/stock/finance/{code}_benefit.json",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "报告期披露后",
+        "fields": "45 指标 × 111 报告期 (含营业总收入/营业成本/三费/研发/投资收益/利润总额/净利润/EPS/综合收益)",
+        "provides": ["financial/ths_benefit.json", "financial_summary 表"],
+        "notes": "~470KB/只; 结构 {flashData, fieldflashData}; flashData.title=指标名列表, "
+                 "report/simple/year 各表 + *_yoy + simple_mom 共 8 个表; "
+                 "坑1: report[1] 是分隔空行, 真实数据从 report[2] 开始; "
+                 "坑2: 值是带单位字符串 (27.85亿/780.25亿), 需 parse; "
+                 "坑3: year 表头是年份 int 不是日期; 比 akshare 版快 10 倍且不用解析 HTML",
+    },
+    {
+        "id": "ths_finance_debt",
+        "name": "同花顺资产负债表 JSON (basic api)",
+        "url": "https://basic.10jqka.com.cn/api/stock/finance/{code}_debt.json",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "quarterly",
+        "fields": "81 指标 × 110 报告期 (流动资产/非流动资产/负债/所有者权益全科目)",
+        "provides": ["financial/ths_debt.json"],
+        "notes": "~810KB/只; 同 benefit 结构; 这是项目此前完全缺失的报表 (registry 只有摘要)",
+    },
+    {
+        "id": "ths_finance_cash",
+        "name": "同花顺现金流量表 JSON (basic api)",
+        "url": "https://basic.10jqka.com.cn/api/stock/finance/{code}_cash.json",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "quarterly",
+        "fields": "75 指标 × 103 报告期 (经营/投资/筹资现金流, 现金净增加额)",
+        "provides": ["financial/ths_cash.json"],
+        "notes": "~670KB/只; 同 benefit 结构",
+    },
+    {
+        "id": "ths_f10_worth",
+        "name": "同花顺F10 业绩预测页 (basic html)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/worth.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "yjycData 机构业绩预测 (年份/EPS/净利润/实际vs预测) + 31 张表 "
+                 "(机构预测明细/研究员/评级/预测EPS区间/详细指标预测)",
+        "provides": ["financial/ths_forecast.json"],
+        "notes": "页面静态渲染无需额外 API; 注意 Content-Type 是 gbk 不是 utf-8 (乱码根因); "
+                 "预测数据含 2026/2027 一致预期, 是估值模型的关键输入",
+    },
+    {
+        "id": "ths_f10_holder",
+        "name": "同花顺F10 股东页 (十大股东/股东人数)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/holder.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "gdrsFlashData 股东人数(旬频, 户数+较上期%) + 19 张表 "
+                 "(十大股东/十大流通股东 5 期, 含机构名/持股/变化/占流通比/股份类型/orgid)",
+        "provides": ["holder/ths_top10.json", "holder/ths_number.json"],
+        "notes": "股东人数是旬频 (2026-09-30/09-18/09-10...), 比东财月频更细; "
+                 "机构名带 orgid (如 00000379) 可关联快查; "
+                 "页面 160KB, 采集需 gb18030 解码",
+    },
+    {
+        "id": "ths_f10_bonus",
+        "name": "同花顺F10 分红页 (分红/增发/配股全史)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/bonus.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "bonusData 分红 + 16 张表 (分红方案 59 期/增发/配股/获配机构/锁定期)",
+        "provides": ["events/ths_bonus.json"],
+        "notes": "分红方案含董事会日期/股东大会/实施公告日/方案说明; "
+                 "增发表含实际发行价格/上市公告日/方案进度",
+    },
+    {
+        "id": "ths_f10_operate",
+        "name": "同花顺F10 经营页 (主营构成/客户供应商集中度)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/operate.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "quarterly",
+        "encoding": "gb18030",
+        "fields": "9 张表 (业务构成 26 行多报告期/前5大客户/前5大供应商/占比)",
+        "provides": ["financial/ths_operate.json"],
+        "notes": "主营构成按地区+按产品双维度; 客户/供应商集中度是排雷关键字段",
+    },
+    {
+        "id": "ths_f10_event",
+        "name": "同花顺F10 大事页 (高管增减持/调研/担保/处罚)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/event.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "21 张表 (高管增减持 175 行/股东增减持 64 行/机构调研 338 家/担保明细/处罚/披露日历)",
+        "provides": ["events/ths_event.json"],
+        "notes": "页面 459KB 最大; 高管增减持含变动日期/关系/数量/交易均价; "
+                 "机构调研表含机构类别+名称, 是机构关注度指标",
+    },
+    {
+        "id": "ths_f10_capital",
+        "name": "同花顺F10 资本运作页 (募资/项目投入/并购)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/capital.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "94 张表 (募集资金/项目承诺与已投入/并购交易 24 笔含金额与进度)",
+        "provides": ["events/ths_capital.json"],
+        "notes": "募资使用进度表 35 行 (承诺/已投入/建设期), 可做项目落地追踪",
+    },
+    {
+        "id": "ths_f10_field",
+        "name": "同花顺F10 行业排名页",
+        "url": "https://basic.10jqka.com.cn/new/{code}/field.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "4 张表 (每股收益/每股净资产 排名, 同行 42-94 只对照)",
+        "provides": ["sector/ths_field_rank.json"],
+        "notes": "同行横向排名, 比绝对估值更有信息量",
+    },
+    {
+        "id": "ths_f10_equity",
+        "name": "同花顺F10 股本结构页",
+        "url": "https://basic.10jqka.com.cn/new/{code}/equity.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "astockconstrData1/2 股本结构 + 5 张表 (流通A股/限售/高管持股占比, 解禁时间表 139 行)",
+        "provides": ["financial/ths_equity.json"],
+        "notes": "解禁时间表是潜在抛压监控的核心; 股本结构比例直接可用",
+    },
+    {
+        "id": "ths_f10_news",
+        "name": "同花顺F10 个股新闻全史 (linkagedata)",
+        "url": "https://basic.10jqka.com.cn/new/{code}/news.html",
+        "auth": "none (Referer: basic.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "linkagedata: seq/ctime(unix)/curl/title/source(同花顺iNews等)/author/stocks/type",
+        "provides": ["news/ths_stock_news.json"],
+        "notes": "单只股票新闻全史 65KB 内联 JSON, 按 seq 倒序; "
+                 "type 区分 yidong/news; source 标注研究栏目 (两融研究/财闻等)",
+    },
+    {
+        "id": "ths_board_kline",
+        "name": "同花顺板块日K (d.10jqka v4 line bk_)",
+        "url": "https://d.10jqka.com.cn/v4/line/bk_{bk}/01/{year}.js",
+        "auth": "none (Referer: d.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "板块指数日线 (date/open/close/high/low/volume/amount)",
+        "provides": ["sector/industry_kline_ths", "sector/concept_kline_ths"],
+        "notes": "按年分文件, 14KB/年; 实测 881272(软件开发) 200; "
+                 "坑: 概念板块 bk_301558 返回 404 — 概念板块内部码与列表码不一致, "
+                 "需先从概念列表页取 detail/code/ 才能拿到正确的 bk 码; "
+                 "比东财板块K线多一个独立源可交叉校验",
+    },
+    {
+        "id": "ths_board_constituents",
+        "name": "同花顺板块成分股 (q.10jqka detail 翻页)",
+        "url": "http://q.10jqka.com.cn/{thshy|gn}/detail/code/{bk}/page/{n}/",
+        "auth": "none (Referer: q.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "盘中实时",
+        "encoding": "gb18030",
+        "fields": "序号/代码/名称/现价/涨跌幅%/涨跌/涨速%/换手%/量比/振幅%/成交额/流通股/流通市值/市盈率",
+        "provides": ["sector/thshy_constituents", "sector/gn_constituents"],
+        "notes": "翻页规律: /{kind}/detail/code/{bk}/page/{n}/ (实测 page/2 返回序号21起); "
+                 "注意不是 akshare 用的 field/.../page/{n}/ajax/1/ (那条全 404); "
+                 "?page=N 无效 (返回第1页); 每页 20 只; 含 14 个实时字段比东财成分股更全",
+    },
+    {
+        "id": "ths_news_push",
+        "name": "同花顺 7x24 快讯 (tapp/news/push/stock)",
+        "url": "https://news.10jqka.com.cn/tapp/news/push/stock?page=1&tag=&track=website",
+        "auth": "none",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "实时",
+        "encoding": "utf-8",
+        "fields": "title/digest/rtime(unix)/url/seq/id",
+        "provides": ["news/ths_724.json"],
+        "notes": "零签名 JSON (akshare stock_info_global_ths 底层); "
+                 "实测 20 条/页, 覆盖全球财经不只A股; "
+                 "与东财 7x24/新浪 zhibo 三源可互为备份",
+    },
+    {
+        "id": "ths_rank_cxfl",
+        "name": "同花顺持续放量/创新高排名 (data.10jqka)",
+        "url": "http://data.10jqka.com.cn/rank/cxfl/field/count/order/desc/ajax/1/free/1/page/1/free/1/",
+        "auth": "cookie (匿名 session 不足)",
+        "status": "blocked",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "持续放量天数/创新高天数/连续上涨排名 + 8 个子榜单 (lxsz/lxxd/cxsl/ljqd/ljqs/cxg/cxd/xstp/xxtp)",
+        "provides": [],
+        "notes": "2026-10-15 实测 HTTP 401 (data.10jqka.com.cn 全域加鉴权); "
+                 "akshare 源码路径同样 401, 说明不是 Referer 问题而是登录态; "
+                 "降级: 用 ths_strong_stocks + 东财 zt_pool 组合近似; "
+                 "若后续拿到匿名 cookie, 该域有 9 个独家榜单值得补采",
+    },
+    {
+        "id": "ths_funds_flow_rank",
+        "name": "同花顺行业/概念资金流排名 (data.10jqka)",
+        "url": "http://data.10jqka.com.cn/funds/hyzjl/field/tradezdf/order/desc/ajax/1/free/1/",
+        "auth": "cookie (匿名 session 不足)",
+        "status": "blocked",
+        "freq": "daily",
+        "encoding": "gb18030",
+        "fields": "行业资金流(hyzjl)/概念资金流(gnzjl)/个股资金流(ggzjl)/大单异动(ddzz) 四类排名",
+        "provides": [],
+        "notes": "2026-10-15 实测 HTTP 401; 与东财 fflow 五档重复度高, 优先级低; "
+                 "留档避免下次再探",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -1279,6 +1555,13 @@ SHARDS = {
             "ths_strong_stocks", "ths_industry", "ths_industry_list",
             "ths_concept_list", "ths_financial_abstract",
             "ths_financial_abstract_v2",
+            "ths_kline_day", "ths_kline_month", "ths_timeshare",
+            "ths_finance_benefit", "ths_finance_debt", "ths_finance_cash",
+            "ths_f10_worth", "ths_f10_holder", "ths_f10_bonus",
+            "ths_f10_operate", "ths_f10_event", "ths_f10_capital",
+            "ths_f10_field", "ths_f10_equity", "ths_f10_news",
+            "ths_board_kline", "ths_board_constituents", "ths_news_push",
+            "ths_rank_cxfl", "ths_funds_flow_rank",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],

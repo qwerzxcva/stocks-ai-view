@@ -1,0 +1,224 @@
+# 同花顺 (THS) 专项采集 — 2026-10-15 逆向成果
+#
+# 背景:
+#   逆向报告 data/research/ths_reverse_20261015.md; 采集器在 stocks-ai-view/scripts/ths_collect.py
+#   新增 20 个源 (18 ok + 2 blocked), 其中最有价值的是:
+#     1. basic.10jqka.com.cn/api/stock/finance/{code}_{benefit,debt,cash}.json
+#        三大报表全科目 (45/81/75 指标 × 103-111 报告期) — 项目此前只有摘要
+#     2. basic.10jqka.com.cn/new/{code}/{worth,holder,bonus,operate,event,capital,field,equity,news}.html
+#        F10 九页静态数据 (GBK 编码)
+#     3. d.10jqka.com.cn/v6/line|time — 独立于东财/腾讯的第三 K 线源 + 分时
+#     4. q.10jqka.com.cn/{thshy,gn}/detail/code/{bk}/page/{n}/ — 板块成分股 14 字段
+#     5. news.10jqka.com.cn/tapp/news/push/stock — 7x24 快讯
+#
+# 分账: A 仓 (qwerzxcva) 跑, cron 与 shard-collect (mod5=2) 错峰 → mod5=4
+# 额度: 私有仓 2000 分钟/月; 每轮约 3-6 分钟 (取决于股票数), 2 轮/天 ≈ 300 分钟/月
+name: ths-collect
+on:
+  schedule:
+    # CST 09:40 / 15:40 → UTC 1:40 / 7:40, 工作日
+    # 09:40 = 开盘后拿分时/板块实时; 15:40 = 收盘后拿 K线/F10 定格数据
+    - cron: '40 1,7 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      codes:
+        description: '股票代码 (逗号分隔, 留空用默认池)'
+        default: ''
+      full:
+        description: '全市场采集 (较慢, 慎用)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ths-collect
+  cancel-in-progress: false   # 采集任务不互相取消, 排队跑完
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ── 采集股票池 ─────────────────────────────────────────
+      # 默认取关注池 (若存在), 否则用核心样本; full=true 时取全市场
+      - name: Resolve universe
+        id: universe
+        run: |
+          if [ "${{ github.event.inputs.full }}" = "true" ]; then
+            echo "mode=full" >> $GITHUB_OUTPUT
+          elif [ -n "${{ github.event.inputs.codes }}" ]; then
+            echo "codes=${{ github.event.inputs.codes }}" >> $GITHUB_OUTPUT
+            echo "mode=custom" >> $GITHUB_OUTPUT
+          elif [ -f data/watchlist.json ]; then
+            CODES=$(python3 -c "import json;d=json.load(open('data/watchlist.json'));print(','.join(d.get('codes') or d.get('items') or [])[:4000])" 2>/dev/null || echo "")
+            if [ -n "$CODES" ]; then
+              echo "codes=$CODES" >> $GITHUB_OUTPUT
+              echo "mode=watchlist" >> $GITHUB_OUTPUT
+            else
+              echo "mode=default" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "mode=default" >> $GITHUB_OUTPUT
+          fi
+          echo "resolved: $(cat $GITHUB_OUTPUT | tr '\n' ' ')"
+
+      # ── 1. 行情/K线/分时 (d.10jqka v6) ─────────────────────
+      - name: Collect kline + timeshare
+        run: |
+          mkdir -p /tmp/ths
+          if [ "${{ steps.universe.outputs.mode }}" = "full" ]; then
+            # 全市场: 从东财 clist 或本地 universe 取码
+            python3 scripts/ths_universe.py --out /tmp/ths/universe.json || echo "universe build failed, fallback"
+            CODES=$(python3 -c "import json;print(','.join(json.load(open('/tmp/ths/universe.json'))['codes'][:1500]))" 2>/dev/null || echo "")
+          else
+            CODES="${{ steps.universe.outputs.codes }}"
+          fi
+          if [ -z "$CODES" ]; then
+            CODES="600519,000001,000063,600036,300750,601318,000858,600030,002594,601899"
+          fi
+          echo "=== kline codes: $(echo $CODES | tr ',' '\n' | wc -l) ==="
+          python3 scripts/ths_collect.py --group kline --codes "$CODES" \
+            --out /tmp/ths/kline.json || echo "::warning::kline 部分失败"
+
+      # ── 2. 三大报表 (basic api) ───────────────────────────
+      # 只在收盘后跑 (cron 15:40 那轮); 盘中跑浪费 (报表不是实时数据)
+      - name: Collect financial statements
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '40 7 * * 1-5'
+        run: |
+          if [ "${{ steps.universe.outputs.mode }}" = "full" ]; then
+            CODES=$(python3 -c "import json;print(','.join(json.load(open('/tmp/ths/universe.json'))['codes'][:800]))" 2>/dev/null || echo "")
+          else
+            CODES="${{ steps.universe.outputs.codes }}"
+          fi
+          if [ -z "$CODES" ]; then
+            CODES="600519,000001,000063,600036,300750,601318,000858,600030,002594,601899"
+          fi
+          python3 scripts/ths_collect.py --group finance --codes "$CODES" \
+            --statements benefit,debt,cash --out /tmp/ths/finance.json \
+            || echo "::warning::finance 部分失败"
+
+      # ── 3. F10 九页 (basic html, GBK) ─────────────────────
+      - name: Collect F10 pages
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '40 7 * * 1-5'
+        run: |
+          if [ "${{ steps.universe.outputs.mode }}" = "full" ]; then
+            CODES=$(python3 -c "import json;print(','.join(json.load(open('/tmp/ths/universe.json'))['codes'][:400]))" 2>/dev/null || echo "")
+          else
+            CODES="${{ steps.universe.outputs.codes }}"
+          fi
+          if [ -z "$CODES" ]; then
+            CODES="600519,000001,000063,600036,300750,601318,000858,600030,002594,601899"
+          fi
+          python3 scripts/ths_collect.py --group f10 --codes "$CODES" \
+            --out /tmp/ths/f10.json || echo "::warning::f10 部分失败"
+
+      # ── 4. 板块 (成分股 + 板块K线) ────────────────────────
+      - name: Collect boards
+        run: |
+          python3 scripts/ths_board_collect.py \
+            --kinds thshy,gn --pages 3 \
+            --out /tmp/ths/board.json || echo "::warning::board 部分失败"
+
+      # ── 5. 7x24 快讯 ─────────────────────────────────────
+      - name: Collect news push
+        run: |
+          python3 scripts/ths_collect.py --group news --out /tmp/ths/news.json \
+            || echo "::warning::news 部分失败"
+
+      # ── 6. 组装落盘 (只追加不覆盖别人的文件) ───────────────
+      - name: Assemble outputs
+        run: |
+          mkdir -p data/ths data/ths/finance data/ths/f10 data/ths/kline
+          python3 - <<'PY'
+          import json, os, shutil
+          from datetime import datetime, timezone, timedelta
+          CST = timezone(timedelta(hours=8))
+          ts = datetime.now(CST).strftime("%Y%m%d_%H%M")
+          os.makedirs("data/ths", exist_ok=True)
+
+          # 6.1 kline/timeshare: /tmp/ths_*.json 逐码落 data/ths/kline/<code>/
+          for f in sorted(os.listdir("/tmp")):
+              if not (f.startswith("ths_") and f.endswith(".json")):
+                  continue
+              # ths_<code>_kline_01.json / ths_<code>_benefit.json / ths_<code>_worth.json
+              parts = f[:-5].split("_")
+              if len(parts) < 3:
+                  continue
+              code = parts[1]
+              kind = "_".join(parts[2:])
+              if kind.startswith("kline_"):
+                  dst = f"data/ths/kline/{code}/{kind}.json"
+              elif kind in ("benefit", "debt", "cash"):
+                  dst = f"data/ths/finance/{code}_{kind}.json"
+              else:
+                  dst = f"data/ths/f10/{code}_{kind}.json"
+              os.makedirs(os.path.dirname(dst), exist_ok=True)
+              try:
+                  shutil.copy(f"/tmp/{f}", dst)
+              except Exception as e:
+                  print(f"  skip {f}: {e}")
+
+          # 6.2 汇总 manifest
+          summary = {"generated": datetime.now(CST).isoformat(timespec="seconds"),
+                     "source": "ths-collect", "files": 0}
+          for root, _, files in os.walk("data/ths"):
+              summary["files"] += len(files)
+          json.dump(summary, open("data/ths/manifest.json", "w", encoding="utf-8"),
+                    ensure_ascii=False, indent=1)
+          print(f"data/ths total files: {summary['files']}")
+          PY
+          du -sh data/ths 2>/dev/null || true
+
+      - name: Summary
+        run: |
+          echo "## THS Collect Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M CST')" >> $GITHUB_STEP_SUMMARY
+          echo "- Mode: ${{ steps.universe.outputs.mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Files under data/ths: $(find data/ths -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
+          for f in /tmp/ths/kline.json /tmp/ths/finance.json /tmp/ths/f10.json /tmp/ths/board.json /tmp/ths/news.json; do
+            if [ -f "$f" ]; then
+              echo "- $(basename $f): $(stat -c%s $f) B" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      # ── 7. 推送 (只推 data/ths, 不碰任何其他路径) ──────────
+      - name: Commit and push
+        run: |
+          git config user.name "ths-collect-bot"
+          git config user.email "3576982374@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add data/ths/ || true
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            git commit -m "ths: collect $ts" || echo "commit failed"
+          fi
+          git -c http.version=HTTP/1.1 push origin main || {
+            echo "push raced, retrying"
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/ths/ || true
+            git commit -m "ths: collect $ts" 2>/dev/null || true
+            git push origin main
+          }
