@@ -74,7 +74,11 @@ jobs:
                           have.add(x["name"])
           u = api("https://api.github.com/repos/jiegengxiangjianxue1/db-market/contents/master/universe.json")
           import base64
-          want = set(json.loads(base64.b64decode(u["content"]).decode())["stocks"].keys())
+          # universe.json 1.4MB 超过 contents API 的 1MB 上限, content 为空;
+          # 改用 download_url (raw 端点)
+          dl = u.get("download_url") or "https://raw.githubusercontent.com/jiegengxiangjianxue1/db-market/main/master/universe.json"
+          want = set(json.loads(urllib.request.urlopen(
+              urllib.request.Request(dl, headers=UA), timeout=90).read().decode())["stocks"].keys())
           missing = sorted(want - have)
           json.dump({"missing": missing, "n_want": len(want), "n_have": len(have)},
                     open("missing.json", "w"))
