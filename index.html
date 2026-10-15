@@ -463,14 +463,27 @@ async function renderSelfReflect(){
   el.innerHTML=h;
 }
 // AI 复盘 (GitCode AI DeepSeek-V4-Flash 生成, data/ai_review.json)
-async function renderAiReview(){
-  const el=document.getElementById('aiReviewBox'); if(!el) return;
-  const d=await fetchJSON('data/ai_review.json');
-  if(!d||!d.ok||!d.review){el.innerHTML='';return}
+// 内容由 gitcode_ai_review.py 把算法/引擎产出 (十维/海外关联/推股/胜率) 喂给 LLM 生成。
+function renderAiReview(){
+  const d=(window._data||{}).ai_review||{};
+  if(!d.ok||!d.review) return '';
   const model=(d.model||'').split('/').pop();
-  el.innerHTML='<div style="font-size:11px;margin-bottom:4px"><b>🤖 AI 复盘</b> '+
-    '<span class="fl" style="font-size:9px">'+model+' (GitCode AI) · '+(d.ts||'').replace('T',' ').slice(5,16)+'</span></div>'+
-    '<div style="font-size:11px;line-height:1.65;white-space:pre-wrap">'+d.review+'</div>';
+  return '<div style="font-size:11px;margin-bottom:4px"><b>🤖 AI 复盘</b> '
+    +'<span class="fl" style="font-size:9px">'+_esc2(model)+' (GitCode AI 免费额度) · '
+    +_t(d.ts)+' · 上下文 '+_esc2(d.context_len)+' 字</span></div>'
+    +'<div style="font-size:11px;line-height:1.7">'+md2html(d.review)+'</div>';
+}
+// 极简 Markdown → HTML (只处理 AI 复盘用到的: ## 标题 / **粗体** / 换行)
+function md2html(md){
+  const esc=_esc2;
+  return String(md||'').split('\n').map(l=>{
+    let s=esc(l);
+    s=s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+    if(/^#{1,4}\s*/.test(s)) return '<div style="font-weight:700;color:var(--accent);margin:7px 0 3px">'+s.replace(/^#+\s*/,'')+'</div>';
+    if(/^[-*]\s/.test(s)) return '<div style="padding-left:12px;margin:1px 0">• '+s.replace(/^[-*]\s/,'')+'</div>';
+    if(!s.trim()) return '<div style="height:4px"></div>';
+    return '<div style="margin:1px 0">'+s+'</div>';
+  }).join('');
 }
 // 实际价值单元格: value=每股内在价值, dev=偏离% (负=低估)
 function valCell(v,dev){
@@ -1414,7 +1427,7 @@ function renderDailySummary(){
   if(!box) return;
   const g=window._data||{};
   const brief=g.daily_brief||{}, selfr=g.self_reflect||{},
-        dec=g.decision||{}, aiRev=g.ai_review||{}, phase=g.market_phase||{},
+        dec=g.decision||{}, phase=g.market_phase||{},
         picks=g.ai_pick_v4||{}, wm=g.winrate_matrix||{}, gm=g.global_markets||{};
   let h='';
 
@@ -1502,10 +1515,11 @@ function renderDailySummary(){
   if(brief.pre_market||brief.premarket) h+='<div style="font-size:11px;line-height:1.6">'+_esc2(brief.pre_market||brief.premarket)+'</div>';
   else h+='<div class="fl" style="font-size:10px">仅在盘前时段生成 (daily-brief 引擎 UTC 23:30 = CST 07:30)</div>';
 
-  // 7. AI 复盘
+  // 7. AI 复盘 (GitCode AI 结合算法/引擎产出生成)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑦ AI 复盘</div>';
-  if(aiRev.summary||aiRev.review) h+='<div style="font-size:11px;line-height:1.6">'+_esc2(aiRev.summary||aiRev.review)+'</div>';
-  else h+='<div class="fl">暂无 AI 复盘 (cloud-analysis 引擎收盘后生成)</div>';
+  const air=renderAiReview();
+  if(air) h+=air;
+  else h+='<div class="fl">暂无 AI 复盘 (gitcode_ai_review 引擎盘后生成, 需 GITCODE_TOKEN)</div>';
 
   // 8. 云端推演 (原独立 cloudBox 已合并进来, 避免重复展示)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑧ 云端推演</div>';
@@ -2497,7 +2511,8 @@ async function render(){
   window._sampleBalance = g.sample_balance;
   window._klineSim = g.kline_sim;
   _safe(()=>renderSelfReflect(),'selfReflect');
-  _safe(()=>renderAiReview(),'aiReview');
+  // AI 复盘改为返回 HTML 字符串, 由 renderDailySummary 的⑦节消费,
+  // 这里不再单独渲染 (原来写不存在的 #aiReviewBox, 是死代码)。
   // 多池选股: renderPools 内部读 window._data, 传 d 会让 enrich/
   // ai_pick_v4 这些独立文件全部取不到。只有用户打开过这个 tab 才画。
   // plRendered 只由 tab 点击置位, 所以这里必然晚于数据就绪。

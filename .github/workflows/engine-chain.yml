@@ -49,6 +49,8 @@ concurrency:
 # Override with a workflow_dispatch input when you want it to run immediately.
 env:
   TZ: Asia/Shanghai
+  # GitCode 免费 AI 额度 (AI 复盘用); 未配置时 ai_review 自动跳过
+  GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
 
 jobs:
   engines:
@@ -57,6 +59,8 @@ jobs:
     env:
       TZ: Asia/Shanghai
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      # GitCode 免费 AI 额度 (AI 复盘); 未配置时脚本自动跳过
+      GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
       FORCE_RUN: ${{ inputs.force }}
       FORCE_MODE: ${{ inputs.mode }}
     steps:
@@ -244,6 +248,11 @@ jobs:
           python3 scripts/premarket_picks.py --out data/premarket_picks.json || echo "premarket skipped"
           python3 scripts/midday_picks.py --out data/midday_picks.json || echo "midday skipped"
 
+          # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
+          # 放在 tier 8 最后, 这样十维/海外关联/推股/收盘复盘全部就绪
+          # 失败不影响其他管线 (token 缺失或额度用尽都只跳过)
+          python3 scripts/gitcode_ai_review.py || echo "ai_review skipped (check GITCODE_TOKEN)"
+
           echo "--- engine chain done ---"
           fi
 
@@ -257,14 +266,15 @@ jobs:
             data/engine_v5.json data/decision.json data/today_picks.json \
             data/ai_pick_v4.json data/valuation.json data/premarket_picks.json \
             data/midday_picks.json data/engine_fusion.json data/multidim.json \
-            data/overseas_linkage.json \
+            data/overseas_linkage.json data/ai_review.json data/ai_review.md \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
             --protect data/valuation.json --protect data/premarket_picks.json \
             --protect data/midday_picks.json \
             --protect data/engine_fusion.json --protect data/multidim.json \
-            --protect data/overseas_linkage.json
+            --protect data/overseas_linkage.json \
+            --protect data/ai_review.json --protect data/ai_review.md
 
       - name: Publish to the data warehouse
         env:
