@@ -64,14 +64,31 @@ def load(name):
 
 
 def bars_from_global(sym, doc):
-    """global_kline.json: symbols[sym].bars = [[date,o,c,h,l,v]]"""
-    v = ((doc or {}).get("symbols") or {}).get(sym) or {}
-    bars = v.get("bars") or []
+    """global_kline.json: klines[code] = [{date, open, close, high, low, vol}]
+
+    注意顶层键是 klines 不是 symbols; code 带交易所后缀
+    (usDJI.OQ / usIXIC.OQ / hkHSI), 而 DRIVER_NAMES 用不带后缀的
+    key (usDJI), 所以这里按「去掉后缀」和「原样」两种方式都试。
+    """
+    klines = (doc or {}).get("klines") or {}
+    bars = None
+    for key in (sym, sym + ".OQ"):
+        if key in klines:
+            bars = klines[key]
+            break
+    if bars is None:
+        # 反向: sym 是不带后缀的简写, 扫一遍找前缀匹配
+        for key, v in klines.items():
+            if key.split(".")[0] == sym:
+                bars = v
+                break
+    if not bars:
+        return {}
     out = {}
     for b in bars:
-        if not b or len(b) < 3:
+        if not b or b.get("close") is None:
             continue
-        out[str(b[0])] = float(b[2])
+        out[str(b.get("date"))] = float(b["close"])
     return out
 
 
@@ -207,7 +224,14 @@ def main():
 
     drivers = [d.strip() for d in args.drivers.split(",") if d.strip()]
     if not drivers:
-        drivers = list((gk.get("symbols") or {}).keys())
+        # 默认用 global_kline 里全部标的; 归一成不带后缀的简写
+        # (usDJI.OQ -> usDJI) 以便对上 DRIVER_NAMES
+        seen = []
+        for code in ((gk.get("klines") or {}).keys()):
+            short = code.split(".")[0]
+            if short not in seen:
+                seen.append(short)
+        drivers = seen
     targets = [t.strip() for t in args.targets.split(",") if t.strip()]
     if not targets:
         targets = list((ik.get("indices") or {}).keys())

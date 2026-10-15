@@ -61,6 +61,11 @@ jobs:
       GH_TOKEN: ${{ secrets.GH_TOKEN }}
       # GitCode 免费 AI 额度 (AI 复盘); 未配置时脚本自动跳过
       GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+      # job 级路径变量: 引擎链整段都要读。只在单步设的话, multidim 的
+      # load_quote_index() 会因 SNAPSHOT_GLOB 落空而返回 {},
+      # 表现为「快照0 基本面全 50」(2026-10-15 实测 run 38728026058)。
+      STOCKS_LIVE_MARKET: ${{ github.workspace }}/stocks-data-live/market
+      STOCKS_LIVE_ROOT: ${{ github.workspace }}/stocks-data-live
       FORCE_RUN: ${{ inputs.force }}
       FORCE_MODE: ${{ inputs.mode }}
     steps:
@@ -136,6 +141,27 @@ jobs:
           print(f'uncompressed {n} gz shards')
           "
           ls ../stocks-data-kline/data/bulk | grep -c 'day_qfq'
+
+      # 腾讯全市场快照: multidim 的基本面维度 (PE/PB/市值) 读
+      # SNAPSHOT_GLOB = $STOCKS_LIVE_MARKET/snapshot_*.json。不配这个
+      # 环境变量、不拉 live 仓, load_quote_index() 返回空,
+      # 表现为「快照0 基本面全 50」(2026-10-15 实测 run 38728026058)。
+      - name: Checkout live repo (snapshot)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-live
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: live-repo
+          sparse-checkout: |
+            data/market
+          sparse-checkout-cone-mode: false
+
+      - name: Prepare snapshot dir
+        run: |
+          mkdir -p ../stocks-data-live/market
+          cp -n live-repo/data/market/snapshot_*.json ../stocks-data-live/market/ 2>/dev/null || true
+          ls ../stocks-data-live/market/ | tail -3
+          echo "snapshots: $(ls ../stocks-data-live/market/snapshot_*.json 2>/dev/null | wc -l)"
           # the ledger engines need wh/daily; pull it from the warehouse
           mkdir -p ../stockdb/wh/daily
           curl -s -H "Authorization: token ${GH_TOKEN}" \
@@ -200,6 +226,11 @@ jobs:
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
 
           echo "--- tier 2: factors + decision + limit-up audit ---"
+          # 板块资金 (东财行业主力净额): multidim 的板块面维度与
+          # AI 复盘的【板块资金】节都读 latest.json.sector_moneyflow。
+          # engine-chain 原先不跑 collect_market_extras, 该字段一直缺失,
+          # 表现为「板块资金0」(2026-10-15 实测 run 38728026058)。
+          python3 scripts/collect_market_extras.py --merge data/latest.json || echo "market_extras skipped"
           # 海外关联性 (大盘/板块 与 纳指/恒指/日经/KOSPI 的相关/贝塔/滞后/隔夜)
           # 必须在 multidim 之前: multidim 的「海外面」维度读它
           python3 scripts/overseas_linkage.py --out data/overseas_linkage.json || echo "linkage skipped"
