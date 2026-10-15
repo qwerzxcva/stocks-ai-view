@@ -2398,6 +2398,415 @@ SOURCES = [
                  "**结论: 可转债走 ths_kzz_all + jisilu_cb_realtime; "
                  "龙虎榜营业部走 ths_lhb_yyb; 明细走 em_lhb_detail**",
     },
+
+    # ============ 东财第三批 (2026-10-16, 子代理探测 + 主代理 25/28 复测通过) ============
+    # 全部在 datacenter-web.eastmoney.com/api/data/v1/get, 零鉴权
+    # 错误码语义 (实测): 9501=排序列/列不存在; 9201=filter合法但无数据; 9701=服务器繁忙(重试)
+    {
+        "id": "em_kzz_value_hist",
+        "name": "东财可转债历史价值分析 (转股/纯债/双溢价率)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_KZZ_LS&columns=ALL&pageSize={n}&pageNumber={p}&filter=(zcode%3D{bondcode})&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "DATE/ZCODE/FCLOSE(收盘价)/SWAPVALUE(转股价值)/PUREBONDVALUE(纯债价值)/"
+                 "PUREBONDOR/SWAPOR/SWAPPRICE/USWAPTVOL/USWAPTRATE/SY...",
+        "provides": ["cb/value_hist.json", "cb 双低策略回测"],
+        "notes": "2026-10-16 实测 200, 1557B, pages=292 (113527 单只); "
+                 "**filter 用小写 zcode + 6 位债券代码** (如 113527); "
+                 "SWAPVALUE/PUREBONDVALUE 可为 null (早期数据缺失); "
+                 "**这是双低策略的直接输入** — registry 只有集思录的实时快照, 无历史序列; "
+                 "注意: 老路径 api/data/get?type=RPTA_WEB_KZZ_LS 已失效 (实测 100B 空)",
+    },
+    {
+        "id": "em_kzz_important_date",
+        "name": "东财可转债重要日期时间轴",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CB_IMPORTANTDATE&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECURITY_CODE%3D%22{code}%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "BOND_COMBINE_CODE/SECURITY_CODE/SECURITY_NAME_ABBR/DATE_TYPE_CODE/"
+                 "DATE_TYPE(债券承销期/发行结果公告/上市...)/START_DATE/END_DATE/IS_INTERVAL",
+        "provides": ["cb/important_date.json", "cb 条款监控"],
+        "notes": "2026-10-16 实测 200, 1575B, pages=3 (123116 万兴转债); "
+                 "DATE_TYPE 是中文事件名 (债券承销期/网上发行/摇号/上市等); "
+                 "覆盖申购→发行→上市全时间轴, 比 ths_kzz_all 的单一 listing_date 细得多",
+    },
+    {
+        "id": "em_kzz_ballot_num",
+        "name": "东财可转债中签号",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CB_BALLOTNUM&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECURITY_CODE%3D%22{code}%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "SECUCODE/SECURITY_CODE/BOND_NAME_ABBR/TYPE_CODE/TYPE(末N位数)/BALLOT_NUM",
+        "provides": ["cb/ballot.json", "打新验签"],
+        "notes": "2026-10-16 实测 200, 1077B, pages=1; "
+                 "BALLOT_NUM 是逗号分隔的中签号码串; TYPE 标注末几位匹配",
+    },
+    {
+        "id": "em_kzz_invest_item",
+        "name": "东财可转债募资投入项目进度",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_BOND_BS_OPRFINVESTITEM&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECURITY_CODE%3D%22{code}%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "encoding": "utf-8",
+        "fields": "ITEM_NUM/ITEM_NAME(项目名)/PLAN_INVEST_AMT(计划投入)/PLAN_INPUT_RF/"
+                 "YIELD(收益率)/INVEST_RE...(已投进度)",
+        "provides": ["cb/invest_item.json", "募投项目追踪"],
+        "notes": "2026-10-16 实测 200, 7150B; 单位万元; "
+                 "PLAN_INVEST_AMT vs 已投进度可判断项目落地情况",
+    },
+    {
+        "id": "em_ipo_apply_yield",
+        "name": "东财打新收益全表 (中签率/首日涨幅/连板)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_APP_IPOAPPLY&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=APPLY_DATE,SECURITY_CODE&sortTypes=-1,-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "SECUCODE/SECURITY_CODE/APPLY_CODE/APPLY_DATE/BALLOT_PAY_DATE/"
+                 "LISTING_DATE/TRADE_MARKET/MARKET_TYPE_NEW/ASSIGN...(中签率/认购倍数/顶格资金/首日涨幅)",
+        "provides": ["ipo/apply_yield.json", "打新策略回测"],
+        "notes": "2026-10-16 实测 200, 20225B/100条, pages=1128; "
+                 "**一表给全打新收益闭环**: 中签率/超额认购倍数/顶格资金/首日涨幅/开盘溢价/"
+                 "连板数/发行PE vs 行业PE; "
+                 "坑 (子代理实测): APPLY_DATE/LISTING_DATE **不可 filter**, 只能用 UPDATE_DATE/ORG_CODE 排序; "
+                 "回溯分页用 lastmark 翻页更稳",
+    },
+    {
+        "id": "em_ipo_neeq_list",
+        "name": "东财北交所新股发行 (每百股获利)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_NEEQ_ISSUEINFO_LIST&columns=ALL&pageSize={n}&pageNumber={p}&source=NEEQSELECT&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "ORG_CODE/SECURITY_CODE/SECURITY_NAME_ABBR/APPLY_CODE/EXPECT_ISSUE_NUM/"
+                 "PRICE_WAY/ISSUE_PRICE/ISSUE_PE_RATIO/APPLY_DATE + "
+                 "每百股获利/上市首日年化收益/稳获百股需配资金",
+        "provides": ["ipo/neeq_list.json", "北交所打新"],
+        "notes": "2026-10-16 实测 200, 5859B, pages=72; "
+                 "**source=NEEQSELECT (不是 WEB)**; "
+                 "**每百股获利 + 上市首日年化收益是北交所打新的独家字段**; "
+                 "SECUCODE 带 .BJ 后缀",
+    },
+    {
+        "id": "em_ipo_review",
+        "name": "东财 IPO 审核进度 (881 家)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_IPO_INFOALLNEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=UPDATE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "STATE(上市委会议通过等)/REG_ADDRESS/INFO_CODE/CSRC_INDUSTRY/"
+                 "ACCEPT_DATE/DECLARE_ORG/PREDICT_LISTING_MARKET/LAW_FIRM",
+        "provides": ["ipo/review.json", "新股储备跟踪"],
+        "notes": "2026-10-16 实测 200, 2824B, pages=881; "
+                 "STATE 是审核阶段中文名; PREDICT_LISTING_MARKET 是拟上市板块; "
+                 "同族 RPT_IPO_AUDIT (6142 条) / RPT_IPO_REGISTER (884 条) 未复测",
+    },
+    {
+        "id": "em_ipo_allotment",
+        "name": "东财配股 (已实施 197 只 + 预案)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_IPO_ALLOTMENT&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=EQUITY_RECORD_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "FINANCE_CODE/SECUCODE/CORRECODE/CORRECODE_NAME_ABBR/PLACING_RATIO/"
+                 "ISSUE_PRICE/TOTAL_SHARES/...(配股比例/价格/股权登记日)",
+        "provides": ["ipo/allotment.json", "配股套利监控"],
+        "notes": "2026-10-16 实测 200, 3434B, pages=197; "
+                 "PLACING_RATIO 是配股比例 (如 4 = 10配4); CORRECODE 是配股代码",
+    },
+    {
+        "id": "em_seo_detail",
+        "name": "东财增发实施明细 (1183 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_SEO_DETAIL&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=ISSUE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "SECUCODE/TRADE_MARKET/CORRECODE/ISSUE_NUM/ISSUE_WAY/ISSUE_PRICE/"
+                 "RAISE_FUNDS/...(增发价/募资额/发行方式/上市日)",
+        "provides": ["events/seo_detail.json", "再融资追踪"],
+        "notes": "2026-10-16 实测 200, 9385B, pages=1183; "
+                 "ISSUE_WAY 是发行方式 (网下定价发行/定向增发等); "
+                 "覆盖 1990s 至今全史; 同族 RPT_SEO_REGISTER / RPT_SEO_FOREHELD 未复测",
+    },
+    {
+        "id": "ths_ipo_xgsr_html",
+        "name": "同花顺新股上市 (HTML, 含是否破发)",
+        "url": "https://data.10jqka.com.cn/ipo/xgsr/",
+        "auth": "none (Referer: data.10jqka.com.cn)",
+        "status": "degraded",
+        "freq": "daily",
+        "encoding": "gbk",
+        "fields": "新股上市列表 (含是否破发字段)",
+        "provides": ["ipo/xgsr.json"],
+        "notes": "2026-10-16 实测 200, 84519B; "
+                 "**返回 HTML 需解析** (不是 JSON) 所以标 degraded; "
+                 "**注意: 同路径的 ajax 接口 /ipo/xgsr/field/SSRQ/... 实测 401** "
+                 "(见 ths_rank_cxfl), 只有 HTML 页可用; "
+                 "**是否破发字段是独家** — em_ipo_apply_yield 没有; "
+                 "用途: 与 em_ipo_apply_yield 交叉校验打新收益",
+    },
+    {
+        "id": "em_lhb_yyb_statistics",
+        "name": "东财龙虎榜营业部统计 (4 周期)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_OPERATEDEPT_LIST_STATISTICS&columns=ALL&pageSize={n}&pageNumber={p}&filter=(STATISTICSCYCLE%3D%2204%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "OPERATEDEPT_CODE/OPERATEDEPT_NAME/STATISTICSCYCLE/AMOUNT/"
+                 "SALES_ONLIST_TIMES/ACT_BUY/TOTAL_BUYER_SALESTIMES/ACT_SELL/...",
+        "provides": ["lhb/yyb_statistics.json", "游资席位追踪"],
+        "notes": "2026-10-16 实测 200, 1985B, pages=933; "
+                 "STATISTICSCYCLE: 01=当日 02=5日 03=10日 **04=30日**; "
+                 "与 em_lhb_yyb_return_ranking 配合可算营业部胜率; "
+                 "同族 RPT_OPERATEDEPT_LIST_STATISTICS_RATIO 未复测",
+    },
+    {
+        "id": "em_lhb_yyb_trade_detail",
+        "name": "东财营业部逐笔交易明细 (含榜后N日涨跌)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_OPERATEDEPT_TRADE_DETAILSNEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TRADE_DATE,SECURITY_CODE&sortTypes=-1,-1&filter=(OPERATEDEPT_CODE%3D%22{code}%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "OPERATEDEPT_CODE/OPERATEDEPT_NAME/TRADE_DATE/D1/D2/D3/D5_CLOSE_ADJCHRATE/"
+                 "...(买入额/卖出额/净额 + 榜后1/2/3/5日涨跌)",
+        "provides": ["lhb/yyb_trade.json", "游资胜率计算"],
+        "notes": "2026-10-16 实测 200, 3576B, pages=44 (单营业部); "
+                 "**D1/D2/D3/D5_CLOSE_ADJCHRATE 直接给榜后涨跌**, 是营业部胜率的原始输入; "
+                 "坑 (子代理实测): sortColumns 必须是 **TRADE_DATE,SECURITY_CODE** "
+                 "(写 ONLIST_DATE 会 9501 排序列不存在)",
+    },
+    {
+        "id": "em_lhb_yyb_return_ranking",
+        "name": "东财营业部收益率排行榜 (胜率)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_RATEDEPT_RETURNT_RANKING&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TOTAL_BUYER_SALESTIMES_1DAY,OPERATEDEPT_CODE&sortTypes=-1,-1&filter=(STATISTICSCYCLE%3D%2204%22)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "OPERATEDEPT_CODE/OPERATEDEPT_NAME/STATISTICSCYCLE/"
+                 "AVERAGE_INCREASE_1DAY/RISE_PROBABILITY_1DAY/TOTAL_BUYER_SALESTIMES_1DAY/"
+                 "AVERAGE_INCREASE_2DAY/...(各周期均涨幅+上涨概率+上榜次数)",
+        "provides": ["lhb/yyb_return.json", "游资胜率榜"],
+        "notes": "2026-10-16 实测 200, 3728B, pages=931; "
+                 "**RISE_PROBABILITY_1DAY 是 1 日上涨概率 (%)** — 识别真游资的核心指标; "
+                 "坑 (子代理实测): sortColumns 必须 TOTAL_BUYER_SALESTIMES_1DAY,OPERATEDEPT_CODE; "
+                 "与同花顺 ths_lhb_yyb 形成两个独立源的交叉校验",
+    },
+    {
+        "id": "em_lhb_org_daily",
+        "name": "东财机构龙虎榜每日明细",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ORGANIZATION_TRADE_DETAILS&columns=ALL&pageSize={n}&pageNumber={p}&filter=(TRADE_DATE%3E%3D%27{start}%27)(TRADE_DATE%3C%3D%27{end}%27)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "SECUCODE/TRADE_DATE/CLOSE_PRICE/CHANGE_RATE/BUY_TIMES/SELL_TIMES/"
+                 "BUY_AMT/SELL_AMT/NET_BUY_AMT/...(机构买卖次数与金额)",
+        "provides": ["lhb/org_daily.json", "机构席位监控"],
+        "notes": "2026-10-16 实测 200, 3214B, pages=19 (单日); "
+                 "BUY_TIMES/SELL_TIMES 是机构上榜次数, 可判断机构一致性; "
+                 "注意 BUY_TIMES=2 SELL_TIMES=3 表示有分歧",
+    },
+    {
+        "id": "em_margin_account_daily",
+        "name": "东财两融账户与余额日统计 (682 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_MARGIN_DAILYTRADE&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=STATISTICS_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "STATISTICS_DATE/DATE_MARK/FIN_BALANCE(融资余额亿)/LOAN_BALANCE(融券)/"
+                 "MARGIN_BALANCE(两融余额)/BALANCE_RATIO/FIN_BUY_AMT/LOAN_SELL_AMT",
+        "provides": ["market/margin_account.json", "杠杆情绪"],
+        "notes": "2026-10-16 实测 200, 3298B, pages=682; "
+                 "坑 (子代理实测): sortColumns 必须 **STATISTICS_DATE** "
+                 "(写 TRADE_DATE 会 9501); "
+                 "BALANCE_RATIO 是融资余额占比 (2.62% = 杠杆水平); "
+                 "比 registry 的 em_datacenter_margin (个股) 更宏观",
+    },
+    {
+        "id": "em_equity_pledge_market",
+        "name": "东财股权质押市场统计 (129 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_CSDC_STATISTICS&columns=ALL&pageSize={n}&pageNumber={p}&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "TRADE_DATE/TOTAL_PLEDGED_SHARES/PLEDGE_MARKET_VALUE/CSI_300_INDEX/"
+                 "CSI_300_CHG/PM_RATIO(质押比例)/PLEDGE_CO_NUM",
+        "provides": ["market/equity_pledge.json", "系统性风险监控"],
+        "notes": "2026-10-16 实测 200, 1287B, pages=129; "
+                 "**PM_RATIO 是 A股整体质押比例** — 系统性风险指标; "
+                 "同时给沪深300点位与涨跌, 可算质押市值随指数变化",
+    },
+    {
+        "id": "em_equity_pledge_detail",
+        "name": "东财股权质押明细 (25397 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_APP_ACCUMDETAILS&columns=ALL&pageSize={n}&pageNumber={p}&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "SECURITY_NAME_ABBR/HOLDER_NAME/IS_CONTROL_SHAREHOLDER/"
+                 "ACCUM_PLEDGE_TSR(累计质押占总股本%)/PRE_ACCUM_PLEDGE_TSR/NOTICE_DATE",
+        "provides": ["events/equity_pledge.json", "高质押排雷"],
+        "notes": "2026-10-16 实测 200, 6231B, pages=25397; "
+                 "**IS_CONTROL_SHAREHOLDER=1 是控股股东质押** (风险最高); "
+                 "ACCUM_PLEDGE_TSR 是累计质押比例 — >70% 是高危信号",
+    },
+    {
+        "id": "em_stock_participation",
+        "name": "东财市场参与意愿 (5294 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_STOCK_PARTICIPATION&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "SECURITY_INNER_CODE/SECURITY_CODE/TRADE_DATE/PARTICIPATION_WISH/"
+                 "PARTICIPATION_WISH_5DAYS/PARTICIPATION_WISH_CHANGE/PARTICIPATION_WISH_5DAYSCHANGE",
+        "provides": ["sentiment/participation.json", "个股情绪"],
+        "notes": "2026-10-16 实测 200, 1253B, pages=5294; "
+                 "**PARTICIPATION_WISH 是市场参与意愿 0-100** — 低成本另类情绪指标; "
+                 "单请求无鉴权, 接入成本极低; registry 无同类",
+    },
+    {
+        "id": "em_dmsk_ts_stock_new",
+        "name": "东财主力成本统计 (20/60 日均价 + 关注度)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_DMSK_TS_STOCKNEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "SECURITY_CODE/TRADE_DATE/SUPERDEAL_INFLOW/SUPERDEAL_OUTFLOW/"
+                 "PRIME_INFLOW/CL...(主力20/60日均价 + FOCUS 关注度)",
+        "provides": ["money/dmsk_cost.json", "主力成本/支撑位"],
+        "notes": "2026-10-16 实测 200, 4111B, pages=1040; "
+                 "**主力 20/60 日均价是支撑/压力位判断的关键**; "
+                 "FOCUS 关注度可与雪球 followers 交叉校验; registry 无同类",
+    },
+    {
+        "id": "em_macro_shibor",
+        "name": "东财 Shibor 利率 (38776 页)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_IMP_INTRESTRATEN&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "REPORT_DATE/REPORT_PERIOD(3M/1Y等)/IR_RATE/CHANGE_RATE/INDICATOR_ID/"
+                 "MARKET(上海银行同业拆借市场)/CURRENCY(Shibor人民币)",
+        "provides": ["macro/shibor.json", "无风险利率基准"],
+        "notes": "2026-10-16 实测 200, 1526B, pages=38776; "
+                 "REPORT_PERIOD 区分各期限; IR_RATE 是年化利率%; "
+                 "**DCF 估值的无风险利率输入**; 比 akshare 的宏观封装更直接",
+    },
+    {
+        "id": "em_macro_house_price_70",
+        "name": "东财 70 城房价指数 (2632 页, 2011 起)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ECONOMY_HOUSE_PRICE&columns=ALL&pageSize={n}&pageNumber={p}&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "monthly",
+        "encoding": "utf-8",
+        "fields": "REPORT_DATE/CITY/FIRST_COMHOUSE_SAME/SECOND_HOUSE_SAME/"
+                 "FIRST_COMHOUSE_SEQUENTIAL/SECOND_HOUSE_SEQUENTIAL/FIRST_COMHOUSE_BASE/...",
+        "provides": ["macro/house_price.json", "地产链监控"],
+        "notes": "2026-10-16 实测 200, 1840B, pages=2632; "
+                 "按城市分 (韶关等三线也有), SAME=同比 SEQUENTIAL=环比 BASE=定基; "
+                 "2011-01 起 15 年历史; **地产链股票的领先指标**",
+    },
+    {
+        "id": "em_performance_express",
+        "name": "东财业绩快报",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_FCI_PERFORMANCEE&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=NOTICE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "encoding": "utf-8",
+        "fields": "业绩快报 (NOTICE_DATE 排序)",
+        "provides": ["events/performance_express.json", "财报季跟踪"],
+        "notes": "2026-10-16 实测 200, 3954B; "
+                 "与 registry 的 em_lcpd_report 互补 (那条是 RPT_LICO_FN_CPD)",
+    },
+    {
+        "id": "em_performance_forecast",
+        "name": "东财业绩预告 (8521B)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_PUBLIC_OP_NEWPREDICT&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=NOTICE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "encoding": "utf-8",
+        "fields": "业绩预告 (预告净利润上下限/同比/原因)",
+        "provides": ["events/performance_forecast.json", "预增选股"],
+        "notes": "2026-10-16 实测 200, 8521B; "
+                 "**业绩预告是财报季最关键的先行指标**; "
+                 "坑 (子代理实测): 不可用 SECURITY_CODE 筛选, 只能用 NOTICE_DATE 排序后本地过滤",
+    },
+    {
+        "id": "em_restricted_unlock_day",
+        "name": "东财解禁时间表 (按日)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_LIFTDAY_STA&columns=ALL&pageSize={n}&pageNumber={p}&filter=(FREE_DATE%3E%3D%27{start}%27)(FREE_DATE%3C%3D%27{end}%27)&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "解禁明细 (FREE_DATE 区间过滤)",
+        "provides": ["events/unlock_day.json", "解禁抛压监控"],
+        "notes": "2026-10-16 实测 200, 1440B (2026-10-16~10-23 一周); "
+                 "**filter 用 FREE_DATE 区间**; "
+                 "按周监控解禁抛压; 与 THS F10 equity 的解禁表互补",
+    },
+    {
+        "id": "em_repurchase_list",
+        "name": "东财回购增持统计 (9939B)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_GETHGLIST_NEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=UPD,DIM_DATE,DIM_SCODE&sortTypes=-1,-1,-1&source=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "encoding": "utf-8",
+        "fields": "回购/增持统计 (UPD/DIM_DATE/DIM_SCODE 排序)",
+        "provides": ["events/repurchase.json", "回购增持监控"],
+        "notes": "2026-10-16 实测 200, 9939B; "
+                 "坑 (子代理实测): sortColumns 必须 **UPD,DIM_DATE,DIM_SCODE** 且 **source=WEB**; "
+                 "与 THS F10 bonus 的分红表互补",
+    },
+    {
+        "id": "em_rev_d_dead_reports",
+        "name": "第三批复测失效报表名 (留档)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_*",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "-",
+        "provides": [],
+        "notes": "2026-10-16 复测 3 个失效: "
+                 "RPT_BOND_CB_LIST (东财可转债列表, 100B 空 — 改用 ths_kzz_all), "
+                 "api/data/get?type=RPTA_WEB_KZZ_LS (老路径已废, 100B — 改用 v1/get), "
+                 "RPTA_OPERATEDEPT_ACTIVE (活跃营业部, 116B 空); "
+                 "另子代理报 9501 排序列不存在的报表 (写错 sortColumns 所致, 非接口失效): "
+                 "RPTA_WEB_MARGIN_DAILYTRADE(应 STATISTICS_DATE) / "
+                 "RPT_OPERATEDEPT_TRADE_DETAILSNEW(应 TRADE_DATE,SECURITY_CODE) / "
+                 "RPT_RATEDEPT_RETURNT_RANKING(应 TOTAL_BUYER_SALESTIMES_1DAY,OPERATEDEPT_CODE) / "
+                 "RPTA_APP_IPOAPPLY(APPLY_DATE 不可 filter) / "
+                 "RPT_EXECUTIVE_HOLD_DETAILS(应 CHANGE_DATE,SECURITY_CODE,PERSON_NAME) / "
+                 "RPTA_WEB_ZDHT_LIST(应 DIM_RDATE) / "
+                 "RPT_MUTUAL_HOLD_DET(应 HOLD_DATE)",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -2501,6 +2910,17 @@ SHARDS = {
             "cls_telegraph_v1", "cls_nodeapi_dead", "cls_article_detail",
             "ths_kzz_all", "jisilu_cb_realtime", "ths_lhb_yyb",
             "em_lhb_detail", "em_lhb_dead_reports",
+            "em_kzz_value_hist", "em_kzz_important_date", "em_kzz_ballot_num",
+            "em_kzz_invest_item", "em_ipo_apply_yield", "em_ipo_neeq_list",
+            "em_ipo_review", "em_ipo_allotment", "em_seo_detail",
+            "ths_ipo_xgsr_html", "em_lhb_yyb_statistics", "em_lhb_yyb_trade_detail",
+            "em_lhb_yyb_return_ranking", "em_lhb_org_daily",
+            "em_margin_account_daily", "em_equity_pledge_market",
+            "em_equity_pledge_detail", "em_stock_participation",
+            "em_dmsk_ts_stock_new", "em_macro_shibor", "em_macro_house_price_70",
+            "em_performance_express", "em_performance_forecast",
+            "em_restricted_unlock_day", "em_repurchase_list",
+            "em_rev_d_dead_reports",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],
