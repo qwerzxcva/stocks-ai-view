@@ -187,6 +187,13 @@ jobs:
             --out /tmp/ths/cls_telegraph.json \
             || echo "::warning::cls telegraph 失败"
 
+      # ── 5e. 可转债 + 龙虎榜 (2026-10-16 破甲) ─────────────
+      - name: Collect convertible bonds + LHB
+        run: |
+          mkdir -p /tmp/ths
+          python3 scripts/cb_lhb_collect.py --group all --lhb-pages 5 \
+            --out /tmp/ths/cb_lhb.json || echo "::warning::cb/lhb 部分失败"
+
       # ── 6. 组装落盘 (只追加不覆盖别人的文件) ───────────────
       - name: Assemble outputs
         run: |
@@ -277,6 +284,33 @@ jobs:
                   print(f"cls_telegraph: {cd.get('total_unique')} unique")
               except Exception as e:
                   print(f"cls copy failed: {e}")
+
+          # 6.6 可转债 + 龙虎榜
+          cblhb = "/tmp/ths/cb_lhb.json"
+          if os.path.exists(cblhb):
+              try:
+                  cb = json.load(open(cblhb, encoding="utf-8"))
+                  os.makedirs("data/ths/cb", exist_ok=True)
+                  os.makedirs("data/ths/lhb", exist_ok=True)
+                  if cb.get("ths_kzz", {}).get("rows"):
+                      json.dump(cb["ths_kzz"], open("data/ths/cb/kzz_all.json", "w", encoding="utf-8"),
+                                ensure_ascii=False)
+                  if cb.get("jisilu_cb", {}).get("rows"):
+                      json.dump(cb["jisilu_cb"], open("data/ths/cb/jisilu_realtime.json", "w", encoding="utf-8"),
+                                ensure_ascii=False)
+                  for t, v in (cb.get("ths_lhb") or {}).items():
+                      json.dump(v, open(f"data/ths/lhb/yyb_type{t}.json", "w", encoding="utf-8"),
+                                ensure_ascii=False)
+                  if cb.get("em_lhb", {}).get("rows"):
+                      json.dump(cb["em_lhb"], open("data/ths/lhb/em_detail.json", "w", encoding="utf-8"),
+                                ensure_ascii=False)
+                  summary["cb_lhb"] = {"kzz": cb.get("ths_kzz", {}).get("n"),
+                                       "jisilu_cb": cb.get("jisilu_cb", {}).get("n"),
+                                       "lhb_yyb": {k: v.get("n") for k, v in (cb.get("ths_lhb") or {}).items()},
+                                       "em_lhb": cb.get("em_lhb", {}).get("n")}
+                  print(f"cb_lhb: {summary['cb_lhb']}")
+              except Exception as e:
+                  print(f"cb_lhb copy failed: {e}")
 
           json.dump(summary, open("data/ths/manifest.json", "w", encoding="utf-8"),
                     ensure_ascii=False, indent=1)

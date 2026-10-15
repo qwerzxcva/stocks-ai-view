@@ -2298,6 +2298,106 @@ SOURCES = [
                  "文章 id 只能反查: 首页 /detail/{id} 链接 / 电报 shareurl / id 邻域扫描; "
                  "**限流: HTTP 420** — 连打 detail 会触发, 需 1.5~2.5s 间隔 + 重试退避",
     },
+
+    # ============ 可转债 + 龙虎榜 (2026-10-16 破甲, 采集器 cb_lhb_collect.py) ============
+    {
+        "id": "ths_kzz_all",
+        "name": "同花顺可转债全量 969 只 (19 字段)",
+        "url": "https://data.10jqka.com.cn/ipo/kzz/",
+        "auth": "none (Referer: data.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "sub_date(申购日)/bond_code/bond_name/code(正股)/name(正股名)/"
+                 "sub_code/share_code/sign_date/plan_total(发行规模亿)/issue_total/"
+                 "issue_price/success_rate(中签率)/listing_date/expire_date(到期日)/"
+                 "price/quota/number/market_id/stock_market_id",
+        "provides": ["cb/kzz_all.json", "新股/可转债申购日历"],
+        "notes": "2026-10-16 实测 200, **765KB JSON, 969 只**; "
+                 "**注意: data.10jqka.com.cn 域大部分接口已 401 (见 ths_rank_cxfl), "
+                 "但 ipo/kzz 是例外, 仍免签可用**; "
+                 "listing_date=0 表示未上市; success_rate 是中签率; "
+                 "覆盖申购前(计划发行)到已上市全生命周期; "
+                 "比集思录的 5 个可转债源更全 (含发行规模/到期日/正股代码)",
+    },
+    {
+        "id": "jisilu_cb_realtime",
+        "name": "集思录可转债实时 63 字段 (溢价率/双低)",
+        "url": "https://www.jisilu.cn/data/cbnew/cb_list_new/?___jsl=LST&rp={page}",
+        "auth": "none (匿名 session + Referer)",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "盘中实时",
+        "encoding": "utf-8",
+        "fields": "bond_id/bond_nm/price/increase_rt/stock_id/stock_nm/sprice/"
+                 "sincrease_rt/pb/convert_price/convert_value/convert_begin/"
+                 "premium_rt(溢价率%)/dblow(双低值)/sw_cd(申万行业)/rating(评级)/...",
+        "provides": ["cb/realtime.json", "cb 双低策略选债"],
+        "notes": "2026-10-16 实测 200, 40796B, 30 只/页; **63 个字段**; "
+                 "**premium_rt 溢价率 + dblow 双低值是核心** — 可转债双低策略的输入; "
+                 "convert_value 转股价值 + convert_price 转股价; "
+                 "翻页参数 rp (不是 page); 单页 30 只, 全市场约需 15 页; "
+                 "与 ths_kzz_all 互补: 集思录给估值指标, 同花顺给发行条款",
+    },
+    {
+        "id": "ths_lhb_yyb",
+        "name": "同花顺龙虎榜营业部排名 (3 类)",
+        "url": "https://data.10jqka.com.cn/ifmarket/lhbyyb/type/{1|2|3}/tab/{btcz|sbcs|zjsl}/field/{xsjs|sbcs|zgczje}/sort/desc/page/{n}/",
+        "auth": "none (Referer: data.10jqka.com.cn)",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "收盘后",
+        "encoding": "gb18030",
+        "fields": "排名/营业部名称/上榜次数(或买入成交)/买入成交股票数/买入成功率(%)",
+        "provides": ["lhb/yyb_rank.json", "游资跟踪"],
+        "notes": "2026-10-16 实测 200, 17797B/页, **翻页生效** (page1/2/5 内容不同); "
+                 "每页 20 家, 3 个 type: 1=榜上榜次数(btcz) 2=买入成交(sbcs) 3=总成交金额(zjsl); "
+                 "**注意: data.10jqka.com.cn 域大部分接口已 401, 这条是例外仍免签**; "
+                 "返回 HTML 表格需解析; 营业部名称含 Unicode 转义 (\\u07b9 等) 需 decode; "
+                 "**买入成功率是独家字段** — 识别真游资 vs 对倒的关键; "
+                 "registry 此前只有东财龙虎榜个股明细, 无营业部维度",
+    },
+    {
+        "id": "em_lhb_detail",
+        "name": "东财龙虎榜明细 39 字段 (含解读)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_DAILYBILLBOARD_DETAILSNEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TRADE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "收盘后实时",
+        "encoding": "utf-8",
+        "fields": "TRADE_DATE/SECUCODE/SECURITY_CODE/SECURITY_NAME_ABBR/CLOSE_PRICE/"
+                 "CHANGE_RATE/BILLBOARD_DEAL_AMT/BILLBOARD_BUY_AMT/BILLBOARD_SELL_AMT/"
+                 "BILLBOARD_NET_AMT/DEAL_AMOUNT_RATIO/DEAL_NET_RATIO/ACCUM_AMOUNT/"
+                 "EXPLANATION(上榜原因)/CHANGE_TYPE/MARKET/"
+                 "D1/D2/D5/D10_CLOSE_ADJCHRATE(后N日涨跌)/TURNOVERRATE/FREE_MARKET_CAP",
+        "provides": ["lhb/detail.json", "lhb 后N日胜率统计"],
+        "notes": "2026-10-16 实测 200, 11115B/100条, pages=2695; "
+                 "**EXPLANATION 是上榜原因中文解读** (如 '上市首日可转债' '连续三个交易日内, "
+                 "涨幅偏离值累计达到12%的ST和*ST证券'); "
+                 "**D1/D2/D5/D10_CLOSE_ADJCHRATE 是龙虎榜后 N 日涨跌幅** — 可直接算胜率; "
+                 "DEAL_AMOUNT_RATIO 是龙虎榜成交占全天比, DEAL_NET_RATIO 是净买占比; "
+                 "比 registry 里旧的 em_datacenter_lhb 字段更全 (那条是 RPT_* 老报表)",
+    },
+    {
+        "id": "em_lhb_dead_reports",
+        "name": "东财龙虎榜/两融失效报表名 (留档)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_*",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "-",
+        "provides": [],
+        "notes": "2026-10-16 实测返回 '报表配置不存在' 或 message 非 null 的报表名: "
+                 "RPT_OPERATEDEPT_STATISTICS (营业部统计, 想替代 ths_lhb_yyb 但不可用), "
+                 "RPTA_WEB_RZRQ_GGMX (两融明细, message=DIM...), "
+                 "RPT_BOND_CB_LIST (东财可转债列表); "
+                 "另: push2.eastmoney.com 的 clist 可转债 fs 参数与 kline 均未返回有效数据 (未深究); "
+                 "集思录 /data/cbnew/premium/ 404; 同花顺 q.10jqka zillist SPA 页"
+                 "**结论: 可转债走 ths_kzz_all + jisilu_cb_realtime; "
+                 "龙虎榜营业部走 ths_lhb_yyb; 明细走 em_lhb_detail**",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -2399,6 +2499,8 @@ SHARDS = {
             "szse_report_a_stock", "szse_report_fund_list", "szse_report_etf_list",
             "dead_third_batch", "sina_hq_node_count",
             "cls_telegraph_v1", "cls_nodeapi_dead", "cls_article_detail",
+            "ths_kzz_all", "jisilu_cb_realtime", "ths_lhb_yyb",
+            "em_lhb_detail", "em_lhb_dead_reports",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],
