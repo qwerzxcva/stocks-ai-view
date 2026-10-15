@@ -1,11 +1,11 @@
 {
-  "generated": "2026-10-14T19:43:15+08:00",
-  "total": 83,
+  "generated": "2026-10-15T13:50:19+08:00",
+  "total": 89,
   "by_status": {
-    "ok": 57,
+    "ok": 61,
     "degraded": 6,
     "blocked": 12,
-    "unauth": 6,
+    "unauth": 8,
     "untested": 2
   },
   "sources": [
@@ -208,6 +208,139 @@
         "tv_screener",
         "em_push2delay_clist"
       ]
+    },
+    {
+      "id": "klineshare_api",
+      "name": "KlineShare A股实时行情API",
+      "url": "https://klineshare.cn/v1/realtime",
+      "auth": "key",
+      "status": "unauth",
+      "freq": "realtime",
+      "delay": "交易时段实时",
+      "fields": "盘中价量(realtime)/当日分时(trend)/涨停专题(limit-up)/K线",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "unknown",
+      "provides": [
+        "quote",
+        "kline",
+        "minute",
+        "limit_up"
+      ],
+      "notes": "2026-10-14 实测: /v1/health 免Key返回 {success:true,version:1}; 其余 401 缺 X-API-Key。支持 REST + 远程 MCP (/mcp) + Agent Skill, 认证头 X-API-Key。注册拿 Key 后可接入 realtime/trend/limit-up。",
+      "degrade_to": [
+        "tencent_quote",
+        "sina_hq"
+      ]
+    },
+    {
+      "id": "tickflow_free",
+      "name": "TickFlow 免费服务 (日K+标的信息, 无需注册)",
+      "url": "pip install tickflow[all]",
+      "auth": "none",
+      "status": "ok",
+      "freq": "daily",
+      "delay": "历史日K (盘中不更新)",
+      "fields": "日K线(1d/1w/1M/1Q/1Y)/标的信息/交易所/标的池",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "n/a",
+      "provides": [
+        "kline",
+        "instrument"
+      ],
+      "notes": "2026-10-14 实测文档: TickFlow.free() 无需 API key; 提供历史日K与标的池; 不提供实时行情与分钟K。支持期货等多市场 (symbol 后缀 .SH/.SZ 等)。",
+      "degrade_to": []
+    },
+    {
+      "id": "wscn_lives",
+      "name": "华尔街见闻 7x24 live (多频道)",
+      "url": "https://api-one.wallstcn.com/apiv1/content/lives?channel=a-stock-channel",
+      "auth": "none",
+      "status": "ok",
+      "freq": "minute",
+      "delay": "分钟级",
+      "fields": "标题/正文/时间/关联题材(related_themes)/关联股票(symbols)/日历标记",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "*",
+      "provides": [
+        "news",
+        "theme",
+        "calendar"
+      ],
+      "notes": "2026-10-14 实测: a-stock/us-stock/hk-stock 三频道各 30 条, 零鉴权; global/tech 频道超时或空。symbols 在快讯流实测为空, 关联维度靠 related_themes (dict 数组, 取 title)。next_cursor 可翻页。",
+      "degrade_to": []
+    },
+    {
+      "id": "cls_telegraph",
+      "name": "财联社电报 (逆向算签)",
+      "url": "https://www.cls.cn/api/cache?name=telegraphList",
+      "auth": "sign",
+      "status": "ok",
+      "freq": "minute",
+      "delay": "分钟级",
+      "fields": "标题/正文/时间/关联股票",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "unknown",
+      "provides": [
+        "news"
+      ],
+      "notes": "2026-10-14 逆向打通: 真实接口是 /api/cache?name=telegraphList (不是网传的 /v1/roll/get_roll_list); sign=md5(sha1(raw)), raw=字典序 key=value & 连接; 用 5 组浏览器真实请求反推 5/5 命中。lastTime=0 返回最新 20 条。实现见 scripts/cls_sign.py。",
+      "degrade_to": []
+    },
+    {
+      "id": "zaobao_news",
+      "name": "联合早报 (SSR 解析)",
+      "url": "https://www.zaobao.com/news/china",
+      "auth": "none",
+      "status": "ok",
+      "freq": "hourly",
+      "delay": "小时级",
+      "fields": "标题/链接/详情页发布时间",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "unknown",
+      "provides": [
+        "news"
+      ],
+      "notes": "2026-10-14 实测: 无公开 RSS (rss/*.xml 是 SPA fallback 返回 Page Not Found), 改解析 SSR HTML; 列表页无时间, 前 8 条抓详情页补 datePublished。Actions 出口 IP 下实测 0 条 (本地 30 条), 原因待查。",
+      "degrade_to": [
+        "cls_telegraph",
+        "wscn_lives"
+      ]
+    },
+    {
+      "id": "tushare_pro",
+      "name": "Tushare Pro (积分制, 覆盖最全)",
+      "url": "https://api.tushare.pro",
+      "auth": "key",
+      "status": "unauth",
+      "freq": "realtime",
+      "delay": "实时 (部分接口需单独权限)",
+      "fields": "A股行情/财务/打板/ETF/指数/公募基金/期货/期权/债券/外汇/港股/美股/宏观/量化因子库/大模型语料",
+      "field_map": {},
+      "encoding": "utf-8",
+      "cors": "unknown",
+      "provides": [
+        "quote",
+        "kline",
+        "financial",
+        "fund",
+        "futures",
+        "option",
+        "bond",
+        "fx",
+        "hk",
+        "us",
+        "macro",
+        "news",
+        "research",
+        "factor"
+      ],
+      "notes": "2026-10-14 读官方文档 doc_id=340 整理: 接口覆盖极广 — 股票(行情/财务/打板/龙虎榜/热榜) / ETF全套 / 指数 / 公募基金(净值/持仓/经理) / 期货(日线/实时分钟 rt_fut_min 500次每分钟/持仓排名/仓单) / 期权 / 可转债 / 外汇 / 港股 / 美股(含三张财务报表) / 宏观(GDP/CPI/PPI/PMI/社融/Shibor/LPR) / 量化因子库 / 大模型语料(国家政策库/券商研报/新闻联播文字稿/上证e互动问答/深证易互动问答)。token 从环境变量 TUSHARE_TOKEN 读, 积分制, 部分接口需单独申请权限。是唯一能一站式补齐多市场+另类数据的源。",
+      "degrade_to": []
     },
     {
       "id": "em_push2delay_clist",
