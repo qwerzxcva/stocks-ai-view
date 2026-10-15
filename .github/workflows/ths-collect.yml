@@ -28,6 +28,10 @@ on:
         description: '全市场采集 (较慢, 慎用)'
         type: boolean
         default: false
+      run_xq:
+        description: '跑雪球 screener (Actions 出口实测 418, 仅大陆出口时开)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -145,13 +149,17 @@ jobs:
             || echo "::warning::news 部分失败"
 
       # ── 5b. 雪球选股器 (40 字段全市场) ────────────────────
+      # 注意: 雪球按 IP 段风控, GitHub Actions (Azure) 出口实测 HTTP 418,
+      #       本机容器 IP 与 GitCode Space (大陆 IP) 均 200。
+      #       故该步默认跳过, 只在显式输入 run_xq=true 时执行 (留给大陆出口场景)。
       - name: Collect xueqiu screener
+        if: github.event.inputs.run_xq == 'true'
         run: |
           mkdir -p /tmp/ths
           python3 scripts/xueqiu_screener_collect.py \
             --markets CN --size 100 --max-pages 60 \
             --out /tmp/ths/xq_screener.json \
-            || echo "::warning::xueqiu screener 失败"
+            || echo "::warning::xueqiu screener 失败 (Actions 出口可能被 418)"
 
       # ── 5c. 东财 F10 / 机构 / 研报 (2026-10-16 逆向, 15 端点全实测 200) ──
       - name: Collect eastmoney F10 + institutional

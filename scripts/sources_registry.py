@@ -1505,6 +1505,10 @@ SOURCES = [
                  "turnover_rate/amplitude/north_net_inflow/net_profit_cagr; "
                  "**筛选参数不生效** (pe/pb/percent/market_capital/limitup_days/roe_ttm/"
                  "net_profit_cagr 传了 count 仍恒为全量) — 必须拉全量后本地过滤; "
+                 "**出口敏感**: 本机容器 IP 全通 (200, 4290B); GitHub Actions (Azure) 出口 "
+                 "实测 HTTP 418 I'm a Teapot — 雪球按 IP 段风控数据中心 IP; "
+                 "试过 cookie 预热/xq_a_token/移动UA/Referer/HTTP2 均无法在 Actions 绕过; "
+                 "→ 该源只能在 GitCode Space (大陆 IP) 或本机跑, 不要放 GitHub Actions; "
                  "独家字段: limitup_days(连板天数)/percent5m(5分钟涨跌)/north_net_inflow(北向)/"
                  "followers(关注人数)/dividend_yield/roe_ttm/net_profit_cagr/income_cagr; "
                  "与东财 push2 clist 形成交叉校验 (后者 24 字段但有市值/量比, 前者有估值成长)",
