@@ -1,0 +1,177 @@
+# 个股数据补齐 — 远端仓缺 1945 只 (2026-10-16 诊断)
+#
+# 缺口: universe 6029 vs db-stocks-a~e 共 4084, 缺 1945 只 (32%)
+#   00xxxx: 644 只 (002373~003816)   shard 00 收录上限之后
+#   30xxxx: 453 只 (301024~302132)   shard 30 上限之后
+#   60xxxx: 846 只 (601567~605599)   shard 60 上限之后
+#   39xxxx:   2 只 (399001~399006)
+#
+# 数据源 (全部已实测):
+#   K线全史   tencent_newfqkline (任意起止区间, sh/sz 前缀, 640根/次)
+#   三大报表  ths basic.10jqka api (benefit 47 / debt 80 / cash 72 指标)
+#
+# 分 5 个 job 并行 (每个 ~390 只), 对应 5 个远端仓, 避免单 job 超时
+name: stock-backfill
+on:
+  schedule:
+    # 每周三 02:00 CST → UTC 周三 18:00 (与其他采集错峰)
+    - cron: '0 18 * * 3'
+  workflow_dispatch:
+    inputs:
+      shard_group:
+        description: '补哪个代码段 (00/30/60/all)'
+        default: 'all'
+      limit:
+        description: '每段最多补多少只 (0=全部)'
+        default: '0'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stock-backfill
+  cancel-in-progress: false
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  # ── 诊断: 对比 universe 与远端, 生成缺口清单 ──
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compute missing stocks
+        id: gap
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          TOKEN = os.environ["GH_TOKEN"]
+          UA = {"User-Agent": "backfill-bot", "Authorization": f"token {TOKEN}",
+                "Accept": "application/vnd.github+json"}
+          def api(u):
+              try:
+                  return json.loads(urllib.request.urlopen(
+                      urllib.request.Request(u, headers=UA), timeout=40).read().decode())
+              except Exception as e:
+                  return {"err": str(e)[:60]}
+          REPOS = ["jiegengxiangjianxue1/db-stocks-a", "jiegengxiangjianxue2/db-stocks-b",
+                   "jiegengxiangjianxue2/db-stocks-c", "jiegengxiangjianxue3/db-stocks-d",
+                   "jiegengxiangjianxue3/db-stocks-e"]
+          have = set()
+          for repo in REPOS:
+              for s in (api(f"https://api.github.com/repos/{repo}/contents/") or []):
+                  if not isinstance(s, dict) or s.get("type") != "dir":
+                      continue
+                  for x in (api(f"https://api.github.com/repos/{repo}/contents/{s['name']}") or []):
+                      if isinstance(x, dict) and x.get("type") == "dir":
+                          have.add(x["name"])
+          u = api("https://api.github.com/repos/jiegengxiangjianxue1/db-market/contents/master/universe.json")
+          import base64
+          want = set(json.loads(base64.b64decode(u["content"]).decode())["stocks"].keys())
+          missing = sorted(want - have)
+          json.dump({"missing": missing, "n_want": len(want), "n_have": len(have)},
+                    open("missing.json", "w"))
+          print(f"want={len(want)} have={len(have)} missing={len(missing)}")
+          # 按前缀分组输出
+          from collections import defaultdict
+          bp = defaultdict(list)
+          for c in missing:
+              bp[c[:2]].append(c)
+          for p in sorted(bp):
+              print(f"  {p}: {len(bp[p])}")
+          PY
+      - name: Upload gap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stock-gap
+          path: missing.json
+          retention-days: 7
+
+  # ── 补齐: 5 个并行 job, 每个负责一个代码段 ──
+  backfill:
+    needs: diagnose
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        segment: ["00", "30", "60", "rest"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-ai-view
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ai-view
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: stock-gap
+          path: gap
+      - name: Backfill segment ${{ matrix.segment }}
+        run: |
+          mkdir -p /tmp/backfill
+          if [ "${{ matrix.segment }}" = "rest" ]; then
+            CODES=$(python3 -c "import json;d=json.load(open('gap/missing.json'));print(','.join([c for c in d['missing'] if c[:2] not in ('00','30','60')]))")
+          else
+            CODES=$(python3 -c "import json;d=json.load(open('gap/missing.json'));print(','.join([c for c in d['missing'] if c[:2]=='${{ matrix.segment }}']))")
+          fi
+          if [ -z "$CODES" ]; then
+            echo "segment ${{ matrix.segment }} 无缺口"
+            exit 0
+          fi
+          echo "segment ${{ matrix.segment }}: $(echo $CODES | tr ',' '\n' | wc -l) 只"
+          python3 ai-view/scripts/backfill_missing_stocks.py \
+            --codes "$CODES" --groups kline,finance \
+            --out /tmp/backfill || echo "::warning::部分失败"
+      - name: Push to stock shard repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # segment → 目标仓
+          case "${{ matrix.segment }}" in
+            00) REPO="jiegengxiangjianxue1/db-stocks-a" ;;
+            30) REPO="jiegengxiangjianxue2/db-stocks-b" ;;
+            60) REPO="jiegengxiangjianxue2/db-stocks-c" ;;
+            *)  REPO="jiegengxiangjianxue3/db-stocks-e" ;;
+          esac
+          cd /tmp/backfill
+          git init -q
+          git config user.name "backfill-bot"
+          git config user.email "3576982374@qq.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          # 拉取远端现有内容再叠加 (避免覆盖已有数据)
+          git fetch -q --depth=1 origin main || echo "empty repo"
+          git checkout -q main 2>/dev/null || git checkout -q -b main
+          git reset --soft origin/main 2>/dev/null || true
+          git add -A stocks/ backfill_stats.json
+          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          if git diff --quiet --cached HEAD 2>/dev/null; then
+            echo "no changes"
+          else
+            git commit -q -m "backfill(${{ matrix.segment }}): $ts" || true
+            git -c http.version=HTTP/1.1 push origin main || {
+              echo "push raced, retrying"
+              git fetch -q origin main
+              git reset --soft origin/main
+              git add -A stocks/ backfill_stats.json
+              git commit -q -m "backfill(${{ matrix.segment }}): $ts" 2>/dev/null || true
+              git push origin main
+            }
+          fi
+          find stocks -type f | wc -l
+      - name: Summary
+        run: |
+          echo "## Stock Backfill (${{ matrix.segment }})" >> $GITHUB_STEP_SUMMARY
+          echo "- Time: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M CST')" >> $GITHUB_STEP_SUMMARY
+          if [ -f /tmp/backfill/backfill_stats.json ]; then
+            cat /tmp/backfill/backfill_stats.json >> $GITHUB_STEP_SUMMARY
+          fi

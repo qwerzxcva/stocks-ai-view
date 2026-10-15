@@ -2268,6 +2268,36 @@ SOURCES = [
                  "'小财正在加载中...'; nodeapi/api/telegraph 路径同样 404; "
                  "结论: 财联社已把免签入口全关, 只剩 v1 签名版可用",
     },
+    {
+        "id": "cls_article_detail",
+        "name": "财联社文章全文 (detail 页 SSR 免签)",
+        "url": "https://www.cls.cn/detail/{id}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "实时",
+        "encoding": "utf-8",
+        "method": "GET",
+        "fields": "column(电报|文章)/isFree/level(A|B|C)/title/brief/content/ctime/"
+                 "author/readingNum/commentNum/images/assocVideoUrl/assocArticleUrl/"
+                 "associatedFastFact/miniMaxAudioUrl",
+        "provides": ["news/cls_articles.json", "hot_impact 题材映射", "ai_review 输入"],
+        "notes": "采集器 scripts/cls_article_collect.py; 2026-10-16 实测; "
+                 "**Next.js SSR 页, 从 __NEXT_DATA__.props.pageProps.articleDetail 免签取全文**; "
+                 "column=电报 → content 短 (平均 200 字符, 与 v1 列表等价); "
+                 "column=文章 → **content 长 10~40 倍 (实测 199~8456 字符)**; "
+                 "isFree 实测 12/12 全 True, 未见 False — **VIP 墙不在这一层**; "
+                 "样本: 2506108 存储芯片业绩预告(8456字) / 2506093 美PPI(3449字) / "
+                 "2505833 焦点复盘(2589字) / 2505784 每日收评(3112字); "
+                 "一次采集 63 篇文章 / 6 电报 / 0 失败; "
+                 "**VIP 内参未破**: category=vip/depth/neican/insider/premium 全部静默降级 "
+                 "为空 category (返回同样 50 条, 0 独有, errno=0); /vip /depth 栏目页是 SPA "
+                 "无 detail id; 需要登录态; "
+                 "**文章列表 API 全 404** (v1/article/list, api/article/list, "
+                 "cache?name=articleList, nodeapi/telegraphList, m.cls.cn/* 全 420); "
+                 "文章 id 只能反查: 首页 /detail/{id} 链接 / 电报 shareurl / id 邻域扫描; "
+                 "**限流: HTTP 420** — 连打 detail 会触发, 需 1.5~2.5s 间隔 + 重试退避",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -2368,7 +2398,7 @@ SHARDS = {
             "em_datacenter_dead_reportnames",
             "szse_report_a_stock", "szse_report_fund_list", "szse_report_etf_list",
             "dead_third_batch", "sina_hq_node_count",
-            "cls_telegraph_v1", "cls_nodeapi_dead",
+            "cls_telegraph_v1", "cls_nodeapi_dead", "cls_article_detail",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],
