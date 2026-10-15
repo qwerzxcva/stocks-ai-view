@@ -33,8 +33,9 @@ import time
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
-MAX_TRIES = 5
-BACKOFF = [5, 10, 20, 40]
+MAX_TRIES = 6
+# 403 (并发 push 被拒) 需要等更久: 别的 bot 可能正持有 push lock
+BACKOFF = [5, 10, 20, 40, 60]
 
 
 def sh(args, check=False):
@@ -277,8 +278,11 @@ def main():
               f"{p.stderr.strip().splitlines()[-1] if p.stderr.strip() else 'unknown'}")
         if i < MAX_TRIES:
             wait = BACKOFF[min(i - 1, len(BACKOFF) - 1)]
-            print(f"backing off {wait}s")
+            # 403 常见于并发 push 被拒; 用墙钟打印确证 sleep 真的等了
+            # (Actions 日志时间戳是同一步骤内的相对时间, 看不出 sleep 是否生效)。
+            print(f"backing off {wait}s (now {datetime.now().strftime('%H:%M:%S')})")
             time.sleep(wait)
+            print(f"retry at {datetime.now().strftime('%H:%M:%S')}")
 
     print(f"::error::{MAX_TRIES} push attempts failed; this round's data was not published")
     return 1
