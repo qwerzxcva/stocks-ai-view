@@ -23,7 +23,19 @@ on:
   schedule:
     # A 仓: mod5=2 (与 moneyflow-realtime 的 mod5=3 错开)
     # 部署到 B 仓改 mod5=4, C 仓改 mod5=0
-    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 1,2,3,5,6,7 * * 1-5'
+    # 时段说明 (2026-10-16 修):
+    #   原 cron 只覆盖 UTC 1,2,3,5,6,7 = CST 09:02-15:57, 即只在盘中跑。
+    #   后果: 盘后 15:57 到次日 09:02 共 17 小时采集停摆,
+    #   深夜/凌晨/周末看网站时 hot_news/news_extra/hot_themes 全是
+    #   昨天盘中的数据 (实测 hot_news 停在 10-15 18:17, mainline 停在
+    #   10-15 09:02, 用户反馈「热点数据没有更新过」)。
+    #   现补 UTC 8,9,10 (= CST 16:02-18:57 盘后) 与 UTC 11,12 (= CST 19:02-20:57
+    #   晚间), 以及 UTC 17 (= CST 次日 01:02 凌晨刷新),
+    #   让热点/资讯在非交易时段也能跟上。UTC 0 与 4 仍跳过
+    #   (UTC 0 = CST 08:00 盘前尚无新数据, UTC 4 = CST 12:00 与 UTC 3 重复)。
+    - cron: '2,7,12,17,22,27,32,37,42,47,52,57 1,2,3,5,6,7,8,9,10,11,12 * * *'
+    # 凌晨兜底: CST 01:02, 保证隔夜也有一轮新数据 (周末同样生效)
+    - cron: '2 17 * * *'
   workflow_dispatch:
     inputs:
       shard:
@@ -147,6 +159,16 @@ jobs:
             --hot data/hot_impact.json \
             || echo "::warning::build_mainlines 失败, 保留上一版"
 
+      # ── 数据新鲜度审计 ────────────────────────────────────────
+      # 2026-10-16 用户反馈「有的数据没有更新/过时」, 根因之一是无人监测新鲜度,
+      # 全靠用户看到才知道。这里每轮采集后自查一次, 超阈值即在 Actions 日志
+      # 告警 (不阻断流程, 采集失败已有各自的保留上一版逻辑)。
+      - name: Freshness audit
+        run: |
+          python3 scripts/audit_freshness.py --out data/freshness_audit.json \
+            --report data/freshness_audit.md \
+            || echo "::warning::有文件超过新鲜度阈值, 见 data/freshness_audit.md"
+
       # ── 全球各大股市实时 (15指数, 含休市状态与情绪) ───────────
       - name: Collect global markets
         run: |
@@ -210,7 +232,7 @@ jobs:
           git config user.name "shard-collect-bot"
           git config user.email "3576982374@qq.com"
           PROTECT_ARGS=""
-          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/hot_themes.json data/mainline.json data/stock_names.json data/industry_stocks.json data/global_kline.json; do
+          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/hot_themes.json data/mainline.json data/stock_names.json data/industry_stocks.json data/global_kline.json data/freshness_audit.json data/freshness_audit.md; do
             PROTECT_ARGS="$PROTECT_ARGS --protect $f"
           done
           if [ "$SHARD_EXTRA" != "$SHARD" ]; then

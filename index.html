@@ -1439,6 +1439,32 @@ function renderDailySummary(){
   // ═══ 0. 早盘推股 (用户核心诉求: 开盘前给清单) ═══════════════
   h+=renderPicksCard();
 
+  // ═══ 0b. 数据新鲜度横幅 ═══════════════════════════════════════
+  //  2026-10-16 用户反馈「从头到尾都显示过时数据」。根因是采集只在盘中跑 +
+  //  一批引擎周更 + GH Actions schedule 静默停跑。这里把审计结果直接摆出来:
+  //  哪些文件过期、旧了多久, 让用户不用自己猜, 也逼着我们看见。
+  const fa=g.freshness_audit;
+  if(fa&&(fa.n_stale||fa.n_no_ts)){
+    const stale=(fa.files||[]).filter(x=>x.status==='STALE')
+      .sort((a,b)=>(b.age_hours||0)-(a.age_hours||0));
+    h+='<div style="border:1px solid var(--amber);border-radius:6px;padding:8px 10px;margin:6px 0;background:rgba(255,193,7,.07)">'
+      +'<b style="font-size:11px;color:var(--amber)">⚠️ 数据新鲜度: '+stale.length+' 个文件过期'
+      +(fa.n_no_ts?', '+fa.n_no_ts+' 个无时间戳':'')
+      +'</b> <span class="fl" style="font-size:9px">'+_t(fa.ts)+' 自查</span>'
+      +'<div style="font-size:10px;margin-top:5px;line-height:1.6">';
+    stale.slice(0,8).forEach(x=>{
+      const hh=x.age_hours>=24?(x.age_hours/24).toFixed(1)+'天':x.age_hours+'h';
+      h+='<span style="display:inline-block;margin-right:10px">'
+        +'<b>'+_esc2(x.file.replace(/\.json$/,''))+'</b> '
+        +'<span class="dn">'+hh+'前</span> '
+        +'<span class="fl">('+_esc2(x.tier)+')</span></span>';
+    });
+    if(stale.length>8) h+='<span class="fl">…等 '+stale.length+' 个</span>';
+    h+='</div><div class="fl" style="font-size:9px;margin-top:4px">'
+      +'非交易时段 (凌晨/周末) 采集类过期属预期; 交易时段仍过期则为采集或引擎未跑, '
+      +'详见 data/freshness_audit.md。</div></div>';
+  }
+
   // 顶部: 全球市场速览 (点击指数名看历年K线)
   if(gm.indices&&gm.indices.length){
     h+='<div class="hd" style="border-top:none;padding:6px 0">全球市场 <span class="sub">'+_t(gm.ts)+' · 点击指数看历年K线</span></div>';
@@ -1750,9 +1776,17 @@ function renderPools(){
   }
 
   // ⑦ 板块池 — sector_pool tier1
-  P('⑦ 板块池','行业/概念板块梯队 (T1 强 / T2 中 / T3 弱)',
-    (g.sector_pool||{}).sectors||(g.sector_pool||{}).pool
-      ||(g.sector_pool||{}).tier1||[]);
+  //  2026-10-16 修: 弱市时 tier1 可能为 0 (实测 10-15 大盘涨429/跌5108,
+  //  100 个板块里没有一個当日涨>=2% 且5日>0), 原代码只读 tier1||tier2
+  //  会让用户看到空白。现改为 tier1→tier2→tier3 逐级回退, 并标注
+  //  「当日无强势板块」的原因, 不让人以为功能坏了。
+  const sp2=g.sector_pool||{};
+  const spTier = (sp2.tier1&&sp2.tier1.length) ? sp2.tier1
+                : ((sp2.tier2&&sp2.tier2.length) ? sp2.tier2
+                : ((sp2.tier3&&sp2.tier3.length) ? sp2.tier3 : []));
+  const spTierName = (sp2.tier1&&sp2.tier1.length) ? 'T1 强'
+                    : ((sp2.tier2&&sp2.tier2.length) ? 'T2 中 (当日无T1)' : 'T3 弱 (当日无T1/T2)');
+  P('⑦ 板块池','行业/概念板块梯队 ('+spTierName+')', spTier);
 
   // ⑦b 板块资金 — 东财行业主力净额 (独立池, 不是个股)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
@@ -2500,6 +2534,7 @@ const SOURCES = [
   'data/hot_impact.json',      // 热点推演
   'data/cycle.json',           // 周期池
   'data/sector_pool.json',     // 板块池
+  'data/freshness_audit.json', // 数据新鲜度审计 (自查哪些文件过期)
   'data/auction_engine.json',  // 竞价抢筹与日内资金结构 (腾讯逐笔分笔)
   'data/trend_strength.json',   // 趋势强度指数族 RTSI/TMA/MSCI (借鉴 AI-Stock-Master)
   'data/bull_bear_debate.json', // 多空辩论红队机制 (借鉴 TradingAgents-MCPmode)

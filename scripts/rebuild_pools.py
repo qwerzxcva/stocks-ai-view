@@ -134,6 +134,7 @@ def build_sector_pool():
         "tier_down_count": len(tdown),
         "tier1": tier1[:20],
         "tier2": tier2[:30],
+        "tier3": tier3[:40],
         "tier_down": tdown[:20],
         # ── 元数据: 数据来源 / 时间 / 口径 (用户要求标注) ──
         "meta": {
