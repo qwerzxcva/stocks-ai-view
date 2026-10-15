@@ -167,6 +167,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span id="refreshBtn" title="重新拉取全部数据源 (绕过 Service Worker 与 HTTP 缓存)" style="margin-left:8px;padding:3px 12px;border-radius:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;cursor:pointer;user-select:none">⟳ 更新</span>
   <span id="rtStatus" title="Browser-direct tencent quotes, 60s refresh" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">RT --:--</span>
   <span id="dataSourceTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;background:rgba(137,87,229,.18);border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;cursor:help"></span>
+  <span id="sessionTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
   <div style="position:relative;margin-left:8px">
     <input id="symSearch" placeholder="Search stock / ETF" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
     <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
@@ -353,8 +354,8 @@ function renderKpis(m){
   const num=v=>(typeof v==='number'&&isFinite(v))?v:'—';
   const idx=(m.indices||[]).slice(0,4).map(i=>`<div class="kpi"><div class="n">${i.name}</div><div class="v ${cls(i.chg_pct)}">${fmt(i.price)}</div><div class="c ${cls(i.chg_pct)}">${sign(i.chg_pct)}%</div></div>`).join('');
   document.getElementById('kpis').innerHTML=idx+`
-  <div class="kpi"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
-  <div class="kpi"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
+  <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 涨停; 与下方「涨停池」列表的家数可能不同 (列表为东财 tc 盘中口径)"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
+  <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 跌停"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${num(m.broken)}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">封板率</div><div class="v">${num(m.zt_rate)}</div><div class="c fl">%</div></div>`;
   // 市场宽度热力条 (market.advance/decline/turnover)
@@ -1710,6 +1711,44 @@ function renderPools(){
   P('⑥ 打板池','涨停判断与次日炸板概率 (涨停原因/题材列已合并入表)',
     (g.ban_pick||{}).picks||(g.ban_pick||{}).items||[],{extraCols:[reasonCol()]});
 
+  // ⑥b 逐笔资金结构 — 腾讯分笔明细 (竞价撮合/主动买卖失衡/大单/尾盘)
+  //  为什么单列: seal_strength 只看收盘离涨停板多远, 分不出「主动买推进的涨停」
+  //  与「靠挂单、实际主动卖占优的涨停」, 后者炸板风险显著更高。逐笔补这个盲区。
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
+     +'<b style="font-size:12px">⑥b 逐笔资金结构</b> <span class="sub">竞价撮合强度 · 全天主动买卖失衡 · 大单占比 · 尾盘异动 (腾讯分笔, 非Level-2)</span></div>';
+  const auc=(g.auction_engine||{}).stocks||[];
+  if(auc.length){
+    const f=(v,d)=>(v==null?'—':(v>=0?'+':'')+Number(v).toFixed(d));
+    const imbC=v=>(v==null?'':(v>=10?'up':(v<=-10?'dn':'')));
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>笔数</th><th>竞价强度</th><th>竞价额</th>'
+      +'<th>主动买卖失衡</th><th>大单占比</th><th>尾盘占比</th><th>尾盘失衡</th><th>涨停</th></tr></thead><tbody>';
+    auc.slice(0,25).forEach(x=>{
+      h+='<tr><td><b>'+_esc2(x.code)+'</b></td>'
+        +'<td>'+_esc2(x.name||'')+'</td>'
+        +'<td class="fl">'+_esc2(x.n_ticks)+'</td>'
+        +'<td class="'+(x.auction_strength>=70?'up':'')+'">'+_esc2(x.auction_strength)+'</td>'
+        +'<td class="fl">'+(x.auction_amount==null?'—':(x.auction_amount/1e4).toFixed(0)+'万')+'</td>'
+        +'<td class="'+imbC(x.buy_sell_imbalance)+'" style="font-weight:700">'+f(x.buy_sell_imbalance,1)+'%</td>'
+        +'<td class="fl">'+(x.large_tick_ratio==null?'—':x.large_tick_ratio.toFixed(1)+'%')+'</td>'
+        +'<td class="fl">'+(x.tail_ratio==null?'—':x.tail_ratio.toFixed(1)+'%')+'</td>'
+        +'<td class="'+imbC(x.tail_imbalance)+'">'+f(x.tail_imbalance,1)+'%</td>'
+        +'<td>'+(x.is_limit_up?'<b class="up">是</b>':'')+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    h+='<div class="fl" style="font-size:9px;padding:4px 0">'
+      +_esc2((g.auction_engine||{}).date||'')+' · '+auc.length+' 只 · 腾讯成交明细分笔 (约3秒一笔) · '
+      +'失衡=(主动买额-主动卖额)/(主动买额+主动卖额) · Research reference only</div>';
+    const ztAuc=auc.filter(x=>x.is_limit_up);
+    if(ztAuc.length){
+      h+='<div class="fl" style="font-size:10px;padding:4px 0;color:var(--tx2)">'
+        +'涨停股逐笔结论: '+ztAuc.slice(0,6).map(x=>
+          '<b>'+_esc2(x.code)+'</b> '+(x.buy_sell_imbalance>=10?'主动买持续,封板真实':
+            (x.buy_sell_imbalance<=-5?'主动卖占优,炸板风险高':'封板质量一般'))).join(' · ')+'</div>';
+    }
+  } else {
+    h+='<div class="fl" style="font-size:10px">暂无逐笔数据 (engine-chain 盘后跑 fetchers_ticks 后产出)</div>';
+  }
+
   // ⑦ 板块池 — sector_pool tier1
   P('⑦ 板块池','行业/概念板块梯队 (T1 强 / T2 中 / T3 弱)',
     (g.sector_pool||{}).sectors||(g.sector_pool||{}).pool
@@ -2381,6 +2420,7 @@ const SOURCES = [
   'data/hot_impact.json',      // 热点推演
   'data/cycle.json',           // 周期池
   'data/sector_pool.json',     // 板块池
+  'data/auction_engine.json',  // 竞价抢筹与日内资金结构 (腾讯逐笔分笔)
   'data/lowpool.json',         // 低位池
   'data/market_now.json',      // 实时行情 (每5分钟)
   'data/realtime_minute.json', // 分钟级 (每3分钟)
@@ -2448,6 +2488,23 @@ async function render(){
     if(mn.tx_sector_ranking) d.westock = {sector_ranking:{date:mn.date, data:mn.tx_sector_ranking}};
     window._realtimeTs = mn.ts;
   }
+  // ── 数据时效横幅: 明确告诉用户数据归属哪个交易日、是否盘中 ──
+  // 非交易时段采集器查的是上一交易日 (东财按今天查只会返回旧收盘缓存),
+  // 若不标注, 用户会把上一交易日的收盘池当成当日实时数据 (2026-10-16 实测)。
+  (function(){
+    var el=document.getElementById('sessionTag');
+    if(!el) return;
+    var st=(mn&&mn.session_state)||'unknown', live=(mn&&mn.is_live)===true;
+    var belongs=(mn&&mn.date)||(d&&d.date)||'';
+    var dash=belongs?belongs.replace(/^(\d{4})(\d{2})(\d{2})$/,'$1-$2-$3'):'';
+    var label={trading:'盘中实时',post_close:'已收盘',pre_open:'盘前',lunch:'午休',weekend:'休市'}[st]||st;
+    var txt=label+(dash?' · '+dash:'');
+    el.textContent=txt;
+    el.style.display='inline-block';
+    if(live){el.style.background='rgba(38,166,154,.18)';el.style.border='1px solid #26a69a';el.style.color='#26a69a';}
+    else{el.style.background='rgba(239,83,80,.15)';el.style.border='1px solid #ef5350';el.style.color='#ef5350';}
+    el.title=live?'当前为盘中实时数据':'当前非交易时段, 涨跌停/成交等为 '+dash+' 收盘定格值 (数据源在非交易时段只返回上一交易日收盘缓存, 已按真实归属日标注)';
+  })();
   if(rm && rm.summary){
     d.market = d.market || {};
     d.market.advance = rm.summary.advance;
@@ -2498,6 +2555,25 @@ async function render(){
   document.getElementById('updTime').textContent =
     '✅ ' + (d.ts || '').slice(5, 16).replace('T', ' ') + ' · ' +
     _num(d.market && d.market.limit_up) + '涨停/' + _num(d.market && d.market.limit_down) + '跌停';
+  // ── 引擎时效: 采集每5分钟一跑, 引擎只在盘前/盘后跑, 两者可能差数小时。
+  //  不显示的话用户以为 engine_v5/decision 也是刚算的 (2026-10-16: 采集02:29,
+  //  引擎19:35, 差7小时)。放在标题栏旁边, 一眼看出引擎数据的新旧。
+  (function(){
+    var cands=[['engine_v5',g.engine_v5],['multidim',g.multidim],['decision',g.decision],
+               ['today_picks',g.today_picks],['ai_pick_v4',g.ai_pick_v4]];
+    var best=null,bestTs=null;
+    cands.forEach(function(c){
+      var t=c[1]&&c[1].ts;
+      if(t&&(!bestTs||t>bestTs)){bestTs=t;best=c[0];}
+    });
+    var el=document.getElementById('updTime');
+    if(!el||!bestTs) return;
+    var ageH=(Date.now()-new Date(bestTs).getTime())/3600000;
+    var tag=' · 引擎 '+bestTs.slice(5,16).replace('T',' ');
+    if(ageH>=6) tag+=' ('+Math.floor(ageH)+'h前) ⚠️';
+    el.textContent+=tag;
+    el.title='主快照 '+((d.ts||'').slice(0,16))+' · 引擎最新 '+bestTs.slice(0,16)+' ('+best+')';
+  })();
   _safe(()=>renderKpis(d.market),'kpis');
   _safe(()=>renderPhase(d.phase),'phase');
   _safe(()=>renderLadder(d.ladder),'ladder');
