@@ -1236,8 +1236,8 @@ function renderPicksCard(){
   // ── 市况闸门 (最重要, 放最上面) ──
   const gate=(pm&&pm.gate)||{};
   if(gate.state){
-    const gc=gate.state==='blocked'?'var(--dn)':(gate.state==='open'?'var(--up)':'var(--amber)');
-    const gl={blocked:'🚫 空仓闸门',open:'✅ 可进攻',half:'⚠️ 半仓纪律',unknown:'❔ 数据缺失'}[gate.state]||gate.state;
+    const gc=gate.state==='defensive'?'var(--amber)':(gate.state==='open'?'var(--up)':'var(--tx3)');
+    const gl={defensive:'⚠️ 弱市防守',open:'✅ 可进攻',half:'⚠️ 半仓纪律',unknown:'❔ 数据缺失'}[gate.state]||gate.state;
     h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;margin-bottom:8px;'+
        'border:1px solid '+gc+';border-radius:8px;background:rgba(0,0,0,.03)">'+
        '<b style="color:'+gc+';font-size:13px">'+gl+'</b>'+
@@ -1250,8 +1250,8 @@ function renderPicksCard(){
     const A=pm.tiers.A_buy||[], B=pm.tiers.B_watch||[];
     h+='<div class="hd" style="padding:6px 0">🌅 早盘推股 <span class="sub">'+_t(pm.ts)+
        ' · 候选 '+pm.n_candidates+' 只 · 全球情绪 '+_esc2((pm.global||{}).score)+' ('+_esc2((pm.global||{}).mood)+')</span></div>';
-    if(gate.state==='blocked'){
-      h+='<div class="fl" style="font-size:11px;padding:6px 0">闸门关闭, 本日不出买入推荐。以下为观察名单 (非买入建议):</div>';
+    if(gate.state==='defensive'){
+      h+='<div class="fl" style="font-size:11px;padding:6px 0">弱市逆势单: 已标注 ⚠️, 建议轻仓试错并严设止损; 空仓亦是合理选择。</div>';
     }
     const tbl=(arr,title,col)=>{
       if(!arr.length) return '<div class="fl" style="font-size:10px;padding:2px 0">'+title+': 无</div>';

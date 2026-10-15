@@ -99,16 +99,25 @@ def horizon_outlook():
 
 
 def market_gate(gm):
-    """市况闸门: 返回 (gate, reason, pos_cap)。"""
+    """市况闸门: 返回 (gate, reason, pos_cap)。
+
+    闸门只决定仓位上限与风险标注, **不阻断出票**。弱市同样给票,
+    否则用户在没有信号的市道里完全拿不到候选; 空仓建议写进 reason,
+    由用户自己决定执不执行。
+    """
     if not gm:
         return "unknown", "无全球面板数据, 按中性处理", 0.5
     m = gm.get("metrics") or {}
     s = m.get("global_score", 0)
     vix = m.get("vix", 0) or 0
     if s < -15:
-        return "blocked", "全球情绪 %.1f (偏空) — 历史复盘: 弱市选票救不了亏, 空仓等信号" % s, 0.0
+        return ("defensive",
+                "全球情绪 %.1f (偏空) — 建议空仓/轻仓; 仍给出候选, "
+                "单票试错、严设止损" % s, 0.1)
     if vix > 25:
-        return "blocked", "VIX %.1f > 25 极端恐慌 — 仅观察不新开仓" % vix, 0.0
+        return ("defensive",
+                "VIX %.1f 极端恐慌 — 建议观察为主; 仍给出候选, "
+                "仅小幅试错" % vix, 0.1)
     if s > 15:
         return "open", "全球情绪 %.1f (偏多) — 可正常进攻" % s, 1.0
     return "half", "全球情绪 %.1f (中性) — 半仓纪律" % s, 0.5
@@ -300,18 +309,31 @@ def main():
 
     ranked.sort(key=lambda x: -x["score"])
 
-    # 分级: 闸门 blocked → 全部降为观察
-    def tier(r):
-        if gate == "blocked":
+    # defensive 市况: 不降级, 但在每只票上标注「弱市持仓」,
+    # 让用户看到票的同时知道这是逆市单, 该压仓位、严止损。
+    if gate == "defensive":
+        for r in ranked:
+            r["weak_market"] = True
+            r["reasons"].insert(0, "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 "
+                                 + (("%.2f" % r["stop"]) if r["stop"] else "严设"))
+
+    # 分级: defensive 不影响分级(仍按分数给 A/B/C), 只压仓位与加风险标注
+    # 绝对分数线 (60/40) 在估值表与位置数据大面积缺失时几乎无人达标,
+    # 会让弱市下的名单整块落空。所以 A 级加一条排名兜底: 候选里分数最高
+    # 的几只直接给 A, 保证任何市况都有可执行的首选。
+    a_quota = max(3, args.top // 4)
+
+    def tier(r, idx):
+        if "flow_div_sell" in r["sources"]:
             return "C"
-        if r["score"] >= 60 and "flow_div_sell" not in r["sources"]:
+        if idx < a_quota or r["score"] >= 60:
             return "A"
         if r["score"] >= 40:
             return "B"
         return "C"
 
-    for r in ranked:
-        r["tier"] = tier(r)
+    for i, r in enumerate(ranked):
+        r["tier"] = tier(r, i)
 
     a_list = [r for r in ranked if r["tier"] == "A"][:args.top]
     b_list = [r for r in ranked if r["tier"] == "B"][:args.top]

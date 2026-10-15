@@ -1,12 +1,12 @@
 {
- "ts": "2026-10-15T08:14:13+08:00",
+ "ts": "2026-10-15T10:25:39+08:00",
  "engine": "premarket_picks v1 (多引擎共振 + 隔夜增量 + 市况闸门)",
  "date": "2026-10-15",
  "session": "premarket",
  "gate": {
-  "state": "blocked",
-  "reason": "全球情绪 -17.6 (偏空) — 历史复盘: 弱市选票救不了亏, 空仓等信号",
-  "pos_cap": 0.0
+  "state": "defensive",
+  "reason": "全球情绪 -17.6 (偏空) — 建议空仓/轻仓; 仍给出候选, 单票试错、严设止损",
+  "pos_cap": 0.1
  },
  "global": {
   "score": -17.6,
@@ -24,42 +24,7 @@
  },
  "n_candidates": 135,
  "tiers": {
-  "A_buy": [],
-  "B_watch": [],
-  "C_avoid": [
-   {
-    "code": "601857",
-    "name": "",
-    "price": 12.2,
-    "score": 53.1,
-    "parts": {
-     "resonance": 24,
-     "engine_avg": 19.335,
-     "valuation": 9.78,
-     "position": 0,
-     "flow": 0
-    },
-    "sources": [
-     "engine_v5",
-     "multidim"
-    ],
-    "entry_zone": [
-     12.02,
-     12.26
-    ],
-    "stop": 11.65,
-    "target": 12.93,
-    "risk_reward": 0.11,
-    "intrinsic_value": 17.56,
-    "value_dev_pct": -32.6,
-    "value_tag": "深度低估",
-    "pos240_pct": null,
-    "reasons": [
-     "1 个引擎共振提名 (engine_v5/multidim)",
-     "低估 -32.6%, 有安全垫"
-    ],
-    "tier": "C"
-   },
+  "A_buy": [
    {
     "code": "000937",
     "name": "",
@@ -87,19 +52,56 @@
     "value_tag": null,
     "pos240_pct": null,
     "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 4.25",
      "资金吸筹背离"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "A"
    },
    {
-    "code": "601818",
-    "name": "",
-    "price": 3.1,
-    "score": 51.6,
+    "code": "300941",
+    "name": "创识科技",
+    "price": 15.34,
+    "score": 45.9,
     "parts": {
      "resonance": 24,
-     "engine_avg": 18.419999999999998,
-     "valuation": 9.15,
+     "engine_avg": 10.758329999999999,
+     "valuation": 0,
+     "position": 11.1,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5",
+     "ai_pick_v4"
+    ],
+    "entry_zone": [
+     15.11,
+     15.42
+    ],
+    "stop": 14.65,
+    "target": 16.26,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": 39.4,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 14.65",
+     "1 个引擎共振提名 (engine_v5/ai_pick_v4)",
+     "20日位 39%"
+    ],
+    "weak_market": true,
+    "tier": "A"
+   },
+   {
+    "code": "688156",
+    "name": "",
+    "price": 25.4,
+    "score": 43.7,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 19.74,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
@@ -108,31 +110,136 @@
      "multidim"
     ],
     "entry_zone": [
-     3.05,
-     3.12
+     25.02,
+     25.53
     ],
-    "stop": 2.96,
-    "target": 3.29,
+    "stop": 24.26,
+    "target": 26.92,
     "risk_reward": 0.11,
-    "intrinsic_value": 4.49,
-    "value_dev_pct": -30.5,
-    "value_tag": "深度低估",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
-     "1 个引擎共振提名 (engine_v5/multidim)",
-     "低估 -30.5%, 有安全垫"
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 24.26",
+     "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "A"
+   }
+  ],
+  "B_watch": [
+   {
+    "code": "601857",
+    "name": "",
+    "price": 12.2,
+    "score": 43.3,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 19.335,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5",
+     "multidim"
+    ],
+    "entry_zone": [
+     12.02,
+     12.26
+    ],
+    "stop": 11.65,
+    "target": 12.93,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 11.65",
+     "1 个引擎共振提名 (engine_v5/multidim)"
+    ],
+    "weak_market": true,
+    "tier": "B"
+   },
+   {
+    "code": "601118",
+    "name": "",
+    "price": 7.33,
+    "score": 43.1,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 19.065,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5",
+     "multidim"
+    ],
+    "entry_zone": [
+     7.22,
+     7.37
+    ],
+    "stop": 7.0,
+    "target": 7.77,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 7.00",
+     "1 个引擎共振提名 (engine_v5/multidim)"
+    ],
+    "weak_market": true,
+    "tier": "B"
+   },
+   {
+    "code": "300781",
+    "name": "",
+    "price": 30.95,
+    "score": 43.0,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 18.96,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5",
+     "multidim"
+    ],
+    "entry_zone": [
+     30.49,
+     31.1
+    ],
+    "stop": 29.56,
+    "target": 32.81,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 29.56",
+     "1 个引擎共振提名 (engine_v5/multidim)"
+    ],
+    "weak_market": true,
+    "tier": "B"
    },
    {
     "code": "600887",
     "name": "",
     "price": 27.86,
-    "score": 42.4,
+    "score": 42.7,
     "parts": {
      "resonance": 24,
      "engine_avg": 18.66,
-     "valuation": -0.3,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
@@ -147,139 +254,190 @@
     "stop": 26.61,
     "target": 29.53,
     "risk_reward": 0.11,
-    "intrinsic_value": 27.61,
-    "value_dev_pct": 1.0,
-    "value_tag": "合理",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 26.61",
      "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "B"
    },
    {
-    "code": "000002",
+    "code": "688353",
     "name": "",
-    "price": 3.77,
-    "score": 42.3,
+    "price": 91.1,
+    "score": 42.6,
     "parts": {
-     "resonance": 12,
-     "engine_avg": 15.33,
-     "valuation": 15,
+     "resonance": 24,
+     "engine_avg": 18.599999999999998,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
     "sources": [
+     "engine_v5",
      "multidim"
     ],
     "entry_zone": [
-     3.71,
-     3.79
+     89.73,
+     91.56
     ],
-    "stop": 3.6,
-    "target": 4.0,
+    "stop": 87.0,
+    "target": 96.57,
     "risk_reward": 0.11,
-    "intrinsic_value": 8.45,
-    "value_dev_pct": -55.4,
-    "value_tag": "深度低估",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
-     "低估 -55.4%, 有安全垫"
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 87.00",
+     "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "B"
    },
    {
-    "code": "002441",
+    "code": "601088",
     "name": "",
-    "price": 9.21,
-    "score": 37.3,
+    "price": 49.01,
+    "score": 42.5,
     "parts": {
-     "resonance": 12,
-     "engine_avg": 15.6,
-     "valuation": 9.69,
+     "resonance": 24,
+     "engine_avg": 18.48,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
     "sources": [
+     "engine_v5",
      "multidim"
     ],
     "entry_zone": [
-     9.07,
-     9.26
+     48.27,
+     49.26
     ],
-    "stop": 8.8,
-    "target": 9.76,
+    "stop": 46.8,
+    "target": 51.95,
     "risk_reward": 0.11,
-    "intrinsic_value": 13.61,
-    "value_dev_pct": -32.3,
-    "value_tag": "深度低估",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
-     "低估 -32.3%, 有安全垫"
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 46.80",
+     "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "B"
    },
    {
-    "code": "601166",
+    "code": "601818",
     "name": "",
-    "price": 18.4,
-    "score": 36.6,
+    "price": 3.1,
+    "score": 42.4,
     "parts": {
-     "resonance": 12,
-     "engine_avg": 16.26,
-     "valuation": 8.34,
+     "resonance": 24,
+     "engine_avg": 18.419999999999998,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
     "sources": [
+     "engine_v5",
      "multidim"
     ],
     "entry_zone": [
-     18.12,
-     18.49
+     3.05,
+     3.12
     ],
-    "stop": 17.57,
-    "target": 19.5,
+    "stop": 2.96,
+    "target": 3.29,
     "risk_reward": 0.11,
-    "intrinsic_value": 25.5,
-    "value_dev_pct": -27.8,
-    "value_tag": "深度低估",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
-     "低估 -27.8%, 有安全垫"
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 2.96",
+     "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "B"
    },
    {
-    "code": "600938",
+    "code": "688617",
     "name": "",
-    "price": 33.91,
-    "score": 36.5,
+    "price": 252.06,
+    "score": 42.2,
     "parts": {
-     "resonance": 12,
-     "engine_avg": 15.81,
-     "valuation": 8.73,
+     "resonance": 24,
+     "engine_avg": 18.18,
+     "valuation": 0,
      "position": 0,
      "flow": 0
     },
     "sources": [
+     "engine_v5",
      "multidim"
     ],
     "entry_zone": [
-     33.4,
-     34.08
+     248.28,
+     253.32
     ],
-    "stop": 32.38,
-    "target": 35.94,
+    "stop": 240.72,
+    "target": 267.18,
     "risk_reward": 0.11,
-    "intrinsic_value": 47.86,
-    "value_dev_pct": -29.1,
-    "value_tag": "深度低估",
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
     "pos240_pct": null,
     "reasons": [
-     "低估 -29.1%, 有安全垫"
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 240.72",
+     "1 个引擎共振提名 (engine_v5/multidim)"
     ],
-    "tier": "C"
+    "weak_market": true,
+    "tier": "B"
    },
+   {
+    "code": "603598",
+    "name": "引力传媒",
+    "price": 20.55,
+    "score": 41.8,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 8.639999999999999,
+     "valuation": 0,
+     "position": 9.175,
+     "flow": 0
+    },
+    "sources": [
+     "ai_pick_v4",
+     "multidim"
+    ],
+    "entry_zone": [
+     20.24,
+     20.65
+    ],
+    "stop": 19.63,
+    "target": 21.78,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": 31.7,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 19.63",
+     "1 个引擎共振提名 (ai_pick_v4/multidim)",
+     "20日位 32%"
+    ],
+    "weak_market": true,
+    "tier": "B"
+   }
+  ],
+  "C_avoid": [
    {
     "code": "601098",
     "name": "",
@@ -306,7 +464,10 @@
     "value_dev_pct": null,
     "value_tag": null,
     "pos240_pct": null,
-    "reasons": [],
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 10.56"
+    ],
+    "weak_market": true,
     "tier": "C"
    },
    {
@@ -335,7 +496,10 @@
     "value_dev_pct": null,
     "value_tag": null,
     "pos240_pct": null,
-    "reasons": [],
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 15.57"
+    ],
+    "weak_market": true,
     "tier": "C"
    },
    {
@@ -364,7 +528,10 @@
     "value_dev_pct": null,
     "value_tag": null,
     "pos240_pct": null,
-    "reasons": [],
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 23.30"
+    ],
+    "weak_market": true,
     "tier": "C"
    },
    {
@@ -393,7 +560,266 @@
     "value_dev_pct": null,
     "value_tag": null,
     "pos240_pct": null,
-    "reasons": [],
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 13.16"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "301190",
+    "name": "",
+    "price": 48.45,
+    "score": 34.7,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.71,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     47.72,
+     48.69
+    ],
+    "stop": 46.27,
+    "target": 51.36,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 46.27"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "002467",
+    "name": "",
+    "price": 5.28,
+    "score": 34.7,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.679999999999996,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     5.2,
+     5.31
+    ],
+    "stop": 5.04,
+    "target": 5.6,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 5.04"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "600323",
+    "name": "",
+    "price": 30.42,
+    "score": 34.7,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.679999999999996,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     29.96,
+     30.57
+    ],
+    "stop": 29.05,
+    "target": 32.25,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 29.05"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "601398",
+    "name": "",
+    "price": 8.5,
+    "score": 34.7,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.679999999999996,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     8.37,
+     8.54
+    ],
+    "stop": 8.12,
+    "target": 9.01,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 8.12"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "605089",
+    "name": "",
+    "price": 22.9,
+    "score": 34.6,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.56,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     22.56,
+     23.01
+    ],
+    "stop": 21.87,
+    "target": 24.27,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 21.87"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "603883",
+    "name": "",
+    "price": 14.42,
+    "score": 34.3,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.349999999999998,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     14.2,
+     14.49
+    ],
+    "stop": 13.77,
+    "target": 15.29,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 13.77"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "600970",
+    "name": "",
+    "price": 7.89,
+    "score": 34.1,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.11,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     7.77,
+     7.93
+    ],
+    "stop": 7.53,
+    "target": 8.36,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 7.53"
+    ],
+    "weak_market": true,
+    "tier": "C"
+   },
+   {
+    "code": "000538",
+    "name": "",
+    "price": 52.08,
+    "score": 34.0,
+    "parts": {
+     "resonance": 12,
+     "engine_avg": 22.05,
+     "valuation": 0,
+     "position": 0,
+     "flow": 0
+    },
+    "sources": [
+     "engine_v5"
+    ],
+    "entry_zone": [
+     51.3,
+     52.34
+    ],
+    "stop": 49.74,
+    "target": 55.2,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 49.74"
+    ],
+    "weak_market": true,
     "tier": "C"
    }
   ]
