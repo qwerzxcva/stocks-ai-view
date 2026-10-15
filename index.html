@@ -1779,6 +1779,86 @@ function renderPools(){
     h+='<div class="fl" style="font-size:10px">暂无板块资金数据 (collect_market_extras 的 sector_moneyflow 未产出)</div>';
   }
 
+  // ⑦c 趋势强度指数 (RTSI 个股 / TMA 板块 / MSCI 市场情绪)
+  //  数学模型借鉴 hengruiyun/AI-Stock-Master (AGPL-3.0, 仅参考公开数学式, 未复制代码)
+  //  与 engine_v5 的差别: 17 指标只给「信号数量」, RTSI 用回归 R²/p 值给「信号质量」。
+  const tsm=g.trend_strength||{};
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
+     +'<b style="font-size:12px">⑦c 趋势强度指数</b> <span class="sub">RTSI 个股趋势强度 (含回归显著性) · TMA 板块技术动量 · MSCI 市场情绪</span></div>';
+  if(tsm.msci){
+    const ms=tsm.msci, dm=ms.dims||{};
+    const mc=ms.msci>=58?'var(--up)':(ms.msci<=42?'var(--dn)':'var(--tx2)');
+    h+='<div style="display:flex;gap:14px;flex-wrap:wrap;padding:4px 0 8px;font-size:10px">'
+      +'<span>MSCI 市场情绪 <b style="font-size:15px;color:'+mc+'">'+_esc2(ms.msci)+'</b> '
+      +'<span class="fl">'+_esc2(ms.mood)+'</span></span>'
+      +'<span class="fl">涨跌家数 '+_esc2(dm.advance)+'</span>'
+      +'<span class="fl">涨跌停比 '+_esc2(dm.limit_ratio)+'</span>'
+      +'<span class="fl">封板率 '+_esc2(dm.seal)+'</span>'
+      +'<span class="fl">晋级率 '+_esc2(dm.promo)+'</span>'
+      +'<span class="fl">成交额 '+_esc2(dm.turnover)+'</span>'
+      +'<span class="fl">主力资金 '+_esc2(dm.capital)+'</span>'
+      +'<span class="fl">全球情绪 '+_esc2(dm.global)+'</span></div>';
+  }
+  const rtsi=((tsm.rtsi||{}).stocks||[]).slice(0,15);
+  if(rtsi.length){
+    h+='<div class="fl" style="font-size:9px;margin:2px 0 4px">RTSI 个股趋势强度 TOP15 (20日回归: 斜率+一致性+R²显著性+量能)</div>';
+    h+='<table><thead><tr><th>代码</th><th>RTSI</th><th>方向</th><th>20日斜率%</th><th>R²</th><th>p值</th><th>一致性</th><th>量比</th></tr></thead><tbody>';
+    rtsi.forEach(x=>{
+      const dc=x.direction==='up'?'var(--up)':(x.direction==='down'?'var(--dn)':'var(--tx3)');
+      const dl={up:'上升',down:'下跌',flat:'走平'}[x.direction]||x.direction;
+      h+='<tr><td><b>'+_esc2(x.code)+'</b></td>'
+        +'<td style="font-weight:700;color:'+(x.rtsi>=65?'var(--up)':'var(--tx)')+'">'+_esc2(x.rtsi)+'</td>'
+        +'<td style="color:'+dc+'">'+dl+'</td>'
+        +'<td class="'+(x.trend_slope_pct>=0?'up':'dn')+'">'+_esc2(x.trend_slope_pct)+'</td>'
+        +'<td class="fl">'+_esc2(x.r2)+'</td>'
+        +'<td class="fl">'+_esc2(x.p_value)+'</td>'
+        +'<td class="fl">'+_esc2(x.consistency)+'</td>'
+        +'<td class="fl">'+_esc2(x.volume_ratio)+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    h+='<div class="fl" style="font-size:9px;padding:2px 0">注意: RTSI 高但方向为「下跌」表示<b>下跌趋势明确</b>, 不是买入信号 —— 强度≠看多。R² 越低趋势越接近随机游走。</div>';
+  }
+  const tma=((tsm.tma||{}).sectors||[]).slice(0,12);
+  if(tma.length){
+    h+='<div class="fl" style="font-size:9px;margin:6px 0 4px">TMA 板块技术动量 TOP12 (RSI+MACD+动量变化+均线上方占比+量能)</div>';
+    h+='<table><thead><tr><th>板块</th><th>TMA</th><th>RSI</th><th>MACD</th><th>动量</th><th>均线上方占比</th><th>1日%</th><th>20日%</th><th>成分数</th></tr></thead><tbody>';
+    tma.forEach(x=>{
+      h+='<tr><td><b>'+_esc2(x.sector)+'</b></td>'
+        +'<td style="font-weight:700;color:'+(x.tma>=65?'var(--up)':'var(--tx)')+'">'+_esc2(x.tma)+'</td>'
+        +'<td class="fl">'+_esc2(x.rsi)+'</td>'
+        +'<td class="fl">'+_esc2(x.macd)+'</td>'
+        +'<td class="fl">'+_esc2(x.momentum)+'</td>'
+        +'<td class="fl">'+_esc2(x.technical_weight)+'%</td>'
+        +'<td class="'+(x.chg_1d>=0?'up':'dn')+'">'+_esc2(x.chg_1d)+'</td>'
+        +'<td class="'+(x.chg_20d>=0?'up':'dn')+'">'+_esc2(x.chg_20d)+'</td>'
+        +'<td class="fl">'+_esc2(x.n_stocks)+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
+
+  // ⑦d 多空辩论 (红队机制), 架构借鉴 guangxiangdebizi/TradingAgents-MCPmode (MIT)
+  //  依据: weight_calibrator_v3 实测看多胜率 43.8%<随机 50%; factor_lab 实测
+  //  12 特征仅 below_ma60 有效。单向看多打分系统性高估, 故强制红队列反面证据。
+  const bb=g.bull_bear_debate||{};
+  const debates=(bb.debates||[]);
+  if(debates.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
+       +'<b style="font-size:12px">⑦d 多空辩论 (红队)</b> <span class="sub">看涨方 vs 看跌方 vs 风控裁决 · 红队否决 '+_esc2(bb.n_vetoed)+'/'+_esc2(bb.n_debated)+' ('+_esc2(bb.veto_rate)+'%)</span></div>';
+    h+='<table><thead><tr><th>代码</th><th>裁决</th><th>分数</th><th>多头证据</th><th>空头证据</th><th>风控理由</th></tr></thead><tbody>';
+    debates.slice(0,15).forEach(x=>{
+      const v=x.risk.verdict;
+      const vc=v==='可关注'?'var(--up)':(v==='回避'?'var(--dn)':'var(--tx2)');
+      h+='<tr><td><b>'+_esc2(x.code)+'</b></td>'
+        +'<td style="font-weight:700;color:'+vc+'">'+_esc2(v)+'</td>'
+        +'<td>'+_esc2(x.risk.final_score)+'</td>'
+        +'<td style="max-width:230px;font-size:9px">'+_esc2((x.bull.case||'').slice(0,110))+'</td>'
+        +'<td style="max-width:230px;font-size:9px">'+_esc2((x.bear.case||'').slice(0,110))+'</td>'
+        +'<td style="max-width:200px;font-size:9px">'+_esc2((x.risk.reasons||[]).join('; ').slice(0,90))+'</td></tr>';
+    });
+    h+='</tbody></table>';
+    h+='<div class="fl" style="font-size:9px;padding:4px 0">红队机制: 强制一个 Agent 站反面列「不该买的理由」; 无显式风险时标注「未检出≠无风险」, 不硬编。阈值全部来自本项目实证 (R²>=0.5 / 炸板率>=22% / 逐笔主动卖<=-15% / 低估20%)。</div>';
+  }
+
   // ⑧ 大宗交易池
   P('⑧ 大宗交易池','大宗交易明细 (溢价率/成交量/成交额)',
     (g.enrich||{}).blocktrade||[]);
@@ -2421,6 +2501,8 @@ const SOURCES = [
   'data/cycle.json',           // 周期池
   'data/sector_pool.json',     // 板块池
   'data/auction_engine.json',  // 竞价抢筹与日内资金结构 (腾讯逐笔分笔)
+  'data/trend_strength.json',   // 趋势强度指数族 RTSI/TMA/MSCI (借鉴 AI-Stock-Master)
+  'data/bull_bear_debate.json', // 多空辩论红队机制 (借鉴 TradingAgents-MCPmode)
   'data/lowpool.json',         // 低位池
   'data/market_now.json',      // 实时行情 (每5分钟)
   'data/realtime_minute.json', // 分钟级 (每3分钟)

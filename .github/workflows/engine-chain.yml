@@ -232,6 +232,10 @@ jobs:
           python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
           python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
+          # 趋势强度指数族 (RTSI/TMA/MSCI), 数学模型借鉴 hengruiyun/AI-Stock-Master
+          # 补 engine_v5 的盲区: 17 指标只给「信号数量」, RTSI 用回归 R²/p 值
+          # 给「信号质量」—— 一条 R²=0.9 的上升趋势远比 7 个指标同时说涨可靠。
+          python3 scripts/trend_strength.py --limit 500 --out data/trend_strength.json || echo "trend_strength skipped"
 
           echo "--- tier 2: factors + decision + limit-up audit ---"
           # 腾讯逐笔成交 (分笔明细): 为竞价抢筹/封板质量提供真实主动买卖数据。
@@ -318,6 +322,15 @@ jobs:
           python3 scripts/premarket_picks.py --out data/premarket_picks.json || echo "premarket skipped"
           python3 scripts/midday_picks.py --out data/midday_picks.json || echo "midday skipped"
 
+          # 多空辩论 (红队机制), 架构借鉴 guangxiangdebizi/TradingAgents-MCPmode (MIT)
+          # 为什么放在推股之后: 对刚生成的推股清单做反向审查。
+          # 依据: weight_calibrator_v3 实测看多胜率 43.8% < 随机 50%,
+          # factor_lab 实测 12 特征仅 below_ma60 有效 —— 单向看多打分系统
+          # 在当前市况下系统性高估, 强制一个 Agent 站反面列「不该买的理由」。
+          # 有 GITCODE_TOKEN 时 LLM 组织论证, 没有则纯规则版 (仍有效)。
+          python3 scripts/bull_bear_debate.py --from-picks today_picks.json --limit 15 \
+            --out data/bull_bear_debate.json || echo "debate skipped"
+
           # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
           # 放在 tier 8 最后, 这样十维/海外关联/推股/收盘复盘全部就绪
           # 失败不影响其他管线 (token 缺失或额度用尽都只跳过)
@@ -340,6 +353,7 @@ jobs:
             data/limitup_attribution.json data/limitup_forecast.json \
             data/weight_calibration.json \
             data/auction_engine.json data/ticks_$(date +%Y%m%d).json \
+            data/trend_strength.json data/bull_bear_debate.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -351,7 +365,8 @@ jobs:
             --protect data/limitup_attribution.json --protect data/limitup_forecast.json \
             --protect data/weight_calibration.json \
             --protect data/auction_engine.json \
-            --protect data/ticks_$(date +%Y%m%d).json
+            --protect data/ticks_$(date +%Y%m%d).json \
+            --protect data/trend_strength.json --protect data/bull_bear_debate.json
 
       - name: Publish to the data warehouse
         env:

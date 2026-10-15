@@ -336,6 +336,35 @@ def main():
         })
 
     bulk_dates = [d for rec in kl.values() for d in ([rec["dates"][-1]] if rec["dates"] else [])]
+
+    # ── Analyzer 指标 (借鉴 backtrader Analyzer 架构, 见 scripts/analyzers.py) ──
+    #  为什么加: 此前 overall 只有胜率+均收益+最大回撤, 缺风险调整收益。
+    #  胜率 50% 但盈亏比 2:1 的策略是赚钱的, 单看胜率会漏掉 ——
+    #  analyzers 的 TradeAnalyzer 给 profit_loss_ratio, Sharpe/Sortino/Calmar/SQN
+    #  给风险调整后的视图。
+    analyzer_stats = None
+    if all_rets:
+        try:
+            from analyzers import run_all
+            trades = [{"ret_pct": r, "exit_date": None, "hold_bars": h}
+                      for r, h in zip(all_rets, [days[0]] * len(all_rets))]
+            az = run_all(trades)
+            analyzer_stats = {
+                "sharpe": az.get("sharpe"),
+                "sortino": az.get("sortino"),
+                "calmar": az.get("calmar"),
+                "drawdown": az.get("drawdown"),
+                "trades": az.get("trades"),
+                "sqn": az.get("sqn"),
+                "origin": "scripts/analyzers.py, 架构借鉴 cloudQuant/backtrader (GPL-3.0,"
+                          " 仅借鉴 Analyzer 设计, 数学式独立实现)",
+            }
+            print(f"[kline_sim] analyzers: sharpe={az['sharpe'].get('sharperatio')} "
+                  f"sqn={az['sqn'].get('sqn')} "
+                  f"盈亏比={az['trades'].get('profit_loss_ratio')}")
+        except Exception as e:
+            print(f"[kline_sim] analyzers skipped: {e}", file=sys.stderr)
+
     result = {
         "ts": datetime.now(CST).isoformat(timespec="seconds"),
         "sources": src_meta,
@@ -355,6 +384,7 @@ def main():
             "n_pairs": len(all_rets),
         },
         "by_horizon": by_horizon,
+        "analyzers": analyzer_stats,
         "equity_curve": {"max_day": tmax, "values": [round(v, 4) for v in curve]},
         "top_signals": top,
         "coverage": {
