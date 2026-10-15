@@ -290,7 +290,13 @@ SOURCES = [
         "notes": "2026-10-14 逆向打通: 真实接口是 /api/cache?name=telegraphList "
                  "(不是网传的 /v1/roll/get_roll_list); sign=md5(sha1(raw)), "
                  "raw=字典序 key=value & 连接; 用 5 组浏览器真实请求反推 5/5 命中。"
-                 "lastTime=0 返回最新 20 条。实现见 scripts/cls_sign.py。",
+                 "lastTime=0 返回最新 20 条。实现见 scripts/cls_sign.py。"
+                 "2026-10-16 复核: **该端点仍可用且实测免签也能返回 200** "
+                 "(errno=0, 20 条, 31 字段); "
+                 "与 cls_telegraph_v1 的差异: cache 版 title 非空率更高 (7/20 vs 0/20), "
+                 "但字段更少 (31 vs 53) 且无 category 分类筛选; "
+                 "lastTime 分页**仅部分生效** — 传末条 ctime 返回 19 条 (边界重叠 1 条), "
+                 "无法真正翻页; 两条端点互补: cache 拿 title, v1 拿分类+富字段",
         "degrade_to": [],
     },
     {
@@ -2218,6 +2224,50 @@ SOURCES = [
                  "用来快速确认全市场股票数与雪球 screener 的 count=5000 交叉校验 "
                  "(5575 vs 5000 差 575, 疑为新股/ST/退市整理期口径差, **未核实**)",
     },
+
+    # ============ 财联社 (2026-10-16 签名逆向成功, 替代已 blocked 的 cls_cn) ============
+    {
+        "id": "cls_telegraph_v1",
+        "name": "财联社电报 (v1 签名版, 分类筛选)",
+        "url": "https://www.cls.cn/v1/roll/get_roll_list?app=CailianpressWeb&category={cat}&os=web&rn=50&sv=7.7.5&sign={sign}",
+        "auth": "sign (md5(sha1(排序参数串)))",
+        "status": "ok",
+        "freq": "minute",
+        "delay": "实时",
+        "encoding": "utf-8",
+        "method": "GET",
+        "fields": "53 字段; 核心: id/ctime/level(A|B|C)/brief/content/subjects(subject_name+plate_id)/"
+                 "stock_list(关联股票)/audio_url/shareurl/reading_num/comment_num/share_num",
+        "provides": ["news/cls_telegraph.json", "hot_impact 题材映射"],
+        "notes": "采集器 scripts/cls_collect.py; 2026-10-16 实测 200, 51909B; "
+                 "**签名算法: 所有参数(含空 category)按 key 排序 → k=v& 拼接 → "
+                 "sha1().hexdigest() → md5().hexdigest()**; "
+                 "**关键坑: category 必须参与签名, 即使为空** — 项目旧 cls_sign.py 漏了它, "
+                 "导致一直返回 errno=10012 '签名错误'; 新采集器已修正; "
+                 "sv 版本号不敏感 (7.7.5/8.0.0/8.7.9 均可); "
+                 "**rn 上限 50** — rn=60/70/80/99/100/150/200 全部返回 0 条; "
+                 "**分页参数全无效**: last_time/last_id/ctime/min_time/refresh_type/page/pageNo/p "
+                 "实测 5 页翻下来都是同样 50 条 — 只返回最新窗口, 无历史回溯; "
+                 "category 白名单 6 个且服务端真过滤: red(40条全B级)/announcement/watch/"
+                 "hk_us/fund(38条C级)/remind; "
+                 "title 字段恒为空串 (电报正文在 brief/content); "
+                 "**subjects 100% 覆盖且带 plate_id** — 可直接映射东财板块, 是 hot_impact 的优质输入; "
+                 "stock_list 覆盖率低 (实测 2/50), 不要依赖它做个股关联",
+    },
+    {
+        "id": "cls_nodeapi_dead",
+        "name": "财联社 nodeapi 路径 (全 404, 留档)",
+        "url": "https://www.cls.cn/nodeapi/{telegraphList,updateTelegraphList}",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "-",
+        "provides": [],
+        "notes": "2026-10-16 实测: 网上多个开源项目 (sshelll/clstelegraph Go 版等) 用的 "
+                 "nodeapi 免签路径现在全 404; v2/roll/get_roll_list 返回 errno=50101 "
+                 "'小财正在加载中...'; nodeapi/api/telegraph 路径同样 404; "
+                 "结论: 财联社已把免签入口全关, 只剩 v1 签名版可用",
+    },
 ]
 
 BY_ID = {s["id"]: s for s in SOURCES}
@@ -2318,6 +2368,7 @@ SHARDS = {
             "em_datacenter_dead_reportnames",
             "szse_report_a_stock", "szse_report_fund_list", "szse_report_etf_list",
             "dead_third_batch", "sina_hq_node_count",
+            "cls_telegraph_v1", "cls_nodeapi_dead",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],

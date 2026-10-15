@@ -4,18 +4,21 @@ import hashlib
 def cls_sign(params):
     """财联社 v1 签名 — 逆向自 wwwjs.cls.cn/_next/static/chunks/pages/_app JS
 
-    算法 (模块 85073 request 封装 + 模块 36498):
-      1. 参数补默认值: os=web, sv=8.7.9, app=CailianpressWeb
+    算法 (2026-10-16 实测修正):
+      1. 参数补默认值: os=web, sv=7.7.5, app=CailianpressWeb, category=''
+         (**category 必须参与签名, 即使为空 — 漏了它返回 errno=10012 '签名错误'**)
       2. 按 key 字典序排序 (JS 的 sort() 默认按字符串)
       3. 每项格式化为 key=value; 数组是 key[0]=v&key[1]=v; 嵌套 object 递归
       4. filter 掉空值, 用 & 连接
-      5. sign = md5(上面的串).hexdigest()  (小写)
-    无需 secret, 无需登录态。
+      5. sign = md5(sha1(raw).hexdigest()).hexdigest()  (双层 hash, 小写)
+    无需 secret, 无需登录态。rn 上限 50; 分页参数服务端忽略。
     """
     p = dict(params or {})
     p.setdefault("os", "web")
-    p.setdefault("sv", "8.7.9")
+    p.setdefault("sv", "7.7.5")
     p.setdefault("app", "CailianpressWeb")
+    # 2026-10-16 实测: category 必须参与签名, 漏了它服务端返回 errno=10012
+    p.setdefault("category", "")
 
     def fmt(key, val):
         if val is None:

@@ -176,6 +176,17 @@ jobs:
           python3 scripts/em_f10_collect.py --codes "$CODES" --group all --limit 50 \
             --out /tmp/ths/em_f10.json || echo "::warning::em_f10 部分失败"
 
+      # ── 5d. 财联社电报 (签名版, 分类筛选) ──────────────────
+      # 盘中高频有价值 (实时电报), 收盘后价值低但可留档
+      - name: Collect CLS telegraph
+        if: github.event_name == 'workflow_dispatch' || github.event.inputs.full == 'true'
+        run: |
+          mkdir -p /tmp/ths
+          python3 scripts/cls_collect.py \
+            --categories ",red,announcement,watch,hk_us,fund,remind" --rn 50 \
+            --out /tmp/ths/cls_telegraph.json \
+            || echo "::warning::cls telegraph 失败"
+
       # ── 6. 组装落盘 (只追加不覆盖别人的文件) ───────────────
       - name: Assemble outputs
         run: |
@@ -253,6 +264,20 @@ jobs:
           summary["eastmoney_f10"] = n_em
           print(f"em_f10 files: {n_em}")
 
+          # 6.5 财联社电报
+          clsj = "/tmp/ths/cls_telegraph.json"
+          if os.path.exists(clsj):
+              try:
+                  cd = json.load(open(clsj, encoding="utf-8"))
+                  summary["cls_telegraph"] = {"unique": cd.get("total_unique"),
+                                              "categories": {k: v.get("n")
+                                                             for k, v in cd.get("categories", {}).items()}}
+                  with open("data/ths/cls_telegraph.json", "w", encoding="utf-8") as f:
+                      json.dump(cd, f, ensure_ascii=False)
+                  print(f"cls_telegraph: {cd.get('total_unique')} unique")
+              except Exception as e:
+                  print(f"cls copy failed: {e}")
+
           json.dump(summary, open("data/ths/manifest.json", "w", encoding="utf-8"),
                     ensure_ascii=False, indent=1)
           print(f"data/ths total files: {summary['files']}")
@@ -265,7 +290,7 @@ jobs:
           echo "- Time: $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M CST')" >> $GITHUB_STEP_SUMMARY
           echo "- Mode: ${{ steps.universe.outputs.mode }}" >> $GITHUB_STEP_SUMMARY
           echo "- Files under data/ths: $(find data/ths -type f | wc -l)" >> $GITHUB_STEP_SUMMARY
-          for f in /tmp/ths/kline.json /tmp/ths/finance.json /tmp/ths/f10.json /tmp/ths/board.json /tmp/ths/news.json /tmp/ths/xq_screener.json /tmp/ths/em_f10.json; do
+          for f in /tmp/ths/kline.json /tmp/ths/finance.json /tmp/ths/f10.json /tmp/ths/board.json /tmp/ths/news.json /tmp/ths/xq_screener.json /tmp/ths/em_f10.json /tmp/ths/cls_telegraph.json; do
             if [ -f "$f" ]; then
               echo "- $(basename $f): $(stat -c%s $f) B" >> $GITHUB_STEP_SUMMARY
             fi
