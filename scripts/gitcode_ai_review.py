@@ -312,6 +312,8 @@ def main():
     ap.add_argument("--out-md", default=os.path.join(DATA_DIR, "ai_review.md"))
     ap.add_argument("--out-json", default=os.path.join(DATA_DIR, "ai_review.json"))
     ap.add_argument("--dry-run", action="store_true", help="只打印 prompt 不调用")
+    ap.add_argument("--force", action="store_true",
+                    help="忽略输入 hash 缓存, 强制重新调用 LLM")
     args = ap.parse_args()
 
     token = os.environ.get("GITCODE_TOKEN") or DEFAULT_TOKEN
@@ -324,6 +326,40 @@ def main():
 
     if args.dry_run:
         print(prompt)
+        return 0
+
+    # ── Replay caching (架构借鉴 Lumiwealth/lumibot, GPL-3.0 仅学设计) ──
+    #  lumibot 的 agentic backtesting 对每次 agent 调用按
+    #  (prompt, context, model, tool surface, timestamp) 的 SHA-256 做缓存,
+    #  重跑同一组合直接复用决策, 零 LLM 调用。GitCode AI 每月有额度限制,
+    #  而我们的复盘输入在同一天内基本不变 —— 不缓存等于反复为同样的数据付费。
+    #  这里按「输入内容 hash」缓存: 输入未变则直接复用上次结果。
+    import hashlib
+    ctx_hash = hashlib.sha256(
+        (prompt + "|" + (MODELS[0] if MODELS else "")).encode("utf-8")).hexdigest()[:16]
+    cache_path = os.path.join(DATA_DIR, "ai_review_cache.json")
+    cached = None
+    try:
+        if os.path.exists(cache_path):
+            cached = json.load(open(cache_path, encoding="utf-8"))
+    except Exception:
+        cached = None
+    if (cached and cached.get("ctx_hash") == ctx_hash and cached.get("review")
+            and not args.force):
+        print(f"[ai_review] 输入未变 (hash={ctx_hash}), 复用缓存, 跳过 LLM 调用 "
+              f"(缓存生成于 {cached.get('ts')})")
+        out = dict(cached)
+        out["from_cache"] = True
+        out["cache_age_hours"] = round(
+            (datetime.now(CST) - datetime.fromisoformat(cached["ts"])).total_seconds() / 3600, 1)
+        for p in (args.out_json,):
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(out, f, ensure_ascii=False, indent=2)
+        md_path = args.out_md
+        with open(md_path, "w", encoding="utf-8") as f:
+            f.write("# AI 每日复盘 %s CST (复用缓存)\n\n%s\n\n---\n\n"
+                    "*输入未变, 复用 %s 的结果; 加 --force 强制重新调用。*\n" % (
+                        out["ts"][:16], out.get("review", ""), out["ts"][:16]))
         return 0
 
     print("[ai_review] 调用 GitCode AI (%s) ..." % MODELS[0], flush=True)
@@ -344,7 +380,9 @@ def main():
                        "self_reflect", "overseas_linkage", "global_markets",
                        "sector_moneyflow", "premarket_picks", "close_review",
                        "news_transmission", "news_digest"],
-            "note": "消耗 GitCode 每月 AI 额度; 失败时不影响其他管线",
+            "note": "消耗 GitCode 每月 AI 额度; 失败时不影响其他管线; "
+                   "输入未变时按 hash 复用缓存 (replay caching, 借鉴 lumibot 设计)",
+            "ctx_hash": ctx_hash,
             "caveat": "AI 生成内容仅供研究参考, 不构成投资建议",
         },
     }
@@ -359,6 +397,15 @@ def main():
               content or "(调用失败)", ctx))
     with open(args.out_md, "w", encoding="utf-8") as f:
         f.write(md)
+    # 写入 replay cache (输入 hash → 结果), 供下次输入未变时复用
+    if content:
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(cache_path)), exist_ok=True)
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(out, f, ensure_ascii=False, indent=1)
+            print(f"[ai_review] 已写缓存 (hash={ctx_hash})")
+        except Exception as e:
+            print(f"[ai_review] 缓存写入失败 (不影响本次产出): {e}", file=sys.stderr)
     print("[ai_review] 模型=%s 长度=%d 字" % (model, len(content or "")))
     print("[ai_review] → %s / %s" % (args.out_md, args.out_json))
     return 0 if content else 1

@@ -253,7 +253,8 @@ def rtsi(rec, window=20):
         "vol_consistency": round(vol_consistency, 1),
         "confidence": round(confidence, 1),
         "r2": round(r2, 3),
-        "p_value": round(p, 4),
+        "p_value": round(p, 4) if p >= 0.0001 else 0.0001,
+        "p_value_note": None if p >= 0.0001 else "<0.0001 (正态近似下溢, 非绝对零)",
         "volume_ratio": round(ratio, 2),
         "vol_score": round(vol_score, 1),
         "slope_score": round(slope_score, 1),
@@ -492,6 +493,9 @@ def main():
             "rtsi_direction": "direction 按 trend_slope_pct 判 up/flat/down; "
                               "RTSI 分高但 direction=down 表示「下跌趋势明确」, "
                               "不是买入信号 —— 强度≠看多",
+            "r2_caveat": "R² 基于 20 个样本点的回归, 即使 0.8 也不算高确定性 "
+                         "(样本少, 单点影响大); p_value 用正态近似, <0.0001 时 "
+                         "截断为 0.0001 并附 note, 不显示 0 以免误导为「完全确定」",
             "caveat": "α/β 权重为本项目自定 (原作者称机器学习优化但未公开数值); "
                       "MACD 用 SMA 近似 EMA (避免逐日递推, 对信号强度足够); "
                       "p_value 用正态近似 (未引 scipy); "
