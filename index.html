@@ -1064,12 +1064,22 @@ function renderGlobalMarkets(d){
   const KC2SYM={HSI:'hkHSI',HSCEI:'hkHSCEI',HSTECH:'hkHSTECH',
     '.DJI':'usDJI','.IXIC':'usIXIC','usSPX':'usINX','.NDX':'usNDX','usNDX':'usNDX',
     DJI:'usDJI',IXIC:'usIXIC',SPX:'usINX',NDX:'usNDX'};
+  // A股指数: kline_code 是 000001 (无前缀), index_kline 的 key 是 sh000001
+  const A_IDX={'000001':'sh000001','399001':'sz399001','000688':'sh000688',
+               '899050':'bj899050','000300':'sh000300','399006':'sz399006'};
   const spark=(sym,n)=>{try{
+    let closes=null;
+    // 格式1: global_kline.symbols[sym].bars = [[date,o,c,h,l,v]]
     const gk=(window._data||{}).global_kline||{};
     const v=(gk.symbols||{})[sym];
-    if(!v||!v.bars||v.bars.length<5) return '';
-    const bars=v.bars.slice(-n);
-    const closes=bars.map(b=>b[2]);
+    if(v&&v.bars&&v.bars.length>=5){ closes=v.bars.slice(-n).map(b=>b[2]); }
+    // 格式2: index_kline.indices[sym] = [{date,close,vol}] (A股指数)
+    if(!closes){
+      const ik=(window._data||{}).index_kline||{};
+      const arr=(ik.indices||{})[sym]||(ik.indices||{})[A_IDX[sym]];
+      if(arr&&arr.length>=5){ closes=arr.slice(-n).map(b=>b.close); }
+    }
+    if(!closes||closes.length<5) return '';
     const lo=Math.min.apply(null,closes), hi=Math.max.apply(null,closes);
     const rng=(hi-lo)||1;
     const W=64,H=20;
@@ -1125,7 +1135,7 @@ function renderGlobalMarkets(d){
       h+='<tr><td>'+nameCell+'</td>'
         +'<td style="font-weight:700">'+_esc2(x.price)+'</td>'
         +'<td class="'+c+'" style="font-weight:700">'+(x.chg_pct>=0?'+':'')+_esc2(x.chg_pct)+'%</td>'
-        +'<td>'+(kc?spark(KC2SYM[kc]||kc,60):'')+'</td>'
+        +'<td>'+(kc?spark(KC2SYM[kc]||A_IDX[kc]||kc,60):'')+'</td>'
         +'<td style="color:'+mcol+'">'+mark+' '+_esc2(x.status_label)+'</td>'
         +'<td class="fl">'+_esc2(x.local_time)+'</td>'
         +'<td class="fl">'+_esc2(x.session)+'</td>'
