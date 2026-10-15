@@ -1,0 +1,87 @@
+# 全球各大股市实时行情 — 覆盖 shard-collect 扫不到的时段
+#
+# 背景: shard-collect 的 cron 只跑 UTC 01:00-08:55 (= CST 09:00-16:55),
+# 恰好是 A 股时段。于是欧美盘中/收盘、亚洲早盘这三个窗口里
+# global_markets.json 一直是旧快照, 「全球股市」tab 的数据停在十几个小时前。
+#
+# 本 workflow 专补这些时段:
+#   CST 16:00-17:00  欧股收盘定格
+#   CST 21:30-23:59  美股盘中 (每 10 分钟)
+#   CST 00:00-02:00  美股收盘后
+#   CST 07:00-08:55  亚洲早盘 (日股/韩股开盘前)
+#
+# 采集脚本只用标准库 (腾讯 sqt / 东财 push2 / 新浪 znb 三源),
+# 单轮 3 个请求, 不装任何依赖。
+name: global-markets-realtime
+
+on:
+  schedule:
+    - cron: '0 8,9,10,14,15,16,17,18 * * 1-5'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: global-markets-realtime
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    # 只在主仓 (A) 跑: 镜像仓同步本文件后靠这里跳过, 不打外部源
+    if: github.repository == 'qwerzxcva/stocks-ai-view'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Collect global markets
+        run: |
+          # 休市时段也照采: 脚本会标注每个指数的 盘中/盘前/盘后/休市 状态,
+          # 价格取上一交易日收盘。只有全部源都失败才保留上一版。
+          python3 scripts/collect_global_markets.py --out data/global_markets.json \
+            || echo "::warning::global_markets 采集失败, 保留上一版"
+
+      - name: Report
+        run: |
+          python3 - <<'PY'
+          import json, os
+          p = "data/global_markets.json"
+          if not os.path.exists(p):
+              print("no global_markets.json"); raise SystemExit(0)
+          d = json.load(open(p, encoding="utf-8"))
+          print("ts:", d.get("ts"))
+          print("ok: %s/%s" % (d.get("n_ok"), d.get("n_indices")))
+          for mkt, lst in (d.get("markets") or {}).items():
+              parts = []
+              for i in lst:
+                  v = i.get("chg_pct")
+                  parts.append("%s%s%s" % (
+                      {"open": "*", "pre": "o", "post": "-", "closed": "x"}.get(i.get("status"), "?"),
+                      i.get("name"),
+                      ("%+.2f%%" % v) if v is not None else ""))
+              print("  %-4s %s" % (mkt, "  ".join(parts)))
+          gs = d.get("global_sentiment") or {}
+          print("情绪: %s (%s) 均值 %s" % (
+              gs.get("sentiment_label"), gs.get("sentiment"), gs.get("avg_chg_pct")))
+          PY
+
+      - name: Commit and push
+        run: |
+          python3 scripts/git_push_retry.py --msg "global-markets: realtime quotes" \
+            data/global_markets.json \
+            --protect data/global_markets.json

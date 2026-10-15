@@ -106,6 +106,30 @@ def fetch_pool(kind, date_str, retries=3):
     return {"count": 0, "pool": []}
 
 
+# ─── 1b. 竞价抢筹榜 ────────────────────────────────────────────────
+# 09:25 集合竞价结束即封涨停的票 = 竞价阶段资金直接抢筹,
+# 不用额外接口: 涨停池的 fbt 字段就是首封时间 (HHMMSS)。
+def build_jingjia(zt_pool):
+    out = []
+    for p in zt_pool or []:
+        t = str(p.get("zt_time") or "").strip()
+        if not t.isdigit():
+            continue
+        # 东财 fbt 省略前导零: 92500 = 09:25:00, 也可能给满 6 位
+        t = t.zfill(6)
+        hh, mm = int(t[:2]), int(t[2:4])
+        # 竞价窗口 09:15-09:25; 09:25:00 整是竞价撮合出结果的时刻
+        if not (hh == 9 and 15 <= mm <= 25):
+            continue
+        rec = dict(p)
+        rec["auction_time"] = t
+        # 竞价抢筹强度: 连板越高 + 封得越早 = 越强
+        rec["strength"] = (p.get("lianban") or 1) * 10 + (25 - mm)
+        out.append(rec)
+    out.sort(key=lambda x: -x["strength"])
+    return out
+
+
 # ─── 2. 涨跌分布 ────────────────────────────────────────────────────
 def fetch_zdfenbu(date_str):
     """东财涨跌分布: fenbu 是 [{'-11':19},{'11':46},...] 形式。"""
@@ -500,6 +524,7 @@ def collect_all(date_str=None, indices=None, phase=None):
         "ths_strong": ths_strong[:40],
         "lhb": lhb[:20],
         "blocktrade": blocktrade[:20],
+        "jingjia": build_jingjia(zt["pool"])[:20],
         "enrich_meta": enrich_meta,
         "margin": margin,
         "index_kline": idx_kline,

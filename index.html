@@ -235,43 +235,43 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="1" style="display:none">
+    <div class="card c-card" data-ci="1">
       <div class="hd">全球股市 <span class="sub" id="gmSub">A股 · 港股 · 日股 · 韩股 · 欧股 · 美股 — 点击指数名看历年K线</span></div>
       <div id="globalMarketsBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="2" style="display:none">
+    <div class="card c-card" data-ci="2">
       <div class="hd">今日主线 <span class="sub" id="mlSub">每个股市收盘后分析得出 · 标注来源股市</span></div>
       <div id="mainlineBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="3" style="display:none">
+    <div class="card c-card" data-ci="3">
       <div class="hd">周期深度分析 <span class="sub" id="cdSub">板块 · 对应股票 · 原因 (非大盘)</span></div>
       <div id="cycleDeep" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="4" style="display:none">
+    <div class="card c-card" data-ci="4">
       <div class="hd">资金背离 <span class="sub" id="fdSub">股票 + 原因 (不含海外)</span></div>
       <div id="flowDivergence" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="5" style="display:none">
+    <div class="card c-card" data-ci="5">
       <div class="hd">热点主题 <span class="sub" id="themesSub">题材聚合 · 关联个股</span></div>
       <div id="themeBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="6" style="display:none">
+    <div class="card c-card" data-ci="6">
       <div class="hd">多池选股 <span class="sub" id="poolSub">推荐池 · 不推荐池 · 打板池 · 板块池 · 低位池 · 强势股 · 龙虎榜 · 竞价抢筹 · 大宗交易</span></div>
       <div id="poolBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
     </div>
-    <div class="card c-card" data-ci="7" style="display:none">
+    <div class="card c-card" data-ci="7">
       <div class="hd">24h 热点资讯流 <span class="sub" id="newsSub">财联社电报 · 华尔街见闻 · 联合早报</span></div>
       <div id="newsFlowBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
@@ -1515,17 +1515,22 @@ function renderThemes(){
   const box=document.getElementById('themeBox');
   if(!box) return;
   const g=window._data||{};
-  const th=g.themes||g.hot_themes||[];
+  // hot_themes.json 顶层是 {ts, themes:[...]}; latest.json 里的 themes 是数组
+  const thRaw=g.themes||g.hot_themes||[];
+  const th=Array.isArray(thRaw)?thRaw:(thRaw.themes||[]);
   const ne=g.news_extra||{};
   let h='';
   if(th.length){
     h+='<div class="hd" style="border-top:none;padding:6px 0">题材热度 <span class="sub">'+th.length+' 个</span></div>';
-    h+='<table><thead><tr><th>主题</th><th>热度</th><th>涨跌</th><th>关联个股</th></tr></thead><tbody>';
+    h+='<table><thead><tr><th>主题</th><th>热度</th><th>方向</th><th>关联个股</th></tr></thead><tbody>';
     th.slice(0,30).forEach(t=>{
+      // stocks 可能是 [{code,name}] 或 ["600000",...], 统一成 code 列表
+      const st=(t.stocks||t.codes||[]).map(s=>(s&&typeof s==='object')?(s.code||''):s).filter(Boolean);
+      const dir=t.direction==='bull'?'看多':(t.direction==='bear'?'看空':'中性');
       h+='<tr><td><b>'+_esc2(t.name||t.theme)+'</b></td>'
-        +'<td>'+_esc2(t.count||t.heat||'')+'</td>'
-        +'<td class="'+(t.chg_pct>=0?'up':'dn')+'">'+(t.chg_pct!=null?(t.chg_pct>=0?'+':'')+t.chg_pct.toFixed(2)+'%':'—')+'</td>'
-        +'<td>'+(t.stocks||t.codes||[]).slice(0,6).map(c=>'<span class="clk" data-code="'+_esc2(c)+'" style="color:var(--accent)">'+_esc2(c)+'</span>').join(' ')+'</td></tr>';
+        +'<td>'+_esc2(t.count||t.news_count||t.heat||'')+'</td>'
+        +'<td>'+_esc2(dir)+'</td>'
+        +'<td>'+st.slice(0,6).map(c=>'<span class="clk" data-code="'+_esc2(c)+'" style="color:var(--accent)">'+_esc2(c)+'</span>').join(' ')+'</td></tr>';
     });
     h+='</tbody></table>';
   } else { h+='<div class="fl">暂无题材数据</div>'; }
@@ -1548,14 +1553,17 @@ function renderPools(){
   if(!box) return;
   const g=window._data||{};
   const SR=window.StockRow;
+  // 数据未就绪时不画: 否则会渲染出一片「暂无数据」, 且 plRendered 已置位,
+  // 数据到达后也不会再重画。留在加载态, 等 render() 末尾按 plRendered 补画。
+  if(!SR || !Object.keys(g).length) return;
   let h='';
   const pools=[
-    ['推荐池','recommend','picks','与每日推股不同, 不记入胜率计算'],
+    ['推荐池','picks','ai_pick_v4','与每日推股不同, 不记入胜率计算'],
     ['不推荐池','avoid','avoid','能看出真有问题的股票'],
     ['打板池','ban','ban_pick','涨停判断与次日概率'],
     ['板块池','sector','sector_pool','行业/概念板块'],
     ['低位池','low','lowpool','低位启动候选'],
-    ['强势股','strong','ths_strong','同花顺强势股'],
+    ['强势股','strong','enrich','同花顺强势股'],
     ['龙虎榜','lhb','enrich','龙虎榜席位'],
     ['竞价抢筹榜','jingjia','enrich','集合竞价抢筹'],
     ['大宗交易','blocktrade','enrich','大宗交易明细'],
@@ -1563,12 +1571,14 @@ function renderPools(){
   pools.forEach(([title,key,src,desc])=>{
     let recs=[];
     const d=g[src]||{};
-    if(key==='picks') recs=(g.ai_pick_v4||{}).picks||[];
+    if(key==='picks') recs=(g.ai_pick_v4||{}).picks||(g.ai_picks||{}).picks||[];
     else if(key==='avoid') recs=(g.decision||{}).avoid||[];
     else if(key==='ban') recs=(g.ban_pick||{}).picks||(g.ban_pick||{}).items||[];
-    else if(key==='sector') recs=(g.sector_pool||{}).sectors||(g.sector_pool||{}).pool||[];
-    else if(key==='low') recs=(g.lowpool||{}).pool||(g.lowpool||{}).items||[];
-    else if(key==='strong') recs=(d.items||d.strong||[]);
+    else if(key==='sector') recs=(g.sector_pool||{}).sectors||(g.sector_pool||{}).pool
+      ||(g.sector_pool||{}).tier1||[];
+    else if(key==='low') recs=(g.lowpool||{}).pool||(g.lowpool||{}).items
+      ||(g.lowpool||{}).watch_list||(g.lowpool||{}).strong||[];
+    else if(key==='strong') recs=d.ths_strong||d.items||d.strong||[];
     else if(key==='lhb') recs=(d.lhb||[]);
     else if(key==='jingjia') recs=(d.jingjia||d.callauction||[]);
     else if(key==='blocktrade') recs=(d.blocktrade||[]);
@@ -2168,6 +2178,8 @@ const SOURCES = [
   'data/rps_rotation.json',    // RPS 轮动
   'data/sample_balance.json',  // 样本均衡
   'data/global_fx.json',       // 全球汇率
+  'data/hot_themes.json',      // 热点主题 (build_mainlines 产出)
+  'data/mainline.json',        // 今日主线 + 明日预测 (build_mainlines 产出)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
   // 需要溯源时直接查 GitHub raw。
 ];
@@ -2295,7 +2307,10 @@ async function render(){
   window._klineSim = g.kline_sim;
   renderSelfReflect();
   renderAiReview();
-  renderPools(d);
+  // 多池选股: renderPools 内部读 window._data, 传 d 会让 enrich/
+  // ai_pick_v4 这些独立文件全部取不到。只有用户打开过这个 tab 才画。
+  // plRendered 只由 tab 点击置位, 所以这里必然晚于数据就绪。
+  if(plRendered) _safe(renderPools,'pools');
   // 已打开过的新 tab: 数据刷新时跟着重画 (未打开则不画, 省开销)
   if(feRendered) _safe(renderFactorEngines,'engineV5');
   if(rvRendered) _safe(renderReview,'reflect');

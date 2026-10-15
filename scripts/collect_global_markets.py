@@ -12,7 +12,9 @@ collect_global_markets.py — 全球各大股市实时状态 + 情绪周期
 
 数据源:
   1. 腾讯 sqt.gtimg.cn (实测可用, 一条请求取多个指数)
-  2. 东财 push2 ulist.np (f62 主力资金, 补充)
+  2. 东财 push2 ulist.np (补日/欧股)
+  3. 新浪 hq.sinajs.cn znb_* (韩股; 东财无 100.KOSPI 这个 secid,
+     实测返回空, 所以韩股单独走新浪)
 
 用法:
   python3 collect_global_markets.py --out data/global_markets.json
@@ -179,13 +181,48 @@ def _num(v):
         return None
 
 
+# 新浪 znb_* 全球指数: 韩股专用 (东财没有 KOSPI 的 secid)
+SINA_CODES = {"KOSPI": ("znb_KOSPI", "韩国综合")}
+
+
+def fetch_sina_global():
+    """新浪 hq.sinajs.cn 取韩股。需带 Referer, 否则 403。"""
+    names = ",".join(v[0] for v in SINA_CODES.values())
+    req = urllib.request.Request(
+        "https://hq.sinajs.cn/list=" + names,
+        headers={"User-Agent": UA["User-Agent"],
+                 "Referer": "https://finance.sina.com.cn/"})
+    try:
+        with urllib.request.urlopen(req, timeout=12) as r:
+            body = r.read().decode("gbk", errors="replace")
+    except Exception as e:
+        print("[global] 新浪失败: %s %s" % (type(e).__name__, str(e)[:50]))
+        return {}
+    out = {}
+    # var hq_str_znb_KOSPI="名称,现价,涨跌额,涨跌幅,时间,时间戳,日期,..."
+    for line in body.split(";"):
+        line = line.strip()
+        if "=" not in line or '"' not in line:
+            continue
+        var = line.split("=", 1)[0].strip()
+        if var.startswith("var hq_str_"):
+            var = var[len("var hq_str_"):]
+        payload = line.split('"', 2)[1] if line.count('"') >= 2 else ""
+        f = payload.split(",")
+        if len(f) < 4:
+            continue
+        out[var] = {"name": f[0], "price": _num(f[1]),
+                    "chg_pct": _num(f[3])}
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=os.path.join(DATA_DIR, "global_markets.json"))
     args = ap.parse_args()
 
     quotes = fetch_tencent()
-    # 东财补腾讯不覆盖的 (日/韩/欧): 按 secid 查询, 结果按 secid 索引
+    # 东财补腾讯不覆盖的 (日/欧): 按 secid 查询, 结果按 secid 索引
     em_secids = [m[1] for m in MARKETS if not m[0]]
     em_quotes = fetch_eastmoney_indices(em_secids) if em_secids else {}
     # 东财返回的 key 是 f12 (如 N225), 建一个 secid->data 的映射
@@ -194,16 +231,24 @@ def main():
         code = secid.split(".", 1)[1]
         if code in em_quotes:
             em_by_secid[secid] = em_quotes[code]
+    # 韩股单独走新浪: 东财没有 KOSPI 这个 secid, 实测查了直接返回空
+    sina_quotes = fetch_sina_global()
     now = datetime.now(CST)
 
     markets = {}
     indices = []
     for tk, secid, name, mkt, tz, session in MARKETS:
-        # 腾讯优先, 东财兜底
+        # 腾讯优先, 东财兜底; 新浪覆盖的(韩股)优先级最高
         key = tk.replace("s_", "") if tk else ""
         q = quotes.get(key) if key else None
         if not q:
             q = em_by_secid.get(secid) or {}
+        sina_key = secid.split(".", 1)[-1]
+        if sina_key in SINA_CODES:
+            sina_name = SINA_CODES[sina_key][0]
+            sq = sina_quotes.get(sina_name)
+            if sq and sq.get("price") is not None:
+                q = sq
         status, status_label = market_status(tz, session)
         local_time = (datetime.now(timezone.utc) + timedelta(hours=tz)).strftime("%H:%M")
         sent, sent_label = sentiment_of(q.get("chg_pct"))
@@ -234,8 +279,8 @@ def main():
 
     out = {
         "ts": now.isoformat(timespec="seconds"),
-        "engine": "collect_global_markets v1 (腾讯 sqt.gtimg.cn)",
-        "source": "tencent sqt.gtimg.cn",
+        "engine": "collect_global_markets v2 (腾讯 sqt + 东财 push2 + 新浪 znb)",
+        "source": "tencent sqt.gtimg.cn / eastmoney push2 / sina hq.sinajs.cn",
         "n_indices": len(indices),
         "n_ok": sum(1 for i in indices if i["price"] is not None),
         "indices": indices,
