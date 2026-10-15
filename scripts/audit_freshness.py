@@ -85,7 +85,11 @@ THRESH_HOURS = {"realtime": 0.5, "intraday": 3, "daily": 30, "weekly": 8 * 24}
 def ts_of(d):
     if not isinstance(d, dict):
         return None
-    for k in ("ts", "date", "data_date"):
+    # 注意: 不同产出用的字段名不一致 —— realtime_minute 用 timestamp,
+    # auction_engine/trend_strength 用 ts, 多数用 ts 或 date。
+    # 2026-10-16 修: 原来只认 ts/date/data_date, 导致 realtime_minute
+    # 被误判为 28.9h 前的陈旧文件 (实际它 timestamp=10-15 18:29, 只有 2.5h)。
+    for k in ("ts", "timestamp", "generated", "date", "data_date"):
         v = d.get(k)
         if isinstance(v, str) and len(v) >= 8:
             return v
