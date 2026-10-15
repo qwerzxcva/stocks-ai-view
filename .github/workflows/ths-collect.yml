@@ -194,6 +194,23 @@ jobs:
           python3 scripts/cb_lhb_collect.py --group all --lhb-pages 5 \
             --out /tmp/ths/cb_lhb.json || echo "::warning::cb/lhb 部分失败"
 
+      # ── 5f. 东财第三批 (IPO/龙虎榜/两融/质押/宏观/事件) ─────
+      - name: Collect EM extra datasets
+        run: |
+          mkdir -p /tmp/ths
+          python3 scripts/em_extra_collect.py --size 100 \
+            --out /tmp/ths/em_extra.json || echo "::warning::em_extra 部分失败"
+
+      # ── 5g. 东财 3 个缓存敏感源 (必须单独采) ───────────────
+      # 实测: 这 3 个在连续批量请求中恒返回空, 单独跑全通
+      - name: EM extra solo (cache-sensitive)
+        run: |
+          for k in ipo_apply_yield lhb_yyb_return_ranking repurchase_list; do
+            python3 scripts/em_extra_collect.py --size 100 --only "$k" \
+              --out "/tmp/ths/em_extra_$k.json" || echo "::warning::$k 失败"
+            sleep 5
+          done
+
       # ── 6. 组装落盘 (只追加不覆盖别人的文件) ───────────────
       - name: Assemble outputs
         run: |
@@ -311,6 +328,22 @@ jobs:
                   print(f"cb_lhb: {summary['cb_lhb']}")
               except Exception as e:
                   print(f"cb_lhb copy failed: {e}")
+
+          # 6.7 东财第三批
+          import glob as _g2
+          for src in sorted(_g2.glob("/tmp/ths/em_extra*.json")):
+              fn = os.path.basename(src)[:-5]
+              try:
+                  ed = json.load(open(src, encoding="utf-8"))
+                  dst = f"data/ths/em_extra/{fn}.json"
+                  os.makedirs(os.path.dirname(dst), exist_ok=True)
+                  json.dump(ed, open(dst, "w", encoding="utf-8"), ensure_ascii=False)
+                  summary.setdefault("em_extra", {})[fn] = {
+                      k: v.get("n") for k, v in (ed.get("datasets") or {}).items()
+                      if isinstance(v, dict) and v.get("n") is not None}
+                  print(f"{fn}: {sum(summary['em_extra'][fn].values())} 条")
+              except Exception as e:
+                  print(f"{fn} copy failed: {e}")
 
           json.dump(summary, open("data/ths/manifest.json", "w", encoding="utf-8"),
                     ensure_ascii=False, indent=1)

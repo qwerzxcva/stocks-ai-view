@@ -2467,18 +2467,21 @@ SOURCES = [
         "name": "东财打新收益全表 (中签率/首日涨幅/连板)",
         "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_APP_IPOAPPLY&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=APPLY_DATE,SECURITY_CODE&sortTypes=-1,-1&source=WEB&client=WEB",
         "auth": "none",
-        "status": "ok",
+        "status": "degraded",
         "freq": "daily",
         "delay": "日更",
         "encoding": "utf-8",
         "fields": "SECUCODE/SECURITY_CODE/APPLY_CODE/APPLY_DATE/BALLOT_PAY_DATE/"
                  "LISTING_DATE/TRADE_MARKET/MARKET_TYPE_NEW/ASSIGN...(中签率/认购倍数/顶格资金/首日涨幅)",
         "provides": ["ipo/apply_yield.json", "打新策略回测"],
-        "notes": "2026-10-16 实测 200, 20225B/100条, pages=1128; "
+        "notes": "2026-10-16 实测 200, 20225B/100条, pages=57~1128; "
                  "**一表给全打新收益闭环**: 中签率/超额认购倍数/顶格资金/首日涨幅/开盘溢价/"
                  "连板数/发行PE vs 行业PE; "
+                 "**采集坑: 连续批量请求中恒返回空 (n=0, pages=None), 单独跑 6/6 全通** "
+                 "— 服务端当日数据缓存不预热, 重试 5 次仍空; 必须单独一个 step 采; "
                  "坑 (子代理实测): APPLY_DATE/LISTING_DATE **不可 filter**, 只能用 UPDATE_DATE/ORG_CODE 排序; "
                  "回溯分页用 lastmark 翻页更稳",
+        "status": "degraded",
     },
     {
         "id": "em_ipo_neeq_list",
@@ -2595,7 +2598,7 @@ SOURCES = [
         "name": "东财营业部收益率排行榜 (胜率)",
         "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_RATEDEPT_RETURNT_RANKING&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=TOTAL_BUYER_SALESTIMES_1DAY,OPERATEDEPT_CODE&sortTypes=-1,-1&filter=(STATISTICSCYCLE%3D%2204%22)&source=WEB&client=WEB",
         "auth": "none",
-        "status": "ok",
+        "status": "degraded",
         "freq": "daily",
         "encoding": "utf-8",
         "fields": "OPERATEDEPT_CODE/OPERATEDEPT_NAME/STATISTICSCYCLE/"
@@ -2776,7 +2779,7 @@ SOURCES = [
         "name": "东财回购增持统计 (9939B)",
         "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPTA_WEB_GETHGLIST_NEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=UPD,DIM_DATE,DIM_SCODE&sortTypes=-1,-1,-1&source=WEB",
         "auth": "none",
-        "status": "ok",
+        "status": "degraded",
         "freq": "daily",
         "encoding": "utf-8",
         "fields": "回购/增持统计 (UPD/DIM_DATE/DIM_SCODE 排序)",
