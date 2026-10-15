@@ -64,14 +64,16 @@ def secid(code):
 
 def fetch_kline_range(code, start="19900101", end=None):
     """腾讯 newfqkline — 任意起止区间前复权日K
-    返回键: 个股 qfqday, 指数 day (实测差异)"""
+    返回键: 个股 qfqday, 指数 day (实测差异)
+    坑 (2026-10-16 实测): start 参数被忽略, 只返回 end 往前 640 根;
+        640 是硬上限 (n=5000 返回 0 条); end 参数真实生效。
+        拿全史需分段翻页, 见 fetch_kline_full。"""
     end = end or datetime.now(CST).strftime("%Y%m%d")
     sym = secid(code)
     u = (f"https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get"
          f"?_var=kline_dayqfq&param={sym},day,"
          f"{start[:4]}-{start[4:6]}-{start[6:]},{end[:4]}-{end[4:6]}-{end[6:]},640,qfq&r=0.82")
     t = _get(u, "tencent")
-    # 兼容三种返回: JSONP (cb({...})) / var={...} / 纯 {...}
     i = t.find("(")
     if i >= 0:
         body = t[i + 1:].rstrip().rstrip(";")
@@ -84,6 +86,46 @@ def fetch_kline_range(code, start="19900101", end=None):
         raise ValueError(f"param error: {sym}")
     node = (d.get("data") or {}).get(sym) or {}
     return node.get("qfqday") or node.get("day") or []
+
+
+def fetch_kline_full(code, max_rounds=20):
+    """分段翻页拿全史 — newfqkline 的 start 被忽略且 640 是硬上限,
+    所以每次把 end 设为上一段最早日期再往前取, 直到不足 640 根或达到 max_rounds。
+    坑 (2026-10-16 实测): 历史深段可能出现负价格/极低价 — 前复权因子对
+    老代码 (重组更名前) 的处理失真, 如 601567 三星电气时代出现 -0.85。
+    对 2024 年后上市的缺口新股, 单段 640 根已覆盖全部历史, 不会触发此坑。"""
+    all_rows, seen = [], set()
+    end = None
+    for rnd in range(max_rounds):
+        rows = fetch_kline_range(code, end=end) if end else fetch_kline_range(code)
+        if not rows:
+            break
+        new = [r for r in rows if r[0] not in seen]
+        if not new:
+            break
+        for r in new:
+            seen.add(r[0])
+        all_rows = new + all_rows   # 新段更早, 放前面
+        if len(rows) < 640:
+            break                   # 已到上市首日
+        # 下一段 end = 本段最早日期的前一天
+        first = rows[0][0]
+        try:
+            dt = datetime.strptime(first, "%Y-%m-%d") - timedelta(days=1)
+            end = dt.strftime("%Y%m%d")
+        except Exception:
+            break
+        time.sleep(0.5)
+    # 丢弃异常价格行 (负价格/价格为 0 — 复权失真)
+    clean = []
+    for r in all_rows:
+        try:
+            vals = [float(x) for x in r[1:5]]
+            if all(v > 0 for v in vals):
+                clean.append(r)
+        except Exception:
+            pass
+    return clean if clean else all_rows
 
 
 def fetch_ths_finance(code, statement):
@@ -143,7 +185,7 @@ def main():
         rec = {"code": code, "updated": datetime.now(CST).isoformat(timespec="seconds")}
         try:
             if "kline" in groups:
-                rows = fetch_kline_range(code)
+                rows = fetch_kline_full(code)
                 if rows:
                     p = os.path.join(d, "kline", "day_qfq.csv")
                     with open(p, "w", encoding="utf-8") as f:
