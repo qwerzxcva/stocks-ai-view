@@ -40,6 +40,7 @@ auction_engine.py — 竞价抢筹与日内资金结构引擎
 import argparse
 import glob
 import json
+import math
 import os
 import sys
 from datetime import datetime, timezone, timedelta
@@ -115,35 +116,63 @@ def _large_threshold(price):
         return LARGE_TICK_AMT
     return max(200.0 * price, 100000.0)     # 下限 10 万, 避免极低价股阈值过小
 def analyze(item):
-    """单只股票的逐笔 → 四指标 dict。"""
-    ticks = item.get("ticks") or []
-    if not ticks:
-        return None
+    """单只股票的逐笔 → 四指标 dict。
+
+    两种输入形态:
+      A) 完整逐笔 (item["ticks"] 非空) — 本地调试或未加 --summary-only
+      B) 仅汇总 (fetchers_ticks 用 --summary-only 输出, ticks 已剔除)
+         CI 用这个形态 (36 只全采时文件会很大), 此时 buy/sell/auction_amount
+         等字段 fetchers_ticks 已算好, 直接用; 只有 large_tick_ratio 和
+         tail_* 无法从汇总推导, 置 None 并在 meta 说明。
+    """
     code = item.get("code")
-    session = [t for t in ticks if t["time"] <= SESSION_END]
-    if not session:
-        return None
-    # 均价 (成交额/成交量) → 用于大单阈值分层
-    tot_vol = sum(t["volume"] or 0 for t in session)
-    tot_amt = sum(t["amount"] or 0 for t in session)
-    avg_px = (tot_amt / tot_vol) if tot_vol else (session[0].get("price") or 0)
-    thr = _large_threshold(avg_px)
+    ticks = item.get("ticks") or []
+    summary_only = not ticks
 
-    buy = sum(t["amount"] for t in session if t["side"] == "B")
-    sell = sum(t["amount"] for t in session if t["side"] == "S")
-    neutral = sum(t["amount"] for t in session if t["side"] == "M")
-    active = buy + sell
-    imbalance = round((buy - sell) / active * 100, 2) if active else None
+    if summary_only:
+        buy = item.get("buy_amount") or 0
+        sell = item.get("sell_amount") or 0
+        total = item.get("session_amount") or 0
+        active = buy + sell
+        imbalance = round((buy - sell) / active * 100, 2) if active else None
+        auction_amt = item.get("auction_amount") or 0
+        session = None
+    else:
+        session = [t for t in ticks if t["time"] <= SESSION_END]
+        if not session:
+            return None
+    if summary_only:
+        # 汇总形态: 大单/尾盘需逐笔, 无法从汇总推导 → None
+        large_ratio = None
+        thr = None
+        avg_px = None
+        tail_ratio = None
+        tail_imb = None
+    else:
+        tot_vol = sum(t["volume"] or 0 for t in session)
+        tot_amt = sum(t["amount"] or 0 for t in session)
+        avg_px = (tot_amt / tot_vol) if tot_vol else (session[0].get("price") or 0)
+        thr = _large_threshold(avg_px)
 
-    large = sum(t["amount"] for t in session if (t["amount"] or 0) >= thr)
-    total = sum(t["amount"] for t in session)
-    large_ratio = round(large / total * 100, 2) if total else None
-    # 均价用于阈值分层说明
-    avg_px = (total / sum(t["volume"] for t in session)
-              if sum(t["volume"] for t in session) else None)
+        buy = sum(t["amount"] for t in session if t["side"] == "B")
+        sell = sum(t["amount"] for t in session if t["side"] == "S")
+        active = buy + sell
+        imbalance = round((buy - sell) / active * 100, 2) if active else None
+
+        large = sum(t["amount"] for t in session if (t["amount"] or 0) >= thr)
+        total = sum(t["amount"] for t in session)
+        large_ratio = round(large / total * 100, 2) if total else None
+
+        tail = [t for t in session if t["time"] >= TAIL_START]
+        tail_amt = sum(t["amount"] for t in tail)
+        tail_ratio = round(tail_amt / total * 100, 2) if total else None
+        tail_buy = sum(t["amount"] for t in tail if t["side"] == "B")
+        tail_sell = sum(t["amount"] for t in tail if t["side"] == "S")
+        tail_active = tail_buy + tail_sell
+        tail_imb = (round((tail_buy - tail_sell) / tail_active * 100, 2)
+                    if tail_active else None)
 
     auction = item.get("auction") or []
-    auction_amt = item.get("auction_amount") or 0
     auction_px = auction[0]["price"] if auction else None
     base = auction_baseline(code)
     if base and base > 0:
@@ -152,24 +181,18 @@ def analyze(item):
         strength_basis = f"竞价额为5日均值的{auction_amt / base:.1f}倍"
     elif total > 0:
         # 无历史: 用竞价额占当日成交额比例 (正常 0.5%~3%, 抢筹可到 10%+)
+        #  映射 0→0 分, 3%→60 分, 10%+→100 分 (对数式, 避免多只并列 100 失去排序意义)
         ratio = auction_amt / total * 100
-        strength = min(100.0, ratio * 8.0)
+        strength = min(100.0, max(0.0, math.log(ratio * 100 + 1) / math.log(1100) * 100))
         strength_basis = f"竞价额占当日成交额{ratio:.2f}% (无历史均值, 用相对口径)"
     else:
         strength, strength_basis = 0.0, "无成交额数据"
-
-    tail = [t for t in session if t["time"] >= TAIL_START]
-    tail_amt = sum(t["amount"] for t in tail)
-    tail_ratio = round(tail_amt / total * 100, 2) if total else None
-    tail_buy = sum(t["amount"] for t in tail if t["side"] == "B")
-    tail_sell = sum(t["amount"] for t in tail if t["side"] == "S")
-    tail_active = tail_buy + tail_sell
-    tail_imb = round((tail_buy - tail_sell) / tail_active * 100, 2) if tail_active else None
 
     return {
         "code": code,
         "date": item.get("date"),
         "n_ticks": item.get("n_ticks"),
+        "summary_only": summary_only,
         "auction_price": auction_px,
         "auction_amount": round(auction_amt, 0),
         "auction_strength": round(strength, 1),
@@ -178,7 +201,7 @@ def analyze(item):
         "sell_amount": round(sell, 0),
         "buy_sell_imbalance": imbalance,
         "large_tick_ratio": large_ratio,
-        "large_tick_threshold": round(thr, 0),
+        "large_tick_threshold": round(thr, 0) if thr else None,
         "avg_price": round(avg_px, 2) if avg_px else None,
         "tail_ratio": tail_ratio,
         "tail_imbalance": tail_imb,
@@ -306,8 +329,11 @@ def main():
             "caliber": "分笔数据 (约3秒一笔), 非Level-2逐笔委托; 09:25那笔=开盘竞价撮合",
             "large_tick_threshold": LARGE_TICK_AMT,
             "caveat": "只覆盖采集时传入的股票 (全市场4500+只 x 4500笔太大, 建议按需取); "
-                      "无历史逐笔时 auction_strength 用相对口径, 跨日不可比; "
-                      "complete=False 表示盘后段有缺笔, 尾盘指标偏低",
+                      "无历史逐笔时 auction_strength 用相对口径 (竞价额占当日成交额, "
+                      "对数映射 3%->60分/10%+->100分), 跨日不可比; "
+                      "complete=False 表示盘后段有缺笔, 尾盘指标偏低; "
+                      "summary_only=True 表示逐笔明细未落盘 (CI 为省空间用 --summary-only), "
+                      "此时 large_tick_ratio 与 tail_* 无法从汇总推导, 置 None",
             "next_step": "接入 ban_prob (用 buy_sell_imbalance 替代封单强度估算) 与 "
                          "premarket_picks (用 auction_strength 替代 zt_time 粗略判断)",
         },
@@ -319,9 +345,11 @@ def main():
 
     print(f"[auction] {len(rows)} 只 (涨停 {n_zt}, 竞价强 {len(strong)})")
     for r in rows[:6]:
+        lr = f"{r['large_tick_ratio']:5.1f}%" if r["large_tick_ratio"] is not None else "   n/a"
         print(f"  {r['code']} 竞价强度{r['auction_strength']:5.1f} "
-              f"失衡{r['buy_sell_imbalance']:+6.1f}% 大单{r['large_tick_ratio']:5.1f}% "
-              f"{'[涨停]' if r['is_limit_up'] else ''} | {r['verdict'][:64]}")
+              f"失衡{r['buy_sell_imbalance']:+6.1f}% 大单{lr} "
+              f"{'[涨停]' if r['is_limit_up'] else ''}{'[summary]' if r.get('summary_only') else ''} "
+              f"| {r['verdict'][:64]}")
     print(f"→ {out}")
 
 
