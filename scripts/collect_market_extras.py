@@ -46,7 +46,7 @@ UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
 
 
 # ─── 基础工具 ────────────────────────────────────────────────────────
-def _http(url, timeout=12, retries=2, headers=None):
+def _http(url, timeout=12, retries=3, headers=None):
     h = dict(UA)
     if headers:
         h.update(headers)
@@ -55,8 +55,10 @@ def _http(url, timeout=12, retries=2, headers=None):
             return urllib.request.urlopen(urllib.request.Request(url, headers=h),
                                           timeout=timeout).read()
         except Exception:
+            # 东财对连续请求会 RemoteDisconnected; 退避短了重试也白试
+            # (实测 0.3s 间隔连丢 2 次, 3s 后第 3 次就通)。
             if i < retries - 1:
-                time.sleep(0.3)
+                time.sleep(2.0 * (i + 1))
     return b""
 
 
@@ -327,6 +329,35 @@ def fetch_tx_sector_ranking(limit=20):
         return []
 
 
+# ─── 8b. 板块资金流 (东财行业主力净额) ─────────────────────────
+# 腾讯 mktHs/rank 只给涨跌幅, 不给主力净额; 板块资金单独走东财 clist
+# (m:90 = 行业板块, fid=f_flow 按主力净额倒序)。
+def fetch_sector_moneyflow(limit=20):
+    url = ("https://push2.eastmoney.com/api/qt/clist/get"
+           "?fid=f_flow&po=1&pz=%d&pn=1&np=1&fltt=2&invt=2"
+           "&fs=m:90+t:2&fields=f12,f14,f3,f62,f184,f128,f136" % limit)
+    try:
+        d = json.loads(_http(url, timeout=15).decode("utf-8"))
+        out = []
+        for r in ((d.get("data") or {}).get("diff")) or []:
+            name = str(r.get("f14", "") or "").strip()
+            if not name:
+                continue
+            net = _f(r.get("f62"))          # 主力净额 (元)
+            out.append({
+                "name": name, "code": str(r.get("f12", "") or ""),
+                "changePct": _f(r.get("f3")),
+                "main_net": net,
+                "main_net_yi": round(net / 1e8, 3) if net is not None else None,
+                "net_pct": _f(r.get("f184")),   # 主力净额占成交额比 %
+                "chg5d": _f(r.get("f128")), "chg20d": _f(r.get("f136")),
+            })
+        return out
+    except Exception as e:
+        print(f"[sector-mf] {e}", file=sys.stderr)
+        return []
+
+
 # ─── 9. 盘面解读 (规则引擎) ──────────────────────────────────────────
 def build_commentary(zt_n, dt_n, zb_n, indices, zdfenbu, turnover, phase,
                      idx_kline, margin, ths_strong):
@@ -498,6 +529,7 @@ def collect_all(date_str=None, indices=None, phase=None):
         lhb, blocktrade, enrich_meta = fetch_lhb(date_dash), fetch_blocktrade(date_dash), {}
 
     tx_rank = fetch_tx_sector_ranking(20)
+    sector_mf = fetch_sector_moneyflow(20)
 
     if indices is None:
         indices = fetch_indices()
@@ -529,6 +561,7 @@ def collect_all(date_str=None, indices=None, phase=None):
         "margin": margin,
         "index_kline": idx_kline,
         "westock": {"sector_ranking": {"date": date_str, "data": tx_rank}},
+        "sector_moneyflow": {"date": date_str, "data": sector_mf},
         "_pools_detail": {"zt": zt, "dt": dt, "zb": zb, "yzt": yzt},
     }
 

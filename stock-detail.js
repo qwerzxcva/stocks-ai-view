@@ -191,16 +191,23 @@
   }
 
   // ─── charts ─────────────────────────────────────────────────
-  // K 线图: 静态 SVG + 十字光标 hover。bars 只带 OHLCV, 所以光标提示里
-  // 的日期/价格/涨跌幅/成交量全部前端从 bars 现算, 不依赖额外接口。
+  // K 线图: 静态 SVG。时间轴 / 价位轴 / 成交量 全部常驻显示,
+  // 不依赖 hover — hover 只做逐日明细放大。
+  function fmtVol(v) {
+    if (v == null || !isFinite(v)) return '—';
+    if (v >= 1e8) return (v / 1e8).toFixed(2) + '亿';
+    if (v >= 1e4) return (v / 1e4).toFixed(1) + '万';
+    return String(Math.round(v));
+  }
+
   function renderKlineChart(bars) {
     if (!bars || bars.length < 5) {
       return '<div class="fl" style="font-size:9px;line-height:1.5">' +
         'K线取数失败 (tencent / eastmoney / sina 三级均未返回)<br>' +
         '可能原因: 当前网络到这三个源均被拦截</div>';
     }
-    var W = 460, H = 210, PL = 6, PR = 52, PT = 8, PB = 18;
-    var VOL_H = 34;                      // 底部成交量带高度
+    var W = 460, H = 226, PL = 6, PR = 52, PT = 8, PB = 22;
+    var VOL_H = 38;
     var priceH = H - PT - PB - VOL_H - 4;
     var cw = W - PL - PR;
     var hi = -1e18, lo = 1e18, vmax = 0;
@@ -212,15 +219,16 @@
     var bw = cw / bars.length;
     var cx = function (i) { return PL + i * bw + bw / 2; };
     var yP = function (v) { return PT + (hi - v) / rng * priceH; };
+    var volTop = PT + priceH + 16;
 
     var out = '';
-    // 价格网格 + 右侧刻度
+    // 价格网格 + 右侧价位刻度 (常驻, 两位小数)
     for (var g = 0; g <= 4; g++) {
       var v = hi - rng * g / 4, y = PT + priceH * g / 4;
       out += '<line x1="' + PL + '" y1="' + y.toFixed(1) + '" x2="' + (W - PR) + '" y2="' + y.toFixed(1)
         + '" stroke="#1e2738" stroke-width="0.5"/>';
-      out += '<text x="' + (W - PR + 4) + '" y="' + (y + 3).toFixed(1) + '" fill="#586069" font-size="8">'
-        + v.toFixed(1) + '</text>';
+      out += '<text x="' + (W - PR + 4) + '" y="' + (y + 3).toFixed(1) + '" fill="#8b949e" font-size="8">'
+        + v.toFixed(2) + '</text>';
     }
     // K 线实体 + 影线
     bars.forEach(function (b, i) {
@@ -235,8 +243,7 @@
         + '" width="' + (bw * 0.7).toFixed(1) + '" height="' + h.toFixed(1)
         + '" fill="' + col + '"/>';
     });
-    // 成交量柱 (与 K 线同色, 贴价格区下方)
-    var volTop = PT + priceH + 6;
+    // 成交量柱
     bars.forEach(function (b, i) {
       var x = cx(i);
       var col = b.close >= b.open ? UP : DN;
@@ -246,23 +253,55 @@
         + '" width="' + (bw * 0.7).toFixed(1) + '" height="' + h.toFixed(1)
         + '" fill="' + col + '" opacity="0.55"/>';
     });
-    out += '<text x="' + PL + '" y="' + (volTop - 1).toFixed(1) + '" fill="#586069" font-size="7">量</text>';
-    // 底部日期 (首/中/尾, 不再只有首尾)
-    var marks = [0, Math.floor(bars.length / 2), bars.length - 1];
+    // 成交量刻度 (常驻)
+    out += '<text x="' + PL + '" y="' + (volTop - 3).toFixed(1) + '" fill="#8b949e" font-size="7">量 '
+      + fmtVol(vmax) + '</text>';
+    out += '<text x="' + PL + '" y="' + (volTop + VOL_H + 7).toFixed(1) + '" fill="#8b949e" font-size="7">0</text>';
+    // 时间轴: bars<=20 时隔根标, 否则 5 等分
+    var marks;
+    if (bars.length <= 20) {
+      marks = [];
+      for (var mi = 0; mi < bars.length; mi += (bars.length > 10 ? 2 : 1)) marks.push(mi);
+      if (marks[marks.length - 1] !== bars.length - 1) marks.push(bars.length - 1);
+    } else {
+      marks = [0, Math.floor(bars.length / 4), Math.floor(bars.length / 2),
+               Math.floor(bars.length * 3 / 4), bars.length - 1];
+    }
     marks.forEach(function (i) {
       var anchor = i === 0 ? 'start' : (i === bars.length - 1 ? 'end' : 'middle');
-      out += '<text x="' + cx(i).toFixed(1) + '" y="' + (H - 5) + '" fill="#586069" font-size="8"'
+      out += '<text x="' + cx(i).toFixed(1) + '" y="' + (H - 6) + '" fill="#8b949e" font-size="8"'
         + ' text-anchor="' + anchor + '">' + (bars[i].date || '').slice(5) + '</text>';
     });
+    // 最新价标签 (常驻, 贴最后一根 K 线)
+    var lastBar = bars[bars.length - 1];
+    var lastCol = lastBar.close >= lastBar.open ? UP : DN;
+    out += '<line x1="' + PL + '" y1="' + yP(lastBar.close).toFixed(1) + '" x2="' + (W - PR)
+      + '" y2="' + yP(lastBar.close).toFixed(1) + '" stroke="' + lastCol
+      + '" stroke-width="0.6" stroke-dasharray="3,2" opacity="0.7"/>';
+    out += '<rect x="' + (W - PR + 1) + '" y="' + (yP(lastBar.close) - 6).toFixed(1)
+      + '" width="' + (PR - 3) + '" height="12" fill="' + lastCol + '" rx="2"/>';
+    out += '<text x="' + (W - PR + 4) + '" y="' + (yP(lastBar.close) + 2.5).toFixed(1)
+      + '" fill="#0d1117" font-size="8" font-weight="700">' + lastBar.close.toFixed(2) + '</text>';
     // 十字光标 (默认隐藏, hover 时定位)
     out += '<g id="kx" style="display:none" pointer-events="none">'
-      + '<line id="kxV" y1="' + PT + '" y2="' + (PT + priceH + 6 + VOL_H) + '" stroke="#7d8590" stroke-width="0.5" stroke-dasharray="2,2"/>'
+      + '<line id="kxV" y1="' + PT + '" y2="' + (volTop + VOL_H) + '" stroke="#7d8590" stroke-width="0.5" stroke-dasharray="2,2"/>'
       + '<line id="kxH" x1="' + PL + '" x2="' + (W - PR) + '" stroke="#7d8590" stroke-width="0.5" stroke-dasharray="2,2"/>'
       + '</g>';
-    var svg = '<svg id="klineSvg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:210px;display:block">'
+    var svg = '<svg id="klineSvg" viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:226px;display:block">'
       + out + '</svg>';
-    return svg + '<div id="klineTip" style="font-size:10px;color:#c9d1d9;min-height:14px;padding:2px 2px 0">'
-      + '移动鼠标查看每日 开/高/低/收 · 涨跌幅 · 成交量</div>';
+    // 常驻明细条: 最后一根的 日期/开/高/低/收/涨跌/成交量
+    var lb = lastBar, lbChg = lb.open > 0 ? (lb.close - lb.open) / lb.open * 100 : 0;
+    var lbCol = lbChg >= 0 ? UP : DN;
+    var detail = '<div id="klineTip" style="font-size:10px;color:#c9d1d9;padding:3px 2px 0;line-height:1.5">'
+      + '<b>' + (lb.date || '') + '</b> '
+      + '开 <b>' + lb.open.toFixed(2) + '</b> '
+      + '高 <b class="up">' + lb.high.toFixed(2) + '</b> '
+      + '低 <b class="dn">' + lb.low.toFixed(2) + '</b> '
+      + '收 <b>' + lb.close.toFixed(2) + '</b> '
+      + '<span style="color:' + lbCol + '">' + (lbChg >= 0 ? '+' : '') + lbChg.toFixed(2) + '%</span> '
+      + '量 <b>' + fmtVol(lb.vol) + '</b>'
+      + '<span class="fl" style="font-size:9px"> · 移动鼠标看每日明细</span></div>';
+    return svg + detail;
   }
 
   // K 线 hover: 由 renderKlineChart 的 id=kx 十字光标 + id=klineTip 组成

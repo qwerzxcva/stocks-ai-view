@@ -79,19 +79,44 @@ def load_quote_index():
 
 
 def load_sector_map():
-    """个股 → 行业 (industry_map_tv.json) + 板块强度 (sector_pool.json)"""
+    """个股 → 行业 (优先东财中文行业) + 板块强度/资金 (sector_pool + sector_moneyflow)
+
+    历史坑: 原先用 industry_map_tv.json (TradingView 英文行业, 如
+    "Electrical Products") 去查 sector_pool.json 的中文板块名 (如「油服工程」),
+    两者永不匹配, dim_sector() 恒返回 None, 板块面被填成占位分 50。
+    现在优先用 build_industry_map_em.py 产出的中文映射。
+    """
     ind = {}
+    # 1) 东财中文行业 (build_industry_map_em.py)
+    em_map = load_json("industry_map_em.json") or {}
+    for bare, name in (em_map.get("map") or {}).items():
+        if name:
+            ind[bare] = name
+    n_em = len(ind)
+    # 2) TradingView 英文行业兜底 (覆盖东财没收录的)
     from paths import INDUSTRY_MAP
     im = load_json_path(INDUSTRY_MAP) or {}
     for bare, v in (im.items() if isinstance(im, dict) else []):
-        if isinstance(v, dict):
+        if isinstance(v, dict) and bare not in ind:
             ind[bare] = v.get("industry") or v.get("sector") or ""
+    # 板块强度: sector_pool 的 tier 打分
     sp = load_json("sector_pool.json") or {}
     sector_strength = {}
     for tier in ("tier1", "tier2"):
         for s in sp.get(tier, []):
             sector_strength[s.get("sector", "")] = s.get("score", 0)
-    return ind, sector_strength
+    # 板块资金: 主力净额(亿) — 有资金流入的板块额外加权
+    smf = ((load_json("latest.json") or {}).get("sector_moneyflow") or {}).get("data") or []
+    sector_money = {}
+    for x in smf:
+        nm = x.get("name")
+        if nm:
+            sector_money[nm] = {
+                "main_net_yi": x.get("main_net_yi"),
+                "net_pct": x.get("net_pct"),
+                "chg": x.get("changePct"),
+            }
+    return ind, sector_strength, sector_money, n_em
 
 
 def load_json_path(p):
@@ -220,21 +245,83 @@ def dim_fundamental(quote):
     return max(0, min(100, score)), f"PE={pe if pe is not None else '—'} PB={pb if pb is not None else '—'} 市值{(mc or 0)/1e8:.0f}亿"
 
 
-def dim_sector(industry, sector_strength):
-    """板块面: 所属板块当日强度"""
-    if not industry or not sector_strength:
-        return None, "无板块映射"
+def dim_sector(industry, sector_strength, sector_money=None):
+    """板块面: 所属板块当日强度 + 主力资金净额
+
+    强度分来自 sector_pool 的 tier 打分; 资金分来自 sector_moneyflow
+    的主力净额(亿)。两者都没有才退回 50 (不再是恒定 50 — 中文行业映射
+    接上后绝大多数股票都能命中)。
+    """
+    sector_money = sector_money or {}
+    if not industry:
+        return None, "无行业映射"
     s = sector_strength.get(industry)
     if s is None:
-        # 模糊匹配 (包含关系)
+        # 模糊匹配 (包含关系): 「白酒Ⅲ」vs「白酒」这类命名差异
         for k, v in sector_strength.items():
             if k and (k in industry or industry in k):
                 s = v
                 break
-    if s is None:
-        return 50, f"板块[{industry}] 非热点"
-    score = 50 + min(40, s * 8)
-    return max(0, min(100, score)), f"板块[{industry}] 强度{s:+.2f}%"
+    m = sector_money.get(industry)
+    if m is None:
+        for k, v in sector_money.items():
+            if k and (k in industry or industry in k):
+                m = v
+                break
+    # 强度分: 50 ± 强度*8 (上限 ±40)
+    if s is not None:
+        score = 50 + min(40, s * 8)
+        why = "板块[%s] 强度%+.2f%%" % (industry, s)
+    else:
+        score = 50
+        why = "板块[%s] 非热点梯队" % industry
+    # 资金分: 主力净额每 1 亿元 +2 分, 上限 ±15; 净占比也参与
+    if m and m.get("main_net_yi") is not None:
+        bonus = max(-15, min(15, m["main_net_yi"] * 2))
+        if m.get("net_pct") is not None:
+            bonus += max(-5, min(5, m["net_pct"] * 0.5))
+        score += bonus
+        why += " · 主力净额%+.2f亿" % m["main_net_yi"]
+    elif s is None:
+        # 既无梯队强度也无资金数据, 才真的退回中性
+        return 50, "板块[%s] 无强度/资金数据" % industry
+    return max(0, min(100, score)), why
+
+
+def dim_overseas(linkage_rows, global_markets, industry):
+    """海外面: 个股所属板块/大盘 与 海外市场的联动强度 + 隔夜海外情绪
+
+    这不是「海外涨了就加分」的单向判断, 而是两步:
+      1) 找出与该标的最相关的海外驱动 (overseas_linkage.py 已算好 corr/beta)
+      2) 用该驱动最新一日的涨跌 × beta, 折算成对 A 股当日的影响分
+    高 beta 的票在海外大跌时同样被放大, 所以分值是双向的 (可正可负)。
+    """
+    if not linkage_rows:
+        return None, "无海外关联数据"
+    # 取与「大盘」(沪深300/上证) 相关度最高的海外驱动作为市场级传导
+    mkt = [r for r in linkage_rows
+           if r.get("target_name") in ("沪深300", "上证指数") and r.get("corr") is not None]
+    mkt.sort(key=lambda r: -abs(r["corr"]))
+    top = mkt[0] if mkt else None
+    # 全球情绪: 各市场当日涨跌均值
+    gs = (global_markets or {}).get("global_sentiment") or {}
+    avg = gs.get("avg_chg_pct")
+    if top is None and avg is None:
+        return None, "无海外情绪/关联数据"
+    score = 50.0
+    parts = []
+    if avg is not None:
+        score += max(-20, min(20, avg * 4))
+        parts.append("全球情绪 %+.2f%%" % avg)
+    if top:
+        b = top.get("beta") or 0
+        c = top.get("corr") or 0
+        # 传导系数: beta 已含弹性, 这里只把「最相关驱动」标出来供人判断
+        parts.append("最相关: %s (corr %.2f / beta %.2f)" % (
+            top.get("driver_name"), c, b))
+        if top.get("overnight_corr") is not None and abs(top["overnight_corr"]) >= 0.15:
+            parts.append("隔夜传导 corr %.2f" % top["overnight_corr"])
+    return max(0, min(100, score)), " · ".join(parts)
 
 
 def dim_market(market_now):
@@ -304,13 +391,17 @@ def main():
     print(f"[multidim] K线 {len(klines)} 只")
 
     quotes = load_quote_index()
-    industry_map, sector_strength = load_sector_map()
+    industry_map, sector_strength, sector_money, n_em = load_sector_map()
     market_now = load_json("market_now.json")
+    linkage = load_json("overseas_linkage.json") or {}
+    linkage_pairs = linkage.get("pairs") or []
+    global_markets = load_json("global_markets.json")
     ban_prob = load_json("ban_prob.json")
     hot_impact = load_json("hot_impact.json")
     cycle_deep = load_json("cycle_deep.json")
     print(f"[multidim] 快照{len(quotes)} 板块强度{len(sector_strength)} "
-          f"行业映射{len(industry_map)}")
+          f"行业映射{len(industry_map)} (东财中文{n_em}) 板块资金{len(sector_money)} "
+          f"海外关联{len(linkage_pairs)}")
 
     # 候选: 按成交额排序取 top N
     def liq(rows):
@@ -376,7 +467,7 @@ def main():
         dims["高低位"], why_p = (s if s is not None else 50), w
         s, w = dim_fundamental(q)
         dims["基本面"], why_f = (s if s is not None else 50), w
-        s, w = dim_sector(industry_map.get(bare), sector_strength)
+        s, w = dim_sector(industry_map.get(bare), sector_strength, sector_money)
         dims["板块面"], why_s = (s if s is not None else 50), w
         s, w = dim_market(market_now)
         dims["市场面"], why_m = s, w
@@ -387,11 +478,14 @@ def main():
         # 消息面: 从行业+个股名关联热点
         s, w = dim_news([], hot_impact)
         dims["消息面"], why_n = s, w
+        # 海外面: 与海外市场的联动强度 + 隔夜海外情绪
+        s, w = dim_overseas(linkage_pairs, global_markets, industry_map.get(bare))
+        dims["海外面"], why_o = (s if s is not None else 50), w
 
-        # 综合: 技术面权重最高 (0.25), 其余 8 维均分
-        weights = {"技术面": 0.25, "资金面": 0.15, "高低位": 0.15, "基本面": 0.10,
+        # 综合: 技术面权重最高 (0.25), 其余均分
+        weights = {"技术面": 0.22, "资金面": 0.14, "高低位": 0.13, "基本面": 0.09,
                    "板块面": 0.10, "市场面": 0.08, "情绪面": 0.07,
-                   "周期面": 0.05, "消息面": 0.05}
+                   "周期面": 0.05, "消息面": 0.05, "海外面": 0.07}
         composite = sum(dims[k] * w for k, w in weights.items() if k in dims)
         results.append({
             "code": bare, "name": q.get("name", ""),
@@ -400,7 +494,8 @@ def main():
             "dims": {k: round(v, 1) for k, v in dims.items()},
             "why": {"技术面": why_t, "资金面": why_c, "高低位": why_p,
                     "基本面": why_f, "板块面": why_s, "市场面": why_m,
-                    "情绪面": why_e, "周期面": why_y, "消息面": why_n},
+                    "情绪面": why_e, "周期面": why_y, "消息面": why_n,
+                    "海外面": why_o},
             "resonance": t["resonance"],
         })
 

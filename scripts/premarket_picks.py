@@ -167,13 +167,14 @@ def collect_candidates():
              "value_tag": r.get("value_tag"), "pos240_pct": r.get("pos240_pct"),
              "ret_pct": r.get("ret_pct"), "vratio": r.get("vratio")})
 
-    # 3. multidim (9 维因子)
+    # 3. multidim (9 维因子) — dims/why 一起带走, 供前端做多维分析展开
     md = load("multidim.json") or {}
     for r in (md.get("top") or [])[:100]:
         add(r.get("code"), r.get("name"), r.get("price"), r.get("composite"), "multidim",
             {"composite": r.get("composite"), "resonance": r.get("resonance"),
              "intrinsic_value": r.get("intrinsic_value"), "value_dev_pct": r.get("value_dev_pct"),
-             "value_tag": r.get("value_tag"), "chg_pct": r.get("chg_pct")})
+             "value_tag": r.get("value_tag"), "chg_pct": r.get("chg_pct"),
+             "dims": r.get("dims"), "why": r.get("why")})
 
     # 4. lowpool (低位启动)
     lp = load("lowpool.json") or {}
@@ -304,6 +305,9 @@ def main():
             "value_dev_pct": ex.get("value_dev_pct"),
             "value_tag": ex.get("value_tag"),
             "pos240_pct": ex.get("pos240_pct"),
+            # 多维分析: 技术/资金/高低位/基本/板块/市场/情绪/周期/消息 九维
+            "dims": ex.get("dims"),
+            "dims_why": ex.get("why"),
             "reasons": reasons,
         })
 

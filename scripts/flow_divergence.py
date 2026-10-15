@@ -208,7 +208,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bulk", default=None)
     ap.add_argument("--out", required=True)
-    ap.add_argument("--limit", type=int, default=200)
+    ap.add_argument("--limit", type=int, default=500)
     ap.add_argument("--codes", help="只算这些股票")
     args = ap.parse_args()
 

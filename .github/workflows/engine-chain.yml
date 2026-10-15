@@ -190,6 +190,9 @@ jobs:
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
 
           echo "--- tier 2: factors + decision + limit-up audit ---"
+          # 海外关联性 (大盘/板块 与 纳指/恒指/日经/KOSPI 的相关/贝塔/滞后/隔夜)
+          # 必须在 multidim 之前: multidim 的「海外面」维度读它
+          python3 scripts/overseas_linkage.py --out data/overseas_linkage.json || echo "linkage skipped"
           python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || echo "multidim skipped"
           python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
           python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
@@ -254,12 +257,14 @@ jobs:
             data/engine_v5.json data/decision.json data/today_picks.json \
             data/ai_pick_v4.json data/valuation.json data/premarket_picks.json \
             data/midday_picks.json data/engine_fusion.json data/multidim.json \
+            data/overseas_linkage.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
             --protect data/valuation.json --protect data/premarket_picks.json \
             --protect data/midday_picks.json \
-            --protect data/engine_fusion.json --protect data/multidim.json
+            --protect data/engine_fusion.json --protect data/multidim.json \
+            --protect data/overseas_linkage.json
 
       - name: Publish to the data warehouse
         env:
