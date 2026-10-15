@@ -238,6 +238,8 @@ jobs:
           python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
           python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
           python3 scripts/ban_pick.py --out data/ban_pick.json || echo "ban_pick skipped"
+          # 涨停归因 + 下一个涨停预测 (依赖 ban_pick 与 market_now)
+          python3 scripts/limitup_attribution.py || echo "limitup_attribution skipped"
           python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns skipped"
           python3 scripts/strategy_card.py || echo "strategy_card skipped"
           python3 scripts/engine_fusion.py || echo "engine_fusion skipped"
@@ -259,6 +261,9 @@ jobs:
           # v2 replaces the averaged calibrator: it scores bull and bear
           # separately, which is what exposed that every bull edge is negative
           python3 scripts/weight_calibrator_v2.py || echo "calibrator_v2 skipped"
+          # v3 分层校准: v2 在全负 edge 时会把权重全部归零 (信号系统空转),
+          # v3 改为分层统计 + 相对权重 (0.1~0.5 不归零) + 市况适配建议
+          python3 scripts/weight_calibrator_v3.py || echo "calibrator_v3 skipped"
           python3 scripts/edge_miner.py || echo "edge_miner skipped"
           python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
 
@@ -304,6 +309,8 @@ jobs:
             data/ai_pick_v4.json data/valuation.json data/premarket_picks.json \
             data/midday_picks.json data/engine_fusion.json data/multidim.json \
             data/overseas_linkage.json data/ai_review.json data/ai_review.md \
+            data/limitup_attribution.json data/limitup_forecast.json \
+            data/weight_calibration.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -311,7 +318,9 @@ jobs:
             --protect data/midday_picks.json \
             --protect data/engine_fusion.json --protect data/multidim.json \
             --protect data/overseas_linkage.json \
-            --protect data/ai_review.json --protect data/ai_review.md
+            --protect data/ai_review.json --protect data/ai_review.md \
+            --protect data/limitup_attribution.json --protect data/limitup_forecast.json \
+            --protect data/weight_calibration.json
 
       - name: Publish to the data warehouse
         env:

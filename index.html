@@ -139,7 +139,11 @@ tr:hover td{background:rgba(137,87,229,.04)}
 .c-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .c-col .card{display:none}
 .c-col .card.on{display:block}
-.c-col .card .hd{display:none}
+/* 只隐藏 tab 卡片的顶层标题 (tab 按钮已有文字, 重复显得冗余)。
+   不能用 .c-col .card .hd — 那会把多池选股/周期深析等 tab 内部的
+   二级小节标题一并隐藏, 用户就看不到「① 风险池」「⑦b 板块资金」
+   这些池名 (2026-10-15 用户反馈)。 */
+.c-col .c-card > .hd{display:none}
 .c-col .card.on{animation:fadein .18s ease}
 @keyframes fadein{from{opacity:.4}to{opacity:1}}
 .n-title{white-space:normal!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.45;overflow:hidden}
@@ -1821,6 +1825,40 @@ function renderNewsFlow(){
   const srcCol={cls:'var(--up)',wallstreetcn:'var(--accent)',zaobao:'var(--amber)'};
   let h='';
 
+  // ── 第零区: 消息传导 (坏消息利好谁 / 好消息利空谁) ──────
+  // news_impact 只做单向映射 (坏消息→该板块bear), 这里补上第二半:
+  // 一条消息有两个方向的资金流向 — 直接受损方 + 间接受益方 (替代/避险/资金转移)
+  const nt=g.news_transmission||{};
+  const trs=nt.transmissions||[];
+  if(trs.length){
+    h+='<div class="hd" style="border-top:none;padding:6px 0">🔀 消息传导 <span class="sub">坏消息利好谁 · 好消息利空谁 · '+_esc2(nt.n_rules)+' 条规则 · '+_t(nt.ts)+'</span></div>';
+    trs.slice(0,8).forEach(r=>{
+      h+='<div style="padding:5px 0;border-bottom:1px dashed var(--bd)">';
+      h+='<div style="font-size:11px;font-weight:700">['+_esc2(r.label)+'] ';
+      if(r.url) h+='<a href="'+_esc2(r.url)+'" target="_blank" style="color:var(--tx);text-decoration:none">'+_esc2(r.title)+'</a>';
+      else h+=_esc2(r.title);
+      h+='</div>';
+      const sec=(title,arr,col)=>{
+        if(!arr||!arr.length) return '';
+        return '<div style="font-size:10px;margin:2px 0 0 8px">'
+          +'<span style="color:'+col+';font-weight:700">'+title+'</span> '
+          +arr.map(x=>'<span class="clk" data-code="'+_esc2((x.stocks||[])[0]||'')+'" '
+            +'style="color:var(--accent)">'+_esc2(x.sector)+'</span>'
+            +' <span class="fl" style="font-size:9px">('+_esc2((x.stocks||[]).length)+'只)</span>').join(' · ')
+          +'</div>';
+      };
+      h+=sec('↓ 直接利空', r.direct_bear, 'var(--dn)');
+      h+=sec('↑ 直接利好', r.direct_bull, 'var(--up)');
+      h+=sec('⇄ 反向受益 (资金转移)', r.inverse_bull, 'var(--up)');
+      h+=sec('⇄ 反向受害 (被抽血)', r.inverse_bear, 'var(--dn)');
+      h+=sec('🛡 避险去向', r.hedge, 'var(--amber)');
+      if(r.note) h+='<div class="fl" style="font-size:9px;margin:2px 0 0 8px">'+_esc2(r.note)+'</div>';
+      h+='</div>';
+    });
+    h+='<div class="fl" style="padding:6px 0 2px;font-size:9px;line-height:1.5">'
+      +_esc2(nt.caveat||'')+'</div>';
+  }
+
   // ── 第一区: Newsnow 全平台热点 (15源) ──────────────────────
   if(hot.items&&hot.items.length){
     h+='<div class="hd" style="border-top:none;padding:6px 0">全平台热点 <span class="sub">'+_esc2(hot.n_sources_ok)+' 个平台 · '+_t(hot.ts)+'</span></div>';
@@ -2361,6 +2399,7 @@ const SOURCES = [
   'data/hot_news.json',        // Newsnow 聚合热点 (15平台)
   'data/daily_brief.json',     // 盘前日报
   'data/news_digest.json',     // 24h 资讯流
+  'data/news_transmission.json', // 消息传导 (坏消息利好谁)
   'data/enrich.json',          // 强势股/龙虎榜/大宗
   'data/index_kline.json',     // 指数K线
   'data/ai_pick_v4.json',      // AI 推荐 v4

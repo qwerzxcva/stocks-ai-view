@@ -49,23 +49,43 @@ def _j(b):
         return {}
 
 
-def fetch_em_industries(limit=200):
-    """东财行业板块列表 (m:90 t:2): [{code, name}]"""
-    url = ("https://push2.eastmoney.com/api/qt/clist/get"
-           "?fid=f3&po=1&pz=%d&pn=1&np=1&fltt=2&invt=2"
-           "&fs=m:90+t:2&fields=f12,f14" % limit)
-    d = _j(_get(url))
+def fetch_em_industries(max_pages=6):
+    """东财行业板块列表 (m:90 t:2): [{code, name}]
+
+    必须分页: 东财把 pz 上限压到 100 (传 200 也只回 100 个),
+    而完整行业表有 500+ 个。只取一页会让半导体/化工/黄金这些关键
+    行业缺失, 下游 news_transmission 的传导表大面积匹配不上
+    (2026-10-15 实测: 单页只拿到 80 个行业, 半导体/黄金/化工全是 0 只)。
+    """
     out = []
-    for it in ((d.get("data") or {}).get("diff")) or []:
-        name = str(it.get("f14", "") or "").strip()
-        code = str(it.get("f12", "") or "").strip()
-        if name and code:
-            out.append({"code": code, "name": name})
+    seen = set()
+    for pn in range(1, max_pages + 1):
+        url = ("https://push2.eastmoney.com/api/qt/clist/get"
+               "?fid=f3&po=1&pz=100&pn=%d&np=1&fltt=2&invt=2"
+               "&fs=m:90+t:2&fields=f12,f14" % pn)
+        d = _j(_get(url))
+        items = ((d.get("data") or {}).get("diff")) or []
+        if not items:
+            break
+        for it in items:
+            name = str(it.get("f14", "") or "").strip()
+            code = str(it.get("f12", "") or "").strip()
+            if name and code and name not in seen:
+                seen.add(name)
+                out.append({"code": code, "name": name})
+        if len(items) < 100:
+            break
+        time.sleep(0.5)
     return out
 
 
-def fetch_industry_stocks(bk_code, page_size=200):
-    """东财行业成分股 (fs=b:BKxxxx), 分页拉全。"""
+def fetch_industry_stocks(bk_code, page_size=100):
+    """东财行业成分股 (fs=b:BKxxxx), 分页拉全。
+
+    page_size 用 100 而不是 200: 东财把 pz 上限压到 100, 传 200
+    实际也只回 100 条, 但代码按 200 判断「还有没有下一页」,
+    会把不足一页的情况误判为已到底 (len(items) < page_size 永远成立)。
+    """
     out = []
     pn = 1
     while pn <= 10:

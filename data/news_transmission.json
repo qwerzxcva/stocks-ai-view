@@ -1,0 +1,235 @@
+{
+ "ts": "2026-10-15T20:10:41+08:00",
+ "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
+ "n_input": 364,
+ "n_transmissions": 4,
+ "n_rules": 16,
+ "rules": [
+  {
+   "id": "semi_down",
+   "label": "半导体下跌"
+  },
+  {
+   "id": "oil_up",
+   "label": "油价上涨"
+  },
+  {
+   "id": "oil_down",
+   "label": "油价下跌"
+  },
+  {
+   "id": "rate_hike",
+   "label": "加息/紧缩"
+  },
+  {
+   "id": "rate_cut",
+   "label": "降息/宽松"
+  },
+  {
+   "id": "reduce_holding",
+   "label": "股东减持"
+  },
+  {
+   "id": "buyback",
+   "label": "回购/增持"
+  },
+  {
+   "id": "comm_down",
+   "label": "通信下跌"
+  },
+  {
+   "id": "ai_down",
+   "label": "AI/算力下跌"
+  },
+  {
+   "id": "market_broad_down",
+   "label": "大盘普跌"
+  },
+  {
+   "id": "new_energy_down",
+   "label": "新能源下跌"
+  },
+  {
+   "id": "medicine_down",
+   "label": "医药集采"
+  },
+  {
+   "id": "realestate_down",
+   "label": "地产下跌"
+  },
+  {
+   "id": "export_control",
+   "label": "出口管制/制裁"
+  },
+  {
+   "id": "geopolitics",
+   "label": "地缘冲突"
+  },
+  {
+   "id": "epidemic",
+   "label": "疫情"
+  }
+ ],
+ "caveat": "传导关系是规则先验, 非实证; 资金实际流向受多重因素影响。Research reference only, not investment advice.",
+ "transmissions": [
+  {
+   "title": "CPI强化加息预期？美联储官员接连表态：不急于10月行动！",
+   "source": "财联社热门",
+   "time": "2026-10-15T18:01:20+08:00",
+   "url": "https://www.cls.cn/detail/2505208",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": []
+  },
+  {
+   "title": "【午报】沪指跌近2%失守3700点，全市场超5000股飘绿，PCB、白酒股逆势活跃",
+   "source": "财联社热门",
+   "time": "2026-10-15T18:01:20+08:00",
+   "url": "https://www.cls.cn/detail/2505423",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "【焦点复盘】大金融逆势护盘提振有限，创业板指跌近3%续创年内新低，长鑫科技总市值跌破3万亿",
+   "source": "财联社热门",
+   "time": "2026-10-15T18:01:20+08:00",
+   "url": "https://www.cls.cn/detail/2505833",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "胡塞武装与沙特冲突如何影响中东",
+   "source": "B站热搜",
+   "time": "2026-10-15T18:03:21+08:00",
+   "url": "https://search.bilibili.com/all?keyword=%E8%83%A1%E5%A1%9E%E6%AD%A6%E8%A3%85%E4%B8%8E%E6%B2%99%E7%89%B9%E5%86%B2%E7%AA%81%E5%A6%82%E4%BD%95%E5%BD%B1%E5%93%8D%E4%B8%AD%E4%B8%9C",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    }
+   ],
+   "hedge": []
+  }
+ ]
+}

@@ -250,6 +250,25 @@ def build_context():
         else:
             P.append("【引擎自我反思】%s" % str(sr.get("summary"))[:200])
 
+    # 消息传导 (坏消息利好谁 / 好消息利空谁)
+    nt = load("news_transmission.json") or {}
+    for r in (nt.get("transmissions") or [])[:6]:
+        seg = []
+        if r.get("inverse_bull"):
+            seg.append("反向受益: " + ",".join(
+                "%s(%d只)" % (x.get("sector"), len(x.get("stocks") or []))
+                for x in r["inverse_bull"][:3]))
+        if r.get("inverse_bear"):
+            seg.append("反向受害: " + ",".join(
+                "%s(%d只)" % (x.get("sector"), len(x.get("stocks") or []))
+                for x in r["inverse_bear"][:3]))
+        if r.get("hedge"):
+            seg.append("避险去向: " + ",".join(
+                x.get("sector") for x in r["hedge"][:3]))
+        if seg:
+            P.append("【消息传导】[%s] %s → %s" % (
+                r.get("label"), (r.get("title") or "")[:40], " ; ".join(seg)))
+
     # 资讯
     news = []
     for cat, arr in (nd.get("categories") or {}).items():
@@ -324,7 +343,7 @@ def main():
             "inputs": ["market_now", "multidim(十维)", "decision", "reflect_latest",
                        "self_reflect", "overseas_linkage", "global_markets",
                        "sector_moneyflow", "premarket_picks", "close_review",
-                       "news_digest"],
+                       "news_transmission", "news_digest"],
             "note": "消耗 GitCode 每月 AI 额度; 失败时不影响其他管线",
             "caveat": "AI 生成内容仅供研究参考, 不构成投资建议",
         },
