@@ -469,6 +469,145 @@ def ad_line(high, low, close, volume):
     return out
 
 
+# ═══ 借鉴 kand-ta/kand (Apache-2.0 OR MIT) 的特色指标 ══════════════
+# kand 是 Rust 写的技术指标库, 除 TA-Lib 标准指标外还实现了几个进阶指标。
+# 这里按其公开文档的**定义与参数**独立实现 (Apache-2.0/MIT 允许借鉴),
+# 不复用其 Rust 代码 (我们是纯 Python, 且不想引入二进制依赖)。
+
+# ─── Vegas Tunnel (维加斯隧道) ─────────────────────────────────────
+def vegas_tunnel(close, ema_n=144, tunnel_n=169):
+    """Vegas Tunnel = EMA(144) 与其上下各 4% 的包络, 构成「隧道」。
+
+    用法 (维加斯四要素):
+      价格在隧道上方 → 多头趋势
+      价格在隧道下方 → 空头趋势
+      价格在隧道内     → 震荡, 无方向
+    判断依据是「是否突破整条隧道」而非单条 EMA, 因此比单 EMA 少假信号。
+
+    返回 (ema_line, upper, lower, position) — position: above/inside/below
+    数据不足 (少于 ema_n) 时返回全 None。
+    """
+    n = len(close)
+    if n < ema_n:
+        return None, None, None, None
+    e = ema(close, ema_n)
+    ema_now = e[-1]
+    if ema_now is None or ema_now <= 0:
+        return None, None, None, None
+    upper = ema_now * 1.04        # 隧道上下沿 = EMA ± 4%
+    lower = ema_now * 0.96
+    c = close[-1]
+    pos = "above" if c > upper else ("below" if c < lower else "inside")
+    return round(ema_now, 3), round(upper, 3), round(lower, 3), pos
+
+
+# ─── Camarilla Levels (卡玛拉枢纽位) ──────────────────────────────
+def camarilla_levels(high, low, close):
+    """Camarilla 水平位 (日内支撑/阻力)。
+
+    基于前一日 H/L/C 计算 8 个价位: H1-H5 (上方阻力) 与 L1-L5 (下方支撑)。
+    特点: H4/L4 是「强反转位」, H3/L3 是「突破确认位」。
+    乘数取自 Camarilla 原始定义 (1.0834/1.0583 等)。
+    """
+    if not (high and low and close):
+        return None
+    h, l, c = high[-1], low[-1], close[-1]
+    rng = h - l
+    if rng <= 0:
+        return None
+    h5 = (h / l) * c if l > 0 else c + rng * 2
+    return {
+        "H5": round(h5, 3),
+        "H4": round(c + rng * 1.1 / 2, 3),
+        "H3": round(c + rng * 1.1 / 4, 3),
+        "H2": round(c + rng * 1.1 / 6, 3),
+        "H1": round(c + rng * 1.1 / 12, 3),
+        "L1": round(c - rng * 1.1 / 12, 3),
+        "L2": round(c - rng * 1.1 / 6, 3),
+        "L3": round(c - rng * 1.1 / 4, 3),
+        "L4": round(c - rng * 1.1 / 2, 3),
+        "L5": round(c - (h5 - c), 3),
+        "pivot": round((h + l + c) / 3, 3),
+        "range": round(rng, 3),
+        "basis": "Camarilla (Nick Stott 1989): R/S = C ± (H-L)×1.1/{12,6,4,2}; "
+                 "H5=(H/L)×C, L5=C-(H5-C); H4/L4=突破位, H3/L3=反转位",
+    }
+
+
+# ─── Heikin Ashi (平均K线/因果K线) ───────────────────────────────
+def heikin_ashi(open_, high, low, close):
+    """平均K线 (Heikin Ashi)。
+
+    HA 是把普通 K 线做平滑后的「另一套价格」:
+      HA_Close = (O + H + L + C) / 4
+      HA_Open  = (上一根 HA_Open + 上一根 HA_Close) / 2  (首根用 (O+C)/2)
+      HA_High  = max(H, HA_Open, HA_Close)
+      HA_Low   = min(L, HA_Open, HA_Close)
+    连续同色 HA (无下影的阳线 / 无上影的阴线) 表示趋势强。
+
+    返回 (ha_open, ha_high, ha_low, ha_close) 四个等长列表。
+    """
+    n = len(close)
+    if n == 0:
+        return [], [], [], []
+    ha_o, ha_h, ha_l, ha_c = [], [], [], []
+    for i in range(n):
+        c = (open_[i] + high[i] + low[i] + close[i]) / 4
+        o = (open_[i] + close[i]) / 2 if i == 0 else (ha_o[-1] + ha_c[-1]) / 2
+        ha_o.append(o)
+        ha_c.append(c)
+        ha_h.append(max(high[i], o, c))
+        ha_l.append(min(low[i], o, c))
+    return ha_o, ha_h, ha_l, ha_c
+
+
+# ─── MFI (Money Flow Index 资金流量指标) ──────────────────────────
+def mfi(high, low, close, volume, n=14):
+    """MFI = 量加权版 RSI (又称「成交量 RSI」)。
+
+    TP = (H + L + C) / 3
+    量能流 = TP × volume
+    MFI = 100 - 100/(1 + 正流量和/负流量和)
+    与 RSI 的差别: 考虑了成交量, 因此「缩量上涨」在 MFI 上不会虚高。
+    """
+    out = []
+    for i in range(len(close)):
+        if i < n:
+            out.append(None)
+            continue
+        pos = neg = 0.0
+        for j in range(i - n + 1, i + 1):
+            tp = (high[j] + low[j] + close[j]) / 3
+            tp_prev = (high[j - 1] + low[j - 1] + close[j - 1]) / 3 if j > 0 else tp
+            flow = tp * (volume[j] or 0)
+            if tp > tp_prev:
+                pos += flow
+            elif tp < tp_prev:
+                neg += flow
+        out.append(round(100 - 100 / (1 + pos / neg), 2) if neg > 0 else
+                   (100.0 if pos > 0 else None))
+    return out
+
+
+# ─── OBV (On Balance Volume 能量潮) ───────────────────────────────
+def obv(close, volume):
+    """OBV = 累加「带方向的成交量」。
+
+    收盘涨 → +volume; 收盘跌 → -volume; 平 → 0。
+    用途: 价涨 OBV 也涨 = 量价配合; 价涨 OBV 跌 = 量价背离 (上涨无量)。
+    """
+    out = []
+    cum = 0.0
+    for i in range(len(close)):
+        if i > 0:
+            if close[i] > close[i - 1]:
+                cum += volume[i] or 0
+            elif close[i] < close[i - 1]:
+                cum -= volume[i] or 0
+        out.append(round(cum, 2))
+    return out
+
+
 # ─── demo ─────────────────────────────────────────────────────────
 def _demo():
     import random
