@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-15T19:37:37+08:00",
+ "ts": "2026-10-15T20:47:58+08:00",
  "engine": "midday_picks v1 (上午实盘验证 + 下午修正)",
  "date": "2026-10-15",
  "session": "midday",
@@ -65,6 +65,22 @@
   },
   "detail": [
    {
+    "code": "000937",
+    "name": "",
+    "tier": "A_buy",
+    "score": 57.9,
+    "entry_zone": [
+     4.38,
+     4.47
+    ],
+    "stop": 4.25,
+    "target": 4.72,
+    "am_price": null,
+    "am_chg_pct": null,
+    "verdict": "no_data",
+    "limit_up": false
+   },
+   {
     "code": "688156",
     "name": "",
     "tier": "A_buy",
@@ -95,22 +111,6 @@
     "am_chg_pct": null,
     "verdict": "no_data",
     "limit_up": false
-   },
-   {
-    "code": "601098",
-    "name": "",
-    "tier": "A_buy",
-    "score": 35.6,
-    "entry_zone": [
-     10.89,
-     11.12
-    ],
-    "stop": 10.56,
-    "target": 11.72,
-    "am_price": null,
-    "am_chg_pct": null,
-    "verdict": "no_data",
-    "limit_up": false
    }
   ],
   "gate_was": "defensive",
@@ -118,6 +118,67 @@
  },
  "afternoon": {
   "keep": [
+   {
+    "code": "000937",
+    "name": "",
+    "price": 4.45,
+    "score": 57.9,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 21.854999999999997,
+     "valuation": 0,
+     "position": 0,
+     "flow": 12
+    },
+    "sources": [
+     "multidim",
+     "flow_div_buy"
+    ],
+    "entry_zone": [
+     4.38,
+     4.47
+    ],
+    "stop": 4.25,
+    "target": 4.72,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "dims": {
+     "技术面": 73.3,
+     "资金面": 53.0,
+     "高低位": 30,
+     "基本面": 50,
+     "板块面": 50,
+     "市场面": 25.2,
+     "情绪面": 54,
+     "周期面": 34,
+     "消息面": 50,
+     "海外面": 50
+    },
+    "dims_why": {
+     "技术面": "17指标共振 73.3",
+     "资金面": "5日主力-0.18亿 (-0.18%市值) 净流入3/5天",
+     "高低位": "20日位100% 60日位77% 乖离+2.4% 高位区",
+     "基本面": "无快照",
+     "板块面": "无行业映射",
+     "市场面": "涨417/跌4925 上涨占比7.8% 涨停45",
+     "情绪面": "封板率—% 晋级率—% 热点主题2个",
+     "周期面": "周期综合-2.0 (偏空)",
+     "消息面": "关联热点0个 主题[]",
+     "海外面": "无海外关联数据"
+    },
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 4.25",
+     "1 个引擎共振提名 (multidim/flow_div_buy)",
+     "资金吸筹背离"
+    ],
+    "weak_market": true,
+    "tier": "A",
+    "am_verdict": "no_data",
+    "am_price": null
+   },
    {
     "code": "688156",
     "name": "",
@@ -232,42 +293,6 @@
     "reasons": [
      "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 87.00",
      "1 个引擎共振提名 (engine_v5/multidim)"
-    ],
-    "weak_market": true,
-    "tier": "A",
-    "am_verdict": "no_data",
-    "am_price": null
-   },
-   {
-    "code": "601098",
-    "name": "",
-    "price": 11.06,
-    "score": 35.6,
-    "parts": {
-     "resonance": 12,
-     "engine_avg": 23.639999999999997,
-     "valuation": 0,
-     "position": 0,
-     "flow": 0
-    },
-    "sources": [
-     "engine_v5"
-    ],
-    "entry_zone": [
-     10.89,
-     11.12
-    ],
-    "stop": 10.56,
-    "target": 11.72,
-    "risk_reward": 0.11,
-    "intrinsic_value": null,
-    "value_dev_pct": null,
-    "value_tag": null,
-    "pos240_pct": null,
-    "dims": null,
-    "dims_why": null,
-    "reasons": [
-     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 10.56"
     ],
     "weak_market": true,
     "tier": "A",
