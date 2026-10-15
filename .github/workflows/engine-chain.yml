@@ -239,10 +239,11 @@ jobs:
 
           echo "--- tier 2: factors + decision + limit-up audit ---"
           # 腾讯逐笔成交 (分笔明细): 为竞价抢筹/封板质量提供真实主动买卖数据。
-          # 只取涨停池 + 强势股 (全市场 4500 只 x 4500 笔太大, 且逐笔只有最近
-          # 一个交易日, 全采无意义)。盘后调用时 fetchers_ticks 会自动核对
-          # 连续竞价段成交额与行情快照是否相符, 对不上则该只跳过。
-          python3 scripts/fetchers_ticks.py --summary-only \
+          # 只取涨停池 + 强势股。注意耗时: 每只约 20-30 秒 (全天 4500-4800 笔,
+          # 逐页翻到空页), 40 只要 8-20 分钟。2026-10-16 实测这一步 +
+          # bull_bear_debate 的 LLM 串行调用把整条链拖了 1 小时+。
+          # 现限 20 只 + timeout 900s 兜底, 超时就跳过 (逐笔是增强不是必需)。
+          timeout 900 python3 scripts/fetchers_ticks.py --summary-only \
             --codes "$(python3 -c "
           import json,os
           d=os.path.join(os.environ.get('STOCKS_AI_VIEW_DATA') or 'data','latest.json')
@@ -251,12 +252,13 @@ jobs:
           except Exception:
               j={}
           pool=[str(x.get('code','')).zfill(6) for x in (j.get('limit_up_pool') or [])]
-          strong=[str(x.get('code','')).zfill(6) for x in (j.get('ths_strong') or [])][:20]
+          strong=[str(x.get('code','')).zfill(6) for x in (j.get('ths_strong') or [])][:10]
           seen=[];
           for c in pool+strong:
               if len(c)==6 and c.isdigit() and c not in seen: seen.append(c)
-          print(','.join(seen[:40]))")" \
-            --out data/ticks_$(date +%Y%m%d).json || echo "ticks skipped"
+          print(','.join(seen[:20]))")" \
+            --out data/ticks_$(date +%Y%m%d).json \
+            || echo "::warning::ticks 采集失败或超时, 保留上一版"
           python3 scripts/auction_engine.py --out data/auction_engine.json || echo "auction skipped"
           # 板块资金 (东财行业主力净额): multidim 的板块面维度与
           # AI 复盘的【板块资金】节都读 latest.json.sector_moneyflow。
@@ -327,9 +329,13 @@ jobs:
           # 依据: weight_calibrator_v3 实测看多胜率 43.8% < 随机 50%,
           # factor_lab 实测 12 特征仅 below_ma60 有效 —— 单向看多打分系统
           # 在当前市况下系统性高估, 强制一个 Agent 站反面列「不该买的理由」。
-          # 有 GITCODE_TOKEN 时 LLM 组织论证, 没有则纯规则版 (仍有效)。
-          python3 scripts/bull_bear_debate.py --from-picks today_picks.json --limit 15 \
-            --out data/bull_bear_debate.json || echo "debate skipped"
+          # 用 --no-llm: 纯规则版。LLM 论证每只一次串行请求, 15 只要跑很久
+          # (2026-10-16 实测这一步拖住整条链 1 小时+), 规则版阈值全部来自
+          # 本项目实证, 结论不依赖 LLM; 要 LLM 论证时手动 workflow_dispatch
+          # 去掉 --no-llm, 或用 gitcode_ai_review 单独跑。
+          timeout 120 python3 scripts/bull_bear_debate.py --from-picks today_picks.json \
+            --limit 15 --no-llm --out data/bull_bear_debate.json \
+            || echo "::warning::debate 失败或超时, 保留上一版"
 
           # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
           # 放在 tier 8 最后, 这样十维/海外关联/推股/收盘复盘全部就绪
