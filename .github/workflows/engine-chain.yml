@@ -22,6 +22,14 @@ on:
     - cron: '5 1 * * 1-5'
     # 15:30 CST weekdays: after the close and the 15:05 settle
     - cron: '30 7 * * 1-5'
+    # 16:40 CST weekdays: a second post-close pass.
+    # Why: the 15:30 run can still be racing the 15:05 settle and the
+    # realtime-minute tail (its last tick is 15:02). A later pass sees the
+    # settled pool/limit-up data, and rebuild-pools has run its 15:40
+    # settle by then. Without it, the site shows the 15:30 snapshot all
+    # night even after the final numbers are in (2026-10-16 observed:
+    # engines frozen at 19:35 while collectors kept running to 02:29).
+    - cron: '40 8 * * 1-5'
   workflow_dispatch:
     inputs:
       force:
@@ -91,7 +99,7 @@ jobs:
           if [ "$mins" -ge 510 ] && [ "$mins" -le 570 ]; then
             echo "MODE=full" >> "$GITHUB_ENV"; echo "pre-open window ($h:$m) -> full"; exit 0
           fi
-          if [ "$mins" -ge 905 ] && [ "$mins" -le 990 ]; then
+          if [ "$mins" -ge 905 ] && [ "$mins" -le 1020 ]; then
             echo "MODE=full" >> "$GITHUB_ENV"; echo "post-close window ($h:$m) -> full"; exit 0
           fi
           echo "MODE=light" >> "$GITHUB_ENV"
@@ -226,6 +234,26 @@ jobs:
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
 
           echo "--- tier 2: factors + decision + limit-up audit ---"
+          # 腾讯逐笔成交 (分笔明细): 为竞价抢筹/封板质量提供真实主动买卖数据。
+          # 只取涨停池 + 强势股 (全市场 4500 只 x 4500 笔太大, 且逐笔只有最近
+          # 一个交易日, 全采无意义)。盘后调用时 fetchers_ticks 会自动核对
+          # 连续竞价段成交额与行情快照是否相符, 对不上则该只跳过。
+          python3 scripts/fetchers_ticks.py --summary-only \
+            --codes "$(python3 -c "
+          import json,os
+          d=os.path.join(os.environ.get('STOCKS_AI_VIEW_DATA') or 'data','latest.json')
+          try:
+              j=json.load(open(d))
+          except Exception:
+              j={}
+          pool=[str(x.get('code','')).zfill(6) for x in (j.get('limit_up_pool') or [])]
+          strong=[str(x.get('code','')).zfill(6) for x in (j.get('ths_strong') or [])][:20]
+          seen=[];
+          for c in pool+strong:
+              if len(c)==6 and c.isdigit() and c not in seen: seen.append(c)
+          print(','.join(seen[:40]))")" \
+            --out data/ticks_$(date +%Y%m%d).json || echo "ticks skipped"
+          python3 scripts/auction_engine.py --out data/auction_engine.json || echo "auction skipped"
           # 板块资金 (东财行业主力净额): multidim 的板块面维度与
           # AI 复盘的【板块资金】节都读 latest.json.sector_moneyflow。
           # engine-chain 原先不跑 collect_market_extras, 该字段一直缺失,
@@ -311,6 +339,7 @@ jobs:
             data/overseas_linkage.json data/ai_review.json data/ai_review.md \
             data/limitup_attribution.json data/limitup_forecast.json \
             data/weight_calibration.json \
+            data/auction_engine.json data/ticks_$(date +%Y%m%d).json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -320,7 +349,9 @@ jobs:
             --protect data/overseas_linkage.json \
             --protect data/ai_review.json --protect data/ai_review.md \
             --protect data/limitup_attribution.json --protect data/limitup_forecast.json \
-            --protect data/weight_calibration.json
+            --protect data/weight_calibration.json \
+            --protect data/auction_engine.json \
+            --protect data/ticks_$(date +%Y%m%d).json
 
       - name: Publish to the data warehouse
         env:

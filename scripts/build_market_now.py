@@ -26,15 +26,65 @@ from collect_market_extras import (
 from ai_screener import fetch_news, theme_of, sentiment_of, THEMES, fetch_fund_rank
 
 
+def _session_state(now):
+    """判断当前是否在 A 股交易时段, 返回 (state, last_trading_date)。
+
+    非交易时段 (含凌晨/午休/周末/假日) 采集器若按今天日期去查东财,
+    拿到的是**上一个交易日的收盘缓存**, 却被打上今天的 date 标签 ——
+    这正是「旧数据冒充新数据」的成因 (2026-10-16 实测: market_now.date=
+    20261016 但涨停池 36 只与 latest.json 的 10-15 数据完全相同)。
+    """
+    mins = now.hour * 60 + now.minute
+    dow = now.weekday()          # 0=Mon
+    if dow >= 5:
+        return "weekend", None
+    if 555 <= mins <= 690:       # 09:15-11:30 上午盘
+        return "trading", None
+    if 780 <= mins <= 900:       # 13:00-15:00 下午盘
+        return "trading", None
+    if 690 < mins < 780:         # 11:30-13:00 午休
+        return "lunch", None
+    if mins < 555:               # 盘前 (00:00-09:15): 数据归属上一交易日
+        return "pre_open", None
+    return "post_close", None   # 15:00 之后: 当日已收盘定格
+
+
+def _last_trading_date(now):
+    """向前找最近一个**已完成**的工作日 (用于非交易时段的数据归属日)。
+
+    周六/周日/周一盘前都要回退到周五, 且必须是过去的日期 ——
+    周六 00:30 时 now-1day 是周五白天 (尚未收盘), 但周五的收盘数据
+    此刻已经定格, 所以退一天即可; 周五盘中/盘前则退到周四。
+    """
+    d = now - timedelta(days=1)
+    if d.weekday() >= 5:
+        # 回退到上一个周五
+        while d.weekday() >= 5:
+            d -= timedelta(days=1)
+    # 若退一天后仍晚于当前时刻 (例如周五 20:00 查, d=周四 20:00 不会),
+    # 只需保证 d <= now 的日期部分
+    return d.strftime("%Y%m%d")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
     now = datetime.now(CST)
-    date_str = now.strftime("%Y%m%d")
-    date_dash = now.strftime("%Y-%m-%d")
-    print(f"[market_now] {now:%Y-%m-%d %H:%M:%S} CST", flush=True)
+    state, _ = _session_state(now)
+    # 只有盘中才按今天查; 盘前/午休/周末回退到上一交易日,
+    # 盘后 (15:00 之后) 用今天 —— 当天收盘数据此刻已定格,
+    # 若退回昨天反而会丢掉刚产生的收盘池 (2026-10-16 实测)。
+    if state in ("trading", "post_close"):
+        date_str = now.strftime("%Y%m%d")
+    else:
+        date_str = _last_trading_date(now)
+    is_live = state == "trading"
+    date_dash = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:]}"
+    print(f"[market_now] {now:%Y-%m-%d %H:%M:%S} CST state={state} "
+          f"query_date={date_str}" + (" (非交易时段, 数据归属上一交易日)"
+                                     if not is_live else ""), flush=True)
 
     zt = fetch_pool("ZT", date_str)
     dtn = fetch_pool("DT", date_str)
@@ -65,6 +115,9 @@ def main():
     out = {
         "ts": now.isoformat(timespec="seconds"),
         "date": date_str,
+        "session_state": state,
+        "is_live": is_live,
+        "collected_at": now.isoformat(timespec="seconds"),
         "source": "tencent+eastmoney (零鉴权实时)",
         "market": {
             "indices": indices,
@@ -91,7 +144,13 @@ def main():
         "meta": {
             "freq": "交易时段每10分钟 (GitHub Actions)",
             "independence": "独立文件, 不与 latest.json 冲突 (远端 sync 只覆盖 latest.json)",
-            "caveat": "实时数据, 未做收盘校准; 仅供参考",
+            "session_state": state,
+            "is_live": is_live,
+            "data_belongs_to": date_str,
+            "caveat": ("非交易时段采集: 涨跌停/成交等字段为上一交易日收盘定格值, "
+                        "指数价为最近快照; 已按真实归属日标注, 不用当日标签冒充"
+                        if not is_live else
+                        "实时数据, 未做收盘校准; 仅供参考"),
         },
     }
 

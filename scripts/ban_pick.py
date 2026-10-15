@@ -53,6 +53,86 @@ DATA_DIR = os.environ.get("STOCKS_AI_VIEW_DATA") or AI_VIEW_DATA
 from collect_market_extras import fetch_pool, fetch_zdfenbu
 
 
+def load_auction():
+    """读 auction_engine.json → {裸码: 逐笔资金结构}。
+
+    没有逐笔数据时返回空 dict, ban_pick 按原有 K 线口径走 (不报错)。
+    逐笔只覆盖 fetchers_ticks 传入的股票, 因此这里是「有则增强」而非必需。
+    """
+    p = os.path.join(DATA_DIR, "auction_engine.json")
+    if not os.path.exists(p):
+        return {}
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except Exception:
+        return {}
+    out = {}
+    for r in d.get("stocks") or []:
+        c = str(r.get("code") or "")
+        c = c[2:] if len(c) == 8 and c[:2] in ("sh", "sz", "bj") else c
+        out[c] = r
+    return out
+
+
+def apply_auction(r, au):
+    """用逐笔资金结构调整 score 并追加 reason。
+
+    为什么值得调: seal_strength 只看收盘价离涨停板多远, 分不出
+    「主动买持续推进的涨停」与「靠大单挂住、实际主动卖占优的涨停」,
+    而后者的炸板风险显著更高。逐笔的 buy_sell_imbalance 正好补这个盲区。
+    """
+    if not au:
+        return r
+    imb = au.get("buy_sell_imbalance")
+    strength = au.get("auction_strength")
+    delta = 0.0
+    notes = []
+    if imb is not None:
+        if imb >= 15:
+            delta += 8
+            notes.append(f"逐笔全天主动买占优 {imb:+.1f}% (封板有真实成交支撑)")
+        elif imb >= 5:
+            delta += 3
+            notes.append(f"逐笔主动买略占优 {imb:+.1f}%")
+        elif imb <= -15:
+            delta -= 12
+            notes.append(f"逐笔全天主动卖占优 {imb:+.1f}% (封板靠挂单, 炸板风险高)")
+        elif imb <= -5:
+            delta -= 5
+            notes.append(f"逐笔主动卖略占优 {imb:+.1f}%")
+    if strength is not None and strength >= 70:
+        delta += 4
+        notes.append(f"竞价异常放量 (强度 {strength:.0f})")
+    tail = au.get("tail_imbalance")
+    if tail is not None and (au.get("tail_ratio") or 0) >= 12:
+        if tail >= 20:
+            delta += 3
+            notes.append(f"尾盘放量主动买 {tail:+.1f}% (抢次日溢价)")
+        elif tail <= -20:
+            delta -= 6
+            notes.append(f"尾盘放量主动卖 {tail:+.1f}% (出货迹象)")
+    if au.get("complete") is False:
+        notes.append("盘后段有缺笔, 尾盘指标可能偏低")
+
+    r["score"] = round(max(0, min(100, r["score"] + delta)), 1)
+    r["auction_delta"] = round(delta, 1)
+    r["tick_structure"] = {
+        "buy_sell_imbalance": imb,
+        "auction_strength": strength,
+        "large_tick_ratio": au.get("large_tick_ratio"),
+        "tail_ratio": au.get("tail_ratio"),
+        "tail_imbalance": tail,
+        "complete": au.get("complete"),
+    }
+    if notes:
+        r["reasons"] = list(r.get("reasons") or []) + notes
+    # 逐笔证据足以推翻 K 线口径的结论: 主动卖占优的涨停一律降为回避
+    if imb is not None and imb <= -15 and r.get("verdict") == "可打":
+        r["verdict"] = "观察"
+        r["verdict_reason"] = "逐笔显示主动卖占优, 封板质量存疑"
+    return r
+
+
 def zt_threshold(code):
     c = str(code)
     if c.startswith(("sh", "sz", "bj")):
@@ -307,6 +387,17 @@ def main():
             r = analyze_one(code, "", bars, bp)
             if r:
                 results.append(r)
+
+    # 逐笔资金结构增强 (有 auction_engine.json 才生效)
+    auction = load_auction()
+    if auction:
+        n_hit = 0
+        for r in results:
+            au = auction.get(str(r.get("code") or "").zfill(6))
+            if au:
+                apply_auction(r, au)
+                n_hit += 1
+        print(f"[ban_pick] 逐笔资金结构增强 {n_hit}/{len(results)} 只")
 
     order = {"可打": 0, "观察": 1, "回避": 2, "无K线": 3}
     results.sort(key=lambda x: (order.get(x["verdict"], 9), -x["score"]))
