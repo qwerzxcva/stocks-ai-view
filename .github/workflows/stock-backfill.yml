@@ -140,38 +140,47 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # segment → 目标仓
-          case "${{ matrix.segment }}" in
-            00) REPO="jiegengxiangjianxue1/db-stocks-a" ;;
-            30) REPO="jiegengxiangjianxue2/db-stocks-b" ;;
-            60) REPO="jiegengxiangjianxue2/db-stocks-c" ;;
-            *)  REPO="jiegengxiangjianxue3/db-stocks-e" ;;
-          esac
           cd /tmp/backfill
-          git init -q
-          git config user.name "backfill-bot"
-          git config user.email "3576982374@qq.com"
-          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
-          # 拉取远端现有内容再叠加 (避免覆盖已有数据)
-          git fetch -q --depth=1 origin main || echo "empty repo"
-          git checkout -q main 2>/dev/null || git checkout -q -b main
-          git reset --soft origin/main 2>/dev/null || true
-          git add -A stocks/ backfill_stats.json
-          ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          if git diff --quiet --cached HEAD 2>/dev/null; then
-            echo "no changes"
-          else
-            git commit -q -m "backfill(${{ matrix.segment }}): $ts" || true
-            git -c http.version=HTTP/1.1 push origin main || {
-              echo "push raced, retrying"
-              git fetch -q origin main
-              git reset --soft origin/main
-              git add -A stocks/ backfill_stats.json
-              git commit -q -m "backfill(${{ matrix.segment }}): $ts" 2>/dev/null || true
-              git push origin main
-            }
-          fi
-          find stocks -type f | wc -l
+          # 按 shard 逐个推到正确仓 (shard → repo 映射与远端一致)
+          for SH in $(ls stocks/ 2>/dev/null); do
+            case "$SH" in
+              00) REPO="jiegengxiangjianxue1/db-stocks-a" ;;
+              30) REPO="jiegengxiangjianxue2/db-stocks-b" ;;
+              60) REPO="jiegengxiangjianxue2/db-stocks-c" ;;
+              15|51|58|68) REPO="jiegengxiangjianxue3/db-stocks-d" ;;
+              *) REPO="jiegengxiangjianxue3/db-stocks-e" ;;
+            esac
+            echo "=== shard $SH -> $REPO ==="
+            WORK="/tmp/push_$SH"
+            rm -rf "$WORK" && mkdir -p "$WORK/stocks"
+            cp -r "stocks/$SH" "$WORK/stocks/"
+            cd "$WORK"
+            git init -q
+            git config user.name "backfill-bot"
+            git config user.email "3576982374@qq.com"
+            git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+            # 拉远端现有内容再叠加 (避免覆盖已有数据)
+            git fetch -q --depth=1 origin main || echo "  empty/first push"
+            git checkout -q main 2>/dev/null || git checkout -q -b main
+            git reset --soft origin/main 2>/dev/null || true
+            git add -A stocks/
+            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+            if git diff --quiet --cached HEAD 2>/dev/null; then
+              echo "  no changes for $SH"
+            else
+              git commit -q -m "backfill($SH): $ts" || true
+              git -c http.version=HTTP/1.1 push origin main || {
+                echo "  push raced, retrying"
+                git fetch -q origin main
+                git reset --soft origin/main
+                git add -A stocks/
+                git commit -q -m "backfill($SH): $ts" 2>/dev/null || true
+                git push origin main
+              }
+            fi
+            echo "  files: $(find stocks -type f | wc -l)"
+            cd /tmp/backfill
+          done
       - name: Summary
         run: |
           echo "## Stock Backfill (${{ matrix.segment }})" >> $GITHUB_STEP_SUMMARY
