@@ -1409,18 +1409,19 @@ SOURCES = [
     },
     {
         "id": "ths_board_kline",
-        "name": "同花顺板块日K (d.10jqka v4 line bk_)",
+        "name": "同花顺板块日K (d.10jqka v4 line bk_, 仅行业板块)",
         "url": "https://d.10jqka.com.cn/v4/line/bk_{bk}/01/{year}.js",
         "auth": "none (Referer: d.10jqka.com.cn)",
-        "status": "ok",
+        "status": "degraded",
         "freq": "daily",
         "encoding": "gb18030",
         "fields": "板块指数日线 (date/open/close/high/low/volume/amount)",
-        "provides": ["sector/industry_kline_ths", "sector/concept_kline_ths"],
-        "notes": "按年分文件, 14KB/年; 实测 881272(软件开发) 200; "
-                 "坑: 概念板块 bk_301558 返回 404 — 概念板块内部码与列表码不一致, "
-                 "需先从概念列表页取 detail/code/ 才能拿到正确的 bk 码; "
-                 "比东财板块K线多一个独立源可交叉校验",
+        "provides": ["sector/industry_kline_ths"],
+        "notes": "按年分文件, 14KB/年; 实测 881272(软件开发)/881121(半导体)/881273(白酒)/881131(白电) 全 200; "
+                 "**概念板块不可用**: bk_301558/bk_307822 及 gn_/hs_ 前缀全部 404 — "
+                 "d.10jqka 的 bk_ 只覆盖 90 个行业板块, 375 个概念板块的 K 线此域不给; "
+                 "概念板块日线降级: 用东财 clist 的板块行情或从成分股自行加权聚合; "
+                 "行业板块 K 线仍可作东财板块K线的独立交叉校验源",
     },
     {
         "id": "ths_board_constituents",
@@ -1479,6 +1480,647 @@ SOURCES = [
         "provides": [],
         "notes": "2026-10-15 实测 HTTP 401; 与东财 fflow 五档重复度高, 优先级低; "
                  "留档避免下次再探",
+    },
+
+    # ============ 雪球选股器 (2026-10-15 逆向, 单端点全字段) ============
+    {
+        "id": "xueqiu_screener",
+        "name": "雪球选股器全市场 40 字段 (service/v5 screener)",
+        "url": "https://xueqiu.com/service/v5/stock/screener/quote/list?page={n}&size={n}&order=desc&order_by={f}&market=CN",
+        "auth": "none (Referer: xueqiu.com)",
+        "status": "ok",
+        "freq": "realtime",
+        "delay": "盘中实时",
+        "fields": "40 字段: symbol/name/current/chg/percent/percent5m/first_percent/"
+                 "current_year_percent/total_percent/amplitude/turnover_rate/volume/amount/"
+                 "volume_ratio/limitup_days/pe_ttm/pb_ttm/ps/pcf/eps/dividend_yield/"
+                 "roe_ttm/net_profit_cagr/income_cagr/north_net_inflow/main_net_inflows/"
+                 "total_shares/float_shares/market_capital/float_market_capital/"
+                 "followers/issue_date_ts/tick_size/lot_size/type",
+        "provides": ["latest.json:xueqiu_screener", "multi_screener 候选池", "data/xq_screener.json"],
+        "notes": "采集器 scripts/xueqiu_screener_collect.py; "
+                 "实测 count=5000(A股)/2919(港股)/5000(美股), size=100 单页 100 行, 0.35s/页; "
+                 "**无需 cookie** (registry 旧的 xueqiu_anon_token 是给其他接口用的); "
+                 "order_by 有效字段 9 个: percent/market_capital/pe_ttm/pb_ttm/volume/amount/"
+                 "turnover_rate/amplitude/north_net_inflow/net_profit_cagr; "
+                 "**筛选参数不生效** (pe/pb/percent/market_capital/limitup_days/roe_ttm/"
+                 "net_profit_cagr 传了 count 仍恒为全量) — 必须拉全量后本地过滤; "
+                 "独家字段: limitup_days(连板天数)/percent5m(5分钟涨跌)/north_net_inflow(北向)/"
+                 "followers(关注人数)/dividend_yield/roe_ttm/net_profit_cagr/income_cagr; "
+                 "与东财 push2 clist 形成交叉校验 (后者 24 字段但有市值/量比, 前者有估值成长)",
+    },
+    {
+        "id": "xueqiu_screener_dead_paths",
+        "name": "雪球其他 API 路径 (全失效, 留档)",
+        "url": "https://stock.xueqiu.com/v5/stock/{chart/kline,capital/flow,quote,f10/*}.json",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "K线/资金流/快照/F10/龙虎榜",
+        "provides": [],
+        "notes": "2026-10-15 实测 15 个路径: stock.xueqiu.com/v5/* 全 404, "
+                 "service/v5/stock/batch/quote.json 403, hot_stock/list 400, "
+                 "screener/{industry,block,f10,fund,hot,follow}/list 全 404/400; "
+                 "结论: 雪球 web 端只开放 screener 一个端点给匿名访问, 其余要登录态; "
+                 "不要再重复探测这些路径",
+    },
+
+    # ============ 腾讯第二批 (2026-10-16 复核子代理结论, curl+urllib 双测) ============
+    {
+        "id": "tencent_board_rank",
+        "name": "腾讯A股全市场排行榜 (含主力资金流+多周期涨幅)",
+        "url": "https://proxy.finance.qq.com/cgi/cgi-bin/rank/hs/getBoardRankList?_appver=11.17.0&board_code=aStock&sort_type={price|turnover|volume|pn|speed}&direct={down|up}&offset={n}&count=200",
+        "auth": "none",
+        "status": "ok",
+        "freq": "realtime",
+        "delay": "秒级 (盘中实时)",
+        "encoding": "utf-8",
+        "fields": "28 字段: code/name/zxj(现价)/zd/zdf(涨跌%)/zf(振幅%)/hsl(换手%)/lb(量比)/"
+                 "volume/turnover/pe_ttm/pn/zsz(总市值亿)/ltsz(流通市值亿)/speed/state/stock_type/"
+                 "zllr(主力流入)/zllc(主力流出)/zljlr(主力净流入)/zllr_d5/zllc_d5(5日流)/"
+                 "zdf_d5/zdf_d10/zdf_d20/zdf_d60/zdf_w52/zdf_y(年初至今)",
+        "provides": ["latest.json:market.stocks", "data/board_rank.json"],
+        "notes": "2026-10-16 实测: HTTP 200, 95457B/200只/0.17s; total=5576 (A股全量); "
+                 "**sort_type 白名单极窄, 仅 5 个**: price/turnover/volume/pn/speed "
+                 "— 传 zdf/hsl/zllr/zllc/ltsz/zsz/pe_ttm/zd/zdf_w52/zdf_d5/zdf_d60/zllr_d5/lb/zxj "
+                 "一律返回 code=1619377101 '参数错误:sort_type error' (全部实测); "
+                 "board_code 只有 aStock 有数据, hkStock/usStock/etf/hk/us 全 total=0 (实测); "
+                 "offset 分页实测 0/200/400/5370 均正常, 5576 只需 28 请求 (现 qt.gtimg.cn 需 ~93 次); "
+                 "direct=up 可拿跌幅榜, state='S' 为停牌; "
+                 "坑: pn 字段含义未定 (茅台 6.53, 疑为市净率另一口径/每股净资产, **未核实**); "
+                 "坑: volume/turnover/zsz/ltsz 单位需再确认 (volume=57677 疑为万手, turnover=753771)",
+        "degrade_to": ["tencent_quote", "em_push2_clist"],
+    },
+    {
+        "id": "tencent_newfqkline",
+        "name": "腾讯K线任意日期区间 (newfqkline)",
+        "url": "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param={code},day,{start},{end},640,qfq&r=0.82",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日K, 收盘定格",
+        "encoding": "utf-8",
+        "fields": "date/open/close/high/low/volume (前复权)",
+        "provides": ["kline/backfill", "global_kline"],
+        "notes": "2026-10-16 实测 HTTP 200 (sh000919, 2025-01-01~2025-03-01); "
+                 "JSONP 变量名固定 kline_dayqfq; 日期格式 YYYY-MM-DD, 起止都生效; "
+                 "单次上限 640 根, 超长历史需按年分段; "
+                 "**这是唯一支持任意起止区间的 K 线端点** — tencent_kline/tencent_index_history "
+                 "都只能取最近 N 根, 补历史必须翻页; 指数代码同样适用",
+    },
+    {
+        "id": "tencent_hk_kline",
+        "name": "腾讯港股后复权K线 (含回购/派息事件)",
+        "url": "https://web.ifzq.gtimg.cn/appstock/app/hkfqkline/get?param=hk{code},day,{start},{end},{n},hfq",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日K",
+        "encoding": "utf-8",
+        "fields": "date/open/close/high/low/volume + 事件对象{cqr(除权日),FHcontent(派息),"
+                 "HGcontent(回购),paixiri,hgcgContent,ggContent} + 换手率 + 成交额 + qt 实时快照 80+ 字段",
+        "provides": ["overseas/hk_kline", "overseas/hk_events"],
+        "notes": "2026-10-16 实测 HTTP 200, 119407B (hk00700, 2026-09-01~2026-10-15); "
+                 "**起止日期参数真实生效** (与美股 usfqkline 的行为不同, 见下条); "
+                 "周期可换 week (返回键变 hfqweek); 复权用 hfq (qfq 未验证); "
+                 "附带的 qt 是港股实时快照 (含52周高低/市值/PE/回购数据); "
+                 "**除权事件文本质量优于现有港股源** — 回购公告直接可读, 如 '回购24.00万股, 均价418.271港元'",
+    },
+    {
+        "id": "tencent_us_kline",
+        "name": "腾讯美股K线 (日期参数失效, 留档)",
+        "url": "https://web.ifzq.gtimg.cn/appstock/app/usfqkline/get?param=us{code},day,{start},{end},{n},qfq",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "daily",
+        "delay": "日K",
+        "encoding": "utf-8",
+        "fields": "date/open/close/high/low/volume + qt 实时快照 + pandata + market(全市场状态串)",
+        "provides": [],
+        "notes": "2026-10-16 实测: **日期区间参数完全失效** — "
+                 "param=usAAPL,day,2026-10-01,2026-10-15,10,qfq 与 "
+                 "param=usAAPL,day,2011-06-02,2011-06-02,10,qfq 返回**完全相同的 1541 字节** "
+                 "(都是首日 2011-06-02 + 当日两条), start/end 被忽略, 只按 count 退化; "
+                 "**要美股历史不能用这个端点**; "
+                 "可用价值只剩 qt 实时快照 (52周高低/市值/PE/交易所后缀, 比 qt.gtimg.cn 全); "
+                 "代码格式 us{TICKER}, 返回带 .OQ 后缀; usDJI 等指数同构可用, 指数 qt 带成分统计",
+    },
+    {
+        "id": "tencent_index_weektrends",
+        "name": "腾讯指数周线全史 (单请求 20 年)",
+        "url": "https://web.ifzq.gtimg.cn/other/klineweb/klineWeb/weekTrends?code={code}&type=qfq&_var=trend_qfq&r=0.35",
+        "auth": "none",
+        "status": "ok",
+        "freq": "weekly",
+        "delay": "周K, 周末定格",
+        "encoding": "utf-8",
+        "fields": "[date, close] 周线收盘价全史",
+        "provides": ["cycle_deep 长期趋势", "index_weektrends"],
+        "notes": "2026-10-16 实测 HTTP 200, 30017B (sh000919 从 2005-01-04 起 1100+ 根); "
+                 "无分页, 单请求拿 20 年; JSONP 变量名须与 _var 一致; type=qfq; "
+                 "**只有收盘价, 无开高低量** — 用途限长期趋势/年线位置判断",
+    },
+
+    # ============ 新浪第二批 (2026-10-16 复核) ============
+    {
+        "id": "sina_futures_realtime",
+        "name": "新浪期货实时盘口 (分品种, 修正 akshare bug)",
+        "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQFuturesData?page=1&num={n}&sort=position&asc=0&node={品种}_qh&base=futures",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "realtime",
+        "delay": "实时 (夜盘 ticktime 到 22:59:59)",
+        "encoding": "utf-8",
+        "fields": "symbol/exchange/name/trade/settlement/presettlement/open/high/low/close/"
+                 "bidprice1/askprice1/bidvol1/askvol1/volume/position/ticktime/tradedate/"
+                 "preclose/changepercent/bid/ask/prevsettlement",
+        "provides": [],
+        "notes": "2026-10-16 实测: **修正 akshare 重大 bug** — akshare futures/cons.py:121-129 "
+                 "写死 node=001, 导致 Market_Center.getHQFuturesData 恒返回 []; "
+                 "正确格式是 {大写品种代码}_qh; "
+                 "**node 白名单实测极窄**: sngz_qh(10年国债, 1422B) 与 IM_qh(中证1000, 2471B) 通; "
+                 "TA_qh / IF_qh / T_qh 实测返回 [] (空, 2B) — 子代理称 TA_qh 可用但本次实测为空; "
+                 "同一 node 返回该品种全部挂牌合约 (主力连续 IM0/TA0 排最前), 按 position 降序即主力置顶; "
+                 "changepercent 是小数 (-0.0001367 = -0.01367%); "
+                 "**白名单未穷举** (akshare futures_inventory_em_symbol_dict 约 70 个品种待逐一试), "
+                 "故标 degraded 而非 ok",
+    },
+    {
+        "id": "sina_moneyflow_zjlrqs",
+        "name": "新浪个股主力资金趋势 (含行业对比)",
+        "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssl_qsfx_zjlrqs?page=1&num={n}&sort=opendate&asc=0&daima={sym}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "T-1 至 T 日, 当日盘中有当日数据 (部分延迟)",
+        "encoding": "utf-8",
+        "fields": "opendate/trade/changeratio/turnover/netamount/ratioamount/r0_net/r0_ratio/"
+                 "r0x_ratio/cnt_r0x_ratio/cate_ra/cate_na",
+        "provides": ["money/fflow", "flow_divergence"],
+        "notes": "2026-10-16 实测 HTTP 200, 869B; "
+                 "netamount 单位是元 (不是万元, 需 /1e4); r0=超大单; "
+                 "独有 r0x_ratio (超大单占主力比%) 与 cate_ra/cate_na (同类/行业对比), lscjfb 没有; "
+                 "偶发 15s 超时 (实测第一次超时第二次成功), 需重试",
+    },
+    {
+        "id": "sina_moneyflow_lscjfb",
+        "name": "新浪个股历史成交分布 (资金四档)",
+        "url": "https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/MoneyFlow.ssl_qsfx_lscjfb?page=1&num={n}&sort=opendate&asc=0&daima={sym}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "T-1 至 T 日",
+        "encoding": "utf-8",
+        "fields": "opendate/trade/changeratio/turnover/netamount/ratioamount/r0/r1/r2/r3/"
+                 "r0_net/r1_net/r2_net/r3_net",
+        "provides": ["money/fflow", "flow_divergence"],
+        "notes": "2026-10-16 实测 HTTP 200, 995B; "
+                 "四档 (r0 超大单 ~ r3 小单) 成交额+净额都给全, 比 zjlrqs 细; "
+                 "**生产已在用** (scripts/moneyflow_scan.py:52) 但此前未注册; "
+                 "同族 ssl_qsfx_zjlrrd 实测返回 Service not found (死)",
+    },
+    {
+        "id": "sina_esg_stocks",
+        "name": "新浪ESG多机构评级 (53418 条, 10 家机构)",
+        "url": "https://global.finance.sina.com.cn/api/openapi.php/EsgService.getEsgStocks?page={p}&num={n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "symbol(SZ000001 格式)/market/esg_info[{agency,agency_name,esg_score,esg_dt,remark}] + total",
+        "provides": ["sector/esg_pool.json"],
+        "notes": "2026-10-16 实测 HTTP 200, total=53418; 首请求 5.76s (慢, 后续 0.3-0.8s); "
+                 "聚合 10 家机构 (商道融绿/中财绿金院/盟浪/中诚信/晨星/联合赤道/妙盈/有机数/中债/国证指数); "
+                 "**symbol 格式 SZ000001, 与其他 4 个 ESG 接口全不兼容**, 需归一化",
+    },
+    {
+        "id": "sina_esg_msci",
+        "name": "新浪 MSCI ESG 评级 (8959 条, E/S/G 分项)",
+        "url": "https://global.finance.sina.com.cn/api/openapi.php/EsgService.getMsciEsgStocks?p={p}&num={n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "symbol(000001.SZ/00066.HK)/quarter_date/market/esg_rating/env_score/social_score/governance_score + total",
+        "provides": ["sector/esg_pool.json"],
+        "notes": "2026-10-16 实测 HTTP 200, total=8959; **分页参数用 p 不是 page**; "
+                 "E/S/G 三项分开且带 quarter_date, 可做 ESG 趋势; 5 个 ESG 源里结构最规范",
+    },
+    {
+        "id": "sina_esg_zd",
+        "name": "新浪中证 ESG 评级 (8200 条, 评级+分数)",
+        "url": "https://global.finance.sina.com.cn/api/openapi.php/EsgService.getZdEsgStocks?page={p}&num={n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "ticker(300124.SZ)/market/esg_rating/esg_score/environmental_rating/environmental_score/"
+                 "social_rating/social_score/governance_rating/governance_score/report_date + total",
+        "provides": ["sector/esg_pool.json"],
+        "notes": "2026-10-16 实测 HTTP 200, total=8200; "
+                 "坑: score 是字符串且带评级后缀如 '87.53(AAA)', 需正则拆分数与评级",
+    },
+    {
+        "id": "sina_esg_rft",
+        "name": "新浪润凡 ESG 评级 (4518 条, 15 细分维度)",
+        "url": "https://global.finance.sina.com.cn/api/openapi.php/EsgService.getRftEsgStocks?p={p}&num={n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "symbol/exchange/industry/market + esg/env/resource/emission/innovation/social/work/"
+                 "human_rights/community/product/governance/management/holder/csr/zy "
+                 "各带 score+date+grade + total",
+        "provides": ["sector/esg_pool.json"],
+        "notes": "2026-10-16 实测 HTTP 200, total=4518; **唯一覆盖 US/CN/HK 三市场**; "
+                 "15 个分项各带 score+date+grade, 粒度最细, ESG 因子研究首选; "
+                 "分页参数用 p; score 同样带评级后缀",
+    },
+    {
+        "id": "sina_esg_hz",
+        "name": "新浪华证 ESG 评级 (6355 条, 含中文名)",
+        "url": "https://global.finance.sina.com.cn/api/openapi.php/EsgService.getHzEsgStocks?page={p}&num={n}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "date/symbol(603605.SH)/market/name(中文名)/esg_score/esg_score_grade/"
+                 "e_score/e_score_grade/s_score/s_score_grade/g_score/g_score_grade/created_time + total",
+        "provides": ["sector/esg_pool.json"],
+        "notes": "2026-10-16 实测 HTTP 200, total=6355; "
+                 "**5 个 ESG 源里唯一带公司中文名**, 省一次代码→名称映射; "
+                 "esg_score 百分制不带评级后缀, 解析最简单",
+    },
+    {
+        "id": "sina_spot_goods",
+        "name": "新浪商品现货价格指数 (BDI/钢坯/澳粉)",
+        "url": "https://stock.finance.sina.com.cn/futures/api/openapi.php/GoodsIndexService.get_goods_index?symbol={BDI|GP|PB}&table=0",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "gbk",
+        "fields": "opendate/price/zde/zdf + page/total_number",
+        "provides": ["macro/goods_index.json"],
+        "notes": "2026-10-16 实测 HTTP 200, 852412B (BDI 全史); "
+                 "**必须显式传 symbol** — 不带 symbol/table 时返回错乱脏数据 "
+                 "(2016 年起, symbol/name 全空, price 在 53~2090 间跳变的 54 条); "
+                 "zdf 是小数 (0.0317 = 3.17%); symbol 为中文时需 URL 编码 (未实测)",
+    },
+    {
+        "id": "sina_option_stock_name",
+        "name": "新浪 ETF 期权合约月份日历",
+        "url": "https://stock.finance.sina.com.cn/futures/api/openapi.php/StockOptionService.getStockName",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日更",
+        "encoding": "utf-8",
+        "fields": "cateList(50ETF/300ETF/500ETF/科创50)/contractMonth(可用合约月)/stockId/cateId",
+        "provides": ["events/option_calendar.json"],
+        "notes": "2026-10-16 实测 HTTP 200, 238B, 零参数; "
+                 "数据有脏项: cateList 有重复 ('50ETF' 出现两次) 且 '科创扳50' 是错别字 (应为板), "
+                 "contractMonth 也有重复 (2026-10 出现两次), 需去重清洗; "
+                 "仅覆盖 ETF 期权, 不含商品期权",
+    },
+    {
+        "id": "sina_hk_klc_js",
+        "name": "新浪港股指数K线 (K2 编码 JS)",
+        "url": "https://finance.sina.com.cn/stock/hkstock/{code}/klc2_kl.js",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "daily",
+        "delay": "日K",
+        "encoding": "gbk",
+        "fields": "港股指数K线 (var KLC_K2_{code}=\"K2/...\" 形式, 需解码)",
+        "provides": [],
+        "notes": "2026-10-16 实测 HTTP 200, 75199B (CES100); "
+                 "**host 必须是 finance.sina.com.cn** — stock.finance.sina.com.cn 同路径实测 404; "
+                 "数据是 K2 前缀的压缩编码字符串, 不是标准 JSON, 需专用解码器 (解析成本高); "
+                 "标 degraded 是因为可用但解析代价大, 且 tencent_hk_kline 已覆盖港股K线需求",
+    },
+    {
+        "id": "sina_us_index_static",
+        "name": "新浪美股指数静态数据 (K2 编码)",
+        "url": "https://finance.sina.com.cn/staticdata/us/{symbol}",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "realtime",
+        "delay": "秒级",
+        "encoding": "gbk",
+        "fields": "美股指数/个股静态页 (var KLC_K2_{symbol} 形式, 非结构化)",
+        "provides": [],
+        "notes": "2026-10-16 实测 HTTP 200, 112352B (.IXIC); "
+                 "体量大且非结构化, 同 K2 编码需专用解码; 解析成本高于收益, 标 degraded",
+    },
+    {
+        "id": "hexun_dead_all",
+        "name": "和讯所有数据接口 (已死, 留档)",
+        "url": "http://webusstock.hermes.hexun.com/usa/kline | http://stockdata.stock.hexun.com/zrbg/",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "美股K线/业绩报告列表",
+        "provides": [],
+        "notes": "2026-10-16 实测: akshare 全库 grep hexun 仅 4 处命中, 对应 2 个 URL 全死; "
+                 "webusstock.hermes.hexun.com **DNS 无法解析主机名** (彻底死亡); "
+                 "stockdata.stock.hexun.com https 证书错乱 (CN=*.unionpayintl.com 银联国际证书劫持), "
+                 "改 http 可连但 301 到 stock.hexun.com 首页, 无 JSON 端点; "
+                 "另: stock.gtimg.cn/data/hk_rank.php 实测返回加密串 "
+                 "{\"code\":2003,\"msg\":\"鉴权失败时鉴权失败支鉴权街\"} (200, 116B, 需专用解密); "
+                 "**结论: 和讯放弃猜 URL 路线, 若要继续需改抓 quote.hexun.com 页面 XHR**",
+    },
+
+    # ============ 东财第二批 (2026-10-16 复核子代理结论, 15 端点全实测 200) ============
+    # 核心发现: emweb.securities.eastmoney.com/PC_HSF10/*/PageAjax 是一次请求拿整类 F10 数据的富接口
+    {
+        "id": "em_org_survey",
+        "name": "东财机构调研 (RPT_ORG_SURVEYNEW)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_ORG_SURVEYNEW&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=NOTICE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "收盘后",
+        "fields": "SECUCODE/SECURITY_CODE/SECURITY_NAME_ABBR/NOTICE_DATE/RECEIVE_START_DATE/"
+                 "RECEIVE_END_DATE/RECEIVE_OBJECT_TYPE/RECEIVE_OBJECT/RECEIVE_PLACE/"
+                 "RECEIVE_WAY_EXPLAIN/RECEPTIONIST/NUM/ORG_NAME",
+        "provides": ["events/org_survey.json", "stock_detail 机构关注度"],
+        "notes": "2026-10-16 实测 200, 3150B, pages=96170 (总量约 29 万条); "
+                 "RECEPTIONIST 含接待高管姓名 (如 '公司董事长、总裁 谢子龙, 独立董事 武连峰...'); "
+                 "RECEIVE_OBJECT_TYPE 区分调研方式 (业绩说明会/网络文字互动); "
+                 "个股查询加 filter=(SECUCODE=\"600519.SH\"); "
+                 "**registry 此前完全无机构调研维度**, 与 THS F10 event 的调研表可互校",
+    },
+    {
+        "id": "em_shareholder_increase",
+        "name": "东财股东增减持 (RPT_SHARE_HOLDER_INCREASE)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_SHARE_HOLDER_INCREASE&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=NOTICE_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "公告后实时",
+        "fields": "SECURITY_CODE/SECURITY_NAME_ABBR/HOLDER_NAME/NOTICE_DATE/START_DATE/END_DATE/"
+                 "CHANGE_NUM/CHANGE_NUM_SYMBOL/CHANGE_RATE/DIRECTION/AFTER_CHANGE_RATE/"
+                 "HOLD_RATIO/CLOSE_PRICE/TRADE_AVERAGE_PRICE/MARKET",
+        "provides": ["events/shareholder_increase.json"],
+        "notes": "2026-10-16 实测 200, 2086B, pages=49023; "
+                 "DIRECTION=增持/减持; **MARKET 区分 大宗交易/二级市场** (关键); "
+                 "CHANGE_RATE 是变动比例%, AFTER_CHANGE_RATE 是变动后持股比例; "
+                 "增减持是强信号, 与 THS F10 event 的高管增减持互补 (那边是高管视角)",
+    },
+    {
+        "id": "em_holder_num_latest",
+        "name": "东财最新股东户数 (RPT_HOLDERNUMLATEST)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_HOLDERNUMLATEST&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=END_DATE&sortTypes=-1&source=WEB&client=WEB&filter=(SECURITY_CODE%3D%22600519%22)",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "SECURITY_CODE/HOLDER_NUM/PRE_HOLDER_NUM/HOLDER_NUM_CHANGE/"
+                 "HOLDER_NUM_RATIO/INTERVAL_CHRATE/AVG_MARKET_CAP/AVG_HOLD_NUM/"
+                 "TOTAL_MARKET_CAP/END_DATE/PRE_END_DATE/CLOSE_PRICE/CHANGE_SHARES",
+        "provides": ["holder/num.json", "stock_detail 筹码集中度"],
+        "notes": "2026-10-16 实测 200, 799B (茅台 HOLDER_NUM=296404, 较上期 +21.9%); "
+                 "**filter 必带 SECURITY_CODE, 不是 SECUCODE** (写 SECUCODE 会静默返回空); "
+                 "户数减少 + 股价涨 = 筹码集中 (强看多); INTERVAL_CHRATE 是区间涨跌幅; "
+                 "与 THS F10 的旬频 gdrsFlashData 形成 密度差: 东财季度 vs 同花顺旬度",
+    },
+    {
+        "id": "em_org_hold_allmarket",
+        "name": "东财机构持仓汇总全市场 (RPT_MAIN_ORGHOLD)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_MAIN_ORGHOLD&columns=ALL&pageSize={n}&pageNumber={p}&sortColumns=REPORT_DATE&sortTypes=-1&source=WEB&client=WEB",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "SECURITY_CODE/SECURITY_NAME_ABBR/REPORT_DATE/ORG_TYPE/ORG_TYPE_NAME/"
+                 "HOULD_NUM/TOTAL_SHARES/HOLD_VALUE/FREESHARES_RATIO/HOLDCHA/HOLDCHA_NUM/"
+                 "HOLDCHA_RATIO/QCHANGE_RATE/FREE_MARKET_CAP",
+        "provides": ["holder/org_hold.json", "机构持仓全市场扫描"],
+        "notes": "2026-10-16 实测 200, 1849B, pages=325332 (全市场按季扫描); "
+                 "ORG_TYPE 00=机构汇总 01=基金 05=保险 07=其他; "
+                 "HOLDCHA_RATIO 是持仓变动%, QCHANGE_RATE 是季度变化率; "
+                 "**全市场扫描机构持仓变动的唯一源**, 可按 HOLDCHA_RATIO 排序找机构加仓股",
+    },
+    {
+        "id": "em_f10_freeholders",
+        "name": "东财F10 十大流通股东 (RPT_F10_EH_FREEHOLDERS)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_F10_EH_FREEHOLDERS&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECUCODE%3D%22600519.SH%22)&source=HSF10&client=PC",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "HOLDER_NAME/HOLD_NUM/FREE_HOLDNUM_RATIO/HOLD_NUM_CHANGE/CHANGE_RATIO/"
+                 "HOLDER_RANK/HOLDER_TYPE/SHARES_TYPE/HOLDER_MARKET_CAP/FREE_RATIO_QOQ/"
+                 "HOLDER_NEWTYPE/IS_LANDSTOCK/UPDATE_DATE/END_DATE",
+        "provides": ["holder/free_holders.json"],
+        "notes": "2026-10-16 实测 200, 4140B, pages=314; "
+                 "**IS_LANDSTOCK=1 表示陆股通** (香港中央结算); HOLDER_NEWTYPE 已归一化; "
+                 "比 registry 的 em_datacenter_lhb 更结构化; "
+                 "与 THS F10 holder 页互校 (后者带 orgid 可跳工商)",
+    },
+    {
+        "id": "em_f10_orghold_history",
+        "name": "东财F10 机构持仓历史 (RPT_F10_MAIN_ORGHOLD)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_F10_MAIN_ORGHOLD&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECUCODE%3D%22600519.SH%22)&source=HSF10&client=PC",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "REPORT_DATE/TOTAL_ORG_NUM/TOTAL_FREE_SHARES/TOTAL_MARKET_CAP/"
+                 "TOTAL_SHARES_RATIO/IS_INCREASE/CHANGE_RATIO_CHANGE/FREE_SHARES_CHANGE/"
+                 "CHANGE_RATIO/CLOSE/TOTAL_ORG_NUM_CHANGE/LABEL_NAME/NOTICE_DATE",
+        "provides": ["holder/org_hold_history.json"],
+        "notes": "2026-10-16 实测 200, 1577B, pages=33 (茅台 33 期历史); "
+                 "LABEL_NAME 为 '机构重仓' 等标签; IS_INCREASE -1=减持; "
+                 "TOTAL_ORG_NUM_CHANGE 是机构家数增减 (茅台本期 +339 家)",
+    },
+    {
+        "id": "em_f10_coretheme_board",
+        "name": "东财F10 核心题材所属板块 (RPT_F10_CORETHEME_BOARDTYPE)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_F10_CORETHEME_BOARDTYPE&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECUCODE%3D%22600519.SH%22)&source=HSF10&client=PC",
+        "auth": "none",
+        "status": "ok",
+        "freq": "weekly",
+        "delay": "周更新",
+        "fields": "SECUCODE/BOARD_CODE/BOARD_NAME/SELECTED_BOARD_REASON/IS_PRECISE/"
+                 "BOARD_RANK/BOARD_YIELD/NEW_BOARD_CODE/DERIVE_BOARD_CODE",
+        "provides": ["hot_impact 题材归因", "sector/core_theme.json"],
+        "notes": "2026-10-16 实测 200, 1236B, pages=10; "
+                 "**IS_PRECISE=1 是精确匹配板块**; SELECTED_BOARD_REASON 是入选理由长文本 "
+                 "(如 '2025年年报显示，公司主导产品贵州茅台酒是我国大曲酱香型白酒的鼻祖...'); "
+                 "NEW_BOARD_CODE 形如 BK0999 可反查 push2 板块行情; "
+                 "**个股题材归因的唯一结构化源** — 直接回答'为什么这只票在这板块'",
+    },
+    {
+        "id": "em_f10_mainop",
+        "name": "东财F10 主营构成 (RPT_F10_FN_MAINOP)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_F10_FN_MAINOP&columns=ALL&pageSize={n}&pageNumber={p}&filter=(SECUCODE%3D%22600519.SH%22)&source=HSF10&client=PC",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "MAINOP_TYPE/ITEM_NAME/MAIN_BUSINESS_INCOME/MBI_RATIO/GROSS_RPOFIT_RATIO/"
+                 "RANK/REPORT_DATE/REPORT_NAME",
+        "provides": ["financial/main_op.json"],
+        "notes": "2026-10-16 实测 200, 1997B, pages=139; "
+                 "MAINOP_TYPE 区分按产品/按地区/按行业; "
+                 "与 THS F10 operate 页互校 (两个独立源算主营占比)",
+    },
+    {
+        "id": "em_reportapi_stock_report",
+        "name": "东财个股研报 (reportapi, 含盈利预测+评级+PDF)",
+        "url": "https://reportapi.eastmoney.com/report/list?industryCode=*&pageSize={n}&industry=*&rating=*&ratingChange=*&beginTime={begin}&endTime={end}&pageNo={p}&fields=&qType=0&orgCode=&code={code}&rcode=&p={p}&pageNum={p}&pageNumber={p}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "实时",
+        "fields": "title/stockName/stockCode/orgSName/publishDate/infoCode/"
+                 "predictThisYearEps/predictThisYearPe/emRatingName/sRatingName/"
+                 "researcher/attachPages/indvInduName/count/TotalPage",
+        "provides": ["events/research_reports.json", "盈利预测输入"],
+        "notes": "2026-10-16 实测 200, 1493B, 1.10s (茅台 2026-09-01~10-16); "
+                 "qType=0 个股研报; **PDF 直链 = https://pdf.dfcfw.com/pdf/H3_{infoCode}_1.pdf**; "
+                 "predictThisYearEps/Pe 是券商一致预期, 可与 THS F10 worth 的机构预测互校; "
+                 "emRatingName 东财评级 vs sRatingName 券商原评级; "
+                 "**registry 此前无任何研报源**",
+    },
+    {
+        "id": "em_hsf10_shareholder_research",
+        "name": "东财F10 股东研究全量 (一次请求拿全)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/ShareholderResearch/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "gdrs(股东户数 HOLDER_TOTAL_NUM/AVG_FREE_SHARES/AVG_HOLD_AMT/HOLD_FOCUS/"
+                 "HOLD_RATIO_TOTAL) + sdltgd(十大流通股东) + sdgd(十大股东) + jgcc(机构持仓) + "
+                 "jjcg(基金持仓 含 NETVALUE_RATIO 基金净值占比) + ltgf(流通股份) + "
+                 "jgcc_date + jjcg_date + sjkzr(实际控制人)",
+        "provides": ["holder/all_in_one.json"],
+        "notes": "2026-10-16 实测 200, 36341B, 0.37s (茅台); "
+                 "**一个接口覆盖 5 类数据**, 比分别调 RPT_HOLDERNUMLATEST/"
+                 "RPT_F10_EH_FREEHOLDERS/RPT_F10_MAIN_ORGHOLD 省 4 次请求; "
+                 "HOLD_FOCUS 是集中度标签 ('非常分散'/'较为集中'...); "
+                 "jjcg 的 NETVALUE_RATIO 是该基金净值中本股的占比, 可反推基金重仓程度; "
+                 "**本轮价值最高的发现**",
+    },
+    {
+        "id": "em_hsf10_company_survey",
+        "name": "东财F10 公司概况 (高管/曾用名/发行信息)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/CompanySurvey/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "实时",
+        "fields": "jbzl(ORG_NAME/ORG_NAME_EN/FORMERNAME/SECURITY_TYPE/EM2016/PRESIDENT/"
+                 "LEGAL_PERSON/CHAIRMAN/ORG_TEL/ORG_EMAIL/ADDRESS/PROVINCE/EMP_NUM/"
+                 "ORG_PROFILE/BUSINESS_SCOPE) + fxxg(FOUND_DATE/LISTING_DATE/"
+                 "AFTER_ISSUE_PE/ISSUE_PRICE/TOTAL_FUNDS/NET_RAISE_FUNDS/"
+                 "OPEN_PRICE/CLOSE_PRICE/TURNOVERRATE)",
+        "provides": ["meta/company_survey.json"],
+        "notes": "2026-10-16 实测 200, 2778B, 0.32s; "
+                 "EM2016 是行业三级分类 '食品饮料-饮料-白酒'; "
+                 "FORMERNAME 含曾用名 ('贵州茅台→G茅台'); "
+                 "EMP_NUM 员工数 + ORG_PROFILE 公司简介长文本; "
+                 "registry 此前无公司基本信息源",
+    },
+    {
+        "id": "em_hsf10_capital_structure",
+        "name": "东财F10 股本结构 (含 2001 至今变动全史)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/CapitalStockStructure/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "实时",
+        "fields": "gbjg(最新股本 TOTAL_SHARES/UNLIMITED_SHARES/LISTED_A_SHARES/"
+                 "LIMITED_SHARES/LISTED_SHARES_RATIO) + lngbbd(历年股本变动含 CHANGE_REASON) + "
+                 "gbgc(股本构成) + xsjj(限售解禁)",
+        "provides": ["financial/capital_structure.json", "解禁监控"],
+        "notes": "2026-10-16 实测 200, 14464B, 0.43s; "
+                 "lngbbd 含 2001-2026 全史, CHANGE_REASON 标注 回购/送股上市/股改 等原因; "
+                 "xsjj 茅台为空 (无限售), 有解禁的票才有数据; "
+                 "与 THS F10 equity 的解禁时间表互校",
+    },
+    {
+        "id": "em_hsf10_bonus_financing",
+        "name": "东财F10 分红融资 (可算股息率)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BonusFinancing/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "实时",
+        "fields": "fhyx(分红送配 IMPL_PLAN_PROFILE/ASSIGN_PROGRESS/EQUITY_RECORD_DATE/"
+                 "EX_DIVIDEND_DATE/PAY_CASH_DATE) + lnfhrz(历年分红融资 TOTAL_DIVIDEND/"
+                 "SEO_NUM/ALLOTMENT_NUM/IPO_NUM) + zfmx + pgmx",
+        "provides": ["events/bonus_financing.json", "股息率计算"],
+        "notes": "2026-10-16 实测 200, 4098B, 0.55s; "
+                 "IMPL_PLAN_PROFILE 直接可读 ('10派280.2423元'); "
+                 "TOTAL_DIVIDEND 是年度累计分红总额(元) — 茅台 2025 年 650.3 亿; "
+                 "配合市值可算真实股息率, 比集思录的 cb 分红更通用",
+    },
+    {
+        "id": "em_hsf10_business_analysis",
+        "name": "东财F10 主营构成 (中文 key, 67KB 富响应)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/BusinessAnalysis/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "ok",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "zyfw(主营范围) + zygcfx(主营构成分析 ITEM_NAME/MAIN_BUSINESS_INCOME/"
+                 "MBI_RATIO/GROSS_RPOFIT_RATIO/RANK/REPORT_DATE/REPORT_NAME) + jyzl(经营质量)",
+        "provides": ["financial/business_analysis.json"],
+        "notes": "2026-10-16 实测 200, 67671B, 0.33s; "
+                 "**key 是中文 (zyfw/zygcfx/jyzl) 不是英文**, 解析时注意; "
+                 "响应大 (67KB), 因含多报告期×多维度交叉; "
+                 "与 em_f10_mainop (英文 key) 是同一数据的两个入口",
+    },
+    {
+        "id": "em_hsf10_operations_required",
+        "name": "东财F10 经营评述 (99KB 长文本)",
+        "url": "https://emweb.securities.eastmoney.com/PC_HSF10/OperationsRequired/PageAjax?code={SH|SZ}{code}",
+        "auth": "none",
+        "status": "degraded",
+        "freq": "quarterly",
+        "delay": "季报后",
+        "fields": "经营情况评述长文本 (chartReportUrl + HTML 混合)",
+        "provides": [],
+        "notes": "2026-10-16 实测 200, 99307B, 0.38s; "
+                 "chartReportUrl 指向 https://bdstatics.eastmoney.com/web/prd/pcyearReport... 图表; "
+                 "**纯长文本需 NLP 加工才能用**, 标 degraded 而非 ok; "
+                 "对 LLM 复盘 (ai_review) 有输入价值, 但结构化入库暂不适用",
+    },
+    {
+        "id": "em_datacenter_dead_reportnames",
+        "name": "东财 datacenter 失效报表名 (留档)",
+        "url": "https://datacenter-web.eastmoney.com/api/data/v1/get?reportName=RPT_*",
+        "auth": "none",
+        "status": "blocked",
+        "freq": "-",
+        "fields": "-",
+        "provides": [],
+        "notes": "2026-10-16 实测返回 9501 '报表配置不存在' 的报表名: "
+                 "RPT_ORG_SURVEYJIGO / RPT_F10_MAIN_FUNDHOLD / RPT_F10_MAIN_SHAREHOLD / "
+                 "RPT_F10_MAIN_BELONGBOARD / RPT_F10_MAIN_TOP10HOLDERS / "
+                 "RPT_F10_MAIN_HOLDERHOLD / RPT_F10_MAIN_HOLDERNUM / "
+                 "RPT_F10_BASIC_ORGBRIEF / RPT_HSGT_HOLD / RPT_MUTUAL_HOLD_DETAIL / "
+                 "RPT_MUTUAL_DEAL_TRADE; "
+                 "另 blocked: push2 kamt.rtmin/ulist.np (TLS reset), "
+                 "emappdata stockrank/getAllCurrentList (GET 返回 code=-2, 需 POST), "
+                 "fund rankhandler.aspx ft=all (ErrCode:-999 无权限), "
+                 "data.eastmoney.com dataapi/zlsj/list (返回 []), "
+                 "api.fund FundHomePage/GetFinanceDetail (ASP.NET 404), "
+                 "FundGuZhi/GetFundGZList (ErrCode:4 路径失效), "
+                 "search-api-web search/jsonp type=cmsArticleWebBean (type 名已变更), "
+                 "so.eastmoney.com/news/s (空壳 HTML), xinsanban ReadData.aspx (空), "
+                 "data.1234567.com.cn api/fund/compareFunds (404), "
+                 "np-cnlist-api comm/wap/getListInfo (400); "
+                 "**不要重复探测这些**",
     },
 ]
 
@@ -1562,6 +2204,22 @@ SHARDS = {
             "ths_f10_field", "ths_f10_equity", "ths_f10_news",
             "ths_board_kline", "ths_board_constituents", "ths_news_push",
             "ths_rank_cxfl", "ths_funds_flow_rank",
+            "xueqiu_screener", "xueqiu_screener_dead_paths",
+            "tencent_board_rank", "tencent_newfqkline", "tencent_hk_kline",
+            "tencent_us_kline", "tencent_index_weektrends",
+            "sina_futures_realtime", "sina_moneyflow_zjlrqs", "sina_moneyflow_lscjfb",
+            "sina_esg_stocks", "sina_esg_msci", "sina_esg_zd",
+            "sina_esg_rft", "sina_esg_hz",
+            "sina_spot_goods", "sina_option_stock_name",
+            "sina_hk_klc_js", "sina_us_index_static",
+            "hexun_dead_all",
+            "em_org_survey", "em_shareholder_increase", "em_holder_num_latest",
+            "em_org_hold_allmarket", "em_f10_freeholders", "em_f10_orghold_history",
+            "em_f10_coretheme_board", "em_f10_mainop", "em_reportapi_stock_report",
+            "em_hsf10_shareholder_research", "em_hsf10_company_survey",
+            "em_hsf10_capital_structure", "em_hsf10_bonus_financing",
+            "em_hsf10_business_analysis", "em_hsf10_operations_required",
+            "em_datacenter_dead_reportnames",
             "tushare", "iwencai_openapi", "alpha_vantage", "finnhub",
             "twelvedata", "fmp", "marketstack", "yahoo_finance", "stooq",
         ],

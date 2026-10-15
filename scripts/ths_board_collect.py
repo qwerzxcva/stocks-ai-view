@@ -135,7 +135,8 @@ def main():
             time.sleep(0.6)
             try:
                 kl = fetch_board_kline(bk, year)
-                rec["kline"][bk] = kl if kl else {"err": "404"}
+                # 概念板块 (gn) 的 K 线在 d.10jqka 域不存在 (实测 404), 只采行业板块
+                rec["kline"][bk] = kl if kl else {"err": "404 (概念板块无K线)"}
             except Exception as e:
                 rec["kline"][bk] = {"err": f"{type(e).__name__}"}
             time.sleep(0.6)
