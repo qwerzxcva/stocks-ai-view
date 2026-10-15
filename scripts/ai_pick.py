@@ -8,7 +8,7 @@ AI推荐池 v2: 未涨停主板票 (用户明确: 推荐里不能是已涨停的
      + 尾盘强度代理=收盘位置(15%) + 换手温和(10%)
 数据全来自 stock.duckdb + pools.json; 输出 ai_picks.json
 """
-import duckdb, json, datetime
+import duckdb, json, datetime, os
 
 con = duckdb.connect("/home/agentuser/stockdb/stock.duckdb", read_only=True)
 last = con.execute("SELECT MAX(date) FROM daily").fetchone()[0]
@@ -71,7 +71,19 @@ except Exception as _e:
 # 全球偏多→加仓位/可碰动量票; 偏空→只留低位防御(位置分权重加倍)+输出减仓指令
 GLOBAL = {"global_score": 0, "global_mood": "unknown", "pos_weight": 0.25, "suggest": "默认"}
 try:
-    _g = json.load(open("/home/agentuser/stockdb/data/global/latest.json"))
+    # 2026-10-15: 原硬编码 /home/agentuser/stockdb/... 是旧服务器路径,
+    # GitHub Actions 里必然抛异常 → GLOBAL 永远是默认值, 偏空闸门从未生效。
+    # 改为按 paths.py 规范定位, 并回退到 data/global.json 快照。
+    _gp = None
+    try:
+        from paths import AI_VIEW_DATA as _D
+        _gp = os.path.join(_D, "global", "latest.json")
+    except Exception:
+        _gp = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "global", "latest.json")
+    if not os.path.exists(_gp):
+        _alt = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "global.json")
+        _gp = _alt if os.path.exists(_alt) else _gp
+    _g = json.load(open(_gp))
     _m = _g.get("metrics", {})
     _s = _m.get("global_score", 0)
     GLOBAL["global_score"] = _s

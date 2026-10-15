@@ -45,6 +45,27 @@ def _load(name):
         return None
 
 
+def _load_global():
+    """全球面板数据。
+
+    2026-10-15: 原先只读 data/global.json, 而它是 global_panel.py 产出的
+    旧快照 (实测落后 1 天, 且 global_score 符号相反: 旧+10.6 vs 新-17.6),
+    导致海外 20% 权重用的是过期且方向相反的数据。
+    改为优先 data/global/latest.json (实时), 缺失才回退快照。
+    """
+    for rel in (("global", "latest.json"), ("global.json",)):
+        p = os.path.join(DATA_DIR, *rel)
+        if os.path.exists(p):
+            try:
+                d = json.load(open(p, encoding="utf-8"))
+                if (d.get("metrics") or {}).get("global_score") is not None:
+                    d["_source"] = "/".join(rel)
+                    return d
+            except Exception:
+                pass
+    return None
+
+
 def phase_score(missing):
     ph = _load("market_phase.json")
     if ph is None:
@@ -67,7 +88,7 @@ def cycle_score(missing):
 
 
 def global_score(missing):
-    g = _load("global.json") or _load("global_panel.json")
+    g = _load_global()
     if g is None:
         missing.append("global.json")
         return 0

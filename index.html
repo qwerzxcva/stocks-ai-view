@@ -1059,6 +1059,30 @@ var _t = ts => ts ? String(ts).replace('T',' ').slice(5,16) : '';
 function renderGlobalMarkets(d){
   const box=document.getElementById('globalMarketsBox');
   if(!box) return;
+  // 迷你 K 线 sparkline (SVG 折线, 无依赖)
+  // kline_code → global_kline 的 sym: 港股 HSI→hkHSI, 美股道指/纳指→usDJI/usIXIC
+  const KC2SYM={HSI:'hkHSI',HSCEI:'hkHSCEI',HSTECH:'hkHSTECH',
+    '.DJI':'usDJI','.IXIC':'usIXIC','usSPX':'usINX','.NDX':'usNDX','usNDX':'usNDX',
+    DJI:'usDJI',IXIC:'usIXIC',SPX:'usINX',NDX:'usNDX'};
+  const spark=(sym,n)=>{try{
+    const gk=(window._data||{}).global_kline||{};
+    const v=(gk.symbols||{})[sym];
+    if(!v||!v.bars||v.bars.length<5) return '';
+    const bars=v.bars.slice(-n);
+    const closes=bars.map(b=>b[2]);
+    const lo=Math.min.apply(null,closes), hi=Math.max.apply(null,closes);
+    const rng=(hi-lo)||1;
+    const W=64,H=20;
+    const pts=closes.map((c,i)=>{
+      const x=(i/(closes.length-1)*W).toFixed(1);
+      const y=(H-(c-lo)/rng*(H-2)-1).toFixed(1);
+      return x+','+y;
+    }).join(' ');
+    const up=closes[closes.length-1]>=closes[0];
+    const col=up?'var(--up)':'var(--dn)';
+    return '<svg width="'+W+'" height="'+H+'" style="vertical-align:middle;margin-left:4px">'
+      +'<polyline points="'+pts+'" fill="none" stroke="'+col+'" stroke-width="1.2"/></svg>';
+  }catch(e){return ''}};
   if(!d||!d.indices||!d.indices.length){
     box.innerHTML='<div class="no-data">暂无全球市场数据</div>'+
       '<div class="fl" style="padding:8px;font-size:9px">由 collect_global_markets.py 采集 (腾讯 sqt), '+
@@ -1088,7 +1112,7 @@ function renderGlobalMarkets(d){
   keys.forEach(mk=>{
     const arr=groups[mk];
     h+='<div class="hd" style="padding:6px 0">'+_esc2(mk)+' <span class="sub">'+arr.length+' 个指数</span></div>';
-    h+='<table><thead><tr><th>指数</th><th>现价</th><th>涨跌幅</th><th>状态</th><th>当地时间</th><th>交易时段</th><th>情绪</th></tr></thead><tbody>';
+    h+='<table><thead><tr><th>指数</th><th>现价</th><th>涨跌幅</th><th>近60日</th><th>状态</th><th>当地时间</th><th>交易时段</th><th>情绪</th></tr></thead><tbody>';
     arr.forEach(x=>{
       if(x.price==null) return;
       const c=x.chg_pct>=0?'var(--up)':'var(--dn)';
@@ -1101,6 +1125,7 @@ function renderGlobalMarkets(d){
       h+='<tr><td>'+nameCell+'</td>'
         +'<td style="font-weight:700">'+_esc2(x.price)+'</td>'
         +'<td class="'+c+'" style="font-weight:700">'+(x.chg_pct>=0?'+':'')+_esc2(x.chg_pct)+'%</td>'
+        +'<td>'+(kc?spark(KC2SYM[kc]||kc,60):'')+'</td>'
         +'<td style="color:'+mcol+'">'+mark+' '+_esc2(x.status_label)+'</td>'
         +'<td class="fl">'+_esc2(x.local_time)+'</td>'
         +'<td class="fl">'+_esc2(x.session)+'</td>'
@@ -1108,6 +1133,30 @@ function renderGlobalMarkets(d){
     });
     h+='</tbody></table>';
   });
+
+  // 美股热门个股 (global_kline 里的 4 龙头, 不在 15 指数中)
+  const gk=(window._data||{}).global_kline||{};
+  const stocks=Object.keys(gk.symbols||{}).filter(s=>/^us(AAPL|NVDA|TSLA|MSFT)$/.test(s));
+  if(stocks.length){
+    const NM={usAAPL:'苹果',usNVDA:'英伟达',usTSLA:'特斯拉',usMSFT:'微软'};
+    h+='<div class="hd" style="padding:6px 0">美股龙头 <span class="sub">近60日走势 · 点击看详情</span></div>';
+    h+='<table><thead><tr><th>个股</th><th>收盘</th><th>日涨跌</th><th>近60日</th><th>K线数</th><th>区间</th></tr></thead><tbody>';
+    stocks.forEach(sym=>{
+      const v=gk.symbols[sym];
+      const bars=v.bars||[];
+      if(!bars.length) return;
+      const last=bars[bars.length-1], prev=bars[bars.length-2]||last;
+      const chg=prev[2]?((last[2]/prev[2]-1)*100):0;
+      const c=chg>=0?'var(--up)':'var(--dn)';
+      h+='<tr><td><span class="clk" data-kline="'+_esc2(sym)+'" style="color:var(--accent);cursor:pointer;text-decoration:underline dotted">'+_esc2(NM[sym]||sym)+'</span></td>'
+        +'<td style="font-weight:700">'+_esc2(last[2])+'</td>'
+        +'<td class="'+c+'" style="font-weight:700">'+(chg>=0?'+':'')+chg.toFixed(2)+'%</td>'
+        +'<td>'+spark(sym,60)+'</td>'
+        +'<td class="fl">'+v.n+'</td>'
+        +'<td class="fl">'+_esc2(bars[0][0])+'~'+_esc2(last[0])+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  }
 
   h+='<div class="fl" style="padding:10px 2px;font-size:9px;line-height:1.6">'+
      '状态说明: ●盘中 ○盘前 ◌盘后 ×休市 ｜ 跨零点时段按当地时间推算, 可能与实际有偏差。<br>'+
@@ -1165,6 +1214,99 @@ function renderHotSide(d){
 // 需求: 盘面解读/明日走势预测与策略及原因/热点推演及主题/热点与市场情绪/
 //       昨日推股胜率验证与复盘总结/盘前分析(大A+美股早盘)/AI复盘/
 //       今日推股及原因/自我反思
+// ═══ 早盘/午盘推股卡片 (每日总结 tab 顶部, 用户核心诉求) ═══════
+// premarket_picks.json: 开盘前 A/B/C 三级 + 入场区间/止损/目标
+// midday_picks.json:    上午验证 + 下午修正清单
+function renderPicksCard(){
+  const g=window._data||{};
+  const pm=g.premarket_picks, md=g.midday_picks;
+  if(!pm&&!md) return '';
+  let h='';
+
+  // ── 市况闸门 (最重要, 放最上面) ──
+  const gate=(pm&&pm.gate)||{};
+  if(gate.state){
+    const gc=gate.state==='blocked'?'var(--dn)':(gate.state==='open'?'var(--up)':'var(--amber)');
+    const gl={blocked:'🚫 空仓闸门',open:'✅ 可进攻',half:'⚠️ 半仓纪律',unknown:'❔ 数据缺失'}[gate.state]||gate.state;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;margin-bottom:8px;'+
+       'border:1px solid '+gc+';border-radius:8px;background:rgba(0,0,0,.03)">'+
+       '<b style="color:'+gc+';font-size:13px">'+gl+'</b>'+
+       '<span class="fl" style="font-size:10px;flex:1">'+_esc2(gate.reason)+'</span>'+
+       '<span class="fl" style="font-size:9px">仓位上限 '+Math.round((gate.pos_cap||0)*100)+'%</span></div>';
+  }
+
+  // ── 早盘 A 级 (可开盘买入) ──
+  if(pm&&pm.tiers){
+    const A=pm.tiers.A_buy||[], B=pm.tiers.B_watch||[];
+    h+='<div class="hd" style="padding:6px 0">🌅 早盘推股 <span class="sub">'+_t(pm.ts)+
+       ' · 候选 '+pm.n_candidates+' 只 · 全球情绪 '+_esc2((pm.global||{}).score)+' ('+_esc2((pm.global||{}).mood)+')</span></div>';
+    if(gate.state==='blocked'){
+      h+='<div class="fl" style="font-size:11px;padding:6px 0">闸门关闭, 本日不出买入推荐。以下为观察名单 (非买入建议):</div>';
+    }
+    const tbl=(arr,title,col)=>{
+      if(!arr.length) return '<div class="fl" style="font-size:10px;padding:2px 0">'+title+': 无</div>';
+      return '<div style="font-size:10px;color:'+col+';margin:6px 0 2px;font-weight:700">'+title+' ('+arr.length+')</div>'+
+        '<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>评分</th><th>入场区间</th><th>止损</th><th>目标</th><th>盈亏比</th><th>核心逻辑</th></tr></thead><tbody>'+
+        arr.map(r=>'<tr class="clk" data-code="'+_esc2(r.code)+'">'+
+          '<td>'+_esc2(r.code)+'</td><td><b>'+_esc2(r.name)+'</b></td>'+
+          '<td>'+_esc2(r.price)+'</td>'+
+          '<td style="font-weight:700;color:'+col+'">'+_esc2(r.score)+'</td>'+
+          '<td class="fl">'+_esc2((r.entry_zone||[]).join(' ~ '))+'</td>'+
+          '<td class="dn">'+_esc2(r.stop)+'</td>'+
+          '<td class="up">'+_esc2(r.target)+'</td>'+
+          '<td>'+_esc2(r.risk_reward)+'</td>'+
+          '<td class="fl" style="font-size:9px;max-width:260px">'+_esc2((r.reasons||[]).join('; ').slice(0,90))+'</td>'+
+        '</tr>').join('')+'</tbody></table>';
+    };
+    h+=tbl(A,'A 级 · 可开盘买入','var(--up)');
+    h+=tbl(B,'B 级 · 观察等回踩','var(--amber)');
+  }
+
+  // ── 午盘: 上午验证 + 下午修正 ──
+  if(md){
+    const v=md.premarket_verification||{};
+    const af=md.afternoon||{};
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">☀️ 午盘修正 <span class="sub">'+_t(md.ts)+'</span></div>';
+    const mr=(md.morning_review||{}).market||{};
+    if(mr.advance!=null){
+      h+='<div class="fl" style="font-size:10px;margin-bottom:4px">上午盘面: 涨'+_esc2(mr.advance)+' / 跌'+_esc2(mr.decline)+
+         ' · 涨停'+_esc2(mr.limit_up)+' · 炸板'+_esc2(mr.broken)+
+         (mr.turnover_yi!=null?' · 成交'+_esc2(mr.turnover_yi)+'亿':'')+'</div>';
+    }
+    if(v.n_checked){
+      h+='<div class="fl" style="font-size:10px;margin-bottom:4px">早盘计划验证: '+_esc2(v.n_checked)+' 只 → '+
+         Object.keys(v.verdicts||{}).map(k=>k+'×'+v.verdicts[k]).join(' · ')+'</div>';
+    }
+    const keep=af.keep||[];
+    if(keep.length){
+      h+='<div style="font-size:10px;color:var(--up);margin:4px 0 2px;font-weight:700">下午保留 ('+keep.length+')</div>'+
+        '<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>评分</th><th>入场区间</th><th>止损</th><th>目标</th></tr></thead><tbody>'+
+        keep.map(r=>'<tr class="clk" data-code="'+_esc2(r.code)+'">'+
+          '<td>'+_esc2(r.code)+'</td><td><b>'+_esc2(r.name)+'</b></td>'+
+          '<td>'+_esc2(r.price)+'</td><td style="font-weight:700">'+_esc2(r.score)+'</td>'+
+          '<td class="fl">'+_esc2((r.entry_zone||[]).join(' ~ '))+'</td>'+
+          '<td class="dn">'+_esc2(r.stop)+'</td><td class="up">'+_esc2(r.target)+'</td>'+
+        '</tr>').join('')+'</tbody></table>';
+    }
+    const watch=af.watch||[];
+    if(watch.length){
+      h+='<div class="fl" style="font-size:10px;margin-top:4px">⏸ 转入观察 '+watch.length+' 只: '+
+         watch.slice(0,5).map(r=>_esc2(r.name||r.code)+'('+_esc2(r.am_verdict||'')+')').join(', ')+'</div>';
+    }
+    const drop=af.drop||[];
+    if(drop.length){
+      h+='<div class="fl" style="font-size:10px;color:var(--dn);margin-top:2px">✖ 剔除 '+drop.length+' 只: '+
+         drop.slice(0,5).map(r=>_esc2(r.name||r.code)).join(', ')+'</div>';
+    }
+  }
+
+  h+='<div class="fl" style="font-size:9px;padding:8px 0 2px;line-height:1.5">'+
+     '评分 = 多引擎共振36 + 引擎均分30 + 估值±15 + 位置15 + 资金±12 ｜ '+
+     '入场区间=昨收±1.5%, 止损-4.5%, 目标+6%, 盈亏比1.62 ｜ '+
+     '<b>Research reference only, not investment advice.</b></div>';
+  return h;
+}
+
 function renderDailySummary(){
   const box=document.getElementById('dailySummaryBox');
   if(!box) return;
@@ -1173,6 +1315,9 @@ function renderDailySummary(){
         dec=g.decision||{}, aiRev=g.ai_review||{}, phase=g.market_phase||{},
         picks=g.ai_pick_v4||{}, wm=g.winrate_matrix||{}, gm=g.global_markets||{};
   let h='';
+
+  // ═══ 0. 早盘推股 (用户核心诉求: 开盘前给清单) ═══════════════
+  h+=renderPicksCard();
 
   // 顶部: 全球市场速览 (点击指数名看历年K线)
   if(gm.indices&&gm.indices.length){
@@ -1990,6 +2135,9 @@ const SOURCES = [
   'data/scenario.json',        // 场景化推股
   'data/moneyflow.json',       // 主力资金实时
   'data/global_markets.json',  // 全球各大股市实时
+  'data/global_kline.json',    // 全球指数/个股历史K线 (10标的, 迷你图用)
+  'data/premarket_picks.json', // 早盘推股 (开盘前, A/B/C 三级+入场止损目标)
+  'data/midday_picks.json',    // 午盘推股 (上午验证+下午修正清单)
   'data/news_extra.json',      // 实时热点资讯 (财联社/见闻/早报)
   'data/hot_news.json',        // Newsnow 聚合热点 (15平台)
   'data/daily_brief.json',     // 盘前日报

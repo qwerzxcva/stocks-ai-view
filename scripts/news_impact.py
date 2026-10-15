@@ -133,8 +133,37 @@ def load_stock_names():
         return {}
 
 
-def match_news(title, concepts, industries, stock_names):
-    """三层匹配。返回 (matched_by, codes, detail)。"""
+def match_news(title, concepts, industries, stock_names, item=None):
+    """四层匹配。返回 (matched_by, codes, detail)。
+
+    L0 优先: 采集器已给出的 codes (华尔街见闻 symbols), 编辑人工标注,
+    比文本匹配可靠。
+    """
+    if item:
+        codes = [str(c).replace("sh", "").replace("sz", "").replace("bj", "")[-6:]
+                 for c in (item.get("codes") or [])]
+        codes = [c for c in codes if c.isdigit()]
+        if codes:
+            return "annotated", codes[:10], "来源标注个股"
+        # themes (编辑标注题材) → 概念/产业链匹配。
+        # 实测 codes (symbols) 恒空, 但 themes 有值 (31/140),
+        # 故 themes 作为 L0 的实际抓手。
+        for th in (item.get("themes") or [])[:5]:
+            th = str(th)
+            if len(th) < 3:
+                continue
+            for concept, cstocks in concepts.items():
+                if len(concept) >= 3 and (concept in th or th in concept):
+                    cc = [str(c).replace("sh", "").replace("sz", "") for c in cstocks]
+                    if cc:
+                        return "theme", cc[:10], f"题材「{th}」→概念「{concept}」"
+            for industry, kws in CHAIN_MAP.items():
+                if any(k in th for k in kws):
+                    cc = [c for c, n in stock_names.items()
+                          if n and len(n) >= 3 and any(k in n for k in kws)]
+                    if cc:
+                        return "theme", cc[:10], f"题材「{th}」→产业链「{industry}」"
+
     # L2: 直接个股名/代码
     hit_codes = []
     for code, name in stock_names.items():
@@ -192,7 +221,7 @@ def main():
         return 1
 
     impacts = []
-    stat = {"stock": 0, "concept": 0, "industry": 0, "unmapped": 0}
+    stat = {"stock": 0, "concept": 0, "industry": 0, "annotated": 0, "theme": 0, "unmapped": 0}
     dir_stat = {"bull": 0, "bear": 0, "neutral": 0, "mixed": 0}
 
     for it in items:
@@ -201,7 +230,7 @@ def main():
             continue
         direction, conf = judge_direction(title)
         dir_stat[direction] += 1
-        matched_by, codes, detail = match_news(title, concepts, industries, stock_names)
+        matched_by, codes, detail = match_news(title, concepts, industries, stock_names, it)
         if not codes:
             stat["unmapped"] += 1
             continue
@@ -212,6 +241,8 @@ def main():
             "source": it.get("source_name") or it.get("source"),
             "time": it.get("updated") or it.get("time") or "",
             "url": it.get("url") or "",
+            "channel": it.get("channel") or "",
+            "themes": (it.get("themes") or [])[:5],
             "direction": direction,
             "confidence": round(conf, 2),
             "matched_by": matched_by,

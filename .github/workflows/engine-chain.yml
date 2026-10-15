@@ -162,11 +162,20 @@ jobs:
           #   today_picks / ai_pick_v4 是几分钟内的新结果。
           # MODE=full: 盘前/盘后跑整条 tier 0-8 链 (~6-9 分钟)。
           if [ "$MODE" = "light" ]; then
-            echo "--- light tier: engine_v5 / decision / today_picks / ai_pick_v4 ---"
+            echo "--- light tier: valuation / engine_v5 / decision / today_picks / ai_pick_v4 / premarket ---"
+            # valuation 提到 light: 它只跑 ~20s, 但产出被 premarket_picks /
+            # multidim / ai_pick_v4 / decision 四个引擎依赖。此前只在 full 跑,
+            # 导致盘中刷新时 valuation.json 停留在上一次 full 的快照
+            # (实测只剩 6 条指数, 因为 full 那轮行情快照源失败)。
+            python3 scripts/valuation_engine.py --out data/valuation.json || echo "valuation skipped"
             python3 scripts/engine_v5.py --out data/engine_v5.json --limit 2000 || echo "engine_v5 skipped"
             python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
             python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
             python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
+            # 早盘/午盘推股: 读上面所有产出, 叠加隔夜增量 + 市况闸门
+            python3 scripts/premarket_picks.py --out data/premarket_picks.json || echo "premarket skipped"
+            # 午盘: 上午 11:30 后验证早盘计划 + 给下午修正清单
+            python3 scripts/midday_picks.py --out data/midday_picks.json || echo "midday skipped"
             echo "--- light tier done ---"
           fi
 
@@ -228,6 +237,9 @@ jobs:
           python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
           python3 scripts/close_review.py || echo "close_review skipped"
           python3 scripts/archive_review.py || echo "archive_review skipped"
+          # 早盘/午盘推股: 盘后跑一次, 让用户收盘后就能看到次日计划
+          python3 scripts/premarket_picks.py --out data/premarket_picks.json || echo "premarket skipped"
+          python3 scripts/midday_picks.py --out data/midday_picks.json || echo "midday skipped"
 
           echo "--- engine chain done ---"
           fi
@@ -240,10 +252,14 @@ jobs:
           # 避免和另外 6 个 bot 互相覆盖。
           python3 scripts/git_push_retry.py --msg "engine($MODE)" \
             data/engine_v5.json data/decision.json data/today_picks.json \
-            data/ai_pick_v4.json \
+            data/ai_pick_v4.json data/valuation.json data/premarket_picks.json \
+            data/midday_picks.json data/engine_fusion.json data/multidim.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
-            --protect data/today_picks.json --protect data/ai_pick_v4.json
+            --protect data/today_picks.json --protect data/ai_pick_v4.json \
+            --protect data/valuation.json --protect data/premarket_picks.json \
+            --protect data/midday_picks.json \
+            --protect data/engine_fusion.json --protect data/multidim.json
 
       - name: Publish to the data warehouse
         env:
