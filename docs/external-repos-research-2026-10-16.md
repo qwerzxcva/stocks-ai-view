@@ -5,7 +5,12 @@
 > **本轮执行情况 (如实说明)**: 原计划派 5 个 Explore 子代理并行调研, 5 个全部因
 > `LLM 调用失败: connection closed` 中断, 只留下「重试中」的中间输出, 无实际报告
 > (token 消耗 1460 万但零产出)。因此本报告由主会话用 websearch 直接调研完成,
-> **只覆盖了 9 个重点仓库**, 其余 39 个未调研。缺口在文末列出。
+> **已覆盖 12 个仓库**, 其余 36 个未调研。缺口在文末列出。
+>
+> **已落地 (不只是调研, 已变成我们的代码)**:
+> a-stock-data 逐笔采集 + 竞价资金结构 / AI-Stock-Master 三大算法 /
+> TradingAgents 多空辩论 / backtrader Analyzer 架构 / lumibot replay caching /
+> kand 5 个进阶指标。详见第四节。
 
 ---
 
@@ -87,6 +92,60 @@
 **其他同源仓 (都是 a-stock-data 的衍生, 内容基本一致, 不必重复看)**:
 `2476097246-alt/a-stock-api` (Flask REST 封装, Apache-2.0),
 `Macco2024/a-stock-data-20260624`, `icenewman/stock-data`, `xuyongfu/a-stock-data-*`。
+
+---
+
+### 1.2 kand-ta/kand ⭐ 已落地 (Apache-2.0 OR MIT, 可合法复制)
+
+**身份**: 447 star / 16 fork, 默认分支 main, Apache-2.0 OR MIT 双许可,
+Rust 实现 + Python/WASM 绑定。
+
+**定位**: 高性能技术指标库, 宣称达到或超过 TA-Lib 峰值性能,
+真正多线程 (不受 Python GIL 限制), **O(1) 增量更新**适合流式实时。
+
+**已落地为我们的 `scripts/indicators_ext.py` 新增 5 个指标**
+(按其公开定义独立实现, 未复用 Rust 代码):
+
+| 指标 | 作用 | 验证 |
+|---|---|---|
+| Vegas Tunnel | EMA(144)±4% 包络, 判断是否突破整条隧道 | ✅ 跑通 |
+| Camarilla Levels | 日内 8+2 个支撑阻力位, H4/L4 突破位, H3/L3 反转位 | ✅ 11 个价位逐档数值验证 |
+| Heikin Ashi | 平滑 K 线, 连续同色无影线=趋势强 | ✅ |
+| MFI | 量加权 RSI, 缩量上涨不虚高 | ✅ |
+| OBV | 能量潮, 量价背离判断 | ✅ 单调性验证 |
+
+**为什么选这几个**: indicators_ext 原有 14 个指标已覆盖 TA-Lib 主流
+(supertrend/VWMA/ATR/Keltner/Donchian/ZigZag/CMO/Choppiness/Vortex/UO/
+MassIndex/Pivot/HullMA)。缺的是 kand 独有的**趋势过滤类 (Vegas)** 与
+**日内水平位类 (Camarilla)**, 以及两个**量价验证类 (MFI/OBV)** ——
+后者正好补 factor_lab 发现的「只看价格不看量的指标不可靠」。
+
+**修了两处初版错误**: Camarilla 的 L5 原写 `c-2*range` 丢了 c;
+H5 未定义。已按 Stott 原始定义改为 `H5=(H/L)*C` / `L5=C-(H5-C)`。
+
+**未借鉴**: Rust 实现本身 (我们纯 Python, 不引入二进制依赖);
+O(1) 增量更新 (我们是批量计算, 用不到)。
+
+---
+
+### 1.3 wshobson/maverick-mcp (MIT, 未落地 — 架构参考)
+
+**身份**: 676 star / 158 fork, 默认分支 main, MIT, Python 3.12+,
+2025-08 创建, 2026-09 仍在更新。
+
+**是什么**: 股票市场 MCP server, 让 AI 助手 (Claude Desktop / Codex /
+Cursor / VS Code) 调用行情/技术分析/组合跟踪/回测工具。核心工具
+**无需 API key** (走 yfinance)。
+
+**可借鉴的架构**: 把股票分析能力封装成 MCP 工具清单供 LLM 调用 ——
+这与我们 `bull_bear_debate.py` 让 LLM 只组织论证不产生事实的思路同向。
+
+**未落地原因**: 依赖 yfinance (容器内实测 Yahoo 429 限流);
+数据源是美股, 对 A 股无直接价值; 我们的场景是 GitHub Actions 批处理
+而非交互式 MCP 会话。
+
+**若要落地**: 借鉴其工具清单设计 (37 tools 的粒度划分),
+把我们的 161 个脚本中适合暴露给 LLM 的整理成工具描述。优先级低。
 
 ---
 
@@ -372,7 +431,26 @@ Nasdaq Data Link       — 另类数据集
 
 ---
 
-## 四、本轮实际落地的代码
+## 四、借鉴 → 落地对照表 (本轮实际变成我们代码的部分)
+
+| 借鉴仓库 | License | 借鉴了什么 | 落地为 | 状态 |
+|---|---|---|---|---|
+| a-stock-data | Apache-2.0 | 腾讯逐笔 (替代失效的 mootdx) | `scripts/fetchers_ticks.py` | ✅ CI 跑通 36 只 |
+| a-stock-data | Apache-2.0 | 逐笔 → 资金结构四指标 | `scripts/auction_engine.py` | ✅ 24/36 涨停股主动卖占优 |
+| a-stock-data | Apache-2.0 | 成交量单位陷阱 (688 按股) | `scripts/volume_units.py` | ✅ 实测相差 13 倍 |
+| AI-Stock-Master | AGPL (仅参考数学式) | RTSI/TMA/MSCI 三大算法 | `scripts/trend_strength.py` | ✅ RTSI 100 只 + TMA 30 板块 |
+| TradingAgents-MCPmode | MIT | 多智能体 + 多空辩论 + 三层风控 | `scripts/bull_bear_debate.py` | ✅ 红队机制工作 |
+| cloudQuant/backtrader | GPL (仅学架构) | Analyzer 插件框架 | `scripts/analyzers.py` | ✅ 8 个分析器 |
+| lumibot | GPL (仅学设计) | Replay caching (SHA-256 输入缓存) | `gitcode_ai_review.py` 加缓存 | ✅ 省 token |
+| kand-ta/kand | Apache-2.0 OR MIT | Vegas/Camarilla/HA/MFI/OBV | `indicators_ext.py` +5 指标 | ✅ Camarilla 11 价位数值验证 |
+| Stocksera | MIT | 60+ 另类数据源清单 | 报告情报 (SEC EDGAR 等) | 📋 未落地 |
+| eltdx | Research-Only | 通达信协议知识 | 报告结论 (该路已死) | 📋 止损, 不做 |
+
+**图例**: ✅ 已落地并实测 / 📋 有情报未落地
+
+---
+
+## 五、本轮实际落地的代码
 
 ### 4.1 `sector_engine.py` (新建, 475 行) — 板块独立算法引擎
 
@@ -452,7 +530,10 @@ edge 全为负」。调权重救不了, 必须系统性回答「到底什么特�
 
 ---
 
-## 五、未调研的 39 个仓库 (子代理失败导致)
+## 六、未调研的 36 个仓库 (子代理失败导致)
+
+> 已从 39 减到 36: kand-ta/kand 与 wshobson/maverick-mcp 本轮补调研完成,
+> zhangxiangliang/stock-api 与 chengzuopeng/stock-sdk 有初步情报 (见 1.1 末尾)。
 
 **A股/数据 API 类 (8)**: allen200909/stock, zhaogods/tostock, zhangxiangliang/stock-api,
 GlacierBo/stock-api, chengzuopeng/stock-sdk, Vulthen/myhhub-stock-quantitative,
@@ -481,35 +562,38 @@ tradernetwork/etf-holdings-tracker, maxgfr/crible, yehomak/NewsAlpha
 
 ---
 
-## 六、Top 5 可立即落地 (按性价比排序)
+## 七、下一步 (按性价比排序, 已完成的标注 ✅)
 
-> 注: 第 6 项 (factor_lab) 本轮已完成, 其结论已改写上面第五节的优先级判断。
-
-1. **把「追突破」从买入逻辑里去掉** — factor_lab 实测 breakout_60 未来 3 日
+1. ⬜ **把「追突破」从买入逻辑里去掉** — factor_lab 实测 breakout_60 未来 3 日
    **-2.50%** (t=-6.92), new_high_20 **-1.56%**, gap_up **-0.45%**,
    全部强负面且统计显著。engine_v5 若给突破类指标正权重, 是在系统性做错方向。
    工作量: 小 (改权重符号或剔除)。**这是当前最高性价比的一步**。
 
-2. **加「深度超跌」买入信号** — below_ma60 是 12 个特征里唯一全持有期有效的
+2. ⬜ **加「深度超跌」买入信号** — below_ma60 是 12 个特征里唯一全持有期有效的
    (1/3/5/10 日 t=3.5/23.6/32.5/42.8, edge 随持有期递增到 +0.42pp)。
    建议在 engine_v5 / multidim 增加该因子, 并把持有期建议从 T+1 拉长到 5-10 日。
    工作量: 小。
 
-3. **SEC EDGAR 美股基本面采集器** — Stocksera 情报 + treg 已实测免 key 可达。
+3. ⬜ **SEC EDGAR 美股基本面采集器** — Stocksera 情报 + treg 已实测免 key 可达。
    新增 `scripts/collect_sec_edgar.py`, 产出 `data/us_fundamentals.json`。
    工作量: 小。价值: 填补美股基本面空白, 是唯一零成本入口。
 
-4. **多空辩论 Agent** — TradingAgents-MCPmode 架构 (MIT) + 复用 GitCode AI 通道。
-   新增 `scripts/bull_bear_debate.py`: 对当日推股列表跑 1 轮看涨 vs 看跌,
-   输出「正反证据 + 风险官结论」。工作量: 中。价值: 直接针对「看多胜率 < 随机」,
-   让模型强制列出反面证据, 比继续调权重更有希望。
+4. ✅ **多空辩论 Agent** — 已落地 `scripts/bull_bear_debate.py`
+   (TradingAgents-MCPmode 架构 + GitCode AI 通道, 3 角色最小闭环)。
 
-5. **板块成分股直连** — 自己实现通达信 0x06b9+0x044d 协议最小子集,
-   替换 industry_map_em 反查。工作量: 中。价值: sector_engine 覆盖率 6/27 → 目标 25+。
+5. ⬜ **板块成分股直连** — 注意: a-stock-data 已实测通达信公开服务器 2026-09 起
+   全部失效, 自己做 7709 协议这条路已死。应改为: 从东财/同花顺的板块成分股
+   HTTP 接口取 (a-stock-data §3.3 东财 slist 是个股→板块归属, 可反向建索引),
+   或接受 6/27 覆盖率 (只分析成分股 >=3 的板块)。工作量: 中。
 
-6. **LLM 复盘 hash 缓存** — lumibot replay caching 思路。
-   在 gitcode_ai_review.py 加 `hash(input_data) → 缓存`, 数据未变则跳过调用。
-   工作量: 小。价值: 省 token (用户成本敏感)。
+6. ✅ **LLM 复盘 hash 缓存** — 已落地 (lumibot replay caching 思路)。
 
-7. **趋势强度指数** — RTSI 思路自己实现 (不声称借鉴其公式)。
-   工作量: 小。价值: 前端可读性, 便于回测验证单值是否比 17 指标共振更有效。
+7. ✅ **趋势强度指数** — 已落地 `scripts/trend_strength.py` (RTSI/TMA/MSCI)。
+
+8. ⬜ **补调研剩余 36 个仓库** — 优先「A股数据 API 类」
+   (allen200909/stock / Vulthen/myhhub / siqyka/dsh-stock-leek / AnacondaKC/Aniu),
+   与现有源直接竞争, 最可能发现免 key 替代。
+
+9. ⬜ **kand 的 O(1) 增量指标** — 若后续做分钟级实时指标, 可借鉴其增量更新
+   设计 (现在是批量全算, 分钟级会浪费)。优先级取决于是否上分钟级。
+
