@@ -92,9 +92,15 @@ jobs:
           echo "MODE=light" >> "$GITHUB_ENV"
           echo "outside the engine window ($h:$m) -> light"; exit 0
 
+      # 必须传 PAT 而不是默认 GITHUB_TOKEN: actions/checkout 会用传入的
+      # token 重写 git remote 的凭据。默认 GITHUB_TOKEN 受
+      # `permissions: contents: read` 限制只有读权限, 用它 checkout 后
+      # git_push_retry.py 的 git push 会稳定 403
+      # (2026-10-15 实测: run 38724673649 / 38726480451 连续 12 次
+      # attempt 全部 403, 6 个 protect 文件的成果全部推不上去)。
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           fetch-depth: 0
 
       - name: Sync remote main
