@@ -1,1 +1,49 @@
-{"ts": "2026-10-14T19:45:53+08:00", "engine": "flow_divergence (自研: 资金流-价格背离)", "n_scanned": 200, "n_scored": 2, "n_no_flow": 198, "buy_side": [{"code": "sz000937", "date": "2026-10-13", "close": 4.42, "score": 95.3, "signal": "波动收敛", "diverge": 1, "price_accel_pct": -0.543, "flow_accel_norm": 0.5733, "flow_persist": 0.5, "vol_compress": 0.698, "n_flow_days": 117}], "sell_side": [], "meta": {"formula": "score = 50 + 40*D + 20*(S-0.5)*2 + 10*(1-V/1.5)", "D": "价格加速度与资金加速度的背离 (sign 相反且 |A_f| 显著)", "S": "近10日主力净流入为正的天数占比 (持续性)", "V": "近20日真实波幅 / 近60日真实波幅 (压缩度, <0.8 意味突破临近)", "signals": {"吸筹背离": "价跌+资金进+持续流入 → 潜在见底", "派发背离": "价涨+资金出+持续流出 → 潜在见顶", "波动收敛": "V<0.8, 突破概率增"}, "source": "价格: 腾讯前复权日K | 资金: 东财 push2his fflow", "caveat": "背离是统计规律非必然; 资金流数据为交易所口径, 不含隐性买单; 仅供研究不构成投资建议"}}
+{
+ "ts": "2026-10-17T04:03:09+08:00",
+ "engine": "flow_divergence (自研: 资金流-价格背离)",
+ "status": "insufficient",
+ "n_scanned": 1,
+ "n_scored": 0,
+ "n_confirmed_divergence": 0,
+ "n_no_flow": 1,
+ "n_rejected": 1,
+ "rejection_reasons": {
+  "source_unavailable": 1
+ },
+ "coverage": {
+  "totals": {
+   "kline_days": 1,
+   "flow_days": 0,
+   "aligned_days": 0
+  },
+  "by_code": [
+   {
+    "code": "sz301569",
+    "kline_days": 1,
+    "flow_days": 0,
+    "aligned_days": 0,
+    "kline_date_start": "2026-10-15",
+    "kline_date_end": "2026-10-15",
+    "flow_date_start": null,
+    "flow_date_end": null
+   }
+  ],
+  "flow_source_ratio": 0.0,
+  "minimum_flow_source_ratio": 0.8,
+  "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"
+ },
+ "buy_side": [],
+ "sell_side": [],
+ "meta": {
+  "formula": "score = 50 + 40*D + 40*(S-0.5) + 10*(1-V/1.5)",
+  "D": "价格与资金加速度反向，且资金持续性确认",
+  "S": "近10个交易日主力净流入为正的天数占比",
+  "V": "近20日真实波幅/近60日真实波幅; 不单独作为背离证据",
+  "source": "价格: 本地前复权日K | 资金: 东财 push2his fflow",
+  "provenance": {
+   "source": "本地前复权日K + 东财主力净流入",
+   "confidence": "observed",
+   "snapshot_ts": "2026-10-17T04:03:09+08:00"
+  }
+ }
+}
