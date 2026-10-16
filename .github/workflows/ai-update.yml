@@ -1,10 +1,11 @@
 # AI 实时选股分析网站
-# GitHub Pages 部署: Settings → Pages → Source: main branch / / (root)
-# Actions cron: 交易日 09:35 / 11:35 / 14:05 / 15:25 CST (UTC 01:35/03:35/06:05/07:25 周一至周五)
+# GitHub Pages 部署: Settings → Pages → Source: main branch / /root
+# 全天更新: 每 15 分钟覆盖 CST 08:00-20:59 + 凌晨 00:00-02:59。
+# 盘前/盘中/盘后均刷新主快照与独立实时行情，非交易时段由数据字段标注真实归属日。
 name: ai-data-update
 on:
   schedule:
-    - cron: '35 1,3,5,7 * * 1-5'
+    - cron: '*/15 0-12,16-17 * * *'
   workflow_dispatch: {}
 permissions:
   contents: write
@@ -26,8 +27,28 @@ jobs:
           python-version: '3.x'
       - name: Run AI screener
         run: python3 scripts/ai_screener.py --out data/latest.json
+      - name: Build independent realtime snapshot
+        run: python3 scripts/build_market_now.py --out data/market_now.json
+      - name: Validate snapshot timestamps
+        run: |
+          python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone, timedelta
+          now = datetime.now(timezone(timedelta(hours=8)))
+          d = json.load(open('data/latest.json', encoding='utf-8'))
+          ts = d.get('ts')
+          if not isinstance(ts, str) or len(ts) < 16:
+              raise SystemExit('latest.json has no usable ts; refusing to publish stale/unknown snapshot')
+          parsed = datetime.fromisoformat(ts)
+          if parsed.tzinfo is None:
+              parsed = parsed.replace(tzinfo=timezone(timedelta(hours=8)))
+          age = (now - parsed).total_seconds() / 60
+          if age < -10 or age > 45:
+              raise SystemExit(f'latest.json ts age={age:.1f}min, refusing to publish')
+          print(f'latest.json ts={ts} age={age:.1f}min')
+          PY
       - name: Commit & push
         run: |
           python3 scripts/git_push_retry.py --msg "ai-data" --dir data \
             --user stocks-ai-bot \
-            --protect data/latest.json --protect data/index_kline.json
+            --protect data/latest.json --protect data/market_now.json --protect data/index_kline.json
