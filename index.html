@@ -167,6 +167,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <span id="refreshBtn" title="重新拉取全部数据源 (绕过 Service Worker 与 HTTP 缓存)" style="margin-left:8px;padding:3px 12px;border-radius:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;cursor:pointer;user-select:none">⟳ 更新</span>
   <span id="rtStatus" title="Browser-direct tencent quotes, 60s refresh" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">RT --:--</span>
   <span id="dataSourceTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;background:rgba(137,87,229,.18);border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;cursor:help"></span>
+  <span id="pipelineTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
   <span id="sessionTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
   <div style="position:relative;margin-left:8px">
     <input id="symSearch" placeholder="Search stock / ETF" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
@@ -2534,6 +2535,7 @@ const SOURCES = [
   'data/hot_impact.json',      // 热点推演
   'data/cycle.json',           // 周期池
   'data/sector_pool.json',     // 板块池
+  'data/analysis_manifest.json', // 统一数据/算法发布状态与新鲜度事实来源
   'data/freshness_audit.json', // 数据新鲜度审计 (自查哪些文件过期)
   'data/auction_engine.json',  // 竞价抢筹与日内资金结构 (腾讯逐笔分笔)
   'data/trend_strength.json',   // 趋势强度指数族 RTSI/TMA/MSCI (借鉴 AI-Stock-Master)
@@ -2596,6 +2598,21 @@ async function render(){
 
   // ── 实时行情覆盖: market_now 优先于 latest, realtime_minute 最细 ──
   const mn = g.market_now, rm = g.realtime_minute;
+  // ── 统一发布状态: analysis_manifest 是所有模块新鲜度的唯一事实来源 ──
+  (function(){
+    const man=g.analysis_manifest;
+    const el=document.getElementById('pipelineTag');
+    if(!el||!man)return;
+    const stale=man.stale_count||0, missing=man.missing_count||0;
+    const ok=man.pipeline_status==='fresh'&&stale===0&&missing===0;
+    el.textContent=ok?'全链路新鲜':'部分数据过期 · '+stale+' stale';
+    el.style.display='inline-block';
+    el.style.background=ok?'rgba(38,166,154,.18)':'rgba(239,83,80,.15)';
+    el.style.border='1px solid '+(ok?'#26a69a':'#ef5350');
+    el.style.color=ok?'#26a69a':'#ef5350';
+    el.title='发布清单 '+(man.ts||'')+' · 过期 '+stale+' · 缺失 '+missing+' · '
+      +(man.stale_files||[]).slice(0,12).join(', ');
+  })();
   if(mn && mn.market){
     d.market = mn.market;
     if(mn.limit_up_pool && mn.limit_up_pool.length) d.limit_up_pool = mn.limit_up_pool;

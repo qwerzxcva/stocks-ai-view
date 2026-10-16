@@ -168,6 +168,7 @@ jobs:
           python3 scripts/audit_freshness.py --out data/freshness_audit.json \
             --report data/freshness_audit.md \
             || echo "::warning::有文件超过新鲜度阈值, 见 data/freshness_audit.md"
+          python3 scripts/build_analysis_manifest.py || echo "::warning::analysis_manifest 构建失败"
 
       # ── 全球各大股市实时 (15指数, 含休市状态与情绪) ───────────
       - name: Collect global markets
