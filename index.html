@@ -224,6 +224,13 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="dailySummaryBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
+      <!-- 热点推演 + 盘面解读: renderHotImpactData / renderCommentary 写入。
+           这两个容器在旧版右栏里, 重构后只剩 dailySummaryBox, 于是这两块
+           数据整块丢失 (渲染函数抛 null, 被 _safe 吞掉)。 -->
+      <div class="hd" style="border-top:1px solid var(--border)">🔥 热点推演 <span class="sub" id="cmtSub"></span></div>
+      <div id="hotImpact" style="padding:0 12px 8px"></div>
+      <div class="hd" style="border-top:1px solid var(--border)">📋 盘面解读 <span class="sub">涨跌分布 · 成交 · 情绪 · 两融</span></div>
+      <div id="commentary" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="1">
       <div class="hd">全球股市 <span class="sub" id="gmSub">A股 · 港股 · 日股 · 韩股 · 欧股 · 美股 — 点击指数名看历年K线</span></div>
@@ -260,12 +267,30 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="poolBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
+      <!-- 强势股 / 龙虎榜 / 大宗 / 今日推股: 由 renderThsStrong / renderLhb /
+           renderBlocktrade / renderPicks 写入。这四个容器曾随旧右栏卡片一起
+           被删掉, 而渲染函数仍在写它们的 id, 导致 _safe 每轮捕获一次
+           "Cannot set properties of null", 数据整块丢失。 -->
+      <div class="hd" style="border-top:1px solid var(--border);margin-top:10px">强势股 <span class="sub">同花顺源 · 涨幅近似判断涨跌停</span></div>
+      <div id="strongKpis" class="pool-kpis"></div>
+      <div id="strongBody" style="padding:0 12px 8px"></div>
+      <div class="hd" style="border-top:1px solid var(--border)">龙虎榜 <span class="sub">东财 RPT_DAILYBILLBOARD_DETAILS · 收盘后出</span></div>
+      <div id="lhbKpis" class="pool-kpis"></div>
+      <div id="lhbBody" style="padding:0 12px 8px"></div>
+      <div class="hd" style="border-top:1px solid var(--border)">大宗交易 <span class="sub">东财 RPT_DATA_BLOCKTRADE · 折价率</span></div>
+      <div id="blockKpis" class="pool-kpis"></div>
+      <div id="blockBody" style="padding:0 12px 8px"></div>
+      <div class="hd" style="border-top:1px solid var(--border)">今日推股 <span class="sub">AI 评分 · 非投资建议</span></div>
+      <div id="pickBody" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="7">
       <div class="hd">24h 热点资讯流 <span class="sub" id="newsSub">财联社电报 · 华尔街见闻 · 联合早报</span></div>
       <div id="newsFlowBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
+      <!-- renderNews 写入: 摘要计数 + 全文列表。容器缺失时整个资讯流不渲染。 -->
+      <div id="newsCount" class="fl" style="padding:4px 12px;font-size:10px"></div>
+      <div id="newsFull" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="8">
       <div class="hd">海外关联 <span class="sub" id="olSub">大盘/板块 与 纳指/恒指/日经/KOSPI 的相关·贝塔·滞后·隔夜传导</span></div>
@@ -2288,8 +2313,11 @@ function _safe(fn, label){
   catch(e){
     console.error('[tab] ' + label + ' failed:', e);
     const box = document.getElementById(label + 'Box');
-    if(box) box.innerHTML = '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--up)">'+
-      '渲染异常: ' + String(e && e.message || e).slice(0,80) + '</div>';
+    // 判空: 没有对应容器时不能赋值, 否则 catch 里再抛一个 TypeError,
+    // 把真正的渲染错误盖掉, 控制台只剩一排 "Cannot set properties of null"。
+    if(!box) return;
+    box.innerHTML = '<div class="fl" style="padding:12px;text-align:center;font-size:10px;color:var(--up)">'+
+      '渲染异常: ' + String((e && e.message) || e).slice(0,80) + '</div>';
   }
 }
 
