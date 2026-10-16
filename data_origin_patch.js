@@ -1,8 +1,14 @@
 // data_origin.js — Cloud-first data routing for the dashboard.
 //
-// The local data/ directory was removed (2026-10-14): the site is deployed
-// from the cloud only. Every fetch goes to the cloud warehouse first and
-// falls back to the GitCode mirror when GitHub raw is unreachable.
+// Read order for every warehouse JSON:
+//   1. 多仓取最新: gh_sources.js 配置的 A/B/C 三仓 raw (A 是唯一事实源,
+//      B/C 是错峰采集镜像, 按 ts 取最新的那份 — 突破单仓 5 分钟 cron 下限)
+//   2. 同源兜底: Pages 自己的 data/<file> (国内可直连 raw 被墙时)
+//   3. GitCode 镜像: 仅 market/* 有
+//
+// 为什么多仓在 raw 而不在 Pages 同源: 镜像仓 (B/C) 是私有采集节点,
+// 不建 Pages, 只能走 raw; 同源那份是 pages-data-sync.yml 从 A 仓 diff 过来
+// 的, 有 10 分钟级延迟, 所以排在第 2 位。
 //
 // Realtime quote providers (qt.gtimg.cn / push2his.eastmoney.com) are called
 // directly by stock-detail.js; this module only handles warehouse JSON.
@@ -17,7 +23,6 @@
   var GH = 'https://raw.githubusercontent.com/';
   var GC = 'https://gitcode.com/';
 
-  // Cloud warehouse repos (see db-client.js for the shard routing).
   var MARKET_GH = GH + 'jiegengxiangjianxue1/db-market/main/';
   var MARKET_GC = GC + 'dufuwuxin/stocks-db-market/raw/main/';
   var AI_VIEW_GH = GH + 'qwerzxcva/stocks-ai-view/main/';
@@ -38,15 +43,15 @@
   };
   var SHARD_DEFAULT = 'jiegengxiangjianxue3/db-stocks-d';
 
-  function remote(url, timeoutMs) {
+  // GitHub raw/CDN 可能继续返回旧 JSON。数据请求统一带版本参数并禁用
+  // HTTP 缓存; 这不是浏览器缓存策略, 而是线上数据版本一致性门禁。
+  // force=true (点「更新」按钮) 时改用 reload, 连磁盘缓存一并绕过。
+  function remote(url, timeoutMs, force) {
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, timeoutMs || 12000) : null;
-    // GitHub raw/CDN 可能继续返回旧 JSON。每次数据请求带版本参数，
-    // 保留 no-store，同时绕过 Pages/Raw 的边缘缓存；这不是浏览器缓存策略，
-    // 而是线上数据版本一致性门禁。
     var sep = url.indexOf('?') >= 0 ? '&' : '?';
     var freshUrl = url + sep + 'v=' + Date.now();
-    return fetch(freshUrl, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+    return fetch(freshUrl, { cache: force ? 'reload' : 'no-store', signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) {
         if (timer) clearTimeout(timer);
         if (!r.ok) throw new Error('remote ' + r.status);
@@ -69,48 +74,97 @@
     }
   }
 
-  // Resolve a legacy data/<file>.json path to its cloud origin.
+  // Resolve a legacy data/<file>.json path to every origin it may live at.
+  // Returns { multi: [raw urls], same: same-origin url or null, mirror: [urls] }.
   function resolve(p) {
     var name = p.replace(/^data\//, '');
+    var res = { multi: [], same: null, mirror: [] };
+
     if (MARKET_FILES.test(name)) {
-      return [MARKET_GH + 'market/' + name, MARKET_GC + 'market/' + name];
-    }
-    if (AI_VIEW_ONLY.test(name)) {
-      return [AI_VIEW_GH + p, null];
-    }
-    if (name.indexOf('master/') === 0 || name.indexOf('market/') === 0 ||
+      res.multi = [MARKET_GH + 'market/' + name];
+      res.same = 'market/' + name;
+      res.mirror = [MARKET_GC + 'market/' + name];
+    } else if (AI_VIEW_ONLY.test(name)) {
+      res.multi = multiUrls(p);
+      res.same = p;
+    } else if (name.indexOf('master/') === 0 || name.indexOf('market/') === 0 ||
       name.indexOf('sector/') === 0 || name.indexOf('overseas/') === 0) {
-      return [MARKET_GH + name, MARKET_GC + name];
+      res.multi = [MARKET_GH + name];
+      res.same = name;
+      res.mirror = [MARKET_GC + name];
+    } else {
+      var m = name.match(/^stocks\/(\d\d)\//);
+      if (m) {
+        var repo = SHARD_REPO[m[1]] || SHARD_DEFAULT;
+        res.multi = [GH + repo + '/main/' + name.replace(/^stocks\//, '')];
+        res.mirror = [GC + 'dufuwuxin/stocks-db-stocks/raw/main/' + name.replace(/^stocks\//, '')];
+      } else {
+        res.multi = multiUrls(p);
+        res.same = p;
+      }
     }
-    // per-stock: data/stocks/<shard>/<code>/... -> db-stocks-*
-    var m = name.match(/^stocks\/(\d\d)\//);
-    if (m) {
-      var repo = SHARD_REPO[m[1]] || SHARD_DEFAULT;
-      return [GH + repo + '/main/' + name.replace(/^stocks\//, ''),
-              GC + 'dufuwuxin/stocks-db-stocks/raw/main/' + name.replace(/^stocks\//, '')];
-    }
-    return [AI_VIEW_GH + p, null];
+    return res;
   }
 
-  window.fetchJSON = function (p) {
+  // A/B/C 三仓的同一路径 raw URL。gh_sources.js 未加载时退回只有 A 仓。
+  function multiUrls(p) {
+    var repos = (globalThis.GHSources && globalThis.GHSources.REPOS) || [];
+    if (!repos.length) return [AI_VIEW_GH + p];
+    return repos.map(function (r) {
+      return GH + r.owner + '/' + r.repo + '/' + r.branch + '/' + p;
+    });
+  }
+
+  // 并发读多仓, 取 ts 最新的那份; 全部失败则抛错交给下一级兜底。
+  // ts 缺失 (daily 档文件只有 date) 时按仓顺序取第一个成功的 —— A 仓在最前,
+  // 它是唯一事实源, 镜像仓不能因为排序把旧版顶到前面。
+  function fetchFreshest(urls, timeoutMs, force) {
+    return Promise.all(urls.map(function (u) {
+      return remote(u, timeoutMs, force).then(function (d) {
+        return { data: d, ts: (d && d.ts) || '' };
+      }).catch(function () { return null; });
+    })).then(function (rs) {
+      var ok = rs.filter(Boolean);
+      if (!ok.length) throw new Error('all repos failed');
+      ok.sort(function (a, b) {
+        if (!a.ts && !b.ts) return 0;
+        if (!a.ts) return 1;
+        if (!b.ts) return -1;
+        return b.ts.localeCompare(a.ts);
+      });
+      return ok[0].data;
+    });
+  }
+
+  window.fetchJSON = function (p, opts) {
+    var force = !!(opts && opts.force);
     var r = resolve(p);
-    return remote(r[0])
+    var chain = [];
+    if (r.multi.length) chain.push(function () { return fetchFreshest(r.multi, 12000, force); });
+    if (r.same) chain.push(function () { return remote(r.same, 6000, force); });
+    r.mirror.forEach(function (u) {
+      chain.push(function () { return remote(u, 12000, force); });
+    });
+    return chain.reduce(function (prev, next) { return prev.catch(next); })()
       .then(function (j) {
+        if (j === null || j === undefined) throw new Error('all origins failed: ' + p);
         tag('CLOUD', 'Data served live from the GitHub warehouse');
         return j;
       })
-      .catch(function () {
-        if (r[1]) return remote(r[1]).catch(function () { return null; });
-        return null;
-      });
+      .catch(function () { return null; });
   };
 
-  window.fetchJSONMinute = function (p) {
+  window.fetchJSONMinute = function (p, opts) {
+    var force = !!(opts && opts.force);
     var r = resolve(p);
-    return remote(r[0], 8000).catch(function () {
-      return r[1] ? remote(r[1], 8000) : null;
+    var chain = [];
+    if (r.multi.length) chain.push(function () { return fetchFreshest(r.multi, 8000, force); });
+    if (r.same) chain.push(function () { return remote(r.same, 5000, force); });
+    r.mirror.forEach(function (u) {
+      chain.push(function () { return remote(u, 8000, force); });
     });
+    return chain.reduce(function (prev, next) { return prev.catch(next); })();
   };
 
-  console.log('[data_origin] cloud-first routing active');
+  console.log('[data_origin] cloud-first routing active (multi-repo freshest → same-origin → gitcode)');
 })();

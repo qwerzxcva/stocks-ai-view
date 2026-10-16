@@ -15,13 +15,14 @@
 (function (global) {
   "use strict";
 
-  // 三个账号的仓, 按优先级排列 (A 为主, B/C 兜底)
-  // phase: A 仓 cron 落在 mod5=2, B 落 mod5=4, C 落 mod5=0 → 任意 2 分钟窗口
-  //        内必有一个仓刚跑完
+  // A 是唯一站点与唯一事实源 (main 分支), B/C 是采集镜像节点 (见 scripts/deploy_mirror.py)。
+  // 三仓 cron 错峰 (A=mod5=2, B=mod5=4, C=mod5=0) → 任意 2 分钟窗口内
+  // 必有一个仓刚跑完, 前端按「取 ts 最新」读取即可突破单仓 5 分钟下限。
+  // C 仓 (dufuwuxin/stocks-ai-view-c) 只采集不同源, 不建站点。
   var REPOS = [
     { owner: "qwerzxcva", repo: "stocks-ai-view", branch: "main", label: "A" },
-    { owner: "", repo: "", branch: "main", label: "B" },  // 待填
-    { owner: "", repo: "", branch: "main", label: "C" },  // 待填
+    { owner: "jiegengxiangjianxue", repo: "stocks-ai-view-b", branch: "main", label: "B" },
+    { owner: "dufuwuxin", repo: "stocks-ai-view-c", branch: "main", label: "C" },
   ].filter(function (r) { return r.owner && r.repo; });
 
   var RAW = "https://raw.githubusercontent.com";
@@ -65,7 +66,14 @@
       var ok = results.filter(Boolean);
       if (ok.length === 0) throw new Error("all repos failed for " + path);
       if (freshest) {
-        ok.sort(function (a, b) { return (b.ts || "").localeCompare(a.ts || ""); });
+        ok.sort(function (a, b) {
+          // ts 缺失 (daily 档文件只有 date) 时按 source 固定顺序, 保证 A 优先 ——
+          // 它是唯一事实源, B/C 只是错峰镜像, 不能因排序把镜像顶到前面。
+          if (!a.ts && !b.ts) return a.source.localeCompare(b.source);
+          if (!a.ts) return 1;
+          if (!b.ts) return -1;
+          return b.ts.localeCompare(a.ts);
+        });
       }
       return ok[0];
     });
