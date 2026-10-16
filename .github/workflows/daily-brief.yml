@@ -10,10 +10,9 @@
 name: daily-brief
 on:
   schedule:
-    - cron: '30 23 * * *'   # CST 07:30 盘前
-    - cron: '0 8 * * 1-5'   # CST 16:00 盘后
-    - cron: '0 12 * * *'    # CST 20:00 盘后补充
-    - cron: '0 2 * * 6'     # 周六 10:00 周度
+    # 全天每 2 小时触发; build_daily_brief 自行判断交易时段，盘中不生成，
+    # 盘前/盘后持续更新，避免日报与复盘停在上一个交易日。
+    - cron: '0 */2 * * *'
   workflow_dispatch: {}
 permissions:
   contents: write
