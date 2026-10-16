@@ -45,8 +45,10 @@ permissions:
   contents: read
 
 concurrency:
-  # one run at a time; the two cron ticks are 6.5h apart, but a manual dispatch
-  # during a scheduled run should queue rather than interleave
+  # One run at a time. cancel-in-progress stays false on purpose: a full run
+  # takes ~6-9 min and the heartbeat wakes this every 5 min, so a cancelled
+  # run would leave the full-tier files stale and the age guard would have to
+  # start over. Queueing means at most one full run is wasted, never a lost one.
   group: engine-chain
   cancel-in-progress: false
 
@@ -79,31 +81,93 @@ jobs:
     steps:
       - name: Time window guard
         run: |
-          # The heartbeat wakes this every 5 min; a full chain only matters
-          # pre-open (08:30-09:30) and post-close (15:05-16:30). Outside those
-          # windows, skip so the heartbeat does not pile up runs all session.
+          # The heartbeat wakes this every 5 min; a full chain takes ~6-9 min
+          # and cannot run every tick. Two rules decide the tier:
+          #
+          #   1. FORCE_RUN=true (manual dispatch) -> whatever FORCE_MODE says.
+          #   2. Otherwise the tier follows the *age of the full-tier output*,
+          #      not a wall-clock window. Stale clocks are what broke this
+          #      before: the guard only allowed full at 09:05/15:30/16:40, so
+          #      when a run was cancelled (10-15 20:37Z was) the ~45 full-tier
+          #      files stayed frozen at the previous day - visible on the site
+          #      as "cycle deep analysis / review / winrate matrix all stale"
+          #      while the collectors kept running. Checking age instead of the
+          #      clock means the next tick after any failure re-runs full.
+          #
+          # MODE decides which tier list the Engine chain step runs.
+          #   light = the engines the site reads directly (~65s measured)
+          #   full  = the whole tier 0-8 chain (~6-9 min)
           if [ "$FORCE_RUN" = "true" ]; then
             echo "MODE=${FORCE_MODE:-full}" >> "$GITHUB_ENV"
             echo "forced run, skipping the window check"; exit 0
           fi
           h=$(date +%H); m=$(date +%M); mins=$((10#$h * 60 + 10#$m))
           dow=$(date +%u)
-          if [ "$dow" -gt 5 ]; then echo "weekend, skipping"; exit 1; fi
-          # MODE decides which tier list the Engine chain step runs.
-          #   light = the four engines the site reads directly (~65s measured)
-          #   full  = the whole tier 0-8 chain (~6-9 min)
-          #盘中 (09:15-15:10) 与盘前都跑 light; 盘后窗口跑 full。
+          # Weekends still run full: if Friday's post-close full fails, the
+          # weekend is the only window left to compensate. light has nothing
+          # new to compute on a weekend (same snapshot, re-scored), so the old
+          # "weekend -> exit 1" pushed the recovery all the way to Monday.
+          if [ "$dow" -gt 5 ]; then
+            echo "MODE=full" >> "$GITHUB_ENV"
+            echo "weekend -> full (compensate for a failed weekday full run)"; exit 0
+          fi
+          # Intraday (09:15-15:10) runs light so the four engines the site
+          # reads directly stay minutes old.
           if [ "$mins" -ge 555 ] && [ "$mins" -le 910 ]; then
             echo "MODE=light" >> "$GITHUB_ENV"; echo "intraday window ($h:$m) -> light"; exit 0
           fi
-          if [ "$mins" -ge 510 ] && [ "$mins" -le 570 ]; then
-            echo "MODE=full" >> "$GITHUB_ENV"; echo "pre-open window ($h:$m) -> full"; exit 0
-          fi
-          if [ "$mins" -ge 905 ] && [ "$mins" -le 1020 ]; then
-            echo "MODE=full" >> "$GITHUB_ENV"; echo "post-close window ($h:$m) -> full"; exit 0
+          # Every other slot looks at the age of representative full-tier
+          # output: older than 6h -> full, otherwise light. A missing or
+          # unparsable file counts as 1e9 hours (never ran -> must run full).
+          # NB: age comes from each JSON's own ts/date field, NOT mtime -
+          # a fresh checkout gives every file the same mtime, so mtime would
+          # always read as "0h old" and full would never trigger.
+          age_h=$(python3 - <<'PY'
+          import json
+          from datetime import datetime, timezone, timedelta
+
+          CST = timezone(timedelta(hours=8))
+          cands = ["data/market_phase.json", "data/ban_pick.json",
+                   "data/reflect_latest.json", "data/multidim.json",
+                   "data/winrate_matrix.json"]
+
+          def parse_ts(d):
+              for k in ("ts", "generated_at", "as_of", "date"):
+                  v = d.get(k)
+                  if not v:
+                      continue
+                  s = str(v).strip()
+                  if len(s) == 8 and s.isdigit():        # YYYYMMDD
+                      s = "%s-%s-%s" % (s[:4], s[4:6], s[6:])
+                  s = s.replace("Z", "+00:00")
+                  try:
+                      t = datetime.fromisoformat(s)
+                  except ValueError:
+                      continue
+                  return t if t.tzinfo else t.replace(tzinfo=CST)
+              return None
+
+          now = datetime.now(timezone.utc)
+          ages = []
+          for p in cands:
+              try:
+                  with open(p, encoding="utf-8") as fh:
+                      d = json.load(fh)
+              except Exception:
+                  ages.append(1e9)
+                  continue
+              t = parse_ts(d) if isinstance(d, dict) else None
+              ages.append(1e9 if t is None
+                          else (now - t).total_seconds() / 3600.0)
+          print("%.1f" % min(ages))
+          PY
+          )
+          if python3 -c "import sys; sys.exit(0 if float('$age_h') > 6.0 else 1)"; then
+            echo "MODE=full" >> "$GITHUB_ENV"
+            echo "full-tier output ${age_h}h old (>6h) -> full"; exit 0
           fi
           echo "MODE=light" >> "$GITHUB_ENV"
-          echo "outside the engine window ($h:$m) -> light"; exit 0
+          echo "full-tier output ${age_h}h old (<=6h) -> light"; exit 0
 
       # 必须传 PAT 而不是默认 GITHUB_TOKEN: actions/checkout 会用传入的
       # token 重写 git remote 的凭据。默认 GITHUB_TOKEN 受
@@ -338,6 +402,8 @@ jobs:
             || echo "::warning::debate 失败或超时, 保留上一版"
           python3 scripts/prediction_bundle.py --out data/prediction_bundle.json \
             || echo "::warning::prediction_bundle 构建失败"
+          python3 scripts/overseas_impact.py || echo "::warning::overseas_impact skipped"
+          python3 scripts/pool_audit.py || echo "::warning::pool_audit skipped"
           python3 scripts/build_analysis_manifest.py || echo "::warning::analysis_manifest 构建失败"
 
           # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
