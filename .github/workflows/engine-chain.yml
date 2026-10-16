@@ -336,6 +336,8 @@ jobs:
           timeout 120 python3 scripts/bull_bear_debate.py --from-picks today_picks.json \
             --limit 15 --no-llm --out data/bull_bear_debate.json \
             || echo "::warning::debate 失败或超时, 保留上一版"
+          python3 scripts/prediction_bundle.py --out data/prediction_bundle.json \
+            || echo "::warning::prediction_bundle 构建失败"
           python3 scripts/build_analysis_manifest.py || echo "::warning::analysis_manifest 构建失败"
 
           # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
@@ -361,6 +363,8 @@ jobs:
             data/weight_calibration.json \
             data/auction_engine.json data/ticks_$(date +%Y%m%d).json \
             data/trend_strength.json data/bull_bear_debate.json \
+            data/prediction_bundle.json data/recent_mainlines.json \
+            data/analysis_manifest.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -373,7 +377,9 @@ jobs:
             --protect data/weight_calibration.json \
             --protect data/auction_engine.json \
             --protect data/ticks_$(date +%Y%m%d).json \
-            --protect data/trend_strength.json --protect data/bull_bear_debate.json
+            --protect data/trend_strength.json --protect data/bull_bear_debate.json \
+            --protect data/prediction_bundle.json --protect data/recent_mainlines.json \
+            --protect data/analysis_manifest.json
 
       - name: Publish to the data warehouse
         env:

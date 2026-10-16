@@ -1,0 +1,375 @@
+{
+ "ts": "2026-10-16T12:46:15+08:00",
+ "engine": "prediction_bundle.py",
+ "snapshot_id": "2026-10-16T12:46:15+08:00",
+ "trading_date": "20261016",
+ "pipeline_status": "partial",
+ "group_status": {
+  "market_snapshot": "fresh",
+  "global_markets": "stale",
+  "hot_news": "stale",
+  "picks": "fresh",
+  "engines": "fresh",
+  "review": "stale"
+ },
+ "today_action": {
+  "status": "candidate_only",
+  "reason": "规则引擎筛出候选；不是确定性买入指令。",
+  "candidates": [
+   {
+    "code": "002242",
+    "name": "",
+    "score": 79.1,
+    "model_probability": 0.554,
+    "action": "candidate",
+    "evidence": [
+     "engine_v5=76.9",
+     "multidim=未覆盖",
+     "RTSI=75.1, direction=up, R²=0.712",
+     "红队=可关注"
+    ],
+    "data_ts": {
+     "engine_v5": "2026-10-16T05:02:47+08:00",
+     "multidim": "2026-10-16T05:13:31+08:00",
+     "trend_strength": "2026-10-16T05:03:03+08:00",
+     "debate": "2026-10-16T05:15:45+08:00"
+    },
+    "invalidation": [
+     "最新主快照/引擎超过 freshness 门槛",
+     "开盘跳空超过预设波动区间",
+     "RTSI 方向转 down 或红队裁决回避"
+    ]
+   }
+  ]
+ },
+ "next_day_candidates": [
+  {
+   "code": "002242",
+   "name": "",
+   "score": 79.1,
+   "model_probability": 0.554,
+   "action": "candidate",
+   "evidence": [
+    "engine_v5=76.9",
+    "multidim=未覆盖",
+    "RTSI=75.1, direction=up, R²=0.712",
+    "红队=可关注"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "601107",
+   "name": "",
+   "score": 69.1,
+   "model_probability": 0.484,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=72.6",
+    "multidim=未覆盖",
+    "RTSI=61.6, direction=up, R²=0.665",
+    "红队=未覆盖"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "601098",
+   "name": "",
+   "score": 63.0,
+   "model_probability": 0.441,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=78.8",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "600085",
+   "name": "",
+   "score": 62.0,
+   "model_probability": 0.434,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=76.6",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "688156",
+   "name": "",
+   "score": 61.9,
+   "model_probability": 0.434,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=76.3",
+    "multidim=50.3",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "002675",
+   "name": "",
+   "score": 61.7,
+   "model_probability": 0.432,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=76.0",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "301190",
+   "name": "",
+   "score": 61.6,
+   "model_probability": 0.431,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=75.7",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "002467",
+   "name": "",
+   "score": 61.5,
+   "model_probability": 0.431,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=75.6",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "601398",
+   "name": "",
+   "score": 61.5,
+   "model_probability": 0.431,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=75.6",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "605089",
+   "name": "",
+   "score": 61.3,
+   "model_probability": 0.429,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=75.2",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "300781",
+   "name": "",
+   "score": 61.2,
+   "model_probability": 0.429,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=75.0",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  },
+  {
+   "code": "603883",
+   "name": "",
+   "score": 61.0,
+   "model_probability": 0.427,
+   "action": "watch",
+   "evidence": [
+    "engine_v5=74.5",
+    "multidim=未覆盖",
+    "RTSI=未覆盖",
+    "红队=观察"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-16T05:02:47+08:00",
+    "multidim": "2026-10-16T05:13:31+08:00",
+    "trend_strength": "2026-10-16T05:03:03+08:00",
+    "debate": "2026-10-16T05:15:45+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "RTSI 方向转 down 或红队裁决回避"
+   ]
+  }
+ ],
+ "market_direction": {
+  "direction": "up",
+  "probability": {
+   "up": 0.578,
+   "down": 0.331,
+   "range": 0.091
+  },
+  "heuristic_score": 19.11,
+  "components": {
+   "a_share_index_avg_pct": 1.415,
+   "global_index_avg_pct": -1.993,
+   "breadth_pct": 80.65
+  },
+  "evidence_ts": "2026-10-16T11:14:51.486669+08:00",
+  "global_ts": "2026-10-16T04:43:02+08:00",
+  "method": "启发式方向概率，不是已完成样本外校准的确定预测; 已联动 cycle_deep 周期综合分",
+  "change_conditions": [
+   "A股主要指数转为同步下跌且上涨家数快速收窄 → 下调 up 概率",
+   "全球市场由负转正且A股成交额/上涨家数同步改善 → 上调 up 概率",
+   "涨跌停结构恶化或跌停数量明显增加 → 将 direction 降级为 down/range"
+  ],
+  "cycle_deep_composite": -2,
+  "cycle_deep_bias": "偏空"
+ },
+ "evidence": {
+  "latest_ts": "2026-10-16T11:14:51.486669+08:00",
+  "market_now_ts": "2026-10-16T11:16:16+08:00",
+  "global_ts": "2026-10-16T04:43:02+08:00",
+  "engine_ts": "2026-10-16T05:02:47+08:00",
+  "trend_ts": "2026-10-16T05:03:03+08:00",
+  "debate_ts": "2026-10-16T05:15:45+08:00",
+  "cycle_deep_ts": null,
+  "manifest_ts": "2026-10-16T12:46:15+08:00"
+ },
+ "meta": {
+  "today": "today_action 只有在 market_snapshot 与 engines 均 fresh 时才允许 candidate；否则强制 watch_stale_data",
+  "tomorrow": "next_day_candidates 是启发式候选，不是已完成样本外校准的确定涨幅预测",
+  "market": "market_direction 是指数/全球/涨跌宽度启发式概率，必须结合 change_conditions 解读",
+  "not_buy_signal": "输出用于研究和排序，不构成确定性交易指令"
+ }
+}

@@ -158,6 +158,9 @@ jobs:
           python3 scripts/build_mainlines.py --news data/news_impact.json \
             --hot data/hot_impact.json \
             || echo "::warning::build_mainlines 失败, 保留上一版"
+          python3 scripts/recent_mainlines.py --days 30 \
+            --out data/recent_mainlines.json \
+            || echo "::warning::recent_mainlines 失败, 保留上一版"
 
       # ── 数据新鲜度审计 ────────────────────────────────────────
       # 2026-10-16 用户反馈「有的数据没有更新/过时」, 根因之一是无人监测新鲜度,

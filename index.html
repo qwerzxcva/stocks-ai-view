@@ -209,9 +209,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <!-- CENTER: tab 化面板 -->
   <div class="col c-col">
     <div class="c-tabs" id="cTabs">
-      <button class="c-tab active" data-c="0">每日总结</button>
+      <button class="c-tab" data-c="0">实时总结</button>
       <button class="c-tab" data-c="1">全球股市</button>
-      <button class="c-tab" data-c="2">今日主线</button>
+      <button class="c-tab" data-c="2">近期主线</button>
       <button class="c-tab" data-c="3">周期深析</button>
       <button class="c-tab" data-c="4">资金背离</button>
       <button class="c-tab" data-c="5">热点主题</button>
@@ -220,7 +220,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="8">海外关联</button>
     </div>
     <div class="card c-card on" data-ci="0">
-      <div class="hd">每日总结 <span class="sub" id="dsSub">盘面解读 · 明日预测 · 热点推演 · 胜率复盘 · 今日推股 · 自我反思</span></div>
+      <div class="hd">实时总结 <span class="sub" id="dsSub">实时行情 · 热搜热点 · 今日推股 · 明日候选 · 复盘状态</span></div>
       <div id="dailySummaryBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
@@ -232,7 +232,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
     <div class="card c-card" data-ci="2">
-      <div class="hd">今日主线 <span class="sub" id="mlSub">每个股市收盘后分析得出 · 标注来源股市</span></div>
+      <div class="hd">近期主线 <span class="sub" id="mlSub">近30日每日主线统计 · 当前热度 · 稳定性 · 代表股</span></div>
       <div id="mainlineBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
@@ -1466,8 +1466,36 @@ function renderDailySummary(){
       +'详见 data/freshness_audit.md。</div></div>';
   }
 
-  // 顶部: 全球市场速览 (点击指数名看历年K线)
-  if(gm.indices&&gm.indices.length){
+  // ═══ 0c. 统一预测包 ══════════���════════════════════════════
+  const pb=g.prediction_bundle;
+  if(pb){
+    const md=pb.market_direction||{}, probs=md.probability||{};
+    const pc=pb.pipeline_status==='fresh'?'var(--up)':'var(--amber)';
+    h+='<div style="border:1px solid '+pc+';border-radius:6px;padding:8px 10px;margin:6px 0;background:rgba(137,87,229,.06)">'
+      +'<b style="font-size:11px;color:'+pc+'">统一预测包 · '+_esc2(pb.trading_date)+' · '+_esc2(pb.pipeline_status)+'</b>'
+      +'<span class="fl" style="font-size:9px;margin-left:8px">批次 '+_esc2(pb.snapshot_id||pb.ts)+'</span>'
+      +'<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;font-size:10px">'
+      +'<span>今日行动: <b>'+_esc2((pb.today_action||{}).status)+'</b></span>'
+      +'<span>明日大盘: <b class="'+(md.direction==='up'?'up':md.direction==='down'?'dn':'fl')+'">'+_esc2(md.direction)+'</b>'
+      +' ↑'+_esc2(probs.up)+' ↓'+_esc2(probs.down)+' →'+_esc2(probs.range)+'</span>'
+      +'<span>候选 '+_esc2((pb.next_day_candidates||[]).length)+' 只</span></div>'
+      +'<div class="fl" style="font-size:9px;margin-top:4px">'+_esc2((pb.today_action||{}).reason||'')
+      +' · 方向变化条件: '+_esc2((md.change_conditions||[]).join(' / '))+'</div></div>';
+    const cand=pb.next_day_candidates||[];
+    if(cand.length){
+      h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">明日候选 <span class="sub">模型排序，不是确定涨幅预测</span></div>';
+      h+='<table><thead><tr><th>代码</th><th>动作</th><th>分数</th><th>模型概率</th><th>证据</th><th>失效条件</th></tr></thead><tbody>';
+      cand.slice(0,10).forEach(x=>{
+        const ac=x.action==='candidate'?'var(--up)':'var(--tx2)';
+        h+='<tr><td><b>'+_esc2(x.code)+'</b></td><td style="color:'+ac+'">'+_esc2(x.action)+'</td>'
+          +'<td>'+_esc2(x.score)+'</td><td>'+_esc2(x.model_probability)+'</td>'
+          +'<td class="fl" style="font-size:9px">'+_esc2((x.evidence||[]).join(' · '))+'</td>'
+          +'<td class="fl" style="font-size:9px">'+_esc2((x.invalidation||[]).join(' / '))+'</td></tr>';
+      });
+      h+='</tbody></table>';
+    }
+  }
+
     h+='<div class="hd" style="border-top:none;padding:6px 0">全球市场 <span class="sub">'+_t(gm.ts)+' · 点击指数看历年K线</span></div>';
     h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
     gm.indices.forEach(x=>{
@@ -1601,10 +1629,25 @@ function renderMainline(){
   let h='';
   const sub=document.getElementById('mlSub');
   if(sub&&cd.ts) sub.textContent=_t(cd.ts)+' · 每个股市收盘后分析得出';
-  // 今日主线 (按来源股市分组)
+  const rm=g.recent_mainlines||{};
+  const recent=(rm.mainlines||[]).slice(0,15);
+  if(recent.length){
+    h+='<div class="hd" style="border-top:none;padding:6px 0">近30日稳定主线 <span class="sub">样本 '+_esc2(rm.history_days_available)+' 天 · 状态 '+_esc2(rm.status)+'</span></div>';
+    h+='<table><thead><tr><th>主线</th><th>出现天数</th><th>占比</th><th>方向</th><th>稳定</th><th>代表股</th></tr></thead><tbody>';
+    recent.forEach(x=>{
+      h+='<tr><td><b>'+_esc2(x.name)+'</b></td><td>'+_esc2(x.days_present)+'</td><td>'+_esc2(x.presence_pct)+'%</td>'
+        +'<td>'+_esc2(x.direction)+'</td><td>'+ (x.stable?'<b class="up">是</b>':'<span class="fl">样本少</span>')+'</td>'
+        +'<td class="fl">'+_esc2((x.representative_stocks||[]).join(' '))+'</td></tr>';
+    });
+    h+='</tbody></table>';
+  } else {
+    h+='<div class="fl" style="padding:8px">暂无近30日主线统计（需要至少3条历史日报/复盘记录）</div>';
+  }
+
+  // 今日主线 / 明日预测兼容展示（历史数据）
   const lines=Array.isArray(ml)?ml:(ml.mainlines||ml.lines||[]);
   if(lines.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">今日主线 <span class="sub">标注来源股市</span></div>';
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">当前主线快照 <span class="sub">单日热度，供近30日统计对照</span></div>';
     h+='<table><thead><tr><th>主线</th><th>来源股市</th><th>热度</th><th>代表股</th><th>逻辑</th></tr></thead><tbody>';
     lines.slice(0,20).forEach(l=>{
       h+='<tr><td><b>'+_esc2(l.name||l.title)+'</b></td>'
@@ -2576,7 +2619,9 @@ const SOURCES = [
   'data/sample_balance.json',  // 样本均衡
   'data/global_fx.json',       // 全球汇率
   'data/hot_themes.json',      // 热点主题 (build_mainlines 产出)
-  'data/mainline.json',        // 今日主线 + 明日预测 (build_mainlines 产出)
+  'data/mainline.json',        // 今日主线 + 明日预测 (保留兼容)
+  'data/recent_mainlines.json', // 近30日稳定主线
+  'data/prediction_bundle.json', // 今日行动/明日候选/大盘方向统一预测包
   'data/cloud_analysis.json',  // 云端推演 (合并进每日总结)
   'data/cycle_pool_v2.json',   // 周期池 v2 (多池选股用)
   'data/industry_map_em.json', // 个股→东财中文行业 (板块面/板块资金用)
