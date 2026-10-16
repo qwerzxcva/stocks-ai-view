@@ -4,7 +4,7 @@
 // for data: everything is fetched from the cloud warehouse at request time
 // (see data_origin_patch.js). This worker only caches the app shell so the
 // page still opens offline.
-const CACHE = 'stocks-ai-view-v14';   // v14: cloud-only, no local data cache
+const CACHE = 'stocks-ai-view-v15';   // v15: shell cache bust after stale-data incident
 const SHELL = ['./', './index.html', './db-client.js', './realtime.js',
                './data_origin_patch.js', './stock-detail.js'];
 
