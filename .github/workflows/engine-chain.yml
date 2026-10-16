@@ -384,6 +384,7 @@ jobs:
           python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
           python3 scripts/close_review.py || echo "close_review skipped"
           python3 scripts/archive_review.py || echo "archive_review skipped"
+          python3 scripts/recent_mainlines.py --out data/recent_mainlines.json || echo "recent_mainlines skipped"
           # 早盘/午盘推股: 盘后跑一次, 让用户收盘后就能看到次日计划
           python3 scripts/premarket_picks.py --out data/premarket_picks.json || echo "premarket skipped"
           python3 scripts/midday_picks.py --out data/midday_picks.json || echo "midday skipped"
@@ -430,7 +431,7 @@ jobs:
             data/auction_engine.json data/ticks_$(date +%Y%m%d).json \
             data/trend_strength.json data/bull_bear_debate.json \
             data/prediction_bundle.json data/recent_mainlines.json \
-            data/analysis_manifest.json \
+            data/analysis_manifest.json data/flow_divergence.json data/ban_pick.json data/pool_audit.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -445,7 +446,8 @@ jobs:
             --protect data/ticks_$(date +%Y%m%d).json \
             --protect data/trend_strength.json --protect data/bull_bear_debate.json \
             --protect data/prediction_bundle.json --protect data/recent_mainlines.json \
-            --protect data/analysis_manifest.json
+            --protect data/analysis_manifest.json --protect data/flow_divergence.json \
+            --protect data/ban_pick.json --protect data/pool_audit.json
 
       - name: Publish to the data warehouse
         env:

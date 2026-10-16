@@ -49,8 +49,13 @@ def load(path):
 def get_ts(data):
     if not isinstance(data, dict):
         return None
+    meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
     for key in ("ts", "timestamp", "generated", "date", "data_date"):
         value = data.get(key)
+        if isinstance(value, str) and len(value) >= 8:
+            return value
+    for key in ("ts", "rebuilt_at"):
+        value = meta.get(key)
         if isinstance(value, str) and len(value) >= 8:
             return value
     return None
@@ -72,9 +77,9 @@ def parse_ts(value):
 
 def main():
     now = datetime.now(CST)
-    files = {}
     stale = []
     missing = []
+    no_timestamp = []
     groups = {}
 
     for group, names in GROUPS.items():
@@ -91,10 +96,11 @@ def main():
                 age = None
             elif not raw_ts or not dt:
                 status = "no_timestamp"
+                no_timestamp.append(name)
                 age = None
             else:
                 age = round((now - dt).total_seconds() / 3600, 2)
-                status = "fresh" if age <= threshold else "stale"
+                status = "fresh" if 0 <= age <= threshold else "stale"
                 if status == "stale":
                     stale.append(name)
             group_items[name] = {
@@ -117,11 +123,13 @@ def main():
         "engine": "build_analysis_manifest.py",
         "trading_date": latest.get("date") or now.strftime("%Y%m%d"),
         "session_state": latest.get("session_state") or "unknown",
-        "pipeline_status": "fresh" if not stale and not missing else "partial",
+        "pipeline_status": "fresh" if not stale and not missing and not no_timestamp else "partial",
         "stale_count": len(stale),
         "missing_count": len(missing),
+        "no_timestamp_count": len(no_timestamp),
         "stale_files": stale,
         "missing_files": missing,
+        "no_timestamp_files": no_timestamp,
         "groups": groups,
         "meta": {
             "purpose": "统一页面数据与算法引擎版本状态, 防止局部更新造成旧数据静默展示",

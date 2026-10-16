@@ -85,6 +85,9 @@ jobs:
         run: |
           python3 scripts/collect_all_sources.py --out /tmp/collected.json --workers 8
 
+      - name: Validate collected snapshot
+        run: python3 scripts/data_audit.py --collected /tmp/collected.json
+
       # ── 3. 数据库导入 (采集侧质量门) ──
       - name: Init DB + load
         run: |
@@ -169,6 +172,13 @@ jobs:
         run: |
           python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
           python3 scripts/numeric_validator.py --out data/validation_report.json || true
+          python3 - <<'PY'
+          import json
+          report=json.load(open('data/validation_report.json', encoding='utf-8'))
+          if not isinstance(report, dict):
+              raise SystemExit('numeric validator returned an invalid report')
+          print('validator fields:', sorted(report))
+          PY
 
       # ── 9. 采集摘要 ──
       - name: Summary
@@ -211,6 +221,8 @@ jobs:
           python3 scripts/git_push_retry.py --msg "pipeline(collect)" \
             data/sources_registry.json data/all_sources.json data/news_digest.json \
             data/predictions data/global_fx.json data/audit_data_report.txt \
+            data/validation_report.json \
             --protect data/sources_registry.json --protect data/all_sources.json \
             --protect data/news_digest.json --protect data/predictions \
-            --protect data/global_fx.json --protect data/audit_data_report.txt
+            --protect data/global_fx.json --protect data/audit_data_report.txt \
+            --protect data/validation_report.json

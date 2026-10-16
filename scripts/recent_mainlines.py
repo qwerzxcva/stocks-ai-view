@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""recent_mainlines.py — 近30日主线统计引擎。
+"""Build recent mainline statistics from paired trading-day records.
 
-输入优先读取 data/review_history.jsonl 中每日 close_review 记录，并合并当前
-mainline/hot_themes。没有足够历史时明确标注 sample_insufficient，不伪造统计。
+History rows are close-review archives. The current premarket snapshot is
+accepted only when its timestamp is on the same date and before 09:15 CST;
+an evening regeneration remains visible as rejected metadata, never as a
+premarket prediction.
 """
 import argparse
 import json
@@ -11,6 +13,9 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
 CST = timezone(timedelta(hours=8))
+PREMARKET_CUTOFF = (9, 15)
+WINDOW_SIZES = (7, 30, 365)
+MIN_SAMPLE_DAYS = 3
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 
@@ -19,25 +24,280 @@ def load_json(name):
     try:
         with open(os.path.join(DATA, name), encoding="utf-8") as f:
             return json.load(f)
-    except Exception:
+    except (OSError, TypeError, json.JSONDecodeError):
         return {}
 
 
-def read_history(days):
+def parse_date(value):
+    if value is None:
+        return None
+    try:
+        return datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return None
+
+
+def parse_timestamp(value):
+    if not value:
+        return None
+    try:
+        text = str(value).strip().replace("Z", "+00:00")
+        parsed = datetime.fromisoformat(text)
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=CST)
+        return parsed.astimezone(CST)
+    except (TypeError, ValueError):
+        return None
+
+
+def read_history():
+    """Read one close-review row per date, retaining the latest timestamp."""
     path = os.path.join(DATA, "review_history.jsonl")
-    rows = []
     if not os.path.exists(path):
-        return rows
-    cutoff = datetime.now(CST).date() - timedelta(days=days)
-    for line in open(path, encoding="utf-8", errors="replace"):
-        try:
-            row = json.loads(line)
-            day = datetime.strptime(str(row.get("date"))[:10], "%Y-%m-%d").date()
-            if day >= cutoff:
-                rows.append(row)
-        except (ValueError, TypeError, json.JSONDecodeError):
+        return {}
+    by_date = {}
+    with open(path, encoding="utf-8", errors="replace") as stream:
+        for line in stream:
+            try:
+                row = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            day = parse_date(row.get("date"))
+            if day is None:
+                continue
+            stamp = parse_timestamp(row.get("generated_at"))
+            previous = by_date.get(day)
+            previous_stamp = parse_timestamp(previous.get("generated_at")) if previous else None
+            if previous is None or (stamp and (previous_stamp is None or stamp > previous_stamp)):
+                if previous and valid_premarket(previous.get("premarket")) and not valid_premarket(row.get("premarket")):
+                    row["premarket"] = previous["premarket"]
+                by_date[day] = row
+            elif valid_premarket(row.get("premarket")) and not valid_premarket(previous.get("premarket")):
+                previous["premarket"] = row["premarket"]
+    return by_date
+
+
+def read_trading_dates(extra_dates):
+    """Use observed index sessions as the calendar; fall back to source dates."""
+    dates = set()
+    index_data = load_json("index_kline.json")
+    indices = index_data.get("indices") if isinstance(index_data, dict) else {}
+    if isinstance(indices, dict):
+        sessions = indices.get("sh000001") or next(iter(indices.values()), [])
+        if isinstance(sessions, list):
+            dates.update(day for day in (parse_date(x.get("date")) for x in sessions)
+                         if day is not None)
+    dates.update(x for x in extra_dates if x is not None)
+    return sorted(day for day in dates if day <= datetime.now(CST).date())
+
+
+def source_theme_items(row):
+    """Extract explicitly named themes, never recommendation group names."""
+    items = []
+    for field in ("mainlines", "themes"):
+        value = row.get(field) if isinstance(row, dict) else None
+        if isinstance(value, dict):
+            value = [{"name": name} for name in value]
+        if not isinstance(value, list):
             continue
-    return rows
+        for item in value:
+            if isinstance(item, str) and item.strip():
+                items.append({"name": item.strip()})
+            elif isinstance(item, dict) and str(item.get("name", "")).strip():
+                items.append(item)
+    return items
+
+
+def theme_names(row):
+    return list(dict.fromkeys(item["name"] for item in source_theme_items(row)))
+
+
+def theme_stats(rows):
+    counts = Counter()
+    directions = defaultdict(Counter)
+    stocks = defaultdict(Counter)
+    for row in rows:
+        day_names = set()
+        for item in source_theme_items(row):
+            name = item["name"]
+            day_names.add(name)
+            direction = item.get("direction")
+            if direction:
+                directions[name][str(direction)] += 1
+            codes = item.get("codes", item.get("stocks", []))
+            if isinstance(codes, list):
+                for code in codes[:30]:
+                    if isinstance(code, dict):
+                        code = code.get("code")
+                    if code is not None:
+                        stocks[name][str(code)] += 1
+        for name in day_names:
+            counts[name] += 1
+    denominator = len(rows)
+    ranked = []
+    for name, days_present in counts.most_common():
+        direction = directions[name].most_common(1)[0][0] if directions[name] else "neutral"
+        ranked.append({
+            "name": name,
+            "days_present": days_present,
+            "presence_pct": round(days_present / denominator * 100, 1) if denominator else 0.0,
+            "direction": direction,
+            "stable": days_present >= MIN_SAMPLE_DAYS,
+            "representative_stocks": [x for x, _ in stocks[name].most_common(10)],
+            "evidence": "review_history.jsonl explicit mainlines/themes",
+        })
+    return ranked
+
+
+def aggregate_metrics(rows):
+    n_buyable = sum((row.get("n_buyable") or 0) for row in rows)
+    hit_pairs = [(row.get("hit_rate_buyable_pct"), row.get("n_buyable") or 0)
+                 for row in rows if row.get("hit_rate_buyable_pct") is not None]
+    avg_pairs = [(row.get("avg_ret_buyable_pct"), row.get("n_buyable") or 0)
+                 for row in rows if row.get("avg_ret_buyable_pct") is not None]
+    metrics = {"n_buyable": n_buyable}
+    if hit_pairs:
+        hit_denominator = sum(weight for _, weight in hit_pairs)
+        metrics["hit_rate_buyable_pct"] = round(
+            sum(value * weight for value, weight in hit_pairs) / hit_denominator, 1
+        ) if hit_denominator else None
+    else:
+        metrics["hit_rate_buyable_pct"] = None
+    if avg_pairs:
+        avg_denominator = sum(weight for _, weight in avg_pairs)
+        metrics["avg_ret_buyable_pct"] = round(
+            sum(value * weight for value, weight in avg_pairs) / avg_denominator, 2
+        ) if avg_denominator else None
+    else:
+        metrics["avg_ret_buyable_pct"] = None
+    return metrics
+
+
+def valid_premarket(snapshot):
+    if not isinstance(snapshot, dict):
+        return False
+    if snapshot.get("session") != "premarket":
+        return False
+    day = parse_date(snapshot.get("date"))
+    stamp = parse_timestamp(snapshot.get("ts") or snapshot.get("generated_at"))
+    return bool(day and stamp and stamp.date() == day and
+                (stamp.hour, stamp.minute) < PREMARKET_CUTOFF)
+
+
+def daily_row(day, history_row, snapshot):
+    close_time = history_row.get("generated_at") if history_row else None
+    archived = history_row.get("premarket") if history_row else None
+    if valid_premarket(archived) and parse_date(archived.get("date")) == day:
+        candidate = archived
+        candidate_source = "data/review_history.jsonl"
+    else:
+        candidate = snapshot
+        candidate_source = "data/premarket_picks.json"
+    snapshot_day = parse_date(candidate.get("date")) if isinstance(candidate, dict) else None
+    snapshot_time = (candidate.get("ts") or candidate.get("generated_at")) \
+        if isinstance(candidate, dict) else None
+    same_snapshot_day = snapshot_day == day
+    premarket_ok = same_snapshot_day and valid_premarket(candidate)
+    close = ({
+        "date": day.isoformat(),
+        "source": "data/review_history.jsonl",
+        "time": close_time,
+        "summary": {
+            "n_picks": history_row.get("n_picks"),
+            "hit_rate_all_pct": history_row.get("hit_rate_all_pct"),
+            "avg_ret_all_pct": history_row.get("avg_ret_all_pct"),
+            "n_buyable": history_row.get("n_buyable"),
+            "hit_rate_buyable_pct": history_row.get("hit_rate_buyable_pct"),
+            "avg_ret_buyable_pct": history_row.get("avg_ret_buyable_pct"),
+        },
+        "market_phase": history_row.get("market_phase"),
+    } if history_row else None)
+    premarket = ({
+        "date": day.isoformat(),
+        "source": candidate_source,
+        "time": snapshot_time,
+        "session": "premarket",
+        "gate": candidate.get("gate"),
+        "tiers": candidate.get("tiers"),
+        "outlook": candidate.get("outlook"),
+    } if premarket_ok else None)
+    if not same_snapshot_day:
+        premarket_status = "missing"
+    elif premarket_ok:
+        premarket_status = "available"
+    else:
+        premarket_status = "rejected_not_before_09:15"
+    return {
+        "date": day.isoformat(),
+        "premarket": premarket,
+        "close": close,
+        "source": {
+            "premarket": candidate_source if same_snapshot_day else None,
+            "close": "data/review_history.jsonl" if history_row else None,
+        },
+        "actual_time": {
+            "premarket": snapshot_time if same_snapshot_day else None,
+            "close": close_time,
+        },
+        "premarket_status": premarket_status,
+        "mainlines": theme_names(history_row) if history_row else [],
+    }
+
+
+def build_window(requested_days, trading_dates, history_by_date, premarket):
+    selected_dates = set(trading_dates[-requested_days:])
+    rows = [history_by_date[day] for day in sorted(selected_dates) if day in history_by_date]
+    paired = [history_by_date[day] for day in sorted(selected_dates)
+              if day in history_by_date and daily_row(day, history_by_date[day], premarket)["premarket"]]
+    return {
+        "requested_days": requested_days,
+        "observed_days": len(rows),
+        "paired_days": len(paired),
+        "status": "ok" if len(paired) >= requested_days else "sample_insufficient",
+        "metrics": aggregate_metrics(rows),
+        "paired_metrics": aggregate_metrics(paired) if paired else None,
+        "themes": theme_stats(rows),
+    }
+
+
+def build_payload(args):
+    now = datetime.now(CST)
+    history_by_date = read_history()
+    current = load_json("mainline.json")
+    premarket = load_json("premarket_picks.json")
+    premarket_day = parse_date(premarket.get("date")) if valid_premarket(premarket) else None
+    trading_dates = read_trading_dates(set(history_by_date) | {premarket_day})
+    trading_dates = [day for day in trading_dates if day is not None]
+
+    legacy_dates = set(trading_dates[-args.days:])
+    legacy_rows = [history_by_date[day] for day in sorted(legacy_dates) if day in history_by_date]
+    ranked = theme_stats(legacy_rows)
+    daily = [daily_row(day, history_by_date.get(day), premarket)
+             for day in sorted(legacy_dates)]
+    observed_days = len(legacy_rows)
+    payload = {
+        "ts": now.isoformat(timespec="seconds"),
+        "engine": "recent_mainlines.py",
+        "window_days": args.days,
+        "history_days_available": len(history_by_date),
+        "status": "ok" if sum(bool(row["premarket"] and row["close"]) for row in daily) >= args.days else "sample_insufficient",
+        "mainlines": ranked[:30],
+        "daily": daily,
+        "current": current.get("mainlines", []) if isinstance(current, dict) else [],
+        "windows": {
+            str(size): build_window(size, trading_dates, history_by_date, premarket)
+            for size in WINDOW_SIZES
+        },
+        "meta": {
+            "purpose": "按交易日配对盘前预测与盘后总结，统计稳定主线",
+            "minimum_history": MIN_SAMPLE_DAYS,
+            "caveat": "未凑齐请求交易日标注 sample_insufficient；只统计显式 mainlines/themes，不把 by_group 当主题",
+            "premarket_cutoff": "09:15 CST",
+            "trading_calendar_source": "data/index_kline.json observed sessions; archived close and valid premarket dates supplement missing sessions",
+            "metrics_scope": "metrics use archived close reviews; paired_metrics and status use only verified same-day premarket+close pairs",
+        },
+    }
+    return payload
 
 
 def main():
@@ -45,63 +305,11 @@ def main():
     ap.add_argument("--days", type=int, default=30)
     ap.add_argument("--out", default=os.path.join(DATA, "recent_mainlines.json"))
     args = ap.parse_args()
-    now = datetime.now(CST)
-    history = read_history(args.days)
-    current = load_json("mainline.json")
-    themes = load_json("hot_themes.json")
-
-    counts = Counter()
-    directions = defaultdict(Counter)
-    stocks = defaultdict(Counter)
-    daily = []
-    for row in history:
-        names = []
-        for group in (row.get("mainlines") or [], row.get("themes") or [], row.get("by_group") or {}):
-            if isinstance(group, dict):
-                names.extend(str(k) for k in group.keys())
-            elif isinstance(group, list):
-                for item in group:
-                    if isinstance(item, str): names.append(item)
-                    elif isinstance(item, dict) and item.get("name"): names.append(item["name"])
-        names = list(dict.fromkeys(n for n in names if n))
-        daily.append({"date": row.get("date"), "mainlines": names})
-        for name in names: counts[name] += 1
-    for item in (themes.get("themes") or []) + (current.get("mainlines") or []):
-        name = item.get("name") if isinstance(item, dict) else None
-        if name:
-            counts[name] += 1
-            directions[name][item.get("direction", "neutral")] += 1
-            for code in item.get("codes", item.get("stocks", []))[:30]: stocks[name][str(code)] += 1
-
-    ranked = []
-    for name, n in counts.most_common():
-        direction = directions[name].most_common(1)[0][0] if directions[name] else "neutral"
-        ranked.append({
-            "name": name,
-            "days_present": n,
-            "presence_pct": round(n / max(1, len(history)) * 100, 1),
-            "direction": direction,
-            "stable": n >= 3,
-            "representative_stocks": [x for x, _ in stocks[name].most_common(10)],
-            "evidence": "review_history.jsonl + current mainline/hot_themes",
-        })
-    payload = {
-        "ts": now.isoformat(timespec="seconds"),
-        "engine": "recent_mainlines.py",
-        "window_days": args.days,
-        "history_days_available": len(history),
-        "status": "ok" if len(history) >= 3 else "sample_insufficient",
-        "mainlines": ranked[:30],
-        "daily": daily,
-        "current": current.get("mainlines", []),
-        "meta": {
-            "purpose": "把单日今日主线合并为近30日稳定主线，避免一天热点被误判为主线",
-            "minimum_history": 3,
-            "caveat": "历史样本不足时只展示当前主线，不给稳定性结论",
-        },
-    }
-    with open(args.out, "w", encoding="utf-8") as f: json.dump(payload, f, ensure_ascii=False, indent=1)
-    print(f"[recent_mainlines] history={len(history)} status={payload['status']} themes={len(ranked)} -> {args.out}")
+    payload = build_payload(args)
+    with open(args.out, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    print(f"[recent_mainlines] history={payload['history_days_available']} status={payload['status']} themes={len(payload['mainlines'])} -> {args.out}")
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()

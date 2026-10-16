@@ -124,23 +124,81 @@ def fetch_baseline():
 # ════════════════════════════════════════════════════════════
 # 1. 时效性校验
 # ════════════════════════════════════════════════════════════
+def _parse_payload_ts(value):
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip().replace("Z", "+00:00")
+    for candidate in (text, text[:19]):
+        try:
+            parsed = datetime.fromisoformat(candidate)
+            return parsed if parsed.tzinfo else parsed.replace(tzinfo=CST)
+        except ValueError:
+            continue
+    for fmt in ("%Y-%m-%d", "%Y%m%d"):
+        try:
+            return datetime.strptime(text[:len(fmt)], fmt).replace(tzinfo=CST)
+        except ValueError:
+            continue
+    return None
+
+
+def _payload_timestamp(data):
+    if not isinstance(data, dict):
+        return None
+    meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
+    for source in (data, meta):
+        for key in ("ts", "timestamp", "generated_at", "generated", "rebuilt_at", "date", "data_date"):
+            parsed = _parse_payload_ts(source.get(key))
+            if parsed:
+                return parsed
+    return None
+
+
+def _load_json(path):
+    try:
+        with open(path, encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, ValueError, TypeError):
+        return None
+
+
+def _latest_payload_timestamp(path):
+    if os.path.isdir(path):
+        latest = None
+        for child in sorted(os.listdir(path)):
+            if not child.endswith(".json"):
+                continue
+            parsed = _payload_timestamp(_load_json(os.path.join(path, child)))
+            if parsed and (latest is None or parsed > latest):
+                latest = parsed
+        return latest
+    return _payload_timestamp(_load_json(path))
+
+
 def check_freshness():
     print("=== 时效性校验 ===")
     problems = []
+    no_timestamp = []
     now = datetime.now(CST)
     for fname, max_h in FRESHNESS.items():
-        p = os.path.join(DATA_DIR, fname)
-        if not os.path.exists(p):
+        path = os.path.join(DATA_DIR, fname)
+        if not os.path.exists(path):
+            no_timestamp.append(fname)
+            print(f"  ❌ {fname:24s} 缺失")
             continue
-        mt = datetime.fromtimestamp(os.path.getmtime(p), CST)
-        age_h = (now - mt).total_seconds() / 3600
-        if age_h > max_h:
+        stamp = _latest_payload_timestamp(path)
+        if stamp is None:
+            no_timestamp.append(fname)
+            print(f"  ❌ {fname:24s} 无有效 payload timestamp")
+            continue
+        age_h = (now - stamp).total_seconds() / 3600
+        if age_h < -0.05 or age_h > max_h:
             crit = " [页面关键]" if fname in PAGE_CRITICAL else ""
             problems.append((fname, age_h, max_h, crit))
             print(f"  ❌ {fname:24s} {age_h:5.1f}h 前 (阈值 {max_h}h){crit}")
         else:
             print(f"  ✅ {fname:24s} {age_h:5.1f}h 前 (阈值 {max_h}h)")
-    return problems
+    return problems + [(fname, None, None, " [无时间戳]") for fname in no_timestamp]
 
 
 # ════════════════════════════════════════════════════════════
@@ -353,9 +411,30 @@ def stamp_provenance(path, dry_run=True):
 # ════════════════════════════════════════════════════════════
 # main
 # ════════════════════════════════════════════════════════════
+def check_collected(path):
+    try:
+        with open(path, encoding="utf-8") as handle:
+            data = json.load(handle)
+        summary = data["summary"]
+        quotes = data["data"].get("quote") or []
+    except (OSError, KeyError, TypeError, ValueError) as exc:
+        print(f"Invalid collector output: {exc}", file=sys.stderr)
+        return 1
+    if not isinstance(quotes, list) or not any(isinstance(row, dict) and row.get("code") for row in quotes):
+        print("Collector output has no identified quote rows", file=sys.stderr)
+        return 1
+    if summary.get("total_merged", 0) <= 0:
+        print("Collector output reports zero merged rows", file=sys.stderr)
+        return 1
+    errors = summary.get("errors") or []
+    print(f"Collector: quotes={len(quotes)} errors={len(errors)} conflicts={summary.get('conflicts', 0)}")
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--collected", help="校验本轮采集 JSON，不联网、不读取旧本地数据")
     ap.add_argument("--check", action="store_true", help="时效性 + 关键字段校验")
     ap.add_argument("--stamp", help="给指定文件补 provenance (dry-run)")
     ap.add_argument("--stamp-write", help="给指定文件补 provenance 并写入")
@@ -363,13 +442,17 @@ def main():
     ap.add_argument("--dedup-write", help="板块去重并写入")
     args = ap.parse_args()
 
-    if not any([args.check, args.stamp, args.stamp_write, args.dedup, args.dedup_write]):
+    if not any([args.check, args.stamp, args.stamp_write, args.dedup, args.dedup_write, args.collected]):
         ap.print_help()
         return 1
 
+    if args.collected and check_collected(args.collected):
+        return 1
     if args.check:
-        check_freshness()
-        check_against_baseline()
+        freshness = check_freshness()
+        baseline = check_against_baseline()
+        if freshness or baseline:
+            return 1
     if args.stamp:
         stamp_provenance(args.stamp, dry_run=True)
     if args.stamp_write:

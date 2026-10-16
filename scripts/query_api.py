@@ -113,30 +113,30 @@ def _rows(con, sql, params=None):
 
 
 # ─── 行情域 ───────────────────────────────────────────────────────
+def _limit(value, default):
+    limit = default if value is None else value
+    if limit < 1:
+        raise ValueError("limit must be positive")
+    return limit
+
+
 def cmd_quotes(args):
     con = _db()
-    base = "SELECT code, name, price, chg_pct, turnover, pe, pb, mktcap FROM quotes WHERE trade_date=(SELECT max(trade_date) FROM quotes)"
-    sql = base
-    conditions = []
-
+    sql = "SELECT code, name, price, chg_pct, turnover, pe, pb, mktcap FROM quotes WHERE trade_date=(SELECT max(trade_date) FROM quotes)"
+    params = []
     if args.code:
-        conditions.append(f"code='{args.code}'")
-    if args.top:
-        if args.by == "pe":
-            sql += f" AND pe>0 ORDER BY pe LIMIT {args.top}"
-        elif args.by == "mktcap":
-            sql += f" ORDER BY mktcap DESC LIMIT {args.top}"
-        else:
-            sql += f" ORDER BY chg_pct DESC LIMIT {args.top}"
-    elif args.low_value:
-        sql += " AND pe>0 AND pe<15 AND pb<1.5 ORDER BY pe LIMIT 50"
-    else:
-        sql += " ORDER BY chg_pct DESC LIMIT 100"
-
-    if args.limit and not args.top and not args.low_value:
-        sql += f" LIMIT {args.limit}"
-
-    rows = _rows(con, sql)
+        sql += " AND code=?"
+        params.append(args.code)
+    if args.low_value:
+        sql += " AND pe>0 AND pe<15 AND pb<1.5"
+    sort = {"chg_pct": "chg_pct DESC", "pe": "pe ASC", "mktcap": "mktcap DESC"}
+    if args.by not in sort:
+        raise ValueError("invalid sort field")
+    if args.top is not None and args.by == "pe":
+        sql += " AND pe>0"
+    sql += " ORDER BY " + ("pe ASC" if args.low_value else sort[args.by]) + " LIMIT ?"
+    params.append(_limit(args.top if args.top is not None else args.limit, 50 if args.low_value else 100))
+    rows = _rows(con, sql, params)
     out = {"query": f"quotes: top={args.top} by={args.by} code={args.code}",
            "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
@@ -147,15 +147,9 @@ def cmd_quotes(args):
 def cmd_kline(args):
     con = _db()
     code = args.code or "600519"
-    days = args.days or 20
-    sql = f"""
-        SELECT date, open, close, high, low, volume
-        FROM kline_daily
-        WHERE code='{code}'
-        ORDER BY date DESC
-        LIMIT {days}
-    """
-    rows = _rows(con, sql)
+    days = _limit(args.days, 20)
+    sql = "SELECT date, open, close, high, low, volume FROM kline_daily WHERE code=? ORDER BY date DESC LIMIT ?"
+    rows = _rows(con, sql, [code, days])
     out = {"query": f"kline: code={code} days={days}", "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
     con.close()
@@ -166,21 +160,24 @@ def cmd_events(args):
     con = _db()
     sql = "SELECT type, code, name, close, chg, deal_amt, premium, vol, expl, trade_date FROM events"
     conditions = []
+    params = []
     if args.type:
-        conditions.append(f"type='{args.type}'")
+        conditions.append("type=?")
+        params.append(args.type)
     if args.date:
-        conditions.append(f"trade_date='{args.date}'")
+        conditions.append("trade_date=?")
+        params.append(args.date)
     if args.code:
-        conditions.append(f"code='{args.code}'")
+        conditions.append("code=?")
+        params.append(args.code)
     if conditions:
         sql += " WHERE " + " AND ".join(conditions)
     if args.top_by == "deal_amt":
         sql += " ORDER BY deal_amt DESC"
     else:
         sql += " ORDER BY trade_date DESC, deal_amt DESC"
-    limit = args.limit or 20
-    sql += f" LIMIT {limit}"
-    rows = _rows(con, sql)
+    sql += " LIMIT ?"
+    rows = _rows(con, sql, params + [_limit(args.limit, 20)])
     out = {"query": f"events: type={args.type} date={args.date} code={args.code}",
            "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
@@ -190,9 +187,9 @@ def cmd_events(args):
 # ─── 两融域 ──────────────────────────────────────────────────────
 def cmd_margin(args):
     con = _db()
-    limit = args.limit or 30
-    sql = f"SELECT date, rzye, rqye, rzrqye, rzmre FROM margin ORDER BY date DESC LIMIT {limit}"
-    rows = _rows(con, sql)
+    limit = _limit(args.limit, 30)
+    sql = "SELECT date, rzye, rqye, rzrqye, rzmre FROM margin ORDER BY date DESC LIMIT ?"
+    rows = _rows(con, sql, [limit])
     out = {"query": f"margin: limit={limit}", "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
     con.close()
@@ -203,16 +200,20 @@ def cmd_announcements(args):
     con = _db()
     sql = "SELECT code, name, title, ann_date, ann_type, url, source FROM announcements"
     conditions = []
+    params = []
     if args.code:
-        conditions.append(f"code='{args.code}'")
+        conditions.append("code=?")
+        params.append(args.code)
     if args.date:
-        conditions.append(f"ann_date='{args.date}'")
+        conditions.append("ann_date=?")
+        params.append(args.date)
     if args.type:
-        conditions.append(f"ann_type='{args.type}'")
+        conditions.append("ann_type=?")
+        params.append(args.type)
     if conditions:
         sql += " WHERE " + " AND ".join(conditions)
-    sql += " ORDER BY ann_date DESC, code LIMIT " + str(args.limit or 20)
-    rows = _rows(con, sql)
+    sql += " ORDER BY ann_date DESC, code LIMIT ?"
+    rows = _rows(con, sql, params + [_limit(args.limit, 20)])
     out = {"query": f"announcements: code={args.code} date={args.date}",
            "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
@@ -224,14 +225,18 @@ def cmd_news(args):
     con = _db()
     sql = "SELECT title, source, pub_time, url, ts FROM news_items"
     conditions = []
+    params = []
     if args.source:
-        conditions.append(f"source='{args.source}'")
+        conditions.append("source=?")
+        params.append(args.source)
     if args.keyword:
-        conditions.append(f"title LIKE '%{args.keyword}%'")
+        conditions.append("title LIKE ? ESCAPE '!'")
+        escaped = args.keyword.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+        params.append("%" + escaped + "%")
     if conditions:
         sql += " WHERE " + " AND ".join(conditions)
-    sql += " ORDER BY pub_time DESC LIMIT " + str(args.limit or 20)
-    rows = _rows(con, sql)
+    sql += " ORDER BY pub_time DESC LIMIT ?"
+    rows = _rows(con, sql, params + [_limit(args.limit, 20)])
     out = {"query": f"news: source={args.source} keyword={args.keyword}",
            "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
@@ -242,13 +247,9 @@ def cmd_news(args):
 def cmd_fund_nav(args):
     con = _db()
     code = args.code or "510500"
-    days = args.days or 30
-    sql = f"""
-        SELECT fund_code, fund_name, date, nav, cum_nav, change_pct, scale_yi
-        FROM fund_nav WHERE fund_code='{code}'
-        ORDER BY date DESC LIMIT {days}
-    """
-    rows = _rows(con, sql)
+    days = _limit(args.days, 30)
+    sql = "SELECT fund_code, fund_name, date, nav, cum_nav, change_pct, scale_yi FROM fund_nav WHERE fund_code=? ORDER BY date DESC LIMIT ?"
+    rows = _rows(con, sql, [code, days])
     out = {"query": f"fund_nav: code={code} days={days}", "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
     con.close()
@@ -257,12 +258,8 @@ def cmd_fund_nav(args):
 def cmd_fund_rebalance(args):
     con = _db()
     code = args.code or "510500"
-    sql = f"""
-        SELECT fund_code, report_date, stock_code, stock_name, ratio
-        FROM fund_rebalance WHERE fund_code='{code}'
-        ORDER BY report_date DESC, ratio DESC LIMIT {args.limit or 10}
-    """
-    rows = _rows(con, sql)
+    sql = "SELECT fund_code, report_date, stock_code, stock_name, ratio FROM fund_rebalance WHERE fund_code=? ORDER BY report_date DESC, ratio DESC LIMIT ?"
+    rows = _rows(con, sql, [code, _limit(args.limit, 10)])
     out = {"query": f"fund_rebalance: code={code}", "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
     con.close()
@@ -272,12 +269,8 @@ def cmd_fund_rebalance(args):
 def cmd_financial(args):
     con = _db()
     code = args.code or "600519"
-    sql = f"""
-        SELECT code, report_date, report_name, metric_name, value, yoy, mom
-        FROM financial_summary WHERE code='{code}'
-        ORDER BY report_date DESC, metric_name LIMIT {args.limit or 20}
-    """
-    rows = _rows(con, sql)
+    sql = "SELECT code, report_date, report_name, metric_name, value, yoy, mom FROM financial_summary WHERE code=? ORDER BY report_date DESC, metric_name LIMIT ?"
+    rows = _rows(con, sql, [code, _limit(args.limit, 20)])
     out = {"query": f"financial: code={code}", "n_rows": len(rows), "rows": rows}
     _output(out, args.csv, args.out)
     con.close()

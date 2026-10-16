@@ -53,7 +53,20 @@ def load(name):
         return None
 
 
-def row_from_review(r):
+def valid_premarket(p, review_date):
+    if not isinstance(p, dict) or p.get("session") != "premarket" or p.get("date") != review_date:
+        return False
+    try:
+        stamp = datetime.fromisoformat(str(p.get("ts", "")).replace("Z", "+00:00"))
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=CST)
+        stamp = stamp.astimezone(CST)
+        return stamp.date().isoformat() == review_date and (stamp.hour, stamp.minute) < (9, 15)
+    except (TypeError, ValueError):
+        return False
+
+
+def row_from_review(r, premarket=None):
     """Compress one close_review into a history-table row."""
     ms = r.get("morning", {}).get("summary") or {}
     groups = r.get("morning", {}).get("by_group") or {}
@@ -64,7 +77,7 @@ def row_from_review(r):
     up_ex = sum(1 for x in rows if (x.get("chg_pct") or 0) > 0)
     sc = r.get("score_effectiveness") or {}
     tp = (r.get("tradable_plans") or {})
-    return {
+    row = {
         "date": r.get("date"),
         "generated_at": r.get("generated_at"),
         "market_phase": (r.get("market") or {}).get("phase"),
@@ -89,6 +102,19 @@ def row_from_review(r):
         "target_hit": tp.get("n_target_hit"),
         "n_rejected": (r.get("rejected_review") or {}).get("n"),
     }
+    for field in ("mainlines", "themes"):
+        if r.get(field):
+            row[field] = r[field]
+    if valid_premarket(premarket, r.get("date")):
+        row["premarket"] = {
+            "date": premarket["date"],
+            "ts": premarket["ts"],
+            "session": "premarket",
+            "gate": premarket.get("gate"),
+            "tiers": premarket.get("tiers"),
+            "outlook": premarket.get("outlook"),
+        }
+    return row
 
 
 def api(method, path, body=None):
@@ -167,7 +193,7 @@ def main():
         if not r:
             log("close_review.json missing; run close_review.py first")
             return 1
-        rows = [row_from_review(r)]
+        rows = [row_from_review(r, load("premarket_picks.json"))]
 
     stage = tempfile.mkdtemp(prefix="revarch_")
     try:
@@ -175,6 +201,17 @@ def main():
         by_date = {x.get("date"): x for x in existing}
         for x in rows:
             if x.get("date"):
+                previous = by_date.get(x["date"]) or {}
+                for field in ("premarket", "mainlines", "themes"):
+                    if field not in previous:
+                        continue
+                    if field == "premarket":
+                        if not valid_premarket(x.get(field), x["date"]):
+                            x.pop(field, None)
+                            if valid_premarket(previous[field], x["date"]):
+                                x[field] = previous[field]
+                    elif field not in x:
+                        x[field] = previous[field]
                 by_date[x["date"]] = x
         merged = [by_date[d] for d in sorted(by_date) if d]
         text = "".join(json.dumps(x, ensure_ascii=False) + "\n" for x in merged)

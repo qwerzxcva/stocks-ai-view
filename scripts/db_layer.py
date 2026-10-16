@@ -243,6 +243,7 @@ def load_quotes(con, records, trade_date):
         ))
     if not rows:
         return 0
+    rows = list({row[0]: row for row in rows if row[0]}.values())
     con.executemany(
         "INSERT INTO quotes VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
     return len(rows)
@@ -260,7 +261,11 @@ def load_events(con, records):
         ))
     if not rows:
         return 0
-    con.executemany("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
+    unique = {}
+    for row in rows:
+        key = json.dumps(row, ensure_ascii=False, sort_keys=True, default=str)
+        unique[key] = row
+    con.executemany("INSERT INTO events VALUES (?,?,?,?,?,?,?,?,?,?,?)", list(unique.values()))
     return len(rows)
 
 
@@ -346,16 +351,35 @@ def load_from_collect(json_path, path=None):
     trade_date = d["summary"]["date"]
     td = f"{trade_date[:4]}-{trade_date[4:6]}-{trade_date[6:8]}"
     con = connect(path)
-    init_db(path)
-    nq = load_quotes(con, d["data"].get("quote", []), td)
-    ne = load_events(con, d["data"].get("event", []))
-    nm = load_margin(con, d["data"].get("event", []))
-    # 溯源日志
-    con.execute("INSERT INTO sources_log VALUES (?,?,?,?,?,?)",
-                [d["summary"]["ts"], "collect_all", d["summary"]["total_raw"],
-                 d["summary"]["total_merged"], d["summary"]["elapsed_s"], "ok"])
-    con.close()
-    print(f"[load] quotes={nq} events={ne} margin={nm} (date={td})")
+    try:
+        con.execute(SCHEMA)
+        for statement in INDEXES:
+            con.execute(statement)
+        con.begin()
+        con.execute("DELETE FROM quotes WHERE trade_date=?", [td])
+        nq = load_quotes(con, d["data"].get("quote", []), td)
+        if not nq:
+            raise ValueError("collector produced no quote rows; refusing to publish empty snapshot")
+        event_rows = d["data"].get("event", [])
+        for row in event_rows:
+            if row.get("type") in ("lhb", "blocktrade") and row.get("trade_date"):
+                con.execute("DELETE FROM events WHERE type=? AND code=? AND trade_date=?",
+                            [row["type"], row.get("code"), row["trade_date"]])
+        ne = load_events(con, event_rows)
+        nm = load_margin(con, event_rows)
+        summary = d["summary"]
+        status = "partial" if summary.get("errors") or summary.get("conflicts") else "ok"
+        con.execute("DELETE FROM sources_log WHERE ts=? AND source='collect_all'", [summary["ts"]])
+        con.execute("INSERT INTO sources_log VALUES (?,?,?,?,?,?)",
+                    [summary["ts"], "collect_all", summary["total_raw"],
+                     summary["total_merged"], summary["elapsed_s"], status])
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+    print(f"[load] quotes={nq} events={ne} margin={nm} status={status} (date={td})")
     return nq + ne + nm
 
 

@@ -1,34 +1,5 @@
 #!/usr/bin/env python3
-"""
-flow_divergence.py — 资金流-价格背离引擎 (自研, org3)
-
-与通用指标的区别:
-  MACD/RSI 只看价格自身的历史, 是「滞后」的。
-  本引擎引入资金流维度, 计算两条加速度曲线的背离:
-
-    价格加速度   A_p = (C_t - C_{t-5}) / 5  -  (C_{t-5} - C_{t-10}) / 5
-    资金加速度   A_f = (M_t - M_{t-5}) / 5  -  (M_{t-5} - M_{t-10}) / 5
-                 其中 M = 主力净流入 (元/日)
-
-  背离度 D = sign(A_p) != sign(A_f) 且 |A_f| 显著
-    D > 0  → 资金在进、价格在跌  → 「吸筹背离」, 潜在见底信号
-    D < 0  → 资金在出、价格在涨  → 「派发背离」, 潜在见顶信号
-
-第二维: 资金持续性 S = 近 10 日主力净流入为正的天数占比
-  S 高 + D>0 → 信号强度高
-
-第三维: 波动压缩 V = 近 20 日真实波幅 / 近 60 日真实波幅
-  V < 0.8   → 波动收敛, 突破概率增
-
-综合分 = 50 + 40*D_scaled + 20*S_scaled + 10*V_scaled
-        (D 主导, S 确认, V 时机)
-
-数据源:
-  价格  本地K线 (腾讯前复权日K)
-  资金  东财 push2his fflow/daykline (主力净流入)
-
-输出: flow_divergence.json (供网站与多池算法消费)
-"""
+"""资金流与价格背离：只计算按交易日对齐、有连续窗口证据的信号。"""
 import argparse
 import glob
 import json
@@ -36,12 +7,12 @@ import os
 import sys
 import time
 import urllib.request
+from collections import Counter
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120",
       "Referer": "https://gu.qq.com/"}
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 try:
@@ -69,9 +40,9 @@ def secid(code):
 
 def load_klines(bulk):
     data = {}
-    for p in sorted(glob.glob(os.path.join(bulk, "day_qfq_*.csv"))):
-        with open(p, encoding="utf-8", errors="replace") as f:
-            for line in f:
+    for path in sorted(glob.glob(os.path.join(bulk, "day_qfq_*.csv"))):
+        with open(path, encoding="utf-8", errors="replace") as handle:
+            for line in handle:
                 line = line.strip()
                 if not line or line.startswith("#") or "|" not in line:
                     continue
@@ -85,208 +56,204 @@ def load_klines(bulk):
                          float(parts[3]), float(parts[4]), float(parts[5])])
                 except ValueError:
                     continue
-    for c in data:
-        data[c].sort(key=lambda b: b[0])
+    for code, bars in data.items():
+        by_date = {bar[0]: bar for bar in bars}
+        data[code] = [by_date[date] for date in sorted(by_date)]
     return data
 
 
-def fetch_flow(code, n=60):
-    """东财主力净流入序列 [{date, main_net}, ...] (按日期升序)"""
+def fetch_flow_detail(code, n=60):
+    """Return (rows, rejection_reason); source failures never synthesize flow."""
     url = ("https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
            f"?secid={secid(code)}&lmt={n}&klt=101"
            "&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65")
     try:
         body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
-        d = json.loads(body.decode("utf-8"))
-        klines = ((d.get("data") or {}).get("klines")) or []
-        out = []
-        for row in klines:
-            f = row.split(",")
-            if len(f) < 2:
-                continue
-            try:
-                out.append({"date": f[0], "main_net": float(f[1])})
-            except ValueError:
-                continue
-        out.sort(key=lambda x: x["date"])
-        return out
-    except Exception as e:
-        return []
+        payload = json.loads(body.decode("utf-8"))
+    except Exception:
+        return [], "source_unavailable"
+    klines = ((payload.get("data") or {}).get("klines")) or []
+    if not klines:
+        return [], "source_empty"
+    rows = []
+    for row in klines:
+        fields = row.split(",")
+        if len(fields) < 2:
+            continue
+        try:
+            rows.append({"date": fields[0], "main_net": float(fields[1])})
+        except ValueError:
+            continue
+    rows.sort(key=lambda item: item["date"])
+    return (rows, None) if rows else ([], "invalid_rows")
 
 
-def _slope(series, i, span=5):
-    """series[i] 附近 span 日的平均变化速度"""
-    if i - 2 * span < 0 or i >= len(series):
+def fetch_flow(code, n=60):
+    return fetch_flow_detail(code, n)[0]
+
+
+def _slope(series, index, span=5):
+    if index - 2 * span < 0 or index >= len(series):
         return None
-    a = (series[i] - series[i - span]) / span
-    b = (series[i - span] - series[i - 2 * span]) / span
-    return a - b
+    return ((series[index] - series[index - span]) -
+            (series[index - span] - series[index - 2 * span])) / span
 
 
-def analyze(code, bars, flows):
-    """单只股票的背离分析"""
-    if len(bars) < 30 or len(flows) < 25:
-        return None
-    closes = [b[2] for b in bars]
-    dates = [b[0] for b in bars]
-    fmap = {f["date"]: f["main_net"] for f in flows}
-    # 对齐: 只用有资金流数据的日期
-    pairs = [(dates[i], closes[i], fmap.get(dates[i]))
-             for i in range(len(bars))]
-    pairs = [(d, c, m) for d, c, m in pairs if m is not None]
-    if len(pairs) < 25:
-        return None
+def _flow_map(flows):
+    mapped = {}
+    for row in flows:
+        try:
+            mapped[str(row["date"])[:10]] = float(row["main_net"])
+        except (KeyError, TypeError, ValueError):
+            continue
+    return mapped
 
-    cs = [p[1] for p in pairs]
-    ms = [p[2] for p in pairs]
-    i = len(cs) - 1
 
-    ap = _slope(cs, i, 5)
-    af = _slope(ms, i, 5)
-    if ap is None or af is None:
-        return None
-
-    # 归一化: 价格加速度用百分比, 资金加速度用日均净流入的百万分位
-    ap_pct = ap / cs[i] * 100 if cs[i] else 0
-    scale = max(1e5, sum(abs(x) for x in ms[-20:]) / 20)
+def analyze_detail(code, bars, flows):
+    """Return (result, reason); missing trading sessions are never compressed."""
+    if not bars:
+        return None, "no_kline"
+    bars = sorted({bar[0]: bar for bar in bars}.values(), key=lambda bar: bar[0])
+    if len(bars) < 30:
+        return None, "insufficient_kline_days"
+    flow_by_date = _flow_map(flows)
+    if not flow_by_date:
+        return None, "insufficient_flow_source"
+    dates = [bar[0] for bar in bars]
+    overlap = [date for date in dates if date in flow_by_date]
+    if len(overlap) < 25:
+        return None, "insufficient_aligned_days"
+    # The latest K-line date, not the latest common date, anchors the signal.
+    # A stale flow source cannot silently produce an older signal.
+    if dates[-1] not in flow_by_date:
+        return None, "flow_not_current"
+    required = dates[-20:]
+    if any(date not in flow_by_date for date in required):
+        return None, "flow_gap_in_window"
+    closes = [bar[2] for bar in bars[-20:]]
+    funds = [flow_by_date[date] for date in required]
+    ap = _slope(closes, len(closes) - 1)
+    af = _slope(funds, len(funds) - 1)
+    close = closes[-1]
+    ap_pct = ap / close * 100 if close else 0.0
+    scale = max(1e5, sum(abs(value) for value in funds) / len(funds))
     af_norm = af / scale
+    persist = sum(value > 0 for value in funds[-10:]) / 10
+    raw_side = 1 if ap_pct < -0.02 and af_norm > 0.05 else (-1 if ap_pct > 0.02 and af_norm < -0.05 else 0)
+    diverge = raw_side if (raw_side > 0 and persist >= 0.6) or (raw_side < 0 and persist <= 0.4) else 0
 
-    # 背离判定
-    diverge = 0
-    if ap_pct < -0.02 and af_norm > 0.05:
-        diverge = 1          # 吸筹: 价跌资金进
-    elif ap_pct > 0.02 and af_norm < -0.05:
-        diverge = -1         # 派发: 价涨资金出
-
-    # 持续性: 近10日主力净流入为正天数占比
-    recent10 = ms[-10:]
-    persist = sum(1 for x in recent10 if x > 0) / len(recent10)
-
-    # 波动压缩
-    tr = []
-    for j in range(1, len(bars)):
-        tr.append(max(bars[j][3] - bars[j][4],
-                      abs(bars[j][3] - bars[j - 1][2]),
-                      abs(bars[j][4] - bars[j - 1][2])))
-    v20 = sum(tr[-20:]) / max(1, len(tr[-20:]))
-    v60 = sum(tr[-60:]) / max(1, len(tr[-60:]))
+    true_ranges = []
+    for index in range(1, len(bars)):
+        true_ranges.append(max(bars[index][3] - bars[index][4],
+                               abs(bars[index][3] - bars[index - 1][2]),
+                               abs(bars[index][4] - bars[index - 1][2])))
+    v20 = sum(true_ranges[-20:]) / max(1, len(true_ranges[-20:]))
+    v60 = sum(true_ranges[-60:]) / max(1, len(true_ranges[-60:]))
     compress = v20 / v60 if v60 else 1.0
-
-    d_scaled = diverge * min(abs(af_norm) / 0.3, 1.0)
-    score = 50 + 40 * d_scaled + 20 * (persist - 0.5) * 2 + 10 * (1 - min(compress, 1.5) / 1.5)
-    score = round(max(0, min(100, score)), 1)
-
-    if diverge > 0 and persist >= 0.6:
+    if diverge > 0:
         signal = "吸筹背离"
-    elif diverge < 0 and persist <= 0.4:
+    elif diverge < 0:
         signal = "派发背离"
     elif compress < 0.8:
-        signal = "波动收敛"
+        signal = "波动收敛（非资金背离）"
     elif persist >= 0.7:
         signal = "资金持续流入"
     elif persist <= 0.3:
         signal = "资金持续流出"
     else:
         signal = "无显著背离"
-
+    score = 50 + 40 * diverge * min(abs(af_norm) / 0.3, 1.0) + 40 * (persist - 0.5) + 10 * (1 - min(compress, 1.5) / 1.5)
     return {
-        "code": code,
-        "date": pairs[-1][0],
-        "close": round(cs[-1], 2),
-        "score": score,
-        "signal": signal,
-        "diverge": diverge,
-        "price_accel_pct": round(ap_pct, 4),
-        "flow_accel_norm": round(af_norm, 4),
-        "flow_persist": round(persist, 2),
-        "vol_compress": round(compress, 3),
-        "n_flow_days": len(ms),
-    }
+        "code": code, "date": dates[-1], "close": round(close, 2),
+        "score": round(max(0, min(100, score)), 1), "signal": signal,
+        "diverge": diverge, "price_accel_pct": round(ap_pct, 4),
+        "flow_accel_norm": round(af_norm, 4), "flow_persist": round(persist, 2),
+        "vol_compress": round(compress, 3), "n_flow_days": len(flow_by_date),
+        "n_aligned_days": len(overlap), "flow_date_start": min(flow_by_date),
+        "flow_date_end": max(flow_by_date),
+        "provenance": {"source": "本地前复权日K + 东财主力净流入", "confidence": "observed", "snapshot_ts": dates[-1]},
+    }, None
+
+
+def analyze(code, bars, flows):
+    return analyze_detail(code, bars, flows)[0]
+
+
+def _coverage(bars, flows):
+    dates = {bar[0] for bar in bars}
+    flow_dates = set(_flow_map(flows))
+    return {"kline_days": len(dates), "flow_days": len(flow_dates),
+            "aligned_days": len(dates & flow_dates),
+            "kline_date_start": min(dates) if dates else None,
+            "kline_date_end": max(dates) if dates else None,
+            "flow_date_start": min(flow_dates) if flow_dates else None,
+            "flow_date_end": max(flow_dates) if flow_dates else None}
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--bulk", default=None)
-    ap.add_argument("--out", required=True)
-    ap.add_argument("--limit", type=int, default=500)
-    ap.add_argument("--codes", help="只算这些股票")
-    args = ap.parse_args()
-
-    bulk = args.bulk or BULK
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--bulk", default=None)
+    parser.add_argument("--out", required=True)
+    parser.add_argument("--limit", type=int, default=500)
+    parser.add_argument("--codes", help="只算这些股票")
+    args = parser.parse_args()
     now = datetime.now(CST)
-    print(f"[flow_divergence] {now:%Y-%m-%d %H:%M} CST")
-    print(f"[flow_divergence] bulk={bulk}")
-
-    klines = load_klines(bulk)
-    print(f"[flow_divergence] {len(klines)} 只K线")
-
+    klines = load_klines(args.bulk or BULK)
     if args.codes:
-        want = [c.strip() for c in args.codes.split(",")]
-        targets = [k for k in klines if any(k.endswith(w) or k == w for w in want)]
+        want = [code.strip() for code in args.codes.split(",")]
+        targets = [code for code in klines if any(code.endswith(item) or code == item for item in want)]
     else:
-        # 取最近交易日有数据的股票, 按 K 线数量降序 (数据质量优先)
         latest = max((bars[-1][0] for bars in klines.values() if bars), default=None)
-        targets = [k for k, b in klines.items() if b and b[-1][0] == latest]
-        targets.sort(key=lambda k: -len(klines[k]))
+        targets = [code for code, bars in klines.items() if bars and bars[-1][0] == latest]
+        targets.sort(key=lambda code: -len(klines[code]))
         targets = targets[:args.limit]
-
-    print(f"[flow_divergence] 分析 {len(targets)} 只", flush=True)
-
-    results = []
-    n_no_flow = 0
-    for i, code in enumerate(targets):
-        flows = fetch_flow(code, 60)
-        if len(flows) < 25:
-            n_no_flow += 1
-            continue
-        r = analyze(code, klines[code], flows)
-        if r:
-            results.append(r)
-        if (i + 1) % 50 == 0:
-            print(f"  {i+1}/{len(targets)}  有效 {len(results)}  无资金流 {n_no_flow}", flush=True)
+    results, rejection_reasons, totals = [], Counter(), Counter()
+    coverage_samples = []
+    for index, code in enumerate(targets):
+        flows, error = fetch_flow_detail(code, 60)
+        coverage = _coverage(klines[code], flows)
+        coverage_samples.append({"code": code, **coverage})
+        totals.update({key: coverage[key] for key in ("kline_days", "flow_days", "aligned_days")})
+        result, reason = analyze_detail(code, klines[code], flows)
+        if error:
+            reason = error
+        if result and not error:
+            results.append(result)
+        else:
+            rejection_reasons[reason] += 1
+        if (index + 1) % 50 == 0:
+            print(f"[flow_divergence] {index+1}/{len(targets)} 有效 {len(results)} 拒绝 {sum(rejection_reasons.values())}", flush=True)
         time.sleep(0.12)
-
-    results.sort(key=lambda x: -abs(x["score"] - 50))
-    buy_side = [r for r in results if r["diverge"] > 0]
-    sell_side = [r for r in results if r["diverge"] < 0]
-
+    results.sort(key=lambda row: -abs(row["score"] - 50))
+    buy_side = [row for row in results if row["diverge"] > 0]
+    sell_side = [row for row in results if row["diverge"] < 0]
+    n_confirmed = len(buy_side) + len(sell_side)
+    n_no_flow = sum(rejection_reasons[key] for key in ("source_unavailable", "source_empty", "invalid_rows", "insufficient_flow_source"))
+    flow_source_coverage = (len(targets) - n_no_flow) / len(targets) if targets else 0.0
     out = {
         "ts": now.isoformat(timespec="seconds"),
         "engine": "flow_divergence (自研: 资金流-价格背离)",
-        "n_scanned": len(targets),
-        "n_scored": len(results),
-        "n_no_flow": n_no_flow,
-        "buy_side": buy_side[:30],
-        "sell_side": sell_side[:30],
+        "status": "insufficient" if flow_source_coverage < 0.8 or not results else ("no_confirmed_divergence" if not n_confirmed else "ok"),
+        "n_scanned": len(targets), "n_scored": len(results),
+        "n_confirmed_divergence": n_confirmed, "n_no_flow": n_no_flow,
+        "n_rejected": sum(rejection_reasons.values()),
+        "rejection_reasons": dict(sorted(rejection_reasons.items())),
+        "coverage": {"totals": dict(totals), "by_code": coverage_samples,
+                     "flow_source_ratio": round(flow_source_coverage, 4), "minimum_flow_source_ratio": 0.8,
+                     "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"},
+        "buy_side": buy_side[:30], "sell_side": sell_side[:30],
         "meta": {
-            "formula": "score = 50 + 40*D + 20*(S-0.5)*2 + 10*(1-V/1.5)",
-            "D": "价格加速度与资金加速度的背离 (sign 相反且 |A_f| 显著)",
-            "S": "近10日主力净流入为正的天数占比 (持续性)",
-            "V": "近20日真实波幅 / 近60日真实波幅 (压缩度, <0.8 意味突破临近)",
-            "signals": {
-                "吸筹背离": "价跌+资金进+持续流入 → 潜在见底",
-                "派发背离": "价涨+资金出+持续流出 → 潜在见顶",
-                "波动收敛": "V<0.8, 突破概率增",
-            },
-            "source": "价格: 腾讯前复权日K | 资金: 东财 push2his fflow",
-            "caveat": "背离是统计规律非必然; 资金流数据为交易所口径, 不含隐性买单; "
-                      "仅供研究不构成投资建议",
+            "formula": "score = 50 + 40*D + 40*(S-0.5) + 10*(1-V/1.5)",
+            "D": "价格与资金加速度反向，且资金持续性确认",
+            "S": "近10个交易日主力净流入为正的天数占比",
+            "V": "近20日真实波幅/近60日真实波幅; 不单独作为背离证据",
+            "source": "价格: 本地前复权日K | 资金: 东财 push2his fflow",
+            "provenance": {"source": "本地前复权日K + 东财主力净流入", "confidence": "observed", "snapshot_ts": now.isoformat(timespec="seconds")},
         },
     }
-    with open(args.out, "w", encoding="utf-8") as f:
-        json.dump(out, f, ensure_ascii=False)
-
-    print(f"\n=== 吸筹背离 TOP8 ===")
-    for r in buy_side[:8]:
-        print(f"  {r['code']} {r['date']} {r['close']:>8} score={r['score']:5.1f} "
-              f"价加速={r['price_accel_pct']:+.4f}% 资加速={r['flow_accel_norm']:+.4f} "
-              f"持续={r['flow_persist']} 压缩={r['vol_compress']}")
-    print(f"\n=== 派发背离 TOP8 ===")
-    for r in sell_side[:8]:
-        print(f"  {r['code']} {r['date']} {r['close']:>8} score={r['score']:5.1f} "
-              f"价加速={r['price_accel_pct']:+.4f}% 资加速={r['flow_accel_norm']:+.4f} "
-              f"持续={r['flow_persist']}")
-    print(f"\n→ {args.out}")
+    with open(args.out, "w", encoding="utf-8") as handle:
+        json.dump(out, handle, ensure_ascii=False, indent=1)
+    print(f"[flow_divergence] {len(targets)} scanned, {len(results)} scored, {n_confirmed} confirmed, {out['status']}; → {args.out}")
     return 0
 
 

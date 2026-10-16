@@ -180,30 +180,11 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <div id="breadthTxt" style="color:var(--tx3)"></div>
 </div>
 <div class="main">
-  <!-- LEFT: 情绪+梯队+主线 -->
+  <!-- LEFT: 每日主线快捷概览 -->
   <div class="col">
     <div class="card">
-      <div class="hd">市场情绪周期</div>
-      <div class="bd gauge-box">
-        <div class="gauge-track"><div class="gauge-fill" id="gaugeI" style="width:0%"></div></div>
-        <div class="phase-meta"><span id="phaseStage">—</span><span id="phaseScore"></span></div>
-        <div id="phaseDesc" style="font-size:10px;color:var(--tx3);margin-top:3px"></div>
-        <div class="minis" id="phaseMinis" style="margin-top:8px"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="hd">连板梯队 <span class="sub" id="ladderH"></span></div>
-      <div class="bd"><div class="ladder" id="ladder"></div></div>
-    </div>
-    <!-- 涨停原因·题材归因 / 竞价抢筹榜 / 云端推演 / 每日总结 / 自我反思 / AI复盘
-         已合并进「每日总结」tab (去重), 此处不再重复展示 -->
-    <div class="card">
-      <div class="hd">今日主线 <span class="sub">资金×涨幅×成交额×新闻</span></div>
-      <div class="bd" id="mainlines" style="max-height:140px;overflow-y:auto"></div>
-    </div>
-    <div class="card">
-      <div class="hd">涨停池 TOP15</div>
-      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th></tr></thead><tbody id="ztBody"></tbody></table></div>
+      <div class="hd">每日主线 <span class="sub">资金 × 涨幅 × 成交额 × 新闻</span></div>
+      <div class="bd" id="mainlines" style="max-height:180px;overflow-y:auto"></div>
     </div>
   </div>
   <!-- CENTER: tab 化面板 -->
@@ -211,7 +192,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="c-tabs" id="cTabs">
       <button class="c-tab" data-c="0">实时总结</button>
       <button class="c-tab" data-c="1">全球股市</button>
-      <button class="c-tab" data-c="2">近期主线</button>
+      <button class="c-tab" data-c="2">每日主线</button>
       <button class="c-tab" data-c="3">周期深析</button>
       <button class="c-tab" data-c="4">资金背离</button>
       <button class="c-tab" data-c="5">热点主题</button>
@@ -220,14 +201,13 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="8">海外关联</button>
     </div>
     <div class="card c-card on" data-ci="0">
-      <div class="hd">实时总结 <span class="sub" id="dsSub">实时行情 · 热搜热点 · 今日推股 · 明日候选 · 复盘状态</span></div>
+      <div class="hd">实时总结 <span class="sub" id="dsSub">交易日窗口 · 实时行情 · 推股验证</span></div>
       <div id="dailySummaryBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
-      <!-- 热点推演 + 盘面解读: renderHotImpactData / renderCommentary 写入。
-           这两个容器在旧版右栏里, 重构后只剩 dailySummaryBox, 于是这两块
-           数据整块丢失 (渲染函数抛 null, 被 _safe 吞掉)。 -->
-      <div class="hd" style="border-top:1px solid var(--border)">🔥 热点推演 <span class="sub" id="cmtSub"></span></div>
+      <div class="hd">实时总结 · 历史窗口 <span class="sub">按已归档交易日</span></div>
+      <div id="summaryWindowsBox" style="padding:8px 12px"></div>
+      <div class="hd" style="border-top:1px solid var(--border)">当日盘面与策略</div>
       <div id="hotImpact" style="padding:0 12px 8px"></div>
       <div class="hd" style="border-top:1px solid var(--border)">📋 盘面解读 <span class="sub">涨跌分布 · 成交 · 情绪 · 两融</span></div>
       <div id="commentary" style="padding:0 12px 8px"></div>
@@ -239,7 +219,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
     <div class="card c-card" data-ci="2">
-      <div class="hd">近期主线 <span class="sub" id="mlSub">近30日每日主线统计 · 当前热度 · 稳定性 · 代表股</span></div>
+      <div class="hd">每日主线 <span class="sub" id="mlSub">盘前预测与收盘复盘按交易日配对</span></div>
       <div id="mainlineBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
@@ -299,11 +279,23 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
   </div>
-  <!-- RIGHT: 全球情绪 + 实时热榜 (与 tab 不重复) -->
+  <!-- RIGHT: 涨停板 + 全球市场情绪 + 实时热榜 -->
   <div class="col">
     <div class="card">
-      <div class="hd">全球市场情绪 <span class="sub" id="gmSideSub">六大市场</span></div>
-      <div class="bd" id="gmSide" style="font-size:11px"></div>
+      <div class="hd">涨停板 <span class="sub" id="ladderH"></span></div>
+      <div class="bd"><div class="ladder" id="ladder"></div></div>
+      <div class="hd" style="border-top:1px solid var(--border)">涨停池 TOP15</div>
+      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th></tr></thead><tbody id="ztBody"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="hd">全球市场情绪 · A股周期 <span class="sub" id="gmSideSub">市场总体与多空周期</span></div>
+      <div class="bd gauge-box">
+        <div class="gauge-track"><div class="gauge-fill" id="gaugeI" style="width:0%"></div></div>
+        <div class="phase-meta"><span id="phaseStage">—</span><span id="phaseScore"></span></div>
+        <div id="phaseDesc" style="font-size:10px;color:var(--tx3);margin-top:3px"></div>
+        <div class="minis" id="phaseMinis" style="margin-top:8px"></div>
+        <div id="gmSide" style="font-size:11px;margin-top:8px"></div>
+      </div>
     </div>
     <div class="card">
       <div class="hd">实时热榜 <span class="sub" id="hotSideSub">Newsnow 15平台</span></div>
@@ -1645,60 +1637,64 @@ function renderDailySummary(){
 
   h+='<div class="fl" style="padding:10px 0 2px;font-size:9px">Research reference only, not investment advice.</div>';
   box.innerHTML=h;
+  const summaryBox=document.getElementById('summaryWindowsBox');
+  if(summaryBox){
+    const windows=(g.recent_mainlines||{}).windows||{};
+    summaryBox.innerHTML=[7,30,365].map(days=>{
+      const w=windows[String(days)]||{};
+      const m=w.metrics||{};
+      return '<div class="chip" style="display:block;margin:4px 0">近'+days+'个交易日：已观测 '+_esc2(w.observed_days||0)+'，已配对 '+_esc2(w.paired_days||0)+'，状态 '+_esc2(w.status||'no_data')+'；可买胜率 '+_esc2(m.hit_rate_buyable_pct==null?'—':m.hit_rate_buyable_pct+'%')+'；平均收益 '+_esc2(m.avg_ret_buyable_pct==null?'—':m.avg_ret_buyable_pct+'%')+'</div>';
+    }).join('');
+  }
   // DOM 插入完成后再补实时价 (renderPicksCard 只返回字符串, 之前调会取不到元素)
   _fillLivePrices();
 }
 
-// ─── 1. 今日主线 / 明日主线预测 ────────────────────────────────
+// ─── 1. 每日主线 / 盘前预测与收盘复盘 ─────────────────────────
 function renderMainline(){
   const box=document.getElementById('mainlineBox');
   if(!box) return;
   const g=window._data||{};
-  const cd=g.cycle_deep||{}, ml=g.mainline||g.hot_themes||{};
+  const rm=g.recent_mainlines||{};
+  const byDate=new Map((rm.daily||[]).map(row=>[row.date,row]));
+  const dates=(rm.daily||[]).slice().sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   let h='';
   const sub=document.getElementById('mlSub');
-  if(sub&&cd.ts) sub.textContent=_t(cd.ts)+' · 每个股市收盘后分析得出';
-  const rm=g.recent_mainlines||{};
-  const recent=(rm.mainlines||[]).slice(0,15);
-  if(recent.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">近30日稳定主线 <span class="sub">样本 '+_esc2(rm.history_days_available)+' 天 · 状态 '+_esc2(rm.status)+'</span></div>';
-    h+='<table><thead><tr><th>主线</th><th>出现天数</th><th>占比</th><th>方向</th><th>稳定</th><th>代表股</th></tr></thead><tbody>';
-    recent.forEach(x=>{
-      h+='<tr><td><b>'+_esc2(x.name)+'</b></td><td>'+_esc2(x.days_present)+'</td><td>'+_esc2(x.presence_pct)+'%</td>'
-        +'<td>'+_esc2(x.direction)+'</td><td>'+ (x.stable?'<b class="up">是</b>':'<span class="fl">样本少</span>')+'</td>'
-        +'<td class="fl">'+_esc2((x.representative_stocks||[]).join(' '))+'</td></tr>';
+  if(sub) sub.textContent='交易日样本 '+(rm.history_days_available||0)+' · '+_t(rm.ts);
+  const windows=rm.windows||{};
+  h+='<div class="chips">'+[7,30,365].map(days=>{
+    const w=windows[String(days)]||{};
+    const m=w.metrics||{};
+    return '<span class="chip">近'+days+'个交易日 <b>'+_esc2(w.paired_days||0)+'/'+days+'</b> 日配对 · '+_esc2(w.status||'no_data')+
+      ' · 可买胜率 '+_esc2(m.hit_rate_buyable_pct==null?'—':m.hit_rate_buyable_pct+'%')+
+      ' · 均收 '+_esc2(m.avg_ret_buyable_pct==null?'—':m.avg_ret_buyable_pct+'%')+'</span>';
+  }).join('')+'</div>';
+  const ranked=(rm.windows&&rm.windows['30']&&rm.windows['30'].themes)||rm.mainlines||[];
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">主题持续度 <span class="sub">仅统计归档主线/主题，每日去重</span></div>';
+  if(ranked.length){
+    h+='<table><thead><tr><th>主线/主题</th><th>出现交易日</th><th>覆盖率</th><th>方向</th><th>代表代码</th></tr></thead><tbody>';
+    ranked.slice(0,12).forEach(x=>h+='<tr><td><b>'+_esc2(x.name)+'</b></td><td>'+_esc2(x.days_present)+'</td><td>'+_esc2(x.presence_pct)+'%</td><td>'+_esc2(x.direction)+'</td><td>'+_esc2((x.representative_stocks||[]).join(' '))+'</td></tr>');
+    h+='</tbody></table>';
+  } else h+='<div class="fl">暂无足够的已归档主题样本</div>';
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">每日盘前预测 + 收盘复盘 <span class="sub">按同一交易日配对；缺失保留空状态</span></div>';
+  if(dates.length){
+    h+='<table><thead><tr><th>交易日</th><th>盘前预测</th><th>收盘实际/复盘</th><th>主线/主题</th><th>来源时间</th></tr></thead><tbody>';
+    dates.forEach(row=>{
+      const pre=row.premarket||{}, close=row.close||{}, cs=close.summary||{};
+      const picks=((pre.tiers||{}).A_buy||[]).slice(0,3).map(x=>_esc2(x.name||x.code)).join('、');
+      const ctext=cs.hit_rate_all_pct==null?'无收盘归档':('胜率 '+cs.hit_rate_all_pct+'% · n='+_esc2(cs.n_picks)+' · 均收 '+_esc2(cs.avg_ret_all_pct)+'%');
+      const dateText=pre.date?'<span>'+_esc2(pre.date)+'</span>':'<span class="fl">缺盘前预测</span>';
+      h+='<tr><td><b>'+_esc2(row.date)+'</b></td><td>'+dateText+(picks?'<div class="fl">'+picks+'</div>':'')+'<div class="fl">'+_esc2(row.premarket_status)+'</div></td>'+
+        '<td>'+_esc2(ctext)+'</td><td>'+_esc2((row.mainlines||[]).join('、')||'—')+'</td><td class="fl">盘前 '+_esc2(row.actual_time&&row.actual_time.premarket||'—')+'<br>收盘 '+_esc2(row.actual_time&&row.actual_time.close||'—')+'</td></tr>';
     });
     h+='</tbody></table>';
-  } else {
-    h+='<div class="fl" style="padding:8px">暂无近30日主线统计（需要至少3条历史日报/复盘记录）</div>';
-  }
-
-  // 今日主线 / 明日预测兼容展示（历史数据）
-  const lines=Array.isArray(ml)?ml:(ml.mainlines||ml.lines||[]);
+  } else h+='<div class="fl">暂无可用交易日归档</div>';
+  const lines=(Array.isArray(g.mainline)?g.mainline:((g.mainline||{}).mainlines||[]));
   if(lines.length){
-    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">当前主线快照 <span class="sub">单日热度，供近30日统计对照</span></div>';
-    h+='<table><thead><tr><th>主线</th><th>来源股市</th><th>热度</th><th>代表股</th><th>逻辑</th></tr></thead><tbody>';
-    lines.slice(0,20).forEach(l=>{
-      h+='<tr><td><b>'+_esc2(l.name||l.title)+'</b></td>'
-        +'<td>'+_esc2(l.market||l.source||'A股')+'</td>'
-        +'<td>'+_esc2(l.heat||l.score||'')+'</td>'
-        +'<td>'+(l.stocks||l.codes||[]).slice(0,5).map(c=>'<span class="clk" data-code="'+_esc2(c)+'" style="color:var(--accent)">'+_esc2(c)+'</span>').join(' ')+'</td>'
-        +'<td class="fl" style="font-size:10px">'+_esc2(l.reason||l.logic||'')+'</td></tr>';
-    });
-    h+='</tbody></table>';
-  } else { h+='<div class="fl">暂无今日主线数据</div>'; }
-  // 明日主线预测
-  const pred=ml.tomorrow||ml.prediction||[];
-  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">明日主线预测 <span class="sub">基于周期与资金流的推演</span></div>';
-  if(pred.length){
-    h+='<table><thead><tr><th>预测主线</th><th>置信</th><th>依据</th></tr></thead><tbody>';
-    pred.slice(0,10).forEach(p=>{
-      h+='<tr><td><b>'+_esc2(p.name||p.title)+'</b></td>'
-        +'<td>'+_esc2(p.confidence!=null?(p.confidence*100).toFixed(0)+'%':'—')+'</td>'
-        +'<td class="fl" style="font-size:10px">'+_esc2(p.basis||p.reason||'')+'</td></tr>';
-    });
-    h+='</tbody></table>';
-  } else { h+='<div class="fl">暂无明日主线预测</div>'; }
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">当前主线快照 <span class="sub">'+_t((g.mainline||{}).ts)+'</span></div><div class="chips">';
+    lines.slice(0,12).forEach(x=>h+='<span class="chip">'+_esc2(x.name)+' <b>'+_esc2(x.news_count||x.heat||'')+'</b></span>');
+    h+='</div>';
+  }
   box.innerHTML=h;
 }
 
