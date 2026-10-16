@@ -1496,6 +1496,10 @@ function renderDailySummary(){
     }
   }
 
+  // 顶部: 全球市场速览 (点击指数名看历年K线)
+  // 注: 这个 if 曾在上一个版本里被误删, 只剩函数体, 导致 renderDailySummary
+  // 少一个 { 而提前闭合, 整个 index.html 的脚本块语法错误、页面全空白。
+  if(gm.indices&&gm.indices.length){
     h+='<div class="hd" style="border-top:none;padding:6px 0">全球市场 <span class="sub">'+_t(gm.ts)+' · 点击指数看历年K线</span></div>';
     h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
     gm.indices.forEach(x=>{
