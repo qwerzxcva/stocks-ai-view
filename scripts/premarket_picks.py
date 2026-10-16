@@ -24,7 +24,12 @@ import argparse
 import json
 import os
 import sys
+from dataclasses import asdict
 from datetime import datetime, timezone, timedelta
+
+from decision_contract import decision_quotes, normalize_code
+from horizon_features import build_features
+from paths import BULK
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -252,6 +257,9 @@ def main():
     args = ap.parse_args()
 
     now = datetime.now(CST)
+    if now.weekday() >= 5 or (now.hour, now.minute) >= (9, 15):
+        print("[premarket] outside pre-open trading session; preserving existing snapshot")
+        return 0
     gm = load_global()
     gate, gate_reason, pos_cap = market_gate(gm)
 
@@ -282,7 +290,8 @@ def main():
         stop = round(price * 0.955, 2) if price else None      # -4.5%
         target = round(price * 1.06, 2) if price else None     # +6%
         reasons = []
-        if n_src := len(c["sources"]) >= 2:
+        n_src = len(c["sources"])
+        if n_src >= 2:
             reasons.append("%d 个引擎共振提名 (%s)" % (n_src, "/".join(c["sources"])))
         if ex.get("value_dev_pct") is not None and ex["value_dev_pct"] <= -10:
             reasons.append("低估 %.1f%%, 有安全垫" % ex["value_dev_pct"])
@@ -300,7 +309,8 @@ def main():
             "score": total, "parts": parts,
             "sources": c["sources"],
             "entry_zone": [entry_lo, entry_hi], "stop": stop, "target": target,
-            "risk_reward": round((1.06 - 0.955) / 0.955, 2) if price else None,
+            "risk_reward": round((target - entry_hi) / (entry_hi - stop), 2)
+            if price and entry_hi is not None and stop is not None and entry_hi > stop else None,
             "intrinsic_value": ex.get("intrinsic_value"),
             "value_dev_pct": ex.get("value_dev_pct"),
             "value_tag": ex.get("value_tag"),
@@ -313,6 +323,46 @@ def main():
 
     ranked.sort(key=lambda x: -x["score"])
 
+    selected = ranked[:max(args.top * 5, 60)]
+    quote_map = decision_quotes([r["code"] for r in selected], now=now,
+                                max_age_seconds=18 * 3600)
+    history = build_features(BULK, [r["code"] for r in selected])
+    stock_names = load("stock_names.json") or {}
+    for r in ranked:
+        digits, exchange = normalize_code(r["code"])
+        symbol = exchange + digits
+        quote = quote_map.get(symbol)
+        feature = history["features"].get(symbol) or {}
+        r["decision_quote"] = asdict(quote) if quote else None
+        r["engine_price"] = r.get("price")
+        if quote and quote.price and quote.status == "ok" and quote.session in ("closed", "preopen"):
+            r["price"] = quote.price
+            r["name"] = r["name"] or stock_names.get(digits) or ""
+            r["entry_zone"] = [round(quote.price * 0.985, 2), round(quote.price * 1.005, 2)]
+            r["stop"] = round(quote.price * 0.955, 2)
+            r["target"] = round(quote.price * 1.06, 2)
+            upper = r["entry_zone"][1]
+            r["risk_reward"] = round((r["target"] - upper) / (upper - r["stop"]), 2)
+        r["history"] = {key: feature.get(key) for key in
+                         ("ma20", "ma60", "ma120", "ma252", "length", "last_date", "conflicting_rows")}
+        missing = []
+        if len(r["sources"]) < 2:
+            missing.append("independent_engine_count")
+        if not quote or quote.status != "ok" or quote.session not in ("closed", "preopen"):
+            missing.append("quote_snapshot")
+        if not feature.get("coverage", {}).get("ma20"):
+            missing.append("history_20d")
+        if feature.get("conflicting_rows"):
+            missing.append("conflicting_kline")
+        if r.get("risk_reward") is None or r["risk_reward"] < 1.5:
+            missing.append("risk_reward")
+        if r.get("name") in (None, "", r["code"]):
+            missing.append("stock_name")
+        if r.get("engine_price") and quote and quote.price and abs(r["engine_price"] / quote.price - 1) > 0.015:
+            missing.append("snapshot_price_deviation")
+        r["missing_evidence"] = missing
+        r["data_quality"] = "insufficient" if missing else "verified"
+
     # defensive 市况: 不降级, 但在每只票上标注「弱市持仓」,
     # 让用户看到票的同时知道这是逆市单, 该压仓位、严止损。
     if gate == "defensive":
@@ -321,16 +371,12 @@ def main():
             r["reasons"].insert(0, "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 "
                                  + (("%.2f" % r["stop"]) if r["stop"] else "严设"))
 
-    # 分级: defensive 不影响分级(仍按分数给 A/B/C), 只压仓位与加风险标注
-    # 绝对分数线 (60/40) 在估值表与位置数据大面积缺失时几乎无人达标,
-    # 会让弱市下的名单整块落空。所以 A 级加一条排名兜底: 候选里分数最高
-    # 的几只直接给 A, 保证任何市况都有可执行的首选。
-    a_quota = max(3, args.top // 4)
-
     def tier(r, idx):
         if "flow_div_sell" in r["sources"]:
             return "C"
-        if idx < a_quota or r["score"] >= 60:
+        if r["data_quality"] != "verified":
+            return "C"
+        if r["score"] >= 60 and gate != "defensive":
             return "A"
         if r["score"] >= 40:
             return "B"
@@ -371,7 +417,7 @@ def main():
         "meta": {
             "sources_used": sorted({s for c in cand.values() for s in c["sources"]}),
             "scoring": "共振36 + 引擎均分30 + 估值±15 + 位置15 + 资金±12",
-            "entry_rule": "入场区间=昨收±1.5%; 止损-4.5%; 目标+6%; 盈亏比1.62",
+            "entry_rule": "入场区间=昨收-1.5%至+0.5%；止损-4.5%；目标+6%；盈亏比=(目标-入场上沿)/(入场上沿-止损)",
             "caveat": "Research reference only, not investment advice. "
                       "历史胜率不代表未来; 空仓也是一种决策。",
         },

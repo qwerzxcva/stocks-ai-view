@@ -17,6 +17,8 @@ import argparse
 import json
 import os
 from datetime import datetime, timezone, timedelta
+from horizon_features import build_features
+from paths import BULK
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -118,16 +120,28 @@ def build_candidates(latest, engine, multidim, trend, debate, manifest):
     e_rows = (engine or {}).get("top") or []
     m_rows = (multidim or {}).get("top") or []
     t_rows = ((trend or {}).get("rtsi") or {}).get("stocks") or []
-    m_idx = {norm(x.get("code")): x for x in m_rows}
-    t_idx = {norm(x.get("code")): x for x in t_rows}
+    pm = load("premarket_picks.json") or {}
+    midday = load("midday_picks.json") or {}
+    sources = ("engine_v5", "multidim", "trend_strength", "premarket", "midday")
+    rows = {
+        "engine_v5": e_rows[:100],
+        "multidim": m_rows[:100],
+        "trend_strength": t_rows[:100],
+        "premarket": sum(((pm.get("tiers") or {}).get(tier) or [] for tier in ("A_buy", "B_watch")), []),
+        "midday": sum(((midday.get("afternoon") or {}).get(tier) or [] for tier in ("keep", "watch", "new_strong")), []),
+    }
+    union = {}
+    for source in sources:
+        for item in rows[source]:
+            code = norm(item.get("code"))
+            if len(code) != 6 or not code.isdigit():
+                continue
+            union.setdefault(code, {})[source] = item
+    history = build_features(BULK, list(union)) if union else {"features": {}}
     b_idx = {norm(x.get("code")): x for x in (debate or {}).get("debates", [])}
     out = []
-    for e in e_rows[:100]:
-        code = norm(e.get("code"))
-        if not code:
-            continue
-        r = t_idx.get(code, {})
-        m = m_idx.get(code, {})
+    for code, votes in union.items():
+        e, m, r = (votes.get("engine_v5") or {}, votes.get("multidim") or {}, votes.get("trend_strength") or {})
         b = b_idx.get(code, {})
         score = float(e.get("score") or 0)
         rtsi = float(r.get("rtsi") or 50)
@@ -135,34 +149,34 @@ def build_candidates(latest, engine, multidim, trend, debate, manifest):
         direction = r.get("direction")
         r2 = float(r.get("r2") or 0)
         risk = ((b.get("risk") or {}).get("verdict") or "unknown")
-        # 只把统计方向一致、趋势显著、红队未回避的标的排进候选。
-        bonus = (min(12, max(0, rtsi - 55)) if direction == "up" and r2 >= 0.5 else 0)
+        bonus = min(12, max(0, rtsi - 55)) if direction == "up" and r2 >= 0.5 else 0
         penalty = 18 if direction == "down" else 10 if risk == "回避" else 0
         final = max(0, min(100, score * 0.45 + composite * 0.35 + rtsi * 0.20 + bonus - penalty))
-        evidence = [
-            f"engine_v5={score:.1f}",
-            f"multidim={composite:.1f}" if code in m_idx else "multidim=未覆盖",
-            f"RTSI={rtsi:.1f}, direction={direction or '未覆盖'}, R²={r2:.3f}" if code in t_idx else "RTSI=未覆盖",
-            f"红队={risk}" if code in b_idx else "红队=未覆盖",
-        ]
+        feature = next((v for k, v in history["features"].items() if k.endswith(code)), {})
+        supporting = list(votes)
+        contradictory = ["RTSI down"] if direction == "down" else []
+        if risk == "回避": contradictory.append("red-team veto")
+        evidence = [f"{source}={getattr(value, 'score', value.get('score', value.get('composite', 'covered')))}" for source, value in votes.items()]
+        data_quality = "sufficient" if feature.get("ma20") is not None and feature.get("last_date") else "insufficient_history"
         out.append({
             "code": code,
-            "name": e.get("name") or m.get("name") or "",
+            "name": next((v.get("name") for v in votes.values() if v.get("name")), ""),
             "score": round(final, 1),
-            "model_probability": round(max(0.05, min(0.75, final / 100 * 0.7)), 3),
-            "action": "watch" if risk in ("回避", "unknown") or direction != "up" else "candidate",
+            "model_probability": None,
+            "probability_status": "uncalibrated",
+            "forecast_horizon": "next_trading_day",
+            "predicted_direction": direction or "unknown",
+            "expected_return_range": None,
+            "ma20": feature.get("ma20"), "ma60": feature.get("ma60"),
+            "ma120": feature.get("ma120"), "ma252": feature.get("ma252"),
+            "history_days": feature.get("length", 0), "history_last_date": feature.get("last_date"),
+            "data_quality": data_quality,
+            "supporting_engines": supporting, "contradicting_engines": contradictory,
+            "action": "candidate" if len(supporting) >= 2 and not contradictory and data_quality == "sufficient" and risk != "unknown" else "watch",
             "evidence": evidence,
-            "data_ts": {
-                "engine_v5": ts_of(engine),
-                "multidim": ts_of(multidim),
-                "trend_strength": ts_of(trend),
-                "debate": ts_of(debate),
-            },
-            "invalidation": [
-                "最新主快照/引擎超过 freshness 门槛",
-                "开盘跳空超过预设波动区间",
-                "RTSI 方向转 down 或红队裁决回避",
-            ],
+            "data_ts": {"engine_v5": ts_of(engine), "multidim": ts_of(multidim),
+                        "trend_strength": ts_of(trend), "debate": ts_of(debate)},
+            "invalidation": ["最新主快照/引擎超过 freshness 门槛", "开盘跳空超过预设波动区间", "资金/趋势/红队反转"],
         })
     out.sort(key=lambda x: -x["score"])
     return out[:20]

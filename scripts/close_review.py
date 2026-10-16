@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""close_review.py — end-of-day review of everything recommended today.
-
-Answers one question with closed prices: did the picks make money?
-
-It reviews three sets separately because they were produced at different times
-and for different purposes:
-  1. morning picks   (morning_review.json)  — the pre-open call
-  2. afternoon picks (afternoon_picks.json) — the intraday revision
-  3. the recommended subset (entry_plans.json) — what was actually flagged
-     as tradable with a buy zone
-
-Output: data/close_review.json
-"""
+"""Review same-day premarket and midday picks against one close quote batch."""
 import argparse
 import json
 import os
@@ -21,351 +9,308 @@ from datetime import datetime, timezone, timedelta
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-
 import signal_hub as H
 
 
-def log(m):
-    print(f"[{datetime.now(CST):%H:%M:%S}] {m}", flush=True)
-
-
 def load(name):
-    p = os.path.join(H.DATA_DIR, name)
-    if not os.path.exists(p):
+    path = os.path.join(H.DATA_DIR, name)
+    if not os.path.exists(path):
         return None
     try:
-        return json.load(open(p, encoding="utf-8"))
-    except Exception:
+        with open(path, encoding="utf-8") as handle:
+            return json.load(handle)
+    except (OSError, ValueError, TypeError):
         return None
 
 
-def collect(codes):
-    """Live close for each code, with the day's range."""
-    H.quotes(codes)
+def normalise_date(value):
+    text = str(value or "")
+    if len(text) == 8 and text.isdigit():
+        return f"{text[:4]}-{text[4:6]}-{text[6:]}"
+    return text[:10]
+
+
+def normalise_code(code):
+    text = str(code or "").strip().lower()
+    market = text[:2] if text[:2] in ("sh", "sz", "bj") else ""
+    bare = text[2:] if market else text
+    if bare.isdigit() and len(bare) < 6:
+        bare = bare.zfill(6)
+    if not market and bare:
+        market = ("sh" if bare.startswith(("6", "5", "9")) else
+                  "bj" if bare.startswith(("4", "8")) else "sz")
+    return bare, market + bare
+
+
+def parse_local_time(value):
+    try:
+        stamp = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return None
+    if stamp.tzinfo is None:
+        stamp = stamp.replace(tzinfo=CST)
+    return stamp.astimezone(CST)
+
+
+def valid_stage(payload, stage, trading_date):
+    if not isinstance(payload, dict) or normalise_date(payload.get("date")) != trading_date:
+        return False, "missing or wrong-date artifact"
+    if payload.get("session") != stage:
+        return False, f"session marker is not {stage}"
+    if stage == "midday" and payload.get("status") not in ("ok", "partial"):
+        return False, "midday artifact status is not ok"
+    stamp = parse_local_time(payload.get("ts") or payload.get("generated_at"))
+    if stamp is None or stamp.date().isoformat() != trading_date:
+        return False, "missing or invalid timestamp"
+    if stage == "premarket" and (stamp.hour, stamp.minute) >= (9, 15):
+        return False, "premarket was generated at or after 09:15"
+    if stage == "midday" and not ((11, 30) <= (stamp.hour, stamp.minute) < (13, 0)):
+        return False, "midday artifact is outside 11:30-13:00"
+    return True, "ok"
+
+
+def close_window(now):
+    if now.weekday() >= 5:
+        return False, "market closed on weekend"
+    if (now.hour, now.minute) < (15, 0):
+        return False, "before the 15:00 close; close result is not available"
+    return True, "at or after the 15:00 close"
+
+
+def premarket_rows(payload):
+    rows = []
+    for tier in ("A_buy", "B_watch"):
+        for row in ((payload or {}).get("tiers") or {}).get(tier) or []:
+            if isinstance(row, dict) and row.get("code"):
+                rows.append({**row, "bucket": tier})
+    return rows
+
+
+def midday_rows(payload):
+    rows = []
+    afternoon = (payload or {}).get("afternoon") or {}
+    for bucket in ("keep", "watch", "drop", "no_quote", "new_strong"):
+        for row in afternoon.get(bucket) or []:
+            if isinstance(row, dict) and row.get("code"):
+                rows.append({**row, "bucket": bucket})
+    return rows
+
+
+def quote_is_close(quote, trading_date):
+    text = str((quote or {}).get("time") or "")
+    if len(text) < 14 or not text[:14].isdigit() or text[:8] != trading_date.replace("-", ""):
+        return False
+    return (14, 55) <= (int(text[8:10]), int(text[10:12])) <= (15, 5)
+
+
+def quote_lookup(raw):
     out = {}
-    for c in codes:
-        q = H.quotes([c]).get(H.prefixed(c))
-        if q:
-            out[str(c)] = q
+    for key, quote in (raw or {}).items():
+        if not isinstance(quote, dict):
+            continue
+        bare, prefixed = normalise_code(key)
+        out[prefixed] = quote
     return out
 
 
+def batch_quotes(codes, should_fetch, trading_date):
+    requested = []
+    for code in codes:
+        _, prefixed = normalise_code(code)
+        if prefixed and prefixed not in requested:
+            requested.append(prefixed)
+    raw = H.quotes(requested) if should_fetch and requested else {}
+    lookup = quote_lookup(raw)
+    result = {}
+    for code in requested:
+        bare, prefixed = normalise_code(code)
+        quote = lookup.get(prefixed)
+        result[prefixed] = (quote if quote and quote.get("price") and quote.get("chg_pct") is not None
+                        and quote_is_close(quote, trading_date) else None)
+    return result, requested
+
+
+def enrich(rows, quotes):
+    output = []
+    for row in rows:
+        bare, prefixed = normalise_code(row.get("code"))
+        quote = quotes.get(prefixed)
+        if not quote:
+            output.append({**row, "code": bare, "status": "no_quote", "quote_time": None,
+                           "quote_source": "signal_hub.quotes", "close": None, "chg_pct": None})
+            continue
+        output.append({**row, "code": bare, "status": "ok", "name": quote.get("name") or row.get("name"),
+                       "close": quote.get("price"), "chg_pct": quote.get("chg_pct"),
+                       "turnover": quote.get("turnover"), "high": quote.get("high"),
+                       "low": quote.get("low"), "quote_time": quote.get("time"),
+                       "quote_source": "signal_hub.quotes"})
+    return output
+
+
 def summarise(rows):
-    n = len(rows)
-    if not n:
-        return {"n": 0}
-    up = sum(1 for r in rows if r["chg_pct"] > 0)
+    requested = len(rows)
+    quoted = [row for row in rows if row.get("status") == "ok" and row.get("chg_pct") is not None]
+    missing = [row.get("code") for row in rows if row.get("status") != "ok" or row.get("chg_pct") is None]
+    if not requested:
+        return {"status": "insufficient", "reason": "stage has no valid candidates", "n_requested": 0,
+                "n_quoted": 0, "n_missing": 0, "missing_codes": []}
+    if not quoted:
+        return {"status": "insufficient", "reason": "no close quotes for stage candidates", "n_requested": requested,
+                "n_quoted": 0, "n_missing": len(missing), "missing_codes": missing}
+    returns = [float(row["chg_pct"]) for row in quoted]
+    ordered = sorted(returns)
+    positive = sum(value > 0 for value in returns)
     return {
-        "n": n,
-        "n_up": up,
-        "hit_rate_pct": round(up / n * 100, 1),
-        "avg_ret_pct": round(sum(r["chg_pct"] for r in rows) / n, 2),
-        "median_ret_pct": round(sorted(r["chg_pct"] for r in rows)[n // 2], 2),
-        "best": max(r["chg_pct"] for r in rows),
-        "worst": min(r["chg_pct"] for r in rows),
-        "avg_turnover_pct": round(
-            sum(r.get("turnover") or 0 for r in rows) / n, 2),
+        "status": "ok" if len(quoted) == requested else "partial",
+        "n_requested": requested,
+        "n_quoted": len(quoted),
+        "n_missing": len(missing),
+        "missing_codes": missing,
+        "n_up": positive,
+        "hit_rate_pct": round(positive / len(returns) * 100, 1),
+        "avg_ret_pct": round(sum(returns) / len(returns), 2),
+        "median_ret_pct": round(ordered[(len(ordered) - 1) // 2], 2),
+        "best": max(returns),
+        "worst": min(returns),
+        "avg_turnover_pct": round(sum(row.get("turnover") or 0 for row in quoted) / len(quoted), 2),
     }
+
+
+def stage_view(rows):
+    buckets = {}
+    for row in rows:
+        buckets.setdefault(row.get("bucket") or "unclassified", []).append(row)
+    return {bucket: {"summary": summarise(items), "rows": sorted(items, key=lambda item: -(item.get("chg_pct") or -999))}
+            for bucket, items in buckets.items()}
+
+
+def legacy_summary(summary):
+    """Keep archive_review's old field names without changing stage semantics."""
+    return {**summary,
+            "n": summary.get("n_quoted", 0),
+            "n_up": summary.get("n_up", 0)}
+
+
+def compatibility_fields(premarket_rows, midday_rows_value, premarket_summary, midday_summary):
+    """Expose old archive keys as derived compatibility data, never old inputs."""
+    pm_groups = {}
+    for row in premarket_rows:
+        pm_groups.setdefault(row.get("bucket") or "unclassified", []).append(row)
+    return {
+        "morning": {"summary": legacy_summary(premarket_summary),
+                    "by_group": {group: legacy_summary(summarise(rows))
+                                 for group, rows in pm_groups.items()},
+                    "rows": premarket_rows},
+        "afternoon": {"summary": legacy_summary(midday_summary),
+                      "rows": midday_rows_value},
+        "market": {"status": "insufficient", "reason": "market summary is not a principal stage input",
+                   "phase": None, "phase_desc": None, "advance": None, "decline": None},
+        "tradable_plans": {"summary": {"status": "insufficient",
+                                         "reason": "entry-plan stage is not a principal input",
+                                         "n": 0, "n_quoted": 0},
+                           "n_stop_hit": None, "n_target_hit": None, "rows": []},
+        "score_effectiveness": None,
+        "historical_winrate": {},
+        "rejected_review": {"n": sum(1 for row in midday_rows_value if row.get("bucket") == "drop"),
+                            "rows": [row for row in midday_rows_value if row.get("bucket") == "drop"]},
+    }
+
+
+def self_test():
+    assert normalise_date("20261016") == "2026-10-16"
+    good = {"session": "premarket", "date": "2026-10-16", "ts": "2026-10-16T09:10:00+08:00"}
+    assert valid_stage(good, "premarket", "2026-10-16")[0]
+    assert not valid_stage({**good, "ts": "2026-10-16T09:16:00+08:00"}, "premarket", "2026-10-16")[0]
+    insufficient = summarise([{"code": "600001", "status": "no_quote"}])
+    assert insufficient["status"] == "insufficient"
+    partial = summarise([{"code": "600001", "status": "ok", "chg_pct": 2.0}, {"code": "000001", "status": "no_quote"}])
+    assert partial["status"] == "partial" and partial["hit_rate_pct"] == 100.0
+    assert not quote_is_close({"time": "20261015150000"}, "2026-10-16")
+    assert quote_is_close({"time": "20261016150000"}, "2026-10-16")
+    assert not valid_stage({"session": "midday", "date": "2026-10-16", "ts": "2026-10-16T12:01:00+08:00", "status": "insufficient"}, "midday", "2026-10-16")[0]
+    print("close_review self-test: OK")
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--dry-run", action="store_true")
-    a = ap.parse_args()
-
-    mr = load("morning_review.json") or {}
-    af = load("afternoon_picks.json") or {}
-    ep = load("entry_plans.json") or {}
-    tp = load("today_picks.json") or {}
-    rl = load("reflect_latest.json") or {}
-
-    # ── the three sets ──
-    morning_codes, afternoon_codes = [], []
-    for g, s in (mr.get("groups") or {}).items():
-        for r in (s.get("rows") or []):
-            morning_codes.append(str(r["code"]))
-    for p in (af.get("picks") or []):
-        afternoon_codes.append(str(p["code"]))
-
-    log(f"morning {len(morning_codes)}, afternoon {len(afternoon_codes)}")
-
-    q_all = collect(sorted(set(morning_codes) | set(afternoon_codes)))
-    log(f"closes: {len(q_all)}")
-
-    morning_rows = []
-    for g, s in (mr.get("groups") or {}).items():
-        for r in (s.get("rows") or []):
-            q = q_all.get(str(r["code"]))
-            if not q:
-                continue
-            morning_rows.append({"code": r["code"], "name": q["name"],
-                                 "group": g, "chg_pct": round(q["chg_pct"], 2),
-                                 "close": q["price"],
-                                 "turnover": q["turnover"],
-                                 "morning_chg_pct": r.get("chg_pct")})
-    afternoon_rows = []
-    for p in (af.get("picks") or []):
-        q = q_all.get(str(p["code"]))
-        if not q:
-            continue
-        afternoon_rows.append({"code": p["code"], "name": q["name"],
-                               "group": p.get("group"),
-                               "chg_pct": round(q["chg_pct"], 2),
-                               "close": q["price"],
-                               "turnover": q["turnover"],
-                               "afternoon_score": p.get("afternoon_score")})
-
-    # ── what was actually tradable, with a zone ──
-    plan_rows = []
-    for p in (ep.get("plans") or []):
-        q = q_all.get(str(p["code"]))
-        if not q:
-            continue
-        zone = p.get("entry_zone") or [None, None]
-        plan_rows.append({"code": p["code"], "name": q["name"],
-                          "group": p.get("group"),
-                          "chg_pct": round(q["chg_pct"], 2),
-                          "close": q["price"], "turnover": q["turnover"],
-                          "entry_zone": zone,
-                          "stop_loss": p.get("stop_loss"),
-                          "in_zone": (zone[0] is not None and
-                                      zone[0] <= q["low"] or
-                                      (zone[0] is not None and zone[1] is not None
-                                       and q["low"] <= zone[1])),
-                          "stop_hit": (p.get("stop_loss") is not None and
-                                       q["low"] <= p["stop_loss"]),
-                          "target_hit": (p.get("target") is not None and
-                                         q["high"] >= p["target"])})
-
-    # ── per-group breakdown for the morning set ──
-    by_group = {}
-    for r in morning_rows:
-        by_group.setdefault(r["group"], []).append(r)
-    group_stats = {g: summarise(rs) for g, rs in by_group.items()}
-
-    # ── score-decile check: did a higher score actually mean a better return? ──
-    scored = [r for r in morning_rows
-              if r.get("morning_chg_pct") is not None]
-    # use the engine_v5 score when available
-    v5 = {str(x.get("code"))[2:] if str(x.get("code", ""))[:2] in ("sh", "sz", "bj")
-          else str(x.get("code")): x.get("score")
-          for x in ((load("engine_v5.json") or {}).get("top") or [])}
-    for r in morning_rows:
-        r["engine_v5_score"] = v5.get(r["code"])
-    with_score = [r for r in morning_rows if r.get("engine_v5_score") is not None]
-    score_check = None
-    if len(with_score) >= 10:
-        with_score.sort(key=lambda r: -(r["engine_v5_score"] or 0))
-        k = len(with_score) // 2
-        top, bot = with_score[:k], with_score[k:]
-        score_check = {
-            "n": len(with_score),
-            "top_half_avg": round(sum(r["chg_pct"] for r in top) / len(top), 2),
-            "bottom_half_avg": round(sum(r["chg_pct"] for r in bot) / len(bot), 2),
-            "top_half_hit": round(sum(1 for r in top if r["chg_pct"] > 0) / len(top) * 100, 1),
-            "bottom_half_hit": round(sum(1 for r in bot if r["chg_pct"] > 0) / len(bot) * 100, 1),
-        }
-
-    # ── tradability filter check ──
-    rejected = (ep.get("rejected") or [])
-    rej_rows = []
-    for r in rejected:
-        q = q_all.get(str(r["code"]))
-        if q:
-            rej_rows.append({"code": r["code"], "name": q["name"],
-                             "chg_pct": round(q["chg_pct"], 2),
-                             "reason": r.get("reason")})
-    limitup_rej = [r for r in rej_rows if "limit" in str(r.get("reason"))]
-    veto_rej = [r for r in rej_rows if "veto" in str(r.get("reason"))]
-
-    out = {
-        "generated_at": datetime.now(CST).isoformat(timespec="seconds"),
-        "engine": "close_review",
-        "date": datetime.now(CST).strftime("%Y-%m-%d"),
-        "market": {
-            "phase": (tp.get("market") or {}).get("phase"),
-            "phase_desc": (tp.get("market") or {}).get("phase_desc"),
-            "advance": (tp.get("market") or {}).get("advance"),
-            "decline": (tp.get("market") or {}).get("decline"),
-        },
-        "morning": {"summary": summarise(morning_rows),
-                    "by_group": group_stats,
-                    "rows": sorted(morning_rows, key=lambda r: -r["chg_pct"])},
-        "afternoon": {"summary": summarise(afternoon_rows),
-                      "rows": sorted(afternoon_rows, key=lambda r: -r["chg_pct"])},
-        "tradable_plans": {
-            "summary": summarise(plan_rows),
-            "n_stop_hit": sum(1 for r in plan_rows if r["stop_hit"]),
-            "n_target_hit": sum(1 for r in plan_rows if r["target_hit"]),
-            "rows": sorted(plan_rows, key=lambda r: -r["chg_pct"]),
-        },
-        "score_effectiveness": score_check,
-        "rejected_review": {
-            "n": len(rej_rows),
-            "n_limit_up": len(limitup_rej),
-            "n_vetoed": len(veto_rej),
-            "limit_up_avg": round(
-                sum(r["chg_pct"] for r in limitup_rej) / len(limitup_rej), 2)
-            if limitup_rej else None,
-            "vetoed_avg": round(
-                sum(r["chg_pct"] for r in veto_rej) / len(veto_rej), 2)
-            if veto_rej else None,
-            "rows": sorted(rej_rows, key=lambda r: -r["chg_pct"]),
-        },
-        "historical_winrate": {
-            h: {"n": v.get("n"), "bull_win_rate": v.get("bull_win_rate"),
-                "avg_ret_pct": v.get("avg_ret_pct")}
-            for h, v in ((rl.get("analysis") or {}).get("overall") or {}).items()},
-        "disclaimer": "Single-day result. Not predictive.",
-    }
-
-    # ── prior reviews: a single day means nothing without the history ──
-    # pull the cloud archive first so the comparison is against every closed
-    # day, not just the ones this machine happens to have seen
-    hist_path = os.path.join(H.DATA_DIR, "review_history.jsonl")
-    try:
-        import urllib.request
-        url = ("https://raw.githubusercontent.com/jiegengxiangjianxue1/"
-               "db-market/main/market/review_history.jsonl")
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        body = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "ignore")
-        if body.strip():
-            with open(hist_path, "w", encoding="utf-8") as f:
-                f.write(body)
-            log(f"pulled cloud archive: {body.count(chr(10))} rows")
-    except Exception:
-        pass
-    prior = []
-    if os.path.exists(hist_path):
-        for line in open(hist_path, encoding="utf-8"):
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                prior.append(json.loads(line))
-            except Exception:
-                pass
-    prior = [p for p in prior if p.get("date") != out["date"]]
-    trend = None
-    if len(prior) >= 3:
-        recent = prior[-10:]
-        hits = [p.get("hit_rate_buyable_pct") for p in recent
-                if p.get("hit_rate_buyable_pct") is not None]
-        avgs = [p.get("avg_ret_buyable_pct") for p in recent
-                if p.get("avg_ret_buyable_pct") is not None]
-        edges = [p.get("score_edge_pct") for p in recent
-                 if p.get("score_edge_pct") is not None]
-        if hits or avgs:
-            trend = {
-                "n_days": len(recent),
-                "mean_hit_rate_pct": round(sum(hits) / len(hits), 1) if hits else None,
-                "mean_avg_ret_pct": round(sum(avgs) / len(avgs), 2) if avgs else None,
-                "days_above_50": sum(1 for h in hits if h > 50),
-                "mean_score_edge_pct": round(sum(edges) / len(edges), 2) if edges else None,
-                "recent": [{"date": p.get("date"),
-                            "hit": p.get("hit_rate_buyable_pct"),
-                            "avg": p.get("avg_ret_buyable_pct"),
-                            "phase": p.get("market_phase")}
-                           for p in recent],
-            }
-    out["prior_reviews"] = {"n": len(prior), "trend": trend}
-
-    # ── what a hard stop would have done (stop_analysis.py) ──
-    sa = load("stop_analysis.json") or {}
-    stop_view = None
-    if sa.get("no_stop") and sa.get("by_stop"):
-        base_mean = sa["no_stop"].get("mean") or 0
-        # only a stop that actually cut something can be judged; a level with
-        # n_cut=0 is not a stop at all, it is the no-stop case renamed
-        real = [(k, v) for k, v in sa["by_stop"].items()
-                if (v.get("n_cut") or 0) > 0]
-        best = None
-        for k, v in real:
-            if best is None or (v.get("mean") or -99) > (best[1].get("mean") or -99):
-                best = (k, v)
-        if best:
-            helped = (best[1].get("mean") or -99) > base_mean
-            stop_view = {
-                "no_stop": sa["no_stop"],
-                "best_stop": best[0],
-                "best_stop_mean": best[1].get("mean"),
-                "best_stop_n_cut": best[1].get("n_cut"),
-                "by_stop": sa["by_stop"],
-                "helped": helped,
-                "verdict": (
-                    f"a {best[0]} stop would have helped today "
-                    f"({best[1].get('mean')}% vs {base_mean}%), cutting "
-                    f"{best[1].get('n_cut')} picks"
-                    if helped else
-                    f"no stop level helped today: the best ({best[0]}) still "
-                    f"trails no-stop ({best[1].get('mean')}% vs {base_mean}%), "
-                    "because most stopped picks recovered by the close"),
-            }
-        else:
-            stop_view = {"no_stop": sa["no_stop"], "by_stop": sa["by_stop"],
-                         "verdict": "no stop level triggered today"}
-
-    out["stop_analysis"] = stop_view
-
-    if a.dry_run:
-        print(json.dumps(out, ensure_ascii=False, indent=1)[:4000])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", default=os.path.join(H.DATA_DIR, "close_review.json"))
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+    if args.self_test:
+        self_test()
         return 0
 
-    path = os.path.join(H.DATA_DIR, "close_review.json")
-    json.dump(out, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-    log(f"-> {path}")
-
-    print()
-    print("=== MORNING (pre-open call) ===")
-    for k, v in out["morning"]["summary"].items():
-        print(f"  {k}: {v}")
-    print("  by group:")
-    for g, s in group_stats.items():
-        print(f"    {g:10s} n={s['n']:>2} hit={s['hit_rate_pct']:>5}% "
-              f"avg={s['avg_ret_pct']:+.2f}%")
-    print()
-    print("=== AFTERNOON (intraday revision) ===")
-    for k, v in out["afternoon"]["summary"].items():
-        print(f"  {k}: {v}")
-    print()
-    print("=== TRADABLE PLANS (with a buy zone) ===")
-    s = out["tradable_plans"]["summary"]
-    print(f"  n={s.get('n')} hit={s.get('hit_rate_pct')}% "
-          f"avg={s.get('avg_ret_pct')}% median={s.get('median_ret_pct')}%")
-    print(f"  stop hit: {out['tradable_plans']['n_stop_hit']}, "
-          f"target hit: {out['tradable_plans']['n_target_hit']}")
-    print()
-    if score_check:
-        print("=== DID A HIGHER SCORE HELP? ===")
-        print(f"  n={score_check['n']}")
-        print(f"  top half    avg={score_check['top_half_avg']:+.2f}% "
-              f"hit={score_check['top_half_hit']}%")
-        print(f"  bottom half avg={score_check['bottom_half_avg']:+.2f}% "
-              f"hit={score_check['bottom_half_hit']}%")
-    print()
-    print("=== PRIOR REVIEWS (context for today) ===")
-    pv = out.get("prior_reviews") or {}
-    tr = pv.get("trend")
-    if not tr:
-        print(f"  archived days: {pv.get('n', 0)} (need >= 3 for a trend)")
-    else:
-        print(f"  archived days: {pv.get('n')}, trend over last {tr['n_days']}")
-        print(f"  mean hit (buyable): {tr['mean_hit_rate_pct']}%  "
-              f"days above 50%: {tr['days_above_50']}/{tr['n_days']}")
-        print(f"  mean avg  (buyable): {tr['mean_avg_ret_pct']}%")
-        print(f"  mean score edge: {tr['mean_score_edge_pct']}pp")
-        print("  recent:")
-        for r in (tr.get("recent") or [])[-6:]:
-            print(f"    {r['date']} hit={r['hit']}% avg={r['avg']}% phase={r['phase']}")
-    print()
-    if stop_view:
-        print("=== HARD STOP CHECK ===")
-        print(f"  {stop_view['verdict']}")
-        print()
-    print("=== REJECTED ===")
-    rv = out["rejected_review"]
-    print(f"  limit-up ({rv['n_limit_up']}): avg {rv['limit_up_avg']}%")
-    print(f"  vetoed   ({rv['n_vetoed']}): avg {rv['vetoed_avg']}%")
+    now = datetime.now(CST)
+    trading_date = now.date().isoformat()
+    premarket = load("premarket_picks.json")
+    midday = load("midday_picks.json")
+    pm_valid, pm_reason = valid_stage(premarket, "premarket", trading_date)
+    md_valid, md_reason = valid_stage(midday, "midday", trading_date)
+    pm_rows = premarket_rows(premarket) if pm_valid else []
+    md_rows = midday_rows(midday) if md_valid else []
+    union_codes = [row.get("code") for row in pm_rows + md_rows]
+    after_close, close_reason = close_window(now)
+    quotes, requested = batch_quotes(union_codes, after_close or args.dry_run, trading_date)
+    pm_enriched = enrich(pm_rows, quotes)
+    md_enriched = enrich(md_rows, quotes)
+    pm_summary = summarise(pm_enriched)
+    md_summary = summarise([row for row in md_enriched if row.get("bucket") == "keep"])
+    if not pm_valid:
+        pm_summary = {"status": "insufficient", "reason": pm_reason, "n_requested": 0, "n_quoted": 0,
+                      "n_missing": 0, "missing_codes": []}
+    if not md_valid:
+        md_summary = {"status": "insufficient", "reason": md_reason, "n_requested": 0, "n_quoted": 0,
+                      "n_missing": 0, "missing_codes": []}
+    if not after_close and not args.dry_run:
+        reason = close_reason
+        pm_summary = {"status": "insufficient", "reason": reason, "n_requested": len(pm_rows),
+                      "n_quoted": 0, "n_missing": len(pm_rows), "missing_codes": [row.get("code") for row in pm_rows]}
+        md_summary = {"status": "insufficient", "reason": reason, "n_requested": len(md_rows),
+                      "n_quoted": 0, "n_missing": len(md_rows), "missing_codes": [row.get("code") for row in md_rows]}
+    previous = load("close_review.json") or {}
+    archive_review = {
+        "freshness": "archive_only; legacy fields were not used as principal inputs",
+        "legacy_input_files": {name: load(name) is not None for name in (
+            "morning_review.json", "afternoon_picks.json", "entry_plans.json")},
+        "legacy_close_fields": {key: previous.get(key) for key in (
+            "morning", "afternoon", "tradable_plans", "score_effectiveness", "rejected_review") if key in previous},
+    }
+    output = {
+        "generated_at": now.isoformat(timespec="seconds"),
+        "engine": "close_review v2 (same-day premarket + midday)",
+        "date": trading_date,
+        "status": ("partial" if (pm_summary["status"] != "ok" or md_summary["status"] != "ok")
+                   else "ok") if (after_close or args.dry_run) and (pm_valid or md_valid)
+                   else "insufficient",
+        "market_window": {"status": "ok" if after_close else "insufficient", "reason": close_reason},
+        "inputs": {
+            "premarket": {"status": "ok" if pm_valid else "insufficient", "reason": pm_reason},
+            "midday": {"status": "ok" if md_valid else "insufficient", "reason": md_reason},
+        },
+        "quote_request": {"n_requested": len(requested), "codes": requested, "source": "signal_hub.quotes",
+                          "batch_calls": 1 if requested and (after_close or args.dry_run) else 0},
+        "coverage": {"n_requested": len(pm_enriched) + len(md_enriched),
+                     "n_quoted": sum(row.get("status") == "ok" for row in pm_enriched + md_enriched),
+                     "n_missing": sum(row.get("status") != "ok" for row in pm_enriched + md_enriched),
+                     "missing_codes": [row.get("code") for row in pm_enriched + md_enriched if row.get("status") != "ok"]},
+        "premarket": {"summary": pm_summary, "rows": sorted(pm_enriched, key=lambda row: -(row.get("chg_pct") or -999))},
+        "midday": {"summary": md_summary, "summary_scope": "keep only", "by_bucket": stage_view(md_enriched),
+                   "rows": sorted(md_enriched, key=lambda row: -(row.get("chg_pct") or -999))},
+        "archive_review": archive_review,
+        "meta": {"principal_inputs": ["premarket_picks.json", "midday_picks.json"],
+                 "missing_quote_policy": "status=no_quote; missing rows never contribute to a full-coverage claim",
+                 "unsupported_stage_policy": "status=insufficient; no invented win rate"},
+    }
+    output.update(compatibility_fields(pm_enriched, md_enriched, pm_summary, md_summary))
+    if args.dry_run:
+        print(json.dumps(output, ensure_ascii=False, indent=1)[:10000])
+        return 0
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
+    with open(args.out, "w", encoding="utf-8") as handle:
+        json.dump(output, handle, ensure_ascii=False, indent=1)
+    print(f"[close] status={output['status']} premarket={pm_summary['status']} midday={md_summary['status']}")
+    print(f"[close] quote coverage={output['coverage']['n_quoted']}/{output['coverage']['n_requested']} -> {args.out}")
     return 0
 
 
