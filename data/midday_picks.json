@@ -1,76 +1,76 @@
 {
- "ts": "2026-10-16T05:15:45+08:00",
+ "ts": "2026-10-16T13:46:32+08:00",
  "engine": "midday_picks v1 (上午实盘验证 + 下午修正)",
  "date": "2026-10-16",
  "session": "midday",
  "morning_review": {
   "market": {
-   "advance": 417,
-   "decline": 4925,
-   "limit_up": 45,
-   "limit_down": 66,
+   "advance": 4720,
+   "decline": 608,
+   "limit_up": 120,
+   "limit_down": 7,
    "broken": 7,
    "seal_rate": null,
-   "turnover_yi": 16330.0,
-   "ts": "2026-10-16T02:29:21+08:00"
+   "turnover_yi": 9625.5,
+   "ts": "2026-10-16T12:19:50+08:00"
   },
   "ladder": [
    {
-    "boards": 5,
-    "count": 2,
+    "boards": 11,
+    "count": 1,
     "codes": [
-     "002343",
-     "002696"
+     "600825"
     ]
    },
    {
-    "boards": 3,
-    "count": 2,
+    "boards": 4,
+    "count": 1,
     "codes": [
-     "001318",
      "000530"
     ]
    },
    {
     "boards": 2,
-    "count": 2,
+    "count": 4,
     "codes": [
-     "605189",
-     "601811"
+     "600668",
+     "003029",
+     "603999",
+     "002889"
     ]
    },
    {
     "boards": 1,
-    "count": 30,
+    "count": 61,
     "codes": [
-     "603386",
-     "603237",
-     "300111",
-     "003029",
-     "603230"
+     "000701",
+     "600501",
+     "002535",
+     "002076",
+     "603668"
     ]
    }
   ],
   "mainlines": [
    {
-    "name": "半导体设备",
-    "score": 82.9
+    "name": "国防军工",
+    "score": 80.8
    },
    {
-    "name": "白酒Ⅱ",
-    "score": 82.2
+    "name": "航空装备Ⅱ",
+    "score": 74.1
    },
    {
-    "name": "白酒Ⅲ",
-    "score": 81.3
+    "name": "汽车",
+    "score": 73.2
    },
    {
-    "name": "大众出版",
-    "score": 78.7
+    "name": "航空装备Ⅲ",
+    "score": 73.2
    },
    {
-    "name": "化学制剂",
-    "score": 77.4
+    "name": "汽车零部件",
+    "score": 72.9
    }
   ]
  },
@@ -80,6 +80,22 @@
    "no_data": 3
   },
   "detail": [
+   {
+    "code": "000937",
+    "name": "",
+    "tier": "A_buy",
+    "score": 57.7,
+    "entry_zone": [
+     4.38,
+     4.47
+    ],
+    "stop": 4.25,
+    "target": 4.72,
+    "am_price": null,
+    "am_chg_pct": null,
+    "verdict": "no_data",
+    "limit_up": false
+   },
    {
     "code": "688156",
     "name": "",
@@ -111,22 +127,6 @@
     "am_chg_pct": null,
     "verdict": "no_data",
     "limit_up": false
-   },
-   {
-    "code": "601098",
-    "name": "",
-    "tier": "A_buy",
-    "score": 35.6,
-    "entry_zone": [
-     10.89,
-     11.12
-    ],
-    "stop": 10.56,
-    "target": 11.72,
-    "am_price": null,
-    "am_chg_pct": null,
-    "verdict": "no_data",
-    "limit_up": false
    }
   ],
   "gate_was": "defensive",
@@ -134,6 +134,67 @@
  },
  "afternoon": {
   "keep": [
+   {
+    "code": "000937",
+    "name": "",
+    "price": 4.45,
+    "score": 57.7,
+    "parts": {
+     "resonance": 24,
+     "engine_avg": 21.735,
+     "valuation": 0,
+     "position": 0,
+     "flow": 12
+    },
+    "sources": [
+     "multidim",
+     "flow_div_buy"
+    ],
+    "entry_zone": [
+     4.38,
+     4.47
+    ],
+    "stop": 4.25,
+    "target": 4.72,
+    "risk_reward": 0.11,
+    "intrinsic_value": null,
+    "value_dev_pct": null,
+    "value_tag": null,
+    "pos240_pct": null,
+    "dims": {
+     "技术面": 73.3,
+     "资金面": 50,
+     "高低位": 30,
+     "基本面": 50,
+     "板块面": 50,
+     "市场面": 25.2,
+     "情绪面": 56,
+     "周期面": 34,
+     "消息面": 50,
+     "海外面": 42.0
+    },
+    "dims_why": {
+     "技术面": "17指标共振 73.3",
+     "资金面": "无资金流数据",
+     "高低位": "20日位100% 60日位77% 乖离+2.4% 高位区",
+     "基本面": "无快照",
+     "板块面": "无行业映射",
+     "市场面": "涨417/跌4925 上涨占比7.8% 涨停45",
+     "情绪面": "封板率—% 晋级率—% 热点主题3个",
+     "周期面": "周期综合-2.0 (偏空)",
+     "消息面": "关联热点0个 主题[]",
+     "海外面": "全球情绪 -1.99% · 最相关: 恒生科技 (corr 0.47 / beta 0.35)"
+    },
+    "reasons": [
+     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 4.25",
+     "1 个引擎共振提名 (multidim/flow_div_buy)",
+     "资金吸筹背离"
+    ],
+    "weak_market": true,
+    "tier": "A",
+    "am_verdict": "no_data",
+    "am_price": null
+   },
    {
     "code": "688156",
     "name": "",
@@ -248,42 +309,6 @@
     "reasons": [
      "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 87.00",
      "1 个引擎共振提名 (engine_v5/multidim)"
-    ],
-    "weak_market": true,
-    "tier": "A",
-    "am_verdict": "no_data",
-    "am_price": null
-   },
-   {
-    "code": "601098",
-    "name": "",
-    "price": 11.06,
-    "score": 35.6,
-    "parts": {
-     "resonance": 12,
-     "engine_avg": 23.639999999999997,
-     "valuation": 0,
-     "position": 0,
-     "flow": 0
-    },
-    "sources": [
-     "engine_v5"
-    ],
-    "entry_zone": [
-     10.89,
-     11.12
-    ],
-    "stop": 10.56,
-    "target": 11.72,
-    "risk_reward": 0.11,
-    "intrinsic_value": null,
-    "value_dev_pct": null,
-    "value_tag": null,
-    "pos240_pct": null,
-    "dims": null,
-    "dims_why": null,
-    "reasons": [
-     "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 10.56"
     ],
     "weak_market": true,
     "tier": "A",
