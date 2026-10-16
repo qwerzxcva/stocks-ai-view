@@ -2623,6 +2623,23 @@ var _el=document.getElementById('cTabs'); if(_el) _el.addEventListener('click', 
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
 
+// 首屏补画当前激活的 tab。tab 0 在 HTML 里就带 on class, 但 dsRendered 只有
+// 点击才置位, 所以不进这个调用时首屏永远停在 "加载中…" — 用户看到的就是
+// "网站啥都没有"。render() 末尾会调它, 数据未就绪时各渲染函数自行判空。
+function renderActiveTab(){
+  const act=document.querySelector('.c-tab.active')||document.querySelector('.c-tab');
+  if(!act) return;
+  const c=act.dataset.c;
+  if(c==='0' && !dsRendered){ dsRendered=true; _safe(renderDailySummary,'dailySummary'); }
+  else if(c==='1' && window._gmData && !gmRendered){ gmRendered=true; renderGlobalMarkets(window._gmData); }
+  else if(c==='2' && !mlRendered){ mlRendered=true; _safe(renderMainline,'mainline'); }
+  else if(c==='3' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
+  else if(c==='4' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
+  else if(c==='5' && !thRendered){ thRendered=true; _safe(renderThemes,'themes'); }
+  else if(c==='6' && !plRendered){ plRendered=true; _safe(renderPools,'pools'); }
+  else if(c==='7' && !nfRendered){ nfRendered=true; _safe(renderNewsFlow,'newsFlow'); }
+  else if(c==='8' && !olRendered){ olRendered=true; _safe(renderOverseasLinkage,'overseasLinkage'); }
+}
 // ─── 数据源清单 (单一事实来源) ──────────────────────────────────
 // 每个条目: [路径, 说明]。render() 一次性并行拉全部, 不再串行 await。
 // 新增数据源只需在这里加一行 + 在 consume() 里消费, 不必改 render。
@@ -2876,6 +2893,9 @@ async function render(){
   if(ovRendered && window.Overseas) _safe(()=>window.Overseas.render(),'overseas');
   if(pkRendered && window.Picks) _safe(()=>window.Picks.render(),'picks');
   if(mfRendered && typeof renderMoneyFlow==='function') _safe(renderMoneyFlow,'moneyflow');
+  // 首屏: 画当前激活的那个 tab (tab 0 默认激活, 但 dsRendered 只有点击才置位,
+  // 不在这里补一次的话首屏永远停在 "加载中…")。
+  renderActiveTab();
   _failCount = 0;
 }
 // 轮询: 90s 起步, 连续失败则指数退避到 5min, 恢复后回落
