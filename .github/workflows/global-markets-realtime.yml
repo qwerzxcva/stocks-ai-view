@@ -16,7 +16,10 @@ name: global-markets-realtime
 
 on:
   schedule:
-    - cron: '0 8,9,10,14,15,16,17,18 * * 1-5'
+    # 全天每 30 分钟: 全球市场跨越多个时区，不能只覆盖 A 股盘中。
+    # 原配置漏掉美股/欧股夜盘与亚洲早盘，导致 global_markets.json
+    # 停在十几个小时前。workflow_dispatch 仍作兜底。
+    - cron: '0,30 0-18 * * *'
   workflow_dispatch: {}
 
 permissions:
