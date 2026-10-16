@@ -1718,9 +1718,16 @@ function renderPools(){
   if(!box) return;
   const g=window._data||{};
   const SR=window.StockRow;
-  // 数据未就绪时不画: 否则会渲染出一片「暂无数据」, 且 plRendered 已置位,
-  // 数据到达后也不会再重画。留在加载态, 等 render() 末尾按 plRendered 补画。
   if(!SR || !Object.keys(g).length) return;
+  const audit=g.pool_audit||{};
+  let h='';
+  if(audit.pools){
+    const stale=Object.entries(audit.pools).filter(([k,v])=>v.status!=='fresh');
+    h+='<div style="border:1px solid '+(stale.length?'var(--amber)':'var(--up)')+';border-radius:5px;padding:6px 8px;margin-bottom:6px;font-size:9px">'
+      +'<b>多池同步状态: '+(stale.length?'部分过期':'正常')+'</b> · '
+      +(stale.length?stale.map(([k,v])=>k+' '+(v.age_hours==null?'无时间':v.age_hours+'h')).join(' · '):'所有池均有时间戳')
+      +'</div>';
+  }
   const mn=g.market_now||{};
   const ztPool=mn.limit_up_pool||[];
   // 涨停原因: 东财涨跌停池只给行业(hybk), 这里做「行业 × 连板」归因,
@@ -1730,7 +1737,6 @@ function renderPools(){
   const thsReason={};
   (g.enrich||{}).ths_strong&&(g.enrich.ths_strong||[]).forEach(s=>{ if(s.code&&s.reason) thsReason[s.code]=s.reason; });
 
-  let h='';
   const P=(title,desc,recs,opts)=>{                  // 二级标题 + 表
     opts=opts||{};
     h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
@@ -1961,12 +1967,27 @@ function renderOverseasLinkage(){
   const box=document.getElementById('overseasLinkageBox');
   if(!box) return;
   const d=(window._data||{}).overseas_linkage||{};
+  const impact=(window._data||{}).overseas_impact||{};
   const rows=d.pairs||[];
   let h='';
+  if(impact && ((impact.benefit||[]).length || (impact.harm||[]).length)){
+    h+='<div class="hd" style="border-top:none;padding:6px 0">海外传导候选 <span class="sub">相关性/贝塔/滞后/隔夜传导 → 受益/受害，不是因果结论</span></div>';
+    const show=(title,arr,col)=>{
+      if(!arr||!arr.length)return '';
+      return '<div style="margin:4px 0"><b style="color:'+col+'">'+title+'</b> '
+        +arr.slice(0,12).map(x=>'<span class="bdg" title="corr '+_esc2(x.corr)+' beta '+_esc2(x.beta)+' lag '+_esc2(x.lag)+' n='+_esc2(x.sample_n)+'">'
+          +_esc2(x.target_name||x.target)+' ← '+_esc2(x.driver_name||x.driver)+'</span>').join(' ')
+        +'</div>';
+    };
+    h+=show('↑ 受益',impact.benefit,'var(--up)');
+    h+=show('↓ 受害',impact.harm,'var(--dn)');
+    h+=show('↔ 混合',impact.mixed,'var(--amber)');
+  }
+
   if(!rows.length){
-    box.innerHTML='<div class="no-data">暂无海外关联数据</div>'
-      +'<div class="fl" style="padding:8px;font-size:9px">由 overseas_linkage.py 生成 '
-      +'(需 global_kline.json + index_kline.json; engine-chain 的 tier 2 会跑)</div>';
+    h+='<div class="no-data">暂无海外指数关联对</div>'
+      +'<div class="fl" style="padding:8px;font-size:9px">由 overseas_linkage.py 生成 (需 global_kline.json + index_kline.json)</div>';
+    box.innerHTML=h;
     return;
   }
   const gm=(window._data||{}).global_markets||{};
@@ -2626,6 +2647,8 @@ const SOURCES = [
   'data/cycle_pool_v2.json',   // 周期池 v2 (多池选股用)
   'data/industry_map_em.json', // 个股→东财中文行业 (板块面/板块资金用)
   'data/overseas_linkage.json', // 海外关联性 (相关/贝塔/滞后/隔夜)
+  'data/overseas_impact.json',  // 海外受益/受害股票候选
+  'data/pool_audit.json',       // 多池字段/时间/来源审计
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
   // 需要溯源时直接查 GitHub raw。
 ];

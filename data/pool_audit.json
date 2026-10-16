@@ -1,0 +1,129 @@
+{
+ "ts": "2026-10-16T18:20:27+08:00",
+ "engine": "pool_audit.py",
+ "status": "partial",
+ "stale_pools": [
+  "risk",
+  "cycle",
+  "recommend",
+  "hot",
+  "low",
+  "limitup",
+  "ticks",
+  "sector",
+  "money_divergence"
+ ],
+ "pools": {
+  "risk": {
+   "file": "decision.json",
+   "field": "avoid",
+   "count": 0,
+   "ts": "2026-10-16T05:13:32+08:00",
+   "age_hours": 13.12,
+   "status": "stale",
+   "source": null
+  },
+  "cycle": {
+   "file": "cycle_pool_v2.json",
+   "field": "regimes",
+   "count": 4,
+   "ts": null,
+   "age_hours": null,
+   "status": "no_timestamp",
+   "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块"
+  },
+  "recommend": {
+   "file": "ai_pick_v4.json",
+   "field": "picks",
+   "count": 30,
+   "ts": "2026-10-16T05:02:56+08:00",
+   "age_hours": 13.29,
+   "status": "stale",
+   "source": "bulk day_qfq_*.csv (3057 只)"
+  },
+  "hot": {
+   "file": "hot_news.json",
+   "field": "items",
+   "count": 362,
+   "ts": "2026-10-16T04:42:55+08:00",
+   "age_hours": 13.63,
+   "status": "stale",
+   "source": "newsnow.busiyi.world"
+  },
+  "low": {
+   "file": "lowpool.json",
+   "field": "strong",
+   "count": 40,
+   "ts": "2026-10-15T20:51:57.352437+08:00",
+   "age_hours": 21.47,
+   "status": "stale",
+   "source": "腾讯日K(qfq) + stocks-data-live 快照"
+  },
+  "limitup": {
+   "file": "ban_pick.json",
+   "field": "picks",
+   "count": 22,
+   "ts": "2026-10-14T19:45:28+08:00",
+   "age_hours": 46.58,
+   "status": "stale",
+   "source": "东财涨跌停池 + 本地K线 + ban_prob 因子分层 + 腾讯行情"
+  },
+  "ticks": {
+   "file": "auction_engine.json",
+   "field": "stocks",
+   "count": 20,
+   "ts": "2026-10-16T05:12:30+08:00",
+   "age_hours": 13.13,
+   "status": "stale",
+   "source": "fetchers_ticks.py (腾讯成交明细, 分笔)"
+  },
+  "blocktrade": {
+   "file": "enrich.json",
+   "field": "blocktrade",
+   "count": 20,
+   "ts": "2026-10-16T12:20:06+08:00",
+   "age_hours": 6.01,
+   "status": "fresh",
+   "source": "同花顺强势股 + 腾讯行情 + 东财 datacenter (龙虎榜/大宗交易)"
+  },
+  "lhb": {
+   "file": "enrich.json",
+   "field": "lhb",
+   "count": 20,
+   "ts": "2026-10-16T12:20:06+08:00",
+   "age_hours": 6.01,
+   "status": "fresh",
+   "source": "同花顺强势股 + 腾讯行情 + 东财 datacenter (龙虎榜/大宗交易)"
+  },
+  "auction": {
+   "file": "enrich.json",
+   "field": "jingjia",
+   "count": 0,
+   "ts": "2026-10-16T12:20:06+08:00",
+   "age_hours": 6.01,
+   "status": "fresh",
+   "source": "同花顺强势股 + 腾讯行情 + 东财 datacenter (龙虎榜/大宗交易)"
+  },
+  "sector": {
+   "file": "sector_pool.json",
+   "field": "tier2",
+   "count": 7,
+   "ts": "2026-10-15",
+   "age_hours": 42.34,
+   "status": "stale",
+   "source": "腾讯证券 proxy.finance.qq.com mktHs/rank"
+  },
+  "money_divergence": {
+   "file": "flow_divergence.json",
+   "field": "buy_side",
+   "count": 1,
+   "ts": "2026-10-14T19:45:53+08:00",
+   "age_hours": 46.58,
+   "status": "stale",
+   "source": "价格: 腾讯前复权日K | 资金: 东财 push2his fflow"
+  }
+ },
+ "meta": {
+  "purpose": "多池真实字段/时间/来源审计，防止前端读错字段后显示空池或旧池"
+ }
+}

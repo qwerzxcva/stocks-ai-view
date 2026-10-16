@@ -21,10 +21,10 @@ DATA = os.path.join(ROOT, "data")
 
 GROUPS = {
     "market_snapshot": ["latest.json", "market_now.json"],
-    "global_markets": ["global_markets.json", "global_kline.json"],
+    "global_markets": ["global_markets.json", "global_kline.json", "overseas_linkage.json", "overseas_impact.json"],
     "hot_news": ["hot_news.json", "news_extra.json", "hot_themes.json", "mainline.json", "recent_mainlines.json", "hot_impact.json"],
     "picks": ["premarket_picks.json", "midday_picks.json", "ai_pick_v4.json", "today_picks.json", "prediction_bundle.json"],
-    "engines": ["engine_v5.json", "multidim.json", "decision.json", "trend_strength.json", "auction_engine.json", "bull_bear_debate.json"],
+    "engines": ["engine_v5.json", "multidim.json", "decision.json", "trend_strength.json", "auction_engine.json", "bull_bear_debate.json", "pool_audit.json"],
     "review": ["daily_brief.json", "ai_review.json", "reflect_latest.json", "winrate_matrix.json", "kline_sim.json", "walkforward.json"],
 }
 
