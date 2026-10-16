@@ -180,11 +180,12 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <div id="breadthTxt" style="color:var(--tx3)"></div>
 </div>
 <div class="main">
-  <!-- LEFT: 每日主线快捷概览 -->
+  <!-- LEFT: 涨停板 (连板梯队已合并进表格) -->
   <div class="col">
     <div class="card">
-      <div class="hd">每日主线 <span class="sub">资金 × 涨幅 × 成交额 × 新闻</span></div>
-      <div class="bd" id="mainlines" style="max-height:180px;overflow-y:auto"></div>
+      <div class="hd">涨停板 <span class="sub" id="ladderH"></span></div>
+      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th><th>板高</th></tr></thead><tbody id="ztBody"></tbody></table></div>
+      <div class="bd" id="mainlines" hidden></div>
     </div>
   </div>
   <!-- CENTER: tab 化面板 -->
@@ -279,14 +280,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
   </div>
-  <!-- RIGHT: 涨停板 + 全球市场情绪 + 实时热榜 -->
+  <!-- RIGHT: 全球市场情绪 (已合并 A 股情绪周期) + 实时热榜 -->
   <div class="col">
-    <div class="card">
-      <div class="hd">涨停板 <span class="sub" id="ladderH"></span></div>
-      <div class="bd"><div class="ladder" id="ladder"></div></div>
-      <div class="hd" style="border-top:1px solid var(--border)">涨停池 TOP15</div>
-      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th></tr></thead><tbody id="ztBody"></tbody></table></div>
-    </div>
     <div class="card">
       <div class="hd">全球市场情绪 · A股周期 <span class="sub" id="gmSideSub">市场总体与多空周期</span></div>
       <div class="bd gauge-box">
@@ -439,8 +434,11 @@ function renderCycleV2(cv){
   el.parentNode.appendChild(bar);
 }
 function renderLadder(lad){
-  document.getElementById('ladderH').textContent=lad&&lad.height?'最高 '+lad.height+' 板':'';
-  document.getElementById('ladder').innerHTML=(lad&&lad.tiers?lad.tiers:[]).map(t=>`<div class="tier"><b class="b">${t.boards}</b>板·${t.count}家 ${(t.codes||[]).slice(0,3).join(' ')}</div>`).join('')||'<span class="fl">暂无</span>';
+  const el=document.getElementById('ladderH');
+  if(!el) return;
+  const tiers=(lad&&lad.tiers)||[];
+  const text=tiers.map(t=>t.boards+'板'+t.count+'家').join(' · ');
+  el.textContent=(lad&&lad.height?'最高 '+lad.height+' 板':'')+(text?' · '+text:'');
 }
 function renderMainlines(mls,themes){
   const box=document.getElementById('mainlines');
@@ -536,10 +534,12 @@ function renderPicks(picks){
   }).join('')||'<tr><td colspan="11" class="fl" style="text-align:center">暂无</td></tr>';
 }
 function renderZt(zts){
-  document.getElementById('ztBody').innerHTML=(zts||[]).slice(0,15).map(z=>`<tr>
-    <td>${z.code}</td><td>${z.name}</td>
+  const rows=(zts||[]).slice().sort((a,b)=>(b.lianban||1)-(a.lianban||1)||String(a.zt_time||'').localeCompare(String(b.zt_time||'')));
+  document.getElementById('ztBody').innerHTML=rows.slice(0,40).map(z=>`<tr>
+    <td>${z.code}</td><td>${z.name||''}</td>
     <td>${z.lianban>=2?'<b class="up">'+z.lianban+'板</b>':'首板'}</td>
-    <td class="fl">${fmtTime(z.zt_time)}</td></tr>`).join('')||'<tr><td colspan="4" class="fl">暂无</td></tr>';
+    <td class="fl">${fmtTime(z.zt_time)}</td>
+    <td class="fl">${z.lianban>=2?z.lianban+'连板':'1板'}</td></tr>`).join('')||'<tr><td colspan="5" class="fl">暂无涨停数据</td></tr>';
 }
 function renderFundRank(fr){
   const el=document.getElementById('fundBody');
@@ -1652,10 +1652,17 @@ function renderDailySummary(){
   const summaryBox=document.getElementById('summaryWindowsBox');
   if(summaryBox){
     const windows=(g.recent_mainlines||{}).windows||{};
+    const wm=g.winrate_matrix||{}, rf=((g.reflect_latest||{}).analysis||{}).overall||{};
     summaryBox.innerHTML=[7,30,365].map(days=>{
-      const w=windows[String(days)]||{};
-      const m=w.metrics||{};
-      return '<div class="chip" style="display:block;margin:4px 0">近'+days+'个交易日：已观测 '+_esc2(w.observed_days||0)+'，已配对 '+_esc2(w.paired_days||0)+'，状态 '+_esc2(w.status||'no_data')+'；可买胜率 '+_esc2(m.hit_rate_buyable_pct==null?'—':m.hit_rate_buyable_pct+'%')+'；平均收益 '+_esc2(m.avg_ret_buyable_pct==null?'—':m.avg_ret_buyable_pct+'%')+'</div>';
+      const w=windows[String(days)]||{}, m=w.metrics||{}, themes=(w.themes||[]).slice(0,5);
+      const horizon=days<=7?'1':(days<=30?'5':'10');
+      const hist=wm.by_horizon&&wm.by_horizon[horizon]||rf[horizon]||{};
+      const hit=hist.win_rate!=null?Math.round(hist.win_rate*1000)/10:hist.bull_win_rate;
+      return '<div style="border:1px solid var(--border);border-radius:6px;padding:7px 8px;margin:5px 0">'
+        +'<b>近'+days+'个交易日</b> <span class="fl">归档 '+_esc2(w.observed_days||0)+'/'+days+' · 盘前收盘配对 '+_esc2(w.paired_days||0)+' · '+_esc2(w.status||'no_data')+'</span>'
+        +'<div style="font-size:10px;line-height:1.6;margin-top:3px">可交易样本 '+_esc2(m.n_buyable||0)+' · 命中率 '+_esc2(m.hit_rate_buyable_pct==null?'样本不足':m.hit_rate_buyable_pct+'%')+' · 平均收益 '+_esc2(m.avg_ret_buyable_pct==null?'—':m.avg_ret_buyable_pct+'%')
+        +' · '+horizon+'日历史胜率 '+_esc2(hit==null?'—':hit+'%')+'</div>'
+        +'<div class="fl" style="font-size:10px">主线: '+(themes.length?themes.map(x=>_esc2(x.name)+'('+_esc2(x.days_present)+'日)').join(' · '):'归档主题不足，未用当前快照回填')+'</div></div>';
     }).join('');
   }
   // DOM 插入完成后再补实时价 (renderPicksCard 只返回字符串, 之前调会取不到元素)
@@ -1688,24 +1695,30 @@ function renderMainline(){
     ranked.slice(0,12).forEach(x=>h+='<tr><td><b>'+_esc2(x.name)+'</b></td><td>'+_esc2(x.days_present)+'</td><td>'+_esc2(x.presence_pct)+'%</td><td>'+_esc2(x.direction)+'</td><td>'+_esc2((x.representative_stocks||[]).join(' '))+'</td></tr>');
     h+='</tbody></table>';
   } else h+='<div class="fl">暂无足够的已归档主题样本</div>';
-  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">每日盘前预测 + 收盘复盘 <span class="sub">按同一交易日配对；缺失保留空状态</span></div>';
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">每日主线日期表 <span class="sub">同一交易日展示盘前预测与收盘复盘两份记录</span></div>';
   if(dates.length){
-    h+='<table><thead><tr><th>交易日</th><th>盘前预测</th><th>收盘实际/复盘</th><th>主线/主题</th><th>来源时间</th></tr></thead><tbody>';
+    h+='<table><thead><tr><th>交易日</th><th>当日主线</th><th>盘前预测</th><th>收盘复盘</th></tr></thead><tbody>';
     dates.forEach(row=>{
       const pre=row.premarket||{}, close=row.close||{}, cs=close.summary||{};
-      const picks=((pre.tiers||{}).A_buy||[]).slice(0,3).map(x=>_esc2(x.name||x.code)).join('、');
-      const ctext=cs.hit_rate_all_pct==null?'无收盘归档':('胜率 '+cs.hit_rate_all_pct+'% · n='+_esc2(cs.n_picks)+' · 均收 '+_esc2(cs.avg_ret_all_pct)+'%');
-      const dateText=pre.date?'<span>'+_esc2(pre.date)+'</span>':'<span class="fl">缺盘前预测</span>';
-      h+='<tr><td><b>'+_esc2(row.date)+'</b></td><td>'+dateText+(picks?'<div class="fl">'+picks+'</div>':'')+'<div class="fl">'+_esc2(row.premarket_status)+'</div></td>'+
-        '<td>'+_esc2(ctext)+'</td><td>'+_esc2((row.mainlines||[]).join('、')||'—')+'</td><td class="fl">盘前 '+_esc2(row.actual_time&&row.actual_time.premarket||'—')+'<br>收盘 '+_esc2(row.actual_time&&row.actual_time.close||'—')+'</td></tr>';
+      const picks=((pre.tiers||{}).A_buy||[]).slice(0,4).map(x=>_esc2(x.name||x.code)).join('、');
+      const preText=row.premarket_status==='available'
+        ?('09:15前有效'+(picks?' · '+picks:''))
+        :(row.premarket_status==='rejected_not_before_09:15'?'记录晚于09:15，已拒绝':'无盘前归档');
+      const closeText=close.time
+        ?('胜率 '+_esc2(cs.hit_rate_all_pct==null?'—':cs.hit_rate_all_pct+'%')+' · 样本 '+_esc2(cs.n_picks||0)+' · 均收 '+_esc2(cs.avg_ret_all_pct==null?'—':cs.avg_ret_all_pct+'%'))
+        :'无收盘归档';
+      h+='<tr><td><b>'+_esc2(row.date)+'</b><div class="fl">盘前 '+_esc2(row.actual_time&&row.actual_time.premarket||'—')+'<br>收盘 '+_esc2(row.actual_time&&row.actual_time.close||'—')+'</div></td>'
+        +'<td>'+_esc2((row.mainlines||[]).join('、')||'—')+'</td>'
+        +'<td>'+_esc2(preText)+'</td><td>'+_esc2(closeText)+'</td></tr>';
     });
     h+='</tbody></table>';
   } else h+='<div class="fl">暂无可用交易日归档</div>';
-  const lines=(Array.isArray(g.mainline)?g.mainline:((g.mainline||{}).mainlines||[]));
-  if(lines.length){
-    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">当前主线快照 <span class="sub">'+_t((g.mainline||{}).ts)+'</span></div><div class="chips">';
-    lines.slice(0,12).forEach(x=>h+='<span class="chip">'+_esc2(x.name)+' <b>'+_esc2(x.news_count||x.heat||'')+'</b></span>');
-    h+='</div>';
+  const current=(g.recent_mainlines||{}).current||(Array.isArray(g.mainline)?g.mainline:((g.mainline||{}).mainlines||[]));
+  if(current.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">当前每日主线 <span class="sub">'+_t((g.mainline||{}).ts)+' · 仅当前快照，不回填历史日期</span></div>';
+    h+='<table><thead><tr><th>主线</th><th>方向</th><th>新闻</th><th>代表代码</th><th>依据</th></tr></thead><tbody>';
+    current.slice(0,12).forEach(x=>h+='<tr><td><b>'+_esc2(x.name)+'</b></td><td>'+_esc2(x.direction||'—')+'</td><td>'+_esc2(x.news_count||0)+'</td><td>'+_esc2((x.codes||x.stocks||[]).slice(0,4).join(' '))+'</td><td class="fl">'+_esc2(x.reason||x.logic||'')+'</td></tr>');
+    h+='</tbody></table>';
   }
   box.innerHTML=h;
 }
@@ -1716,7 +1729,9 @@ function renderThemes(){
   if(!box) return;
   const g=window._data||{};
   // hot_themes.json 顶层是 {ts, themes:[...]}; latest.json 里的 themes 是数组
-  const thRaw=g.themes||g.hot_themes||[];
+  const themeFile=g.hot_themes||{};
+  const impactReports=(g.hot_impact||{}).reports||themeFile.hot_reports||[];
+  const thRaw=(themeFile.themes&&themeFile.themes.length)?themeFile.themes:(g.themes||[]);
   const th=Array.isArray(thRaw)?thRaw:(thRaw.themes||[]);
   const ne=g.news_extra||{};
   let h='';
@@ -1733,7 +1748,14 @@ function renderThemes(){
         +'<td>'+st.slice(0,6).map(c=>'<span class="clk" data-code="'+_esc2(c)+'" style="color:var(--accent)">'+_esc2(c)+'</span>').join(' ')+'</td></tr>';
     });
     h+='</tbody></table>';
-  } else { h+='<div class="fl">暂无题材数据</div>'; }
+  } else { h+='<div class="fl">主题聚合样本不足</div>'; }
+  if(impactReports.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">热点推演主题 <span class="sub">'+_t((g.hot_impact||themeFile).ts)+'</span></div>';
+    impactReports.forEach(r=>{
+      h+='<div class="hi"><div class="hi-head">'+_esc2(r.theme)+'<span class="sub">热度 '+Math.round((r.heat||0)*100)+'% · '+_esc2(r.news_count||0)+' 条</span></div>';
+      h+='<div class="chips">'+(r.stocks||[]).slice(0,8).map(s=>'<span class="chip clk" data-code="'+_esc2(String(s.code||'').replace(/^(sh|sz|bj)/,''))+'">'+_esc2(s.name||s.code)+' <b>'+_esc2(s.signal||'')+'</b></span>').join('')+'</div></div>';
+    });
+  }
   // 从实时资讯里提取的题材 (华尔街见闻 related_themes)
   const fromNews={};
   (ne.items||[]).forEach(it=>{ (it.themes||[]).forEach(t=>{ fromNews[t]=(fromNews[t]||0)+1; }); });
@@ -1790,30 +1812,48 @@ function renderPools(){
     fn:s=>{const r=ztReason[s.code]||thsReason[s.code]||(s.raw&&s.raw.reason)||'';return r?SR.esc(String(r).slice(0,30)):null;}
   });
 
-  // ① 风险池 — decision.avoid (多维打分为 avoid 的票)
-  P('① 风险池','多维评分判定为回避的股票 (能看出真有问题的票)',
-    (g.decision||{}).avoid||[],{legend:false});
+  // ① 风险池 — decision.avoid 优先; 空时使用决策卡里的明确风险字段，不把买入卡伪装成风险。
+  const riskRows=(g.decision||{}).avoid||[];
+  const riskFallback=((g.decision||{}).cards||[]).filter(x=>x.action==='avoid'||x.risk);
+  P('① 风险池','回避名单; 无回避结论时展示决策卡中带风险说明的标的，不把普通买入卡混入',
+    riskRows.length?riskRows:riskFallback,{legend:false});
 
-  // ② 周期池 — cycle_pool_v2 的周期归位
+  // ② 周期池 — 当前状态 + 行业/概念轮动，不再把历史年份区间当成股票。
   const cv2=g.cycle_pool_v2||{};
-  const regimeRows=[];
-  Object.entries(cv2.regimes||{}).forEach(([k,v])=>{ regimeRows.push({
-    code:k, name:(v.n||0)+'个年份', score:v.avg_chg, composite:v.avg_chg,
-    raw:{regime:k, n:v.n, avg_chg:v.avg_chg, best:v.best, worst:v.worst}
-  });});
-  regimeRows.sort((a,b)=>(b.score||0)-(a.score||0));
-  P('② 周期池','35年周期归位: 各涨幅区间的年份分布与均值 (判定当前所处周期)',
-    regimeRows,{limit:8,legend:false});
+  const cycleStatus=cv2.status||{};
+  const cycleItems=[...(((cv2.demand_shift||{}).industry_top)||[]).slice(0,8).map(x=>Object.assign({kind:'行业'},x)),
+                    ...(((cv2.demand_shift||{}).concept_top)||[]).slice(0,8).map(x=>Object.assign({kind:'概念'},x))];
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+' · MA5/20/60 '+[_esc2(cycleStatus.ma5),_esc2(cycleStatus.ma20),_esc2(cycleStatus.ma60)].join('/')+'</span></div>';
+  if(cycleItems.length){
+    h+='<table><thead><tr><th>类型</th><th>名称</th><th>涨跌%</th><th>上涨/下跌</th><th>龙头</th><th>主力净额</th></tr></thead><tbody>';
+    cycleItems.forEach(x=>h+='<tr><td>'+_esc2(x.kind)+'</td><td><b>'+_esc2(x.name)+'</b></td><td class="'+((x.chg_pct||0)>=0?'up':'dn')+'">'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.up_n)+'/'+_esc2(x.down_n)+'</td><td>'+_esc2(x.leader||'—')+'</td><td>'+_esc2(x.main_net_inflow_yi==null?'—':x.main_net_inflow_yi+'亿')+'</td></tr>');
+    h+='</tbody></table>';
+  } else h+='<div class="fl">周期池的行业/概念轮动为空</div>';
+  const regimeRows=Object.entries(cv2.regimes||{}).map(([k,v])=>({name:k,count:v.n,avg:v.avg_chg,best:v.best,worst:v.worst}));
+  if(regimeRows.length){
+    h+='<div class="fl" style="font-size:10px;margin:4px 0">35年历史区间仅作背景，不是当前股票池: '+regimeRows.map(x=>_esc2(x.name)+' '+_esc2(x.count)+'年/均值'+_esc2(x.avg)+'%').join(' · ')+'</div>';
+  }
 
   // ③ 推荐池 — ai_pick_v4 (与每日推股不同, 不计入胜率)
   P('③ 推荐池','与每日推股不同, 不记入胜率计算及优化方案',
     (g.ai_pick_v4||{}).picks||(g.ai_picks||{}).picks||[]);
 
-  // ④ 热榜池 — 与右栏实时热榜同源, 算法筛选后取前 20 的 A 股关联股
+  // ④ 热榜池 — 只保留热榜标题能映射到 A 股代码的结果。
   const hotTop=(typeof rankHotNews==='function')?rankHotNews(g.hot_news):[];
-  P('④ 热榜池','与右侧实时热榜绑定 (同一算法筛选结果), 附平台权重分',
-    hotTop.map(it=>({code:it.x.code||'', name:(it.x.title||'').slice(0,18),
-                     score:it.s, raw:it.x})),{limit:20,legend:false});
+  const hotStocks=[];
+  const seenHot=new Set();
+  hotTop.forEach(it=>{
+    const text=(it.x.title||'')+(it.x.summary||'');
+    const codes=(text.match(/\b\d{6}\b/g)||[]).concat((it.x.codes||[]));
+    codes.forEach(code=>{
+      const bare=String(code).replace(/^(sh|sz|bj)/,'');
+      if(!/^\d{6}$/.test(bare)||seenHot.has(bare)) return;
+      seenHot.add(bare);
+      hotStocks.push({code:bare,name:(it.x.title||'').slice(0,24),score:Math.round(it.s),raw:{source:it.x.source_name||it.x.source,title:it.x.title}});
+    });
+  });
+  P('④ 热榜池','从热榜标题和关联代码映射出的A股，未映射的新闻不进入股票池',
+    hotStocks,{limit:20,legend:false});
 
   // ⑤ 低位池 — lowpool
   P('⑤ 低位池','低位启动候选 (位置/RSI/缩量止跌)',
@@ -2061,6 +2101,10 @@ function renderOverseasLinkage(){
     });
     h+='</tbody></table>';
   });
+  const levels={};
+  rows.forEach(r=>{const k=r.level||'未分级';(levels[k]=levels[k]||[]).push(r);});
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">关联分层 <span class="sub">按相关强度汇总，不把单对相关写成因果</span></div>';
+  h+='<div class="chips">'+Object.entries(levels).map(([k,arr])=>'<span class="chip">'+_esc2(k)+' <b>'+arr.length+'</b></span>').join('')+'</div>';
   h+='<div class="fl" style="padding:8px 0 2px;font-size:9px;line-height:1.5">'
     +'方法: '+_esc2(JSON.stringify(d.method||{}).replace(/[{}"]/g,'').replace(/,/g,' · '))
     +'<br>'+_esc2(d.caveat||'')+'</div>';
@@ -2272,7 +2316,17 @@ function renderCycleDeep(d){
 function renderFlowDivergence(d){
   const box=document.getElementById('flowDivergence');
   if(!box) return;
-  if(!d||!d.buy_side||!d.buy_side.length){box.innerHTML='<div class="no-data">暂无背离数据</div>';return}
+  if(!d){box.innerHTML='<div class="no-data">资金背离文件缺失</div>';return}
+  if(d.status!=='ok' || !((d.buy_side||[]).length || (d.sell_side||[]).length)){
+    const cov=d.coverage||{}, reasons=d.rejection_reasons||{};
+    box.innerHTML='<div class="no-data">本轮没有可确认的资金背离</div>'
+      +'<div class="fl" style="padding:8px 12px;font-size:10px;line-height:1.6">状态 '+_esc2(d.status||'unknown')
+      +' · 扫描 '+_esc2(d.n_scanned||0)+' · 有效 '+_esc2(d.n_scored||0)
+      +' · 资金源覆盖 '+_esc2(cov.flow_source_ratio==null?'—':Math.round(cov.flow_source_ratio*100)+'%')
+      +'<br>拒绝原因: '+_esc2(Object.entries(reasons).map(([k,v])=>k+' '+v).join(' · ')||'无')
+      +'<br>规则: 最近20个交易日必须逐日对齐，不允许用旧资金日冒充当前交易日。</div>';
+    return;
+  }
   const esc=s=>String(s==null?'—':s);
   let h='<div class="fl" style="padding:4px 12px;font-size:9px;line-height:1.5">'+esc(d.meta&&d.meta.source)+' · '+(d.ts||'').replace('T',' ').slice(5,16)+' · 公式 '+esc(d.meta&&d.meta.formula)+'</div>';
   const tbl=(title,arr,col)=>{

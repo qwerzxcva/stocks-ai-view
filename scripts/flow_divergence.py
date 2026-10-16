@@ -40,7 +40,9 @@ def secid(code):
 
 def load_klines(bulk):
     data = {}
-    for path in sorted(glob.glob(os.path.join(bulk, "day_qfq_*.csv"))):
+    paths = [path for path in sorted(glob.glob(os.path.join(bulk, "day_qfq_*.csv")))
+             if os.path.basename(path) not in ("day_qfq_recent.csv",)]
+    for path in paths:
         with open(path, encoding="utf-8", errors="replace") as handle:
             for line in handle:
                 line = line.strip()
@@ -64,17 +66,31 @@ def load_klines(bulk):
 
 def fetch_flow_detail(code, n=60):
     """Return (rows, rejection_reason); source failures never synthesize flow."""
-    url = ("https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
-           f"?secid={secid(code)}&lmt={n}&klt=101"
-           "&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65")
-    try:
-        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
-        payload = json.loads(body.decode("utf-8"))
-    except Exception:
+    urls = [
+        ("https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get"
+         f"?secid={secid(code)}&lmt={n}&klt=101"
+         "&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64,f65"),
+        ("https://push2delay.eastmoney.com/api/qt/stock/fflow/kline/get"
+         f"?secid={secid(code)}&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58&lmt={n}&klt=101"),
+    ]
+    payload, saw_empty = None, False
+    for url in urls:
+        try:
+            body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+            candidate = json.loads(body.decode("utf-8"))
+        except Exception:
+            continue
+        klines = ((candidate.get("data") or {}).get("klines")) or []
+        if len(klines) >= 25:
+            payload = candidate
+            break
+        saw_empty = saw_empty or not klines
+        payload = payload or candidate
+    if payload is None:
         return [], "source_unavailable"
     klines = ((payload.get("data") or {}).get("klines")) or []
     if not klines:
-        return [], "source_empty"
+        return [], "source_empty" if saw_empty else "source_short_window"
     rows = []
     for row in klines:
         fields = row.split(",")
@@ -204,8 +220,9 @@ def main():
         targets = [code for code in klines if any(code.endswith(item) or code == item for item in want)]
     else:
         latest = max((bars[-1][0] for bars in klines.values() if bars), default=None)
-        targets = [code for code, bars in klines.items() if bars and bars[-1][0] == latest]
-        targets.sort(key=lambda code: -len(klines[code]))
+        targets = [code for code, bars in klines.items()
+                   if len(bars) >= 30 and bars[-1][0] == latest]
+        targets.sort(key=lambda code: -klines[code][-1][5])
         targets = targets[:args.limit]
     results, rejection_reasons, totals = [], Counter(), Counter()
     coverage_samples = []
