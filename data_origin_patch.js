@@ -41,7 +41,12 @@
   function remote(url, timeoutMs) {
     var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, timeoutMs || 12000) : null;
-    return fetch(url, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
+    // GitHub raw/CDN 可能继续返回旧 JSON。每次数据请求带版本参数，
+    // 保留 no-store，同时绕过 Pages/Raw 的边缘缓存；这不是浏览器缓存策略，
+    // 而是线上数据版本一致性门禁。
+    var sep = url.indexOf('?') >= 0 ? '&' : '?';
+    var freshUrl = url + sep + 'v=' + Date.now();
+    return fetch(freshUrl, { cache: 'no-store', signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) {
         if (timer) clearTimeout(timer);
         if (!r.ok) throw new Error('remote ' + r.status);
