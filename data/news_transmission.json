@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-17T17:44:51+08:00",
+ "ts": "2026-10-17T21:22:09+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 476,
- "n_transmissions": 11,
+ "n_input": 475,
+ "n_transmissions": 9,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "【早报】美股纳指大跌超500点，半导体、存储股全线跳水；黄仁勋谈“AI市场震荡”；国际油价大涨；胜宏科技、豪威集团等计划回购股份",
    "source": "财联社热门",
-   "time": "2026-10-17T17:44:39+08:00",
+   "time": "2026-10-17T21:11:31+08:00",
    "url": "https://www.cls.cn/detail/2507382",
    "transmission_id": "oil_up",
    "label": "油价上涨",
@@ -177,63 +177,10 @@
    }
   },
   {
-   "title": "纳斯达克综合指数（纳指）下跌540点、跌幅超过2%，标普跌超1.1%，道指跌超0.5%，纳斯达克100指数跌2.3%，生",
-   "source": "wallstreetcn",
-   "time": "2026-10-17T01:18:13+08:00",
-   "url": "https://wallstreetcn.com/live/3180406",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-16",
-    "event_date": "2026-10-17",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "特朗普签署行政令豁免对俄多项制裁",
+   "title": "俄官员称特朗普放松对俄制裁有“历史意义”",
    "source": "财联社电报",
-   "time": "2026-10-17T17:44:39+08:00",
-   "url": "https://www.cls.cn/detail/2507449",
+   "time": "2026-10-17T21:12:18+08:00",
+   "url": "https://www.cls.cn/detail/2507499",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
    "direct_bear": [],
@@ -258,10 +205,10 @@
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "欧洲央行行长拉加德：战争带来通胀上行风险。\n\n财政可持续性仍是整体经济稳定的“重要支柱”，各国政府应当确保针对能源冲击出台的财政举措具备临时性、定向性与适配性。\n\n经济前景下行风险",
-   "source": "华尔街见闻",
-   "time": "2026-10-17T17:25:11+08:00",
-   "url": "https://wallstreetcn.com/livenews/3180545",
+   "title": "日本宣称侵华战争是圣战",
+   "source": "微博热搜",
+   "time": "2026-10-17T20:57:25+08:00",
+   "url": "https://s.weibo.com/weibo?q=%23%E6%97%A5%E6%9C%AC%E5%AE%A3%E7%A7%B0%E4%BE%B5%E5%8D%8E%E6%88%98%E4%BA%89%E6%98%AF%E5%9C%A3%E6%88%98%23&t=31&band_rank=21&Refer=top",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -302,40 +249,23 @@
    }
   },
   {
-   "title": "华中科技大学女篮与武汉盛帆女篮爆发大规模冲突，华科主帅追打对方球员，具体情况如何？将面临什么处罚？",
-   "source": "知乎热榜",
-   "time": "2026-10-17T17:32:08+08:00",
-   "url": "https://www.zhihu.com/question/2094458019136410730",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "特朗普签署行政令豁免对俄多项制裁",
+   "source": "澎湃新闻",
+   "time": "2026-10-17T21:22:02+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34269052",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "半导体设备",
      "stocks": [
-      "300045",
-      "688631"
+      "688385"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "300581"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -343,12 +273,41 @@
     "trade_date": "2026-10-16",
     "event_date": "2026-10-17",
     "matched_codes": []
-   }
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "“特朗普暂停对俄制裁，是历史性时刻”",
+   "source": "凤凰网",
+   "time": "2026-10-17T21:22:02+08:00",
+   "url": "https://news.ifeng.com/c/8xIg4YWs1S4",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688385"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
    "title": "“我上去就给她三拳”，女篮热身赛爆发大规模冲突",
    "source": "凤凰网",
-   "time": "2026-10-17T17:15:09+08:00",
+   "time": "2026-10-17T21:22:02+08:00",
    "url": "https://v.ifeng.com/c/8xIKbtgrJMm",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -418,50 +377,6 @@
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "航行警告：渤海执行军事任务",
-   "source": "wallstreetcn",
-   "time": "2026-10-17T09:04:51+08:00",
-   "url": "https://wallstreetcn.com/live/3180519",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "300045",
-      "688631"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "300581"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-16",
-    "event_date": "2026-10-17",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "特朗普豁免《格雷厄姆法案》中多项对俄制裁、限制措施及关税",
    "source": "wallstreetcn",
    "time": "2026-10-17T08:49:29+08:00",
@@ -488,50 +403,6 @@
     "matched_codes": []
    },
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "伊朗：愿意帮助解决沙特和也门（胡塞武装）之间的冲突。",
-   "source": "wallstreetcn",
-   "time": "2026-10-17T01:42:10+08:00",
-   "url": "https://wallstreetcn.com/live/3180418",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "300045",
-      "688631"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "300581"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-16",
-    "event_date": "2026-10-17",
-    "matched_codes": []
-   }
   }
  ]
 }
