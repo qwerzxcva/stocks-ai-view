@@ -49,20 +49,21 @@ def _j(b):
         return {}
 
 
-def fetch_em_industries(max_pages=6):
-    """东财行业板块列表 (m:90 t:2): [{code, name}]
+def fetch_em_boards(fs_filter, max_pages=8):
+    """东财板块列表。fs=m:90+t:2 是行业 (~86), fs=m:90+t:3 是概念 (400+)。
 
     必须分页: 东财把 pz 上限压到 100 (传 200 也只回 100 个),
     而完整行业表有 500+ 个。只取一页会让半导体/化工/黄金这些关键
     行业缺失, 下游 news_transmission 的传导表大面积匹配不上
     (2026-10-15 实测: 单页只拿到 80 个行业, 半导体/黄金/化工全是 0 只)。
+    概念板块 (t:3) 覆盖燃料电池/飞行汽车等题材, 与行业互为补充。
     """
     out = []
     seen = set()
     for pn in range(1, max_pages + 1):
         url = ("https://push2.eastmoney.com/api/qt/clist/get"
                "?fid=f3&po=1&pz=100&pn=%d&np=1&fltt=2&invt=2"
-               "&fs=m:90+t:2&fields=f12,f14" % pn)
+               "&fs=%s&fields=f12,f14" % (pn, fs_filter))
         d = _j(_get(url))
         items = ((d.get("data") or {}).get("diff")) or []
         if not items:
@@ -77,6 +78,14 @@ def fetch_em_industries(max_pages=6):
             break
         time.sleep(0.5)
     return out
+
+
+def fetch_em_industries(max_pages=8):
+    return fetch_em_boards("m:90+t:2", max_pages)
+
+
+def fetch_em_concepts(max_pages=8):
+    return fetch_em_boards("m:90+t:3", max_pages)
 
 
 def fetch_industry_stocks(bk_code, page_size=100):
@@ -116,13 +125,17 @@ def main():
                     help="只处理前 N 个板块 (0=全部)")
     args = ap.parse_args()
 
-    inds = fetch_em_industries(200)
-    if not inds:
-        print("[indmap] 东财行业列表取数失败 (限流?), 终止")
+    inds = fetch_em_boards("m:90+t:2", 8)
+    # 概念板块 (400+, 含燃料电池/飞行汽车等题材): 与行业互补, 扩大成分股覆盖
+    concepts = fetch_em_boards("m:90+t:3", 8)
+    if not inds and not concepts:
+        print("[indmap] 东财行业/概念列表取数失败 (限流?), 终止")
         return 1
     if args.limit:
         inds = inds[:args.limit]
-    print("[indmap] 行业板块 %d 个, 开始拉成分股..." % len(inds), flush=True)
+        concepts = concepts[:args.limit]
+    print("[indmap] 行业 %d 个 + 概念 %d 个, 开始拉成分股..." % (
+        len(inds), len(concepts)), flush=True)
 
     code2ind = {}
     ok = 0
@@ -134,18 +147,34 @@ def main():
                 # 一只票可能在多个板块, 保留第一个 (东财按涨幅排序, 靠前的是主板块)
                 code2ind.setdefault(c, b["name"])
         if (i + 1) % 10 == 0:
-            print("[indmap] %d/%d 板块完成, 已映射 %d 只" % (
+            print("[indmap] 行业 %d/%d 完成, 已映射 %d 只" % (
                 i + 1, len(inds), len(code2ind)), flush=True)
+        time.sleep(0.3)
+
+    # 概念板块同样反查 (不进 code2ind 主映射, 单独存概念→成分, 供周期池/题材用)
+    concept_map = {}
+    okc = 0
+    for i, b in enumerate(concepts):
+        codes = fetch_industry_stocks(b["code"])
+        if codes:
+            okc += 1
+            concept_map[b["name"]] = codes
+        if (i + 1) % 20 == 0:
+            print("[indmap] 概念 %d/%d 完成" % (i + 1, len(concepts)), flush=True)
         time.sleep(0.3)
 
     out = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%S+08:00"),
-        "engine": "build_industry_map_em v1 (东财行业成分股反查)",
+        "engine": "build_industry_map_em v2 (东财行业成分股反查 + 概念板块)",
         "n_industries": len(inds),
         "n_industries_ok": ok,
+        "n_concepts": len(concepts),
+        "n_concepts_ok": okc,
         "n_stocks": len(code2ind),
         "map": code2ind,
-        "caveat": "个股→东财行业多对一; 保留首个命中板块 (东财按涨幅排序)",
+        "concept_map": concept_map,
+        "caveat": "个股→东财行业多对一; 保留首个命中板块 (东财按涨幅排序); "
+                  "concept_map 是概念→[代码] 供周期池/题材引擎用",
     }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

@@ -27,6 +27,7 @@ import argparse
 import json
 import math
 import os
+import re
 import sys
 import time
 import urllib.request
@@ -36,6 +37,33 @@ from datetime import datetime, timezone, timedelta
 CST = timezone(timedelta(hours=8))
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+try:
+    from paths import BULK
+except Exception:
+    BULK = os.path.join(os.path.dirname(HERE), "..", "..",
+                        "stocks-data-kline", "data", "bulk")
+
+
+def load_universe_names():
+    """universe.csv → {裸码: 名称}。5344 只全市场股票, 解决成分股无名称。"""
+    path = os.path.join(BULK, "universe.csv")
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, encoding="utf-8", errors="replace") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "|" not in line:
+                continue
+            parts = line.split("|")
+            if len(parts) >= 2:
+                c = parts[0]
+                out[c[2:] if c[:2] in ("sh", "sz", "bj") else c] = parts[1]
+    return out
+
 INDEXES = ["sh000001", "sz399001", "sh000300", "sz399006", "sh000688"]
 NAMES = {"sh000001": "上证指数", "sz399001": "深成指", "sh000300": "沪深300",
          "sz399006": "创业板指", "sh000688": "科创50"}
@@ -43,8 +71,92 @@ NAMES = {"sh000001": "上证指数", "sz399001": "深成指", "sh000300": "沪�
 DEFAULT_OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                            "data", "cycle_pool_v2.json")
 
+def _strip_suffix(name):
+    """去东财行业层级后缀: 航空装备Ⅲ→航空装备, 地面兵装Ⅱ→地面兵装。"""
+    return re.sub(r"[ⅠⅡⅢⅣⅤ]+$", "", str(name or ""))
+
+
+def _fuzzy_industry_codes(target):
+    """行业名模糊匹配 industry_map_em 的所有个股。
+
+    航空装备Ⅲ → 去后缀「航空装备」 → 匹配映射里所有含「航空装备」的行业
+    (航空装备Ⅱ/Ⅲ/航天航空装备等) 的全部个股。比精确匹配覆盖面大得多。
+    """
+    base = _strip_suffix(target)
+    if not base:
+        return []
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(root, "data", "industry_map_em.json")
+    try:
+        mapping = json.load(open(path, encoding="utf-8")).get("map") or {}
+    except (OSError, json.JSONDecodeError):
+        return []
+    return [c for c, ind in mapping.items() if base in str(ind)]
+
+
+def _concept_stocks_from_reports(concept_name):
+    """从 hot_impact 的概念归因里找成分股 (零网络, 已有数据)。"""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        _im = json.load(open(os.path.join(root, "data", "industry_map_em.json"),
+                             encoding="utf-8"))
+        cmap = _im.get("concept_map") or {}
+    except (OSError, json.JSONDecodeError):
+        cmap = {}
+    for rep_name, codes in cmap.items():
+        if str(rep_name) == str(concept_name):
+            return [str(c) for c in codes]
+    # 旧版无 concept_map: 从 reports.stocks 兜底
+    try:
+        d = json.load(open(os.path.join(root, "data", "hot_impact.json"),
+                           encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    for rep in (d.get("reports") or []):
+        if str(rep.get("theme")) == str(concept_name):
+            out = []
+            for s in (rep.get("stocks") or []):
+                c = str(s.get("code") or "")
+                out.append(c[2:] if c[:2] in ("sh", "sz", "bj") else c)
+            return out
+    return []
+    """东财板块/个股搜索接口 → 成分候选。
+
+    searchapi 的 type=14 混返板块+个股: 搜索「燃料电池」前几条是板块(BK),
+    后面是个股(实际成分)。本地沙盒出口对 push2 系 TLS 超时(分片架构里
+    正是 B 仓在采), 所以这里用 searchapi(可用) 而非 clist(本机不可达)。
+    过滤: 取 AStock 个股代码; 若只有板块没有个股, 返回空 (交由下游兜底)。
+    """
+    try:
+        q = urllib.parse.quote(str(board_name))
+        url = ("https://searchapi.eastmoney.com/api/suggest/get"
+               "?input=%s&type=14&count=20&markettype=&mktnum=" % q)
+        d = json.loads(urllib.request.urlopen(
+            urllib.request.Request(url, headers=UA), timeout=10).read().decode())
+        out = []
+        for x in (d.get("QuotationCodeTable") or {}).get("Data") or []:
+            code = str(x.get("Code") or "")
+            # AStock=个股, BK=板块 (跳过), 沪A/深A/京A 都在 AStock
+            if x.get("Classify") == "AStock" and code.isdigit() and len(code) == 6:
+                out.append(code)
+            if len(out) >= max_codes:
+                break
+        return out
+    except Exception:
+        return []
+
+
 def stock_candidates(demand):
-    """Turn the current industry/concept rotation into named stock candidates."""
+    """Turn the current industry/concept rotation into named stock candidates.
+
+    2026-10-17 用户反馈「周期池数据缺失严重」根因: 行业映射只覆盖 80/496 行业,
+    带Ⅲ后缀的行业名 0 命中。三层候选来源按优先级:
+      1. 精确行业匹配 (industry_map_em)
+      2. 去层级后缀匹配 (航空装备Ⅲ→航空装备 命中父级映射)
+      3. 东财板块接口按概念名取成分 (概念榜 + 无映射行业)
+      4. 概念用涨停池名称兜底 (已有归因)
+    """
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     path = os.path.join(root, "data", "industry_map_em.json")
     try:
@@ -52,16 +164,104 @@ def stock_candidates(demand):
     except (OSError, json.JSONDecodeError):
         return []
     by_industry = {}
+    by_base = {}
     for code, industry in mapping.items():
         by_industry.setdefault(industry, []).append(code)
+        by_base.setdefault(_strip_suffix(industry), []).append(code)
+    names = load_universe_names()
+
+    def _zt_pool_codes():
+        """涨停池名称 → 代码 (概念兜底, 复用 hot_impact 的归因)。"""
+        try:
+            d = json.load(open(os.path.join(root, "data", "limitup_attribution.json"),
+                               encoding="utf-8"))
+            return {str(x.get("name")): str(x.get("code"))
+                    for x in (d.get("pools") or d.get("items") or [])
+                    if isinstance(x, dict) and x.get("name") and x.get("code")}
+        except Exception:
+            return {}
+
+    zt_names = _zt_pool_codes()
     rows = []
-    for item in ((demand or {}).get("industry_top") or [])[:12]:
-        codes = by_industry.get(item.get("name"), [])[:4]
+    seen = set()
+
+    def _add(codes, item, reason):
         for code in codes:
-            rows.append({"code": code, "name": "", "industry": item.get("name"),
-                         "chg_pct": item.get("chg_pct"), "leader": item.get("leader"),
-                         "reason": "当前周期需求迁移行业成分股"})
-    return rows[:30]
+            if code in seen:
+                continue
+            seen.add(code)
+            rows.append({"code": code, "name": names.get(code) or "",
+                         "industry": item.get("name"),
+                         "chg_pct": item.get("chg_pct"),
+                         "leader": item.get("leader"),
+                         "main_net_inflow_yi": item.get("main_net_inflow_yi"),
+                         "reason": reason})
+
+    # 行业榜: 精确 → 去后缀模糊 → 涨停名称兜底
+    for item in ((demand or {}).get("industry_top") or [])[:12]:
+        nm = item.get("name")
+        codes = by_industry.get(nm) or _fuzzy_industry_codes(nm) or []
+        if not codes and nm in zt_names:
+            codes = [zt_names[nm]]
+        if codes:
+            _add(codes[:6], item, "当前周期需求迁移行业成分股")
+
+    # 概念榜: 概念不在行业映射 → hot_impact 归因 → 涨停名称兜底
+    for item in ((demand or {}).get("concept_top") or [])[:8]:
+        nm = item.get("name")
+        codes = _concept_stocks_from_reports(nm) or ([] if nm not in zt_names else [zt_names[nm]])
+        if codes:
+            _add(codes[:4], item, "当前周期需求迁移概念成分股")
+
+    return rows[:60]
+
+
+def _prefixed(code):
+    c = str(code or "")
+    if c[:2] in ("sh", "sz", "bj"):
+        return c
+    return ("sh" if c.startswith(("6", "9"))
+            else "bj" if c.startswith(("4", "8")) else "sz") + c
+
+
+def enrich_candidates(rows):
+    """实时行情补全 (腾讯 qt.gtimg.cn 批量): 价格/涨跌/换手/PE/PB/市值。
+
+    2026-10-17 用户反馈「每个池的实时价值、综合分等缺少严重」: 周期池
+    原本只有行业涨幅一个字段, 现在每只候选补齐实时估值与市值。
+    """
+    codes = [_prefixed(r["code"]) for r in rows]
+    out = {}
+    for i in range(0, len(codes), 60):
+        url = "https://qt.gtimg.cn/q=" + ",".join(codes[i:i + 60])
+        try:
+            b = urllib.request.urlopen(urllib.request.Request(url, headers=UA),
+                                       timeout=15).read()
+        except Exception as e:
+            print(f"[enrich] {e}", file=sys.stderr)
+            continue
+        try:
+            text = b.decode("gbk", "replace")
+        except Exception:
+            continue
+        for m in re.finditer(r'v_([a-z0-9]+)="([^"]*)"', text):
+            sym, p = m.group(1), m.group(2).split("~")
+            if len(p) < 47:
+                continue
+            bare = sym[2:] if sym[:2] in ("sh", "sz", "bj") else sym
+            def _f(x):
+                try:
+                    return float(x)
+                except (TypeError, ValueError):
+                    return None
+            out[bare] = {
+                "price": _f(p[3]), "chg_pct": _f(p[32]),
+                "turnover": _f(p[38]), "pe": _f(p[39]),
+                "mktcap_yi": _f(p[44]), "pb": _f(p[46]),
+                "quote_time": p[30] or "",
+            }
+        time.sleep(0.15)
+    return out
 
 
 # ─── 拉取: 腾讯指数全史 (分页, 同 cycle_deep) ────────────────────
@@ -463,6 +663,21 @@ def main():
     print("[4/4] 需求变化 (板块轮动) ...")
     demand = demand_shift()
 
+    print("[5/5] 股票候选 (行业/概念成分股 + 实时行情补全) ...")
+    stocks = stock_candidates(demand)
+    # 实时行情补全: 周期池原本只有行业涨幅, 现在每只候选带现价/涨跌/换手/PE/PB/市值
+    if stocks:
+        quotes = enrich_candidates(stocks)
+        n_enriched = 0
+        for s in stocks:
+            q = quotes.get(s["code"])
+            if q:
+                s.update(q)
+                if not s["name"]:
+                    s["name"] = q.get("name") or s["name"]
+                n_enriched += 1
+        print(f"[stocks] 候选 {len(stocks)} 只, 行情补全 {n_enriched} 只", flush=True)
+
     print("[+] 五维状态 ...")
     status = five_dim_status(bars)
 
@@ -483,7 +698,11 @@ def main():
         "regimes": regimes,
         "cycle_law": law,
         "demand_shift": demand,
-        "stocks": stock_candidates(demand),
+        "stocks": stocks,
+        "stocks_meta": {
+            "n": len(stocks),
+            "enriched": sum(1 for s in stocks if s.get("price") is not None),
+        },
     }
 
     path = args.out or DEFAULT_OUT

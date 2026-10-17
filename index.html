@@ -2064,10 +2064,12 @@ function renderPools(){
   const cycleStocks=cv2.stocks||[];
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">股票级候选 · 当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+'</span></div>';
   if(cycleStocks.length){
-    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属行业</th><th>MA20</th><th>行业涨跌%</th><th>行业龙头</th><th>入池原因</th></tr></thead><tbody>';
-    cycleStocks.slice(0,30).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.ma20==null?'—':x.ma20)+'</td><td>'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.leader||'—')+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属板块</th><th>现价</th><th>涨跌%</th><th>换手%</th><th>PE</th><th>市值(亿)</th><th>主力净流入</th><th>入池原因</th></tr></thead><tbody>';
+    cycleStocks.slice(0,40).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.price==null?'—':x.price)+'</td><td class="'+(x.chg_pct>=0?'up':'dn')+'">'+_esc2(x.chg_pct==null?'—':(x.chg_pct>=0?'+':'')+x.chg_pct)+'</td><td>'+_esc2(x.turnover==null?'—':x.turnover)+'</td><td>'+_esc2(x.pe==null?'—':x.pe)+'</td><td>'+_esc2(x.mktcap_yi==null?'—':x.mktcap_yi)+'</td><td>'+_esc2(x.main_net_inflow_yi==null?'—':x.main_net_inflow_yi)+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
     h+='</tbody></table>';
-  } else h+='<div class="fl">周期股票候选尚未生成；当前只有行业轮动，未把它伪装成股票池</div>';
+    const _sm=cv2.stocks_meta||{};
+    if(_sm.n!=null) h+='<div class="fl" style="font-size:9px;margin-top:2px">候选 '+_esc2(_sm.n)+' 只 · 行情补全 '+_esc2(_sm.enriched)+' 只 · 行业/概念成分股 + 实时估值</div>';
+  } else h+='<div class="fl">周期股票候选尚未生成</div>';
   const regimeRows=Object.entries(cv2.regimes||{}).map(([k,v])=>({name:k,count:v.n,avg:v.avg_chg,best:v.best,worst:v.worst}));
   if(regimeRows.length){
     h+='<div class="fl" style="font-size:10px;margin:4px 0">35年历史区间仅作背景，不是当前股票池: '+regimeRows.map(x=>_esc2(x.name)+' '+_esc2(x.count)+'年/均值'+_esc2(x.avg)+'%').join(' · ')+'</div>';
