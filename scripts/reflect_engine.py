@@ -342,7 +342,7 @@ def analyze(results_list, horizons, phase_map):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--pred-dir', default='/tmp', help='engine_v5 输出所在目录')
+    ap.add_argument('--pred-dir', default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'predictions'), help='engine_v5 历史预测目录')
     ap.add_argument('--bulk', default=None, help='K线 bulk 目录 (默认 paths.BULK)')
     ap.add_argument('--data-dir', default=None, help='ai-view data 目录 (默认 paths.AI_VIEW_DATA)')
     ap.add_argument('--horizons', default='1,3,5,10')
