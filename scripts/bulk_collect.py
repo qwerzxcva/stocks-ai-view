@@ -167,6 +167,77 @@ def fetch_ks_realtime(code):
         return None, "非 JSON (限流返回 HTML)"
 
 
+def fetch_em_daily_raw(code):
+    """东财原始价 (不复权 fqt=0) 全历史。
+
+    2026-10-17 净化链路兜底: 新浪挂时用它。腾讯 qfq 有污染 (九阳 2009-04-30
+    实证 -49.8% 假跳空), 只在两路都断时由调用方决定。
+    返回 [(date,o,c,h,l,v),...]
+    """
+    mkt = "1" if code[0] in "69" else "0"
+    url = ("https://push2his.eastmoney.com/api/qt/stock/kline/get"
+           "?secid=%s.%s&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56"
+           "&klt=101&fqt=0&beg=0&end=20500101&ut=7eea3edcaed734bea9cbfc24409ed989"
+           % (mkt, code))
+    try:
+        d = json.loads(urllib.request.urlopen(
+            urllib.request.Request(url, headers=UA), timeout=20).read().decode())
+        klines = ((d.get("data") or {}).get("klines")) or []
+        rows = []
+        for line in klines:
+            p = line.split(",")
+            if len(p) >= 6:
+                rows.append([p[0], float(p[2]), float(p[3]),
+                             float(p[4]), float(p[5]), float(p[6])])
+        return rows, None
+    except Exception as e:
+        return [], str(e)
+
+
+def fetch_tencent_qfq(code):
+    """腾讯 qfq 全史 (640 根硬上限) —— 仅作最后兜底, 已知有污染。"""
+    sym = prefixed(code)
+    url = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+           f"?param={sym},day,,,640,qfq")
+    try:
+        d = json.loads(urllib.request.urlopen(
+            urllib.request.Request(url, headers=UA), timeout=20).read().decode())
+        node = (d.get("data") or {}).get(sym) or {}
+        arr = node.get("qfqday") or node.get("day") or []
+        rows = []
+        for r in arr:
+            if len(r) >= 6:
+                rows.append([r[0], float(r[1]), float(r[2]),
+                             float(r[3]), float(r[4]), float(r[5])])
+        return rows, None
+    except Exception as e:
+        return [], str(e)
+
+
+def fetch_tencent_kline(code):
+    """腾讯 fqkline day 全史 (通常 640+ 根, 多为上市起完整)。
+
+    第三兜底: 新浪/东财都挂时用。腾讯自身有污染 (九阳 2009-04-30 实证 -49.8%
+    假跳空), 投票众数时其价值低于新浪/东财, 但三源里至少它有自己的数据。
+    """
+    sym = prefixed(code)
+    url = ("https://web.ifzq.gtimg.cn/appstock/app/fqkline/get"
+           f"?param={sym},day,,,1500,qfq")
+    try:
+        d = json.loads(urllib.request.urlopen(
+            urllib.request.Request(url, headers=UA), timeout=20).read().decode())
+        node = (d.get("data") or {}).get(sym) or {}
+        arr = node.get("qfqday") or node.get("day") or []
+        rows = []
+        for r in arr:
+            if len(r) >= 6:
+                rows.append([r[0], float(r[1]), float(r[2]),
+                             float(r[3]), float(r[4]), float(r[5])])
+        return rows, None
+    except Exception as e:
+        return [], str(e)
+
+
 def existing_dates(code):
     """本地 bulk 里该 code 已有的日期集合 (增量用)。"""
     have = set()
@@ -213,13 +284,32 @@ def append_bulk(code, rows):
 
 
 def rewrite_bulk(code, rows):
-    """整股重写: 从分片文件剔除该股所有旧行, 写入新浪全历史 (纯净原始价)。
+    """整股重写: 从分片文件剔除该股所有旧行, 写入全历史 (净化口径单一)。
 
-    2026-10-17 数据净化: existing append 模式让qfq污染段永久残留在 bulk 里
+    2026-10-17 数据净化: existing append 模式让污染段永久残留在 bulk 里
     (603866 实测比值漂移 0.94→1.00), 只有整股重写才能保证口径单一。
+
+    防掉点: 同批次两次拉取做 close 序列比对, 不一致(截断/掉点)则拒写,
+    保留旧数据等下一轮——单次返回的污染段比陈旧数据更糟 (九阳 2023-06-19
+    单点 -3% 若写入即固化)。
     """
     if not rows:
         return 0
+    if len(rows) >= 200:
+        rows2, _ = fetch_sina_full(code)
+        if len(rows2) >= 200:
+            def _f(x):
+                try:
+                    return float(x)
+                except (TypeError, ValueError):
+                    return 0.0
+            s1 = [_f(r[2]) for r in rows[-120:]]
+            s2 = [_f(r[2]) for r in rows2[-120:]]
+            if len(s1) == len(s2) and any(abs(a - b) / max(1e-9, abs(a)) > 0.004
+                                          for a, b in zip(s1, s2)):
+                print("[rewrite] %s 双拉不一致 (>0.4%%), 拒写防污染" % code,
+                      file=sys.stderr)
+                return 0
     p = os.path.join(BULK, "day_qfq_%s.csv" % str(code).zfill(6)[:2])
     os.makedirs(BULK, exist_ok=True)
     bare = str(code).zfill(6)
@@ -287,7 +377,18 @@ def main():
             continue
         try:
             if args.kind == "kline":
+                # 净化链路: 新浪全史(纯raw) → 东财原始价 → 腾讯qfq(已知污染,仅兜最底)
                 rows, err = fetch_sina_full(code)
+                if not rows:
+                    rows, err2 = fetch_em_daily_raw(code)
+                    if rows:
+                        err = None
+                    else:
+                        rows, err3 = fetch_tencent_qfq(code)
+                        if rows:
+                            err = None
+                        else:
+                            err = err or err2 or err3
                 if args.rewrite:
                     if rows:
                         n = rewrite_bulk(code, rows)
