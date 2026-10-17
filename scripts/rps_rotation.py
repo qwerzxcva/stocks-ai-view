@@ -65,6 +65,9 @@ def load_closes(bulk_dir: str) -> pd.DataFrame:
     if not frames:
         raise ValueError("bulk CSV 全部解析失败")
     all_df = pd.concat(frames, ignore_index=True)
+    # bulk 分片里同一 (date, code) 可能重复 (跨分片文件重名/同票多行),
+    # pivot 遇重复直接炸 (2026-10-17 CI 实测 87h 未更新)。去重取最后一行。
+    all_df = all_df.drop_duplicates(subset=["date", "code"], keep="last")
     closes = all_df.pivot(index="date", columns="code", values="close").sort_index()
     return closes
 
