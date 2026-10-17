@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-17T09:25:49+08:00",
+ "ts": "2026-10-17T13:40:42+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 175,
@@ -1772,6 +1772,27 @@
  },
  "buy_side": [
   {
+   "code": "sz000402",
+   "date": "2026-10-16",
+   "close": 2.47,
+   "score": 100,
+   "signal": "吸筹背离",
+   "diverge": 1,
+   "price_accel_pct": -2.2672,
+   "flow_accel_norm": 0.5726,
+   "flow_persist": 0.9,
+   "vol_compress": 1.308,
+   "n_flow_days": 60,
+   "n_aligned_days": 60,
+   "flow_date_start": "2026-07-17",
+   "flow_date_end": "2026-10-16",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-16"
+   }
+  },
+  {
    "code": "sz001209",
    "date": "2026-10-16",
    "close": 17.8,
@@ -1887,27 +1908,6 @@
    "flow_accel_norm": 0.676,
    "flow_persist": 0.6,
    "vol_compress": 1.043,
-   "n_flow_days": 60,
-   "n_aligned_days": 60,
-   "flow_date_start": "2026-07-17",
-   "flow_date_end": "2026-10-16",
-   "provenance": {
-    "source": "本地前复权日K + 东财主力净流入",
-    "confidence": "observed",
-    "snapshot_ts": "2026-10-16"
-   }
-  },
-  {
-   "code": "sz000001",
-   "date": "2026-10-16",
-   "close": 11.5,
-   "score": 96.9,
-   "signal": "吸筹背离",
-   "diverge": 1,
-   "price_accel_pct": -0.6609,
-   "flow_accel_norm": 0.6422,
-   "flow_persist": 0.6,
-   "vol_compress": 1.061,
    "n_flow_days": 60,
    "n_aligned_days": 60,
    "flow_date_start": "2026-07-17",
@@ -2497,7 +2497,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-17T09:25:49+08:00"
+   "snapshot_ts": "2026-10-17T13:40:42+08:00"
   }
  }
 }
