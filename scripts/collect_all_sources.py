@@ -602,6 +602,24 @@ def _register_external_fetchers():
                 registered += 1
     except Exception as e:
         print("[fetchers] fetchers_extra 跳过: %s" % type(e).__name__)
+    # fetchers_new_sources: 2026-10-17 逆向调研确认的新源 (docs/research/)
+    try:
+        import fetchers_new_sources as _fn2
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("news", "jrj_yaowen_daily"),
+                          ("news", "aigupiao_express"),
+                          ("event", "sseinfo_qa"),
+                          ("event", "sseinfo_survey"),
+                          ("event", "stockstar_forecast")):
+            if name in have:
+                continue
+            fn = getattr(_fn2, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_new_sources 跳过: %s" % type(e).__name__)
     return registered
 
 

@@ -133,6 +133,70 @@ SOURCES = [
         "notes": "实测返回体经常只有 113 bytes (zhibo_id missing), "
                  "内容量不稳定; 已由 fetch_remote_news 从 data-news 仓兜底",
     },
+    # ── 2026-10-17 逆向调研新源 (docs/research/platforms-1.md) ──
+    {
+        "id": "jrj_yaowen_daily",
+        "name": "金融界每日要闻 (静态 JSON)",
+        "url": "https://stockjs.jrj.com.cn/share/news/yaowen/yw{yyyy-MM-dd}.js",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "分钟级 (按天文件)",
+        "fields": "title/makedate/detail/infourl/infosource/chnmb",
+        "provides": ["shard_a.json:news", "news_extra.json"],
+        "notes": "一天一个静态 js 文件 (var newsdata= 前缀需剥离), 实测 200; "
+                 "单日 50-100 条, 天然适配 Actions 日更",
+    },
+    {
+        "id": "aigupiao_express",
+        "name": "爱股票 7x24 快讯 (带题材标签)",
+        "url": "https://apis.aigupiao.com/Express/express_list/",
+        "auth": "none",
+        "freq": "minute",
+        "delay": "秒级",
+        "fields": "content/rec_time/theme/stock_infos/theme_quotes/important",
+        "provides": ["shard_a.json:news", "hot_themes.json"],
+        "notes": "实测 200; 快讯自带题材名+关联个股+题材涨跌幅, 增量价值在题材打标; "
+                 "after=<last_time> 可增量轮询",
+    },
+    {
+        "id": "sseinfo_qa",
+        "name": "上证 e 互动董秘问答",
+        "url": "https://sns.sseinfo.com/ajax/feeds.do?type=11",
+        "auth": "none",
+        "status": "ok",
+        "freq": "hourly",
+        "delay": "小时级",
+        "fields": "公司/代码/问题/回答/时间 (HTML 片段)",
+        "provides": ["shard_a.json:event"],
+        "notes": "实测 200; type=10 全部/11 已回复/30 调研纪要; 独家董秘问答源, "
+                 "对个股基本面监控有直接价值",
+    },
+    {
+        "id": "sseinfo_survey",
+        "name": "上证 e 互动调研纪要",
+        "url": "https://sns.sseinfo.com/ajax/feeds.do?type=30",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "天级",
+        "fields": "公司/代码/公告标题/附件链接 (HTML)",
+        "provides": ["shard_a.json:event"],
+        "notes": "实测有数据; 投资者关系活动记录 (调研纪要 docx/pdf 标题+链接)",
+    },
+    {
+        "id": "stockstar_forecast",
+        "name": "证券之星业绩预告",
+        "url": "https://resource.stockstar.com/DataCenter/StockData/GetAchieveForecast.htm",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "天级",
+        "fields": "代码/简称/公告日期/报告期/预告类型/摘要 (HTML 表格)",
+        "provides": ["shard_a.json:event"],
+        "notes": "实测 200 但域名解析偶发失败 (需 Actions 环境实测); 同目录还有 "
+                 "主力统计/解禁页",
+    },
     {
         "id": "sina_kline_daily",
         "name": "新浪个股日K (akshare stock_zh_a_daily_sina)",
@@ -2868,6 +2932,10 @@ SHARDS = {
             "coingecko", "sec_edgar", "macro_china_cpi_gdp",
             "local_kline_bulk", "local_snapshot", "remote_news",
             "industry_map_tv", "douyin_hot_search", "toutiao_hot",
+            # 2026-10-17 逆向调研新源 (docs/research/platforms-1.md):
+            # 全部零鉴权、实测 200, 与已有源零重叠
+            "jrj_yaowen_daily", "aigupiao_express",
+            "sseinfo_qa", "sseinfo_survey", "stockstar_forecast",
         ],
     },
     "b": {
