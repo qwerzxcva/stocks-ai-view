@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-17T12:43:59+08:00",
+ "ts": "2026-10-17T17:44:51+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 547,
- "n_transmissions": 8,
+ "n_input": 476,
+ "n_transmissions": 11,
  "n_rules": 16,
  "rules": [
   {
@@ -79,35 +79,42 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "航行警告：渤海执行军事任务",
-   "source": "财联社电报",
-   "time": "2026-10-17T09:10:46+08:00",
-   "url": "https://www.cls.cn/detail/2507396",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "【早报】美股纳指大跌超500点，半导体、存储股全线跳水；黄仁勋谈“AI市场震荡”；国际油价大涨；胜宏科技、豪威集团等计划回购股份",
+   "source": "财联社热门",
+   "time": "2026-10-17T17:44:39+08:00",
+   "url": "https://www.cls.cn/detail/2507382",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600339"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688122"
+      "900945"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "化工",
      "stocks": [
-      "600250"
+      "688295"
      ]
     }
    ],
@@ -121,29 +128,45 @@
    }
   },
   {
-   "title": "财联社10月17日电，美国总统特朗普在一项行政命令中表示，他即日起豁免适用《格雷厄姆制裁俄罗斯和伊朗法案》规定的部分制裁、限制措施及关税。",
-   "source": "财联社电报",
-   "time": "2026-10-17T09:10:46+08:00",
-   "url": "https://www.cls.cn/detail/2507394",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
+   "title": "布伦特原油期货涨至110美元/桶，为5月20日以来首次。WTI原油日内涨幅达3.5%，报101.41美元/桶。",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T02:33:55+08:00",
+   "url": "https://wallstreetcn.com/live/3180431",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "半导体设备",
+     "sector": "油服工程",
      "stocks": [
-      "603690"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "002812"
+      "600339"
      ]
     }
    ],
-   "inverse_bear": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    },
+    {
+     "sector": "化工",
+     "stocks": [
+      "688295"
+     ]
+    }
+   ],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -151,95 +174,7 @@
     "trade_date": "2026-10-16",
     "event_date": "2026-10-17",
     "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "周六你需要知道的隔夜全球要闻：纳指跌超2% 热门科技股普跌；黄仁勋谈AI市场震荡“这一切都会过去”；科技记者古尔曼称苹果过早推出了iPhone Duo",
-   "source": "财联社电报",
-   "time": "2026-10-17T09:10:46+08:00",
-   "url": "https://www.cls.cn/detail/2507379",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-16",
-    "event_date": "2026-10-17",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "特朗普豁免《格雷厄姆法案》中多项对俄制裁、限制措施及关税",
-   "source": "华尔街见闻",
-   "time": "2026-10-17T08:54:11+08:00",
-   "url": "https://wallstreetcn.com/livenews/3180516",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "603690"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "002812"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-16",
-    "event_date": "2026-10-17",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+   }
   },
   {
    "title": "纳斯达克综合指数（纳指）下跌540点、跌幅超过2%，标普跌超1.1%，道指跌超0.5%，纳斯达克100指数跌2.3%，生",
@@ -295,14 +230,50 @@
    "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   },
   {
-   "title": "伊朗：愿意帮助解决沙特和也门（胡塞武装）之间的冲突。",
-   "source": "wallstreetcn",
-   "time": "2026-10-17T01:42:10+08:00",
-   "url": "https://wallstreetcn.com/live/3180418",
+   "title": "特朗普签署行政令豁免对俄多项制裁",
+   "source": "财联社电报",
+   "time": "2026-10-17T17:44:39+08:00",
+   "url": "https://www.cls.cn/detail/2507449",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688385"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "欧洲央行行长拉加德：战争带来通胀上行风险。\n\n财政可持续性仍是整体经济稳定的“重要支柱”，各国政府应当确保针对能源冲击出台的财政举措具备临时性、定向性与适配性。\n\n经济前景下行风险",
+   "source": "华尔街见闻",
+   "time": "2026-10-17T17:25:11+08:00",
+   "url": "https://wallstreetcn.com/livenews/3180545",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045",
+      "688631"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
@@ -317,13 +288,7 @@
       "603885",
       "600115",
       "002928",
-      "688122"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600250"
+      "300581"
      ]
     }
    ],
@@ -337,29 +302,37 @@
    }
   },
   {
-   "title": "【早报】美股纳指大跌超500点，半导体、存储股全线跳水；黄仁勋谈“AI市场震荡”；国际油价大涨；胜宏科技、豪威集团等计划回购股份",
-   "source": "财联社热门",
-   "time": "2026-10-17T08:58:12+08:00",
-   "url": "https://www.cls.cn/detail/2507382",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
+   "title": "华中科技大学女篮与武汉盛帆女篮爆发大规模冲突，华科主帅追打对方球员，具体情况如何？将面临什么处罚？",
+   "source": "知乎热榜",
+   "time": "2026-10-17T17:32:08+08:00",
+   "url": "https://www.zhihu.com/question/2094458019136410730",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045",
+      "688631"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空机场",
+     "sector": "航空",
      "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945"
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300581"
      ]
     }
    ],
@@ -373,29 +346,181 @@
    }
   },
   {
-   "title": "布伦特原油期货涨至110美元/桶，为5月20日以来首次。WTI原油日内涨幅达3.5%，报101.41美元/桶。",
+   "title": "“我上去就给她三拳”，女篮热身赛爆发大规模冲突",
+   "source": "凤凰网",
+   "time": "2026-10-17T17:15:09+08:00",
+   "url": "https://v.ifeng.com/c/8xIKbtgrJMm",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045",
+      "688631"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300581"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "特朗普宣布暂缓实施新一轮对俄制裁",
    "source": "wallstreetcn",
-   "time": "2026-10-17T02:33:55+08:00",
-   "url": "https://wallstreetcn.com/live/3180431",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
+   "time": "2026-10-17T10:27:52+08:00",
+   "url": "https://wallstreetcn.com/live/3180527",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
    "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688385"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "航行警告：渤海执行军事任务",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T09:04:51+08:00",
+   "url": "https://wallstreetcn.com/live/3180519",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045",
+      "688631"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空机场",
+     "sector": "航空",
      "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945"
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300581"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "特朗普豁免《格雷厄姆法案》中多项对俄制裁、限制措施及关税",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T08:49:29+08:00",
+   "url": "https://wallstreetcn.com/live/3180516",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688385"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "伊朗：愿意帮助解决沙特和也门（胡塞武装）之间的冲突。",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T01:42:10+08:00",
+   "url": "https://wallstreetcn.com/live/3180418",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045",
+      "688631"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300581"
      ]
     }
    ],
