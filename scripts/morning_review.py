@@ -13,7 +13,16 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
-DATA = "/root/workspace/stocks-ai-view/data"
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+
+try:
+    from paths import AI_VIEW_DATA as DATA
+except Exception:
+    DATA = os.path.join(os.path.dirname(HERE), "data")
+
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
 
 
@@ -78,6 +87,14 @@ def main():
     all_codes = [prefixed(c) for g in groups.values() for c in g]
     log(f"picks: {sum(len(v) for v in groups.values())} codes")
 
+    # 回避榜单独测量 (2026-10-17): 不进 groups —— afternoon_picks 会把
+    # groups 全部当候选池; 回避榜的验证口径是「命中率=下跌占比」。
+    avoid_codes = [r["code"]
+                   for r in ((tp.get("picks") or {}).get("avoid") or [])]
+    for c in avoid_codes:
+        all_codes.append(prefixed(c))
+    log(f"avoid: {len(avoid_codes)} codes")
+
     q = fetch(all_codes)
     log(f"quotes: {len(q)}/{len(all_codes)}")
 
@@ -88,6 +105,17 @@ def main():
 
     report = {"generated_at": datetime.now(CST).isoformat(timespec="seconds"),
               "indices": idx, "groups": {}}
+
+    def _measure(rows, hit_is_up=True):
+        n = len(rows)
+        hits = sum(1 for r in rows if (r["chg_pct"] > 0 if hit_is_up
+                                       else r["chg_pct"] < 0))
+        return {
+            "n": n,
+            "hit_rate_pct": round(hits / n * 100, 1) if n else None,
+            "avg_ret_pct": round(sum(r["chg_pct"] for r in rows) / n, 2) if n else None,
+            "rows": rows,
+        }
 
     for g, codes in groups.items():
         rows = []
@@ -101,14 +129,19 @@ def main():
                          "high": v["high"], "low": v["low"],
                          "turnover": v["turnover"], "time": v["time"]})
         rows.sort(key=lambda r: -r["chg_pct"])
-        n = len(rows)
-        up = sum(1 for r in rows if r["chg_pct"] > 0)
-        report["groups"][g] = {
-            "n": n, "n_up": up,
-            "hit_rate_pct": round(up / n * 100, 1) if n else None,
-            "avg_ret_pct": round(sum(r["chg_pct"] for r in rows) / n, 2) if n else None,
-            "rows": rows,
-        }
+        report["groups"][g] = _measure(rows)
+
+    # 回避榜验证口径: 命中=下跌 (回避成功), 命中率越高回避榜越有效
+    avoid_rows = []
+    for c in avoid_codes:
+        v = q.get(prefixed(c))
+        if not v:
+            continue
+        avoid_rows.append({"code": c, "name": v["name"],
+                           "price": v["price"],
+                           "chg_pct": round(v["chg_pct"], 2),
+                           "turnover": v["turnover"], "time": v["time"]})
+    report["avoid"] = _measure(avoid_rows, hit_is_up=False)
 
     out = os.path.join(DATA, "morning_review.json")
     json.dump(report, open(out, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
@@ -127,6 +160,13 @@ def main():
                   f"现价{r['price']} 换手{r['turnover']}%")
         if s["n"] > 6:
             print(f"  ... 共 {s['n']} 只")
+        print()
+    av = report.get("avoid") or {}
+    if av.get("n"):
+        print(f"=== avoid 回避榜 (n={av['n']}) 回避成功率(下跌占比) "
+              f"{av['hit_rate_pct']}% 平均 {av['avg_ret_pct']}% ===")
+        for r in av["rows"][:6]:
+            print(f"  {r['code']} {r['name']:10s} {r['chg_pct']:+.2f}%")
         print()
     return 0
 
