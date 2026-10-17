@@ -2152,7 +2152,7 @@ function renderNewsFlow(){
   const nt=g.news_transmission||{};
   const trs=nt.transmissions||[];
   if(trs.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">🔀 消息传导 <span class="sub">坏消息利好谁 · 好消息利空谁 · '+_esc2(nt.n_rules)+' 条规则 · '+_t(nt.ts)+'</span></div>';
+    h+='<div class="hd" style="border-top:none;padding:6px 0">🔀 消息传导 <span class="sub">好消息利好谁 · 坏消息利空谁 · 诱多/洗盘只在资金证据相反时标注 · '+_t(nt.ts)+'</span></div>';
     trs.slice(0,8).forEach(r=>{
       h+='<div style="padding:5px 0;border-bottom:1px dashed var(--bd)">';
       h+='<div style="font-size:11px;font-weight:700">['+_esc2(r.label)+'] ';
@@ -2168,8 +2168,12 @@ function renderNewsFlow(){
             +' <span class="fl" style="font-size:9px">('+_esc2((x.stocks||[]).length)+'只)</span>').join(' · ')
           +'</div>';
       };
-      h+=sec('↓ 直接利空', r.direct_bear, 'var(--dn)');
-      h+=sec('↑ 直接利好', r.direct_bull, 'var(--up)');
+      h+=sec('↑ 好消息利好谁', r.direct_bull, 'var(--up)');
+      h+=sec('↓ 坏消息利空谁', r.direct_bear, 'var(--dn)');
+      const behavior=[].concat(...(r.direct_bull||[]).map(x=>x.behavior||[]), ...(r.direct_bear||[]).map(x=>x.behavior||[]));
+      if(behavior.length){
+        h+='<div style="font-size:10px;margin:2px 0 0 8px"><b>行为证据</b> '+behavior.slice(0,4).map(x=>'<span class="clk" data-code="'+_esc2(x.code)+'">'+_esc2(x.code)+' '+_esc2(x.label)+'</span> <span class="fl">'+_esc2(x.evidence)+'</span>').join(' · ')+'</div>';
+      }
       h+=sec('⇄ 反向受益 (资金转移)', r.inverse_bull, 'var(--up)');
       h+=sec('⇄ 反向受害 (被抽血)', r.inverse_bear, 'var(--dn)');
       h+=sec('🛡 避险去向', r.hedge, 'var(--amber)');

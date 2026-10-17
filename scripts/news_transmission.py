@@ -289,6 +289,21 @@ def main():
             cs = find_sector_stocks(name, ind_map, con_map)
             if cs:
                 rec["hedge"].append({"sector": name, "stocks": cs})
+        money = load("moneyflow.json") or {}
+        flow = {str(x.get("code")): x for x in (money.get("top_outflow") or [])}
+        flow.update({str(x.get("code")): x for x in (money.get("top_inflow") or [])})
+        for item in rec["direct_bull"]:
+            for code in item.get("stocks") or []:
+                evidence = flow.get(str(code)) or {}
+                ratio = evidence.get("main_net_ratio")
+                if ratio is not None and ratio < 0:
+                    item.setdefault("behavior", []).append({"code": code, "label": "好消息诱多嫌疑", "evidence": f"主力净占比 {ratio}%"})
+        for item in rec["direct_bear"]:
+            for code in item.get("stocks") or []:
+                evidence = flow.get(str(code)) or {}
+                ratio = evidence.get("main_net_ratio")
+                if ratio is not None and ratio > 0:
+                    item.setdefault("behavior", []).append({"code": code, "label": "坏消息洗盘嫌疑", "evidence": f"主力净占比 {ratio}%"})
         if hit.get("note"):
             rec["note"] = hit["note"]
         # 只有真的推出受益/受损方才收录
