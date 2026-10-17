@@ -43,6 +43,11 @@ SHARDS = {"B": "b", "C": "c"}
 A_ONLY = {"moneyflow-realtime.yml", "kline-backfill-full.yml",
           "nightly-backfill.yml", "dataset-archive.yml"}
 
+# 镜像仓必须整文件删除的 workflow:
+# 它们带 push 触发器且写外部仓 (gitcode), 只在 A 仓跑——
+# 镜像仓 push 后自动触发, 会跟 A 仓互相覆盖 gitcode 上的数据。
+REMOVE_ON_MIRROR = {"gitcode-sync.yml"}
+
 
 def run(cmd, cwd=None, check=True):
     r = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
@@ -124,6 +129,11 @@ def main():
         for f in sorted(os.listdir(wf)):
             p = os.path.join(wf, f)
             if not f.endswith(".yml"):
+                continue
+            if f in REMOVE_ON_MIRROR:
+                os.remove(p)
+                print(f"    {f}: REMOVED (writes external repo on push, A only)")
+                n_dis += 1
                 continue
             with open(p, encoding="utf-8") as fh:
                 body = fh.read()
