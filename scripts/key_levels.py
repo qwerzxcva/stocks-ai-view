@@ -38,6 +38,16 @@ from paths import BULK
 OUT = os.path.join(DATA_DIR, "key_levels.json")
 
 
+def prefixed(code):
+    """裸码 → 带市场前缀。0/2/3 开头是深市, 不能先试 sh——
+    000001 先试 sh 会命中上证指数 (与 stocks-ai-view 同前缀规则, morning_review 同款)。"""
+    c = str(code or "")
+    if c[:2] in ("sh", "sz", "bj"):
+        return c
+    return ("sh" if c.startswith(("6", "9"))
+            else "bj" if c.startswith(("4", "8")) else "sz") + c
+
+
 def load(name):
     p = os.path.join(DATA_DIR, name)
     if not os.path.exists(p):
@@ -211,8 +221,7 @@ def main():
             if p.get("name"):
                 name_of[bare_c] = p.get("name")
     for code in codes:
-        bars = klines.get(code) or klines.get("sh" + code) or \
-            klines.get("sz" + code) or klines.get("bj" + code)
+        bars = klines.get(prefixed(code))
         if not bars:
             continue
         lv = compute_one(bars)

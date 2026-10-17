@@ -42,6 +42,16 @@ def bare(c):
     return c[2:] if c[:2] in ("sh", "sz", "bj") else c
 
 
+def prefixed(code):
+    """裸码 → 带市场前缀。0/2/3 开头是深市, 先试 sh 会把 000001 解析成
+    上证指数 (实测: 平安银行 entry 10.99 配上证 high 4175, 单只污染全表均值)。"""
+    c = str(code or "")
+    if c[:2] in ("sh", "sz", "bj"):
+        return c
+    return ("sh" if c.startswith(("6", "9"))
+            else "bj" if c.startswith(("4", "8")) else "sz") + c
+
+
 def load_snapshot(path):
     """读一个快照文件, 统一成 {date, picks: [{code,name,price}]}。"""
     try:
@@ -93,8 +103,7 @@ def main():
             continue
         rows = []
         for p in s["picks"][:TOP_N]:
-            bars = klines.get(p["code"]) or klines.get("sh" + p["code"]) or \
-                klines.get("sz" + p["code"]) or klines.get("bj" + p["code"])
+            bars = klines.get(prefixed(p["code"]))
             if not bars:
                 continue
             dates = [b[0] for b in bars]
