@@ -1597,7 +1597,14 @@ function renderDailySummary(){
   //  取相邻两轮快照逐股差分 (amount 为当日累计, 差即区间成交)。
   (function(){
     const curve=g['market/amount_curve']||{}, spd=g['market/speed_leaders']||{};
-    if(!curve.today&&!spd.gainers) return;
+    if(!curve.today&&!spd.gainers){
+      // 2026-10-17 用户反馈「子标题下没数据分不清休市还是故障」:
+      // 休市(周末/假日/盘后)显示明确标注 + 最近交易日日期, 不再整块消失。
+      const last=(curve.prev&&curve.prev.date)||(curve.today&&curve.today.date)||(curve.date)||(spd.date)||'';
+      h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">实时异动 <span class="sub">休市中</span></div>';
+      h+='<div class="fl" style="font-size:10px">今日无盘中数据 (周末/假日/非交易时段), 量能曲线与涨速榜将在开盘后首个采集轮填充。'+(last?' 最近交易日: '+_esc2(last):'')+'</div>';
+      return;
+    }
     const fv=v=>(typeof v==='number'&&isFinite(v))?(Math.round(v*100)/100):'—';
     const mins=s=>{const p=String(s).split(':').map(Number);let m=(p[0]*60+p[1])-570;if(p[0]*60+p[1]>=780)m-=90;return Math.max(0,Math.min(240,m));};
     function amountCurveSvg(tt,pv){
@@ -1623,6 +1630,13 @@ function renderDailySummary(){
     }
     h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">实时异动 <span class="sub">'+_t(curve.ts||spd.ts)+'</span></div>';
     const tt=(curve.today&&curve.today.ticks)||[], pvt=(curve.prev&&curve.prev.ticks)||[];
+    // 非当日数据标注 (周末/假日/盘前看的是最近交易日的曲线): 分清休市和故障
+    const cstNow=new Date(new Date().toLocaleString('en-US',{timeZone:'Asia/Shanghai'}));
+    const todayStr=cstNow.getFullYear()+'-'+String(cstNow.getMonth()+1).padStart(2,'0')+'-'+String(cstNow.getDate()).padStart(2,'0');
+    const curveDate=(curve.today&&curve.today.date)||'';
+    if(curveDate&&curveDate!==todayStr){
+      h+='<div class="fl" style="font-size:10px;color:var(--amber)">非交易日: 以下为最近交易日 '+_esc2(curveDate)+' 的数据, 开盘后自动更新</div>';
+    }
     if(tt.length){
       const last=tt[tt.length-1];
       let cmp='';

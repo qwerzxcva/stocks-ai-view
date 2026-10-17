@@ -18,10 +18,13 @@
 name: engine-chain
 on:
   schedule:
+    # 2026-10-17 修: 1-5 改每天。周末不跑会导致 review/复盘类文件整周末停更
+    # (freshness_audit 一轮 12 个 STALE 全是周五产物), 用户要求 24h 自动化。
+    # 成本: 公开仓标准 runner 免费, 多烧的是 cron 调度配额而非钱。
     # 09:05 CST weekdays: after the pre-open data lands, before the session
-    - cron: '5 1 * * 1-5'
+    - cron: '5 1 * * *'
     # 15:30 CST weekdays: after the close and the 15:05 settle
-    - cron: '30 7 * * 1-5'
+    - cron: '30 7 * * *'
     # 16:40 CST weekdays: a second post-close pass.
     # Why: the 15:30 run can still be racing the 15:05 settle and the
     # realtime-minute tail (its last tick is 15:02). A later pass sees the
@@ -29,7 +32,7 @@ on:
     # settle by then. Without it, the site shows the 15:30 snapshot all
     # night even after the final numbers are in (2026-10-16 observed:
     # engines frozen at 19:35 while collectors kept running to 02:29).
-    - cron: '40 8 * * 1-5'
+    - cron: '40 8 * * *'
   workflow_dispatch:
     inputs:
       force:
