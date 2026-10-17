@@ -1704,11 +1704,13 @@ function renderMainline(){
       const preText=row.premarket_status==='available'
         ?('09:15前有效'+(picks?' · '+picks:''))
         :(row.premarket_status==='rejected_not_before_09:15'?'记录晚于09:15，已拒绝':'无盘前归档');
+      const ms=row.market_summary||{};
+      const marketText=ms.close==null?'无指数记录':('上证 '+_esc2(ms.close)+' · '+_esc2(ms.change_pct==null?'—':(ms.change_pct>0?'+':'')+ms.change_pct+'%')+' · 量 '+_esc2(ms.volume==null?'—':Math.round(ms.volume/1e6)+'百万手'));
       const closeText=close.time
-        ?('胜率 '+_esc2(cs.hit_rate_all_pct==null?'—':cs.hit_rate_all_pct+'%')+' · 样本 '+_esc2(cs.n_picks||0)+' · 均收 '+_esc2(cs.avg_ret_all_pct==null?'—':cs.avg_ret_all_pct+'%'))
-        :'无收盘归档';
+        ?('选股复盘 胜率 '+_esc2(cs.hit_rate_all_pct==null?'—':cs.hit_rate_all_pct+'%')+' · 样本 '+_esc2(cs.n_picks||0)+' · 均收 '+_esc2(cs.avg_ret_all_pct==null?'—':cs.avg_ret_all_pct+'%'))
+        :'无选股复盘';
       h+='<tr><td><b>'+_esc2(row.date)+'</b><div class="fl">盘前 '+_esc2(row.actual_time&&row.actual_time.premarket||'—')+'<br>收盘 '+_esc2(row.actual_time&&row.actual_time.close||'—')+'</div></td>'
-        +'<td>'+_esc2((row.mainlines||[]).join('、')||'—')+'</td>'
+        +'<td>'+_esc2((row.mainlines||[]).join('、')||'—')+'<div class="fl">'+_esc2(marketText)+'</div></td>'
         +'<td>'+_esc2(preText)+'</td><td>'+_esc2(closeText)+'</td></tr>';
     });
     h+='</tbody></table>';

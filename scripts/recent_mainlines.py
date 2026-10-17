@@ -260,11 +260,34 @@ def build_window(requested_days, trading_dates, history_by_date, premarket):
     }
 
 
+def market_summary(index_doc):
+    """Observed Shanghai Composite close and volume, not a stock-pick review."""
+    rows = ((index_doc or {}).get("indices") or {}).get("sh000001") or []
+    out = {}
+    previous = None
+    for row in rows:
+        close = row.get("close")
+        if close is None:
+            continue
+        change = None if previous in (None, 0) else round((close / previous - 1) * 100, 2)
+        out[row.get("date")] = {
+            "index": "sh000001",
+            "close": close,
+            "change_pct": change,
+            "volume": row.get("vol"),
+            "source": "data/index_kline.json",
+            "scope": "大A指数总结，不含个股推荐验证",
+        }
+        previous = close
+    return out
+
+
 def build_payload(args):
     now = datetime.now(CST)
     history_by_date = read_history()
     current = load_json("mainline.json")
     premarket = load_json("premarket_picks.json")
+    market_by_date = market_summary(load_json("index_kline.json"))
     premarket_day = parse_date(premarket.get("date")) if valid_premarket(premarket) else None
     trading_dates = read_trading_dates(set(history_by_date) | {premarket_day})
     trading_dates = [day for day in trading_dates if day is not None]
@@ -272,8 +295,14 @@ def build_payload(args):
     legacy_dates = set(trading_dates[-args.days:])
     legacy_rows = [history_by_date[day] for day in sorted(legacy_dates) if day in history_by_date]
     ranked = theme_stats(legacy_rows)
-    daily = [daily_row(day, history_by_date.get(day), premarket)
-             for day in sorted(legacy_dates)]
+    daily = []
+    for day in sorted(legacy_dates):
+        row = daily_row(day, history_by_date.get(day), premarket)
+        row["market_summary"] = market_by_date.get(day.isoformat())
+        daily.append(row)
+    market_rows = [row for row in daily if row.get("market_summary")]
+    changes = [row["market_summary"]["change_pct"] for row in market_rows
+               if row["market_summary"].get("change_pct") is not None]
     observed_days = len(legacy_rows)
     payload = {
         "ts": now.isoformat(timespec="seconds"),
@@ -284,6 +313,16 @@ def build_payload(args):
         "mainlines": ranked[:30],
         "daily": daily,
         "current": current.get("mainlines", []) if isinstance(current, dict) else [],
+        "market_window": {
+            "index": "sh000001",
+            "days": len(market_rows),
+            "up_days": sum(value > 0 for value in changes),
+            "down_days": sum(value < 0 for value in changes),
+            "avg_change_pct": round(sum(changes) / len(changes), 3) if changes else None,
+            "cumulative_change_pct": round(sum(changes), 2) if changes else None,
+            "source": "data/index_kline.json",
+            "scope": "大A指数表现；不是选股推荐的胜率",
+        },
         "windows": {
             str(size): build_window(size, trading_dates, history_by_date, premarket)
             for size in WINDOW_SIZES
