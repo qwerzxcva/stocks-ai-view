@@ -1838,22 +1838,19 @@ function renderPools(){
   P('③ 推荐池','与每日推股不同, 不记入胜率计算及优化方案',
     (g.ai_pick_v4||{}).picks||(g.ai_picks||{}).picks||[]);
 
-  // ④ 热榜池 — 只保留热榜标题能映射到 A 股代码的结果。
+  // ④ 热榜池 — 热榜原始记录没有稳定的股票代码，按“热榜条目→关联主题/代码”展示，
+  // 不把新闻标题塞进股票代码列。
   const hotTop=(typeof rankHotNews==='function')?rankHotNews(g.hot_news):[];
-  const hotStocks=[];
-  const seenHot=new Set();
-  hotTop.forEach(it=>{
-    const text=(it.x.title||'')+(it.x.summary||'');
-    const codes=(text.match(/\b\d{6}\b/g)||[]).concat((it.x.codes||[]));
-    codes.forEach(code=>{
-      const bare=String(code).replace(/^(sh|sz|bj)/,'');
-      if(!/^\d{6}$/.test(bare)||seenHot.has(bare)) return;
-      seenHot.add(bare);
-      hotStocks.push({code:bare,name:(it.x.title||'').slice(0,24),score:Math.round(it.s),raw:{source:it.x.source_name||it.x.source,title:it.x.title}});
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>④ 热榜池</b> <span class="sub">算法筛选后的热榜，及其能明确关联到的A股代码</span></div>';
+  if(hotTop.length){
+    h+='<table><thead><tr><th>分数</th><th>来源</th><th>热榜</th><th>关联代码</th></tr></thead><tbody>';
+    hotTop.slice(0,20).forEach(it=>{
+      const text=(it.x.title||'')+(it.x.summary||'');
+      const codes=(text.match(/\b\d{6}\b/g)||[]).concat(it.x.codes||[]).map(x=>String(x).replace(/^(sh|sz|bj)/,'')).filter((x,i,a)=>/^\d{6}$/.test(x)&&a.indexOf(x)===i);
+      h+='<tr><td>'+Math.round(it.s)+'</td><td>'+_esc2(it.x.source_name||it.x.source||'')+'</td><td>'+_esc2(it.x.title||'')+'</td><td>'+(codes.length?codes.map(c=>'<span class="clk" data-code="'+c+'">'+c+'</span>').join(' '):'<span class="fl">无明确代码</span>')+'</td></tr>';
     });
-  });
-  P('④ 热榜池','从热榜标题和关联代码映射出的A股，未映射的新闻不进入股票池',
-    hotStocks,{limit:20,legend:false});
+    h+='</tbody></table>';
+  } else h+='<div class="fl">热榜数据为空</div>';
 
   // ⑤ 低位池 — lowpool
   P('⑤ 低位池','低位启动候选 (位置/RSI/缩量止跌)',
@@ -1913,7 +1910,12 @@ function renderPools(){
                 : ((sp2.tier3&&sp2.tier3.length) ? sp2.tier3 : []));
   const spTierName = (sp2.tier1&&sp2.tier1.length) ? 'T1 强'
                     : ((sp2.tier2&&sp2.tier2.length) ? 'T2 中 (当日无T1)' : 'T3 弱 (当日无T1/T2)');
-  P('⑦ 板块池','行业/概念板块梯队 ('+spTierName+')', spTier);
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>⑦ 板块池</b> <span class="sub">行业/概念梯队 ('+spTierName+')</span></div>';
+  if(spTier.length){
+    h+='<table><thead><tr><th>板块</th><th>代码</th><th>分数</th><th>1日%</th><th>5日%</th><th>20日%</th><th>龙头</th></tr></thead><tbody>';
+    spTier.slice(0,20).forEach(x=>h+='<tr><td><b>'+_esc2(x.sector||x.name)+'</b></td><td>'+_esc2(x.code||'')+'</td><td>'+_esc2(x.score)+'</td><td>'+_esc2(x.avg_chg_1d)+'</td><td>'+_esc2(x.chg_5d)+'</td><td>'+_esc2(x.chg_20d)+'</td><td>'+_esc2(x.leader||'—')+'</td></tr>');
+    h+='</tbody></table>';
+  } else h+='<div class="fl">板块池为空</div>';
 
   // ⑦b 板块资金 — 东财行业主力净额 (独立池, 不是个股)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
