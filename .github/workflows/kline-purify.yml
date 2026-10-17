@@ -1,0 +1,88 @@
+name: kline-purify
+# K 线数据净化 (2026-10-17): 整股重写 bulk 为纯净原始价 + 建全市场复权因子表。
+#
+# 背景 (validate_ground_truth 基准校验发现):
+#   1. day_qfq_*.csv 名为 qfq 实为新浪非复权原始价 (茅台隐含因子恒 1.0)
+#   2. 追加式采集让部分股票的序列混入 qfq 污染段 (603866 raw/GT 比值
+#      从 0.94 漂到 1.00), append 无法剔除
+#   3. 修复链: bulk_collect --rewrite (整股重拉新浪全历史, 实测与 cnfin
+#      基准逐日 1.0000 一致) → build_factors_market (东财分红送配建因子,
+#      每10股口径÷10, 数据起点前事件逆序反推) → load_klines 读时
+#      qfq = raw×factor/factor_latest (实测 2626 日偏差≤0.02%)
+#
+# 运行方式: 手动 dispatch (先小范围验证再全量)。全量约 5268 只 × 2.5s
+# ÷ 3 分片 ≈ 1.2h/分片。确认稳定后再加 schedule (建议周日)。
+on:
+  workflow_dispatch:
+    inputs:
+      shard:
+        description: '分片号 0/1/2 (先跑 0 验证)'
+        default: '0'
+      codes:
+        description: '指定代码 (逗号分隔, 优先于 shard)'
+        default: ''
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  purify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Checkout kline repo (bulk)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          path: kline-repo
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Link bulk
+        run: |
+          mkdir -p stocks-data-kline/data
+          cp -r kline-repo/data/bulk stocks-data-kline/data/bulk 2>/dev/null || true
+          ls stocks-data-kline/data/bulk | head -3
+
+      - name: Rewrite bulk (pure raw from Sina full history)
+        run: |
+          if [ -n "${{ github.event.inputs.codes }}" ]; then
+            python3 scripts/bulk_collect.py --kind kline \
+              --codes "${{ github.event.inputs.codes }}" --rewrite
+          else
+            python3 scripts/bulk_collect.py --kind kline \
+              --shard "${{ github.event.inputs.shard }}" --n-shards 3 --rewrite
+          fi
+
+      - name: Build adjustment factor tables
+        run: |
+          if [ -n "${{ github.event.inputs.codes }}" ]; then
+            python3 scripts/build_factors_market.py \
+              --codes "${{ github.event.inputs.codes }}"
+          else
+            python3 scripts/build_factors_market.py \
+              --shard "${{ github.event.inputs.shard }}" --n-shards 3 --sleep 0.2
+          fi
+
+      - name: Push kline repo
+        run: |
+          cd kline-repo
+          rm -rf data/bulk && cp -r ../stocks-data-kline/data/bulk data/bulk
+          git config user.name "kline-purify-bot"
+          git config user.email "3576982374@qq.com"
+          git add data/bulk
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "purify: rewrite shard ${{ github.event.inputs.shard }} as pure raw + factor-ready"
+          git push origin main || (git pull --rebase origin main && git push origin main)
+
+      - name: Push factor tables (this repo)
+        run: |
+          python3 scripts/git_push_retry.py --msg "factors: shard ${{ github.event.inputs.shard }}" \
+            data/adjusted/factors --user factor-bot

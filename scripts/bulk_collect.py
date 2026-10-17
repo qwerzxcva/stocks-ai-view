@@ -212,6 +212,37 @@ def append_bulk(code, rows):
     return len(new)
 
 
+def rewrite_bulk(code, rows):
+    """整股重写: 从分片文件剔除该股所有旧行, 写入新浪全历史 (纯净原始价)。
+
+    2026-10-17 数据净化: existing append 模式让qfq污染段永久残留在 bulk 里
+    (603866 实测比值漂移 0.94→1.00), 只有整股重写才能保证口径单一。
+    """
+    if not rows:
+        return 0
+    p = os.path.join(BULK, "day_qfq_%s.csv" % str(code).zfill(6)[:2])
+    os.makedirs(BULK, exist_ok=True)
+    bare = str(code).zfill(6)
+    kept = []
+    if os.path.exists(p):
+        with open(p, encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if line.startswith("#") or "|" not in line:
+                    kept.append(line)
+                    continue
+                head = line.split("|", 1)[0]
+                hb = head[2:] if head[:2] in ("sh", "sz", "bj") else head
+                if hb != bare:
+                    kept.append(line)
+    sym = prefixed(code)
+    new = sorted(rows, key=lambda r: r[0])
+    with open(p, "w", encoding="utf-8") as f:
+        f.writelines(kept)
+        for r in new:
+            f.write("%s|%s|%s|%s|%s|%s|%s\n" % (sym, r[0], r[1], r[2], r[3], r[4], r[5]))
+    return len(new)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--kind", default="kline", choices=["kline", "realtime", "universe"])
@@ -222,6 +253,10 @@ def main():
     ap.add_argument("--limit", type=int, default=0, help="最多处理多少只 (0=全部)")
     ap.add_argument("--sleep", type=float, default=0.4, help="每股间隔秒")
     ap.add_argument("--resume", action="store_true", help="跳过已有数据的股票")
+    ap.add_argument("--rewrite", action="store_true",
+                    help="重写模式: 丢弃该股本地历史, 用新浪全历史重拉整段"
+                         " (2026-10-17 数据净化用: 现有 bulk 混入qfq污染,"
+                         "  append 无法剔除, 必须整股重写)")
     args = ap.parse_args()
 
     if args.kind == "universe":
@@ -247,12 +282,22 @@ def main():
     stats = {"ok": 0, "empty": 0, "fail": 0, "rows": 0, "skipped": 0}
     t0 = time.time()
     for i, code in enumerate(codes):
-        if args.resume and args.kind == "kline" and existing_dates(code):
+        if args.resume and not args.rewrite and args.kind == "kline" and existing_dates(code):
             stats["skipped"] += 1
             continue
         try:
             if args.kind == "kline":
                 rows, err = fetch_sina_full(code)
+                if args.rewrite:
+                    if rows:
+                        n = rewrite_bulk(code, rows)
+                        stats["rows"] += n
+                        stats["ok"] += 1
+                    elif err:
+                        stats["fail"] += 1
+                    else:
+                        stats["empty"] += 1
+                    continue
                 if rows:
                     n = append_bulk(code, rows)
                     stats["rows"] += n
