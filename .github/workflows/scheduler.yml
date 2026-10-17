@@ -53,7 +53,7 @@ jobs:
           # ai-update 负责 latest.json (主快照), 不唤醒它 latest 就一直旧。
           # engine-chain 自带时间窗守卫: 盘中跑 light 档 (四个直连网站的引擎),
           # 盘前/盘后跑 full 档 (tier 0-8)。不需要额外区分。
-          WF="realtime-minute,full-pipeline,engine-chain,hot-impact-realtime,rebuild-pools,cloud-analysis,ai-update"
+          WF="realtime-minute,shard-collect,full-pipeline,engine-chain,hot-impact-realtime,rebuild-pools,cloud-analysis,ai-update"
           if [ -n "$ONLY" ]; then WF="$ONLY"; fi
           ok=0; skip=0; fail=0
           IFS=',' read -ra LIST <<< "$WF"
