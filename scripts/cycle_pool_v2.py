@@ -43,6 +43,26 @@ NAMES = {"sh000001": "上证指数", "sz399001": "深成指", "sh000300": "沪�
 DEFAULT_OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
                            "data", "cycle_pool_v2.json")
 
+def stock_candidates(demand):
+    """Turn the current industry/concept rotation into named stock candidates."""
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    path = os.path.join(root, "data", "industry_map_em.json")
+    try:
+        mapping = json.load(open(path, encoding="utf-8")).get("map") or {}
+    except (OSError, json.JSONDecodeError):
+        return []
+    by_industry = {}
+    for code, industry in mapping.items():
+        by_industry.setdefault(industry, []).append(code)
+    rows = []
+    for item in ((demand or {}).get("industry_top") or [])[:12]:
+        codes = by_industry.get(item.get("name"), [])[:4]
+        for code in codes:
+            rows.append({"code": code, "name": "", "industry": item.get("name"),
+                         "chg_pct": item.get("chg_pct"), "leader": item.get("leader"),
+                         "reason": "当前周期需求迁移行业成分股"})
+    return rows[:30]
+
 
 # ─── 拉取: 腾讯指数全史 (分页, 同 cycle_deep) ────────────────────
 def idx_seg(code, end="", n=800):
@@ -463,6 +483,7 @@ def main():
         "regimes": regimes,
         "cycle_law": law,
         "demand_shift": demand,
+        "stocks": stock_candidates(demand),
     }
 
     path = args.out or DEFAULT_OUT

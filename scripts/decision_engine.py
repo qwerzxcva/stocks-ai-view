@@ -151,9 +151,9 @@ def main():
     win1d = (win1d / 100) if win1d else None
     n1 = (ov.get("1") or {}).get("n") or 0
 
-    top = (md or {}).get("top") or []
+    universe = (md or {}).get("table") or (md or {}).get("top") or []
     cards, avoid = [], []
-    for r in top:
+    for r in universe:
         action, conf, reasons, risk = decide_stock(r, regime, win1d)
         entry, stop, target = entry_stop_target(r)
         rec = {
@@ -175,6 +175,23 @@ def main():
     # 按 置信度 排序, buy 优先
     cards.sort(key=lambda x: (-(x["action"] == "buy"), -x["confidence"]))
     cards = cards[: args.top]
+    observed = []
+    for row in (load("moneyflow.json") or {}).get("top_outflow") or []:
+        observed.append({"code": row.get("code"), "name": row.get("name"), "price": None,
+                         "chg_pct": row.get("chg_pct"), "action": "avoid", "confidence": 0.7,
+                         "risk": f"主力净流出 {round((row.get('main_net') or 0)/1e8, 2)} 亿，占成交 {row.get('main_net_ratio')}%",
+                         "reasons": ["资金流出榜观测"], "why": {"资金面": "主力净流出"}})
+    for row in (load("enrich.json") or {}).get("lhb") or []:
+        if (row.get("chg") or 0) >= 0 or "买入" in str(row.get("expl") or ""):
+            continue
+        observed.append({"code": row.get("code"), "name": row.get("name"), "price": row.get("close"),
+                         "chg_pct": row.get("chg"), "action": "avoid", "confidence": 0.65,
+                         "risk": row.get("expl") or "龙虎榜卖出", "reasons": ["龙虎榜卖出席位"],
+                         "why": {"资金面": "龙虎榜卖出"}})
+    seen = {x.get("code") for x in avoid}
+    avoid.extend(x for x in observed if x.get("code") and x.get("code") not in seen)
+    avoid.sort(key=lambda x: (x.get("composite") or 0, x.get("chg_pct") or 0))
+    avoid = avoid[:30]
 
     pos_cap = POSITION_CAP[regime]
     n_buy = sum(1 for c in cards if c["action"] == "buy")
@@ -199,7 +216,7 @@ def main():
             "reason": f"市场环境={regime} ({regime_detail}), 建议总仓位≤{pos_cap*100:.0f}%",
         },
         "cards": cards,
-        "avoid": avoid[:8],
+        "avoid": avoid,
         "strategy_summary": (
             f"{regime}市场下, {len(cards)}只候选 ({n_buy}只买入信号)。"
             f"历史1日胜率{(win1d or 0)*100:.1f}% (n={n1})。"

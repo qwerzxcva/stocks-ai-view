@@ -86,6 +86,10 @@ def fetch_flow_detail(code, n=60):
             break
         saw_empty = saw_empty or not klines
         payload = payload or candidate
+    if payload is None or len(((payload.get("data") or {}).get("klines")) or []) < 25:
+        sina = fetch_sina_flow(code, n)
+        if sina[0]:
+            return sina
     if payload is None:
         return [], "source_unavailable"
     klines = ((payload.get("data") or {}).get("klines")) or []
@@ -102,6 +106,28 @@ def fetch_flow_detail(code, n=60):
             continue
     rows.sort(key=lambda item: item["date"])
     return (rows, None) if rows else ([], "invalid_rows")
+
+
+def fetch_sina_flow(code, n=60):
+    """Sina historical main-flow fallback. Amounts stay in source units."""
+    symbol = prefixed(code)
+    url = ("https://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/"
+           f"MoneyFlow.ssl_qsfx_zjlrqs?page=1&num={n}&sort=opendate&asc=0&daima={symbol}")
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=15).read()
+        rows = json.loads(body.decode("utf-8"))
+    except Exception:
+        return [], "source_unavailable"
+    if not isinstance(rows, list) or len(rows) < 25:
+        return [], "source_short_window"
+    parsed = []
+    for row in rows:
+        try:
+            parsed.append({"date": str(row["opendate"])[:10], "main_net": float(row["netamount"])})
+        except (KeyError, TypeError, ValueError):
+            continue
+    parsed.sort(key=lambda item: item["date"])
+    return (parsed, None) if len(parsed) >= 25 else ([], "invalid_rows")
 
 
 def fetch_flow(code, n=60):
@@ -264,8 +290,8 @@ def main():
             "D": "价格与资金加速度反向，且资金持续性确认",
             "S": "近10个交易日主力净流入为正的天数占比",
             "V": "近20日真实波幅/近60日真实波幅; 不单独作为背离证据",
-            "source": "价格: 本地前复权日K | 资金: 东财 push2his fflow",
-            "provenance": {"source": "本地前复权日K + 东财主力净流入", "confidence": "observed", "snapshot_ts": now.isoformat(timespec="seconds")},
+            "source": "价格: 本地前复权日K | 资金: 东财 fflow，不足25日时回退新浪 MoneyFlow.ssl_qsfx_zjlrqs",
+            "provenance": {"source": "本地前复权日K + 东财/新浪主力净流入", "confidence": "observed", "snapshot_ts": now.isoformat(timespec="seconds")},
         },
     }
     with open(args.out, "w", encoding="utf-8") as handle:

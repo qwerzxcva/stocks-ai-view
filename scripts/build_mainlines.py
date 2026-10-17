@@ -40,6 +40,16 @@ INDUSTRY_LABEL = {
     "医药": "医药", "汽车": "汽车", "消费": "消费", "化工": "化工",
 }
 
+THEME_BENEFICIARIES = {
+    "低空经济": [("688297", "中无人机"), ("000099", "中信海直"), ("002085", "万丰奥威"), ("600178", "东安动力")],
+    "军工": [("002933", "新兴装备"), ("300581", "晨曦航空"), ("601606", "长城军工"), ("002683", "广东宏大")],
+    "机器人": [("300024", "机器人"), ("603278", "大业股份"), ("002889", "东方嘉盛"), ("603197", "保隆科技")],
+    "半导体": [("688981", "中芯国际"), ("002049", "紫光国微"), ("603986", "兆易创新"), ("688012", "中微公司")],
+    "人工智能": [("002230", "科大讯飞"), ("603019", "中科曙光"), ("000977", "浪潮信息"), ("688111", "金山办公")],
+    "汽车": [("000550", "江铃汽车"), ("600741", "华域汽车"), ("000887", "中鼎股份"), ("601127", "赛力斯")],
+    "金融": [("000001", "平安银行"), ("601318", "中国平安"), ("600036", "招商银行"), ("601398", "工商银行")],
+}
+
 
 def load(path):
     if not path or not os.path.exists(path):
@@ -116,6 +126,10 @@ def build_themes(news, hot):
     # hot_impact 的推演结论作为补充(带预期区间与理由)
     hot_reports = []
     for r in (hot or {}).get("reports") or []:
+        known = {str(s.get("code", "")).replace("sh", "").replace("sz", "").replace("bj", ""): s
+                 for s in (r.get("stocks") or [])}
+        for code, name in THEME_BENEFICIARIES.get(r.get("theme"), []):
+            known.setdefault(code, {"code": code, "name": name, "signal": "主题映射", "why": "主题受益股映射表"})
         hot_reports.append({
             "theme": r.get("theme"),
             "heat": r.get("heat"),
@@ -128,7 +142,7 @@ def build_themes(news, hot):
                     "expect": s.get("expect"),
                     "why": s.get("why"),
                 }
-                for s in (r.get("stocks") or [])
+                for s in known.values()
             ],
         })
 

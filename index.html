@@ -1821,14 +1821,13 @@ function renderPools(){
   // ② 周期池 — 当前状态 + 行业/概念轮动，不再把历史年份区间当成股票。
   const cv2=g.cycle_pool_v2||{};
   const cycleStatus=cv2.status||{};
-  const cycleItems=[...(((cv2.demand_shift||{}).industry_top)||[]).slice(0,8).map(x=>Object.assign({kind:'行业'},x)),
-                    ...(((cv2.demand_shift||{}).concept_top)||[]).slice(0,8).map(x=>Object.assign({kind:'概念'},x))];
-  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+' · MA5/20/60 '+[_esc2(cycleStatus.ma5),_esc2(cycleStatus.ma20),_esc2(cycleStatus.ma60)].join('/')+'</span></div>';
-  if(cycleItems.length){
-    h+='<table><thead><tr><th>类型</th><th>名称</th><th>涨跌%</th><th>上涨/下跌</th><th>龙头</th><th>主力净额</th></tr></thead><tbody>';
-    cycleItems.forEach(x=>h+='<tr><td>'+_esc2(x.kind)+'</td><td><b>'+_esc2(x.name)+'</b></td><td class="'+((x.chg_pct||0)>=0?'up':'dn')+'">'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.up_n)+'/'+_esc2(x.down_n)+'</td><td>'+_esc2(x.leader||'—')+'</td><td>'+_esc2(x.main_net_inflow_yi==null?'—':x.main_net_inflow_yi+'亿')+'</td></tr>');
+  const cycleStocks=cv2.stocks||[];
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">股票级候选 · 当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+'</span></div>';
+  if(cycleStocks.length){
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属行业</th><th>行业涨跌%</th><th>行业龙头</th><th>入池原因</th></tr></thead><tbody>';
+    cycleStocks.slice(0,30).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.leader||'—')+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
     h+='</tbody></table>';
-  } else h+='<div class="fl">周期池的行业/概念轮动为空</div>';
+  } else h+='<div class="fl">周期股票候选尚未生成；当前只有行业轮动，未把它伪装成股票池</div>';
   const regimeRows=Object.entries(cv2.regimes||{}).map(([k,v])=>({name:k,count:v.n,avg:v.avg_chg,best:v.best,worst:v.worst}));
   if(regimeRows.length){
     h+='<div class="fl" style="font-size:10px;margin:4px 0">35年历史区间仅作背景，不是当前股票池: '+regimeRows.map(x=>_esc2(x.name)+' '+_esc2(x.count)+'年/均值'+_esc2(x.avg)+'%').join(' · ')+'</div>';
@@ -1846,8 +1845,12 @@ function renderPools(){
     h+='<table><thead><tr><th>分数</th><th>来源</th><th>热榜</th><th>关联代码</th></tr></thead><tbody>';
     hotTop.slice(0,20).forEach(it=>{
       const text=(it.x.title||'')+(it.x.summary||'');
-      const codes=(text.match(/\b\d{6}\b/g)||[]).concat(it.x.codes||[]).map(x=>String(x).replace(/^(sh|sz|bj)/,'')).filter((x,i,a)=>/^\d{6}$/.test(x)&&a.indexOf(x)===i);
-      h+='<tr><td>'+Math.round(it.s)+'</td><td>'+_esc2(it.x.source_name||it.x.source||'')+'</td><td>'+_esc2(it.x.title||'')+'</td><td>'+(codes.length?codes.map(c=>'<span class="clk" data-code="'+c+'">'+c+'</span>').join(' '):'<span class="fl">无明确代码</span>')+'</td></tr>';
+      const direct=(text.match(/\b\d{6}\b/g)||[]).concat(it.x.codes||[]).map(x=>String(x).replace(/^(sh|sz|bj)/,'')).filter((x,i,a)=>/^\d{6}$/.test(x)&&a.indexOf(x)===i);
+      const mapped=((g.news_impact||{}).impacts||[]).filter(x=>(x.title||'')===it.x.title).flatMap(x=>x.stocks||[]);
+      const themeStocks=((g.hot_impact||{}).reports||[]).filter(r=>String(it.x.title||'').includes(r.theme)).flatMap(r=>r.stocks||[]);
+      const linked=(mapped.length?mapped:themeStocks).slice(0,4);
+      const cell=direct.length?direct.map(c=>'<span class="clk" data-code="'+c+'">'+c+'</span>').join(' '):(linked.length?linked.map(s=>'<span class="clk" data-code="'+_esc2(String(s.code||'').replace(/^(sh|sz|bj)/,''))+'">'+_esc2(s.name||s.code)+'</span>').join(' '):'<span class="fl">无受益映射</span>');
+      h+='<tr><td>'+Math.round(it.s)+'</td><td>'+_esc2(it.x.source_name||it.x.source||'')+'</td><td>'+_esc2(it.x.title||'')+'</td><td>'+cell+'</td></tr>';
     });
     h+='</tbody></table>';
   } else h+='<div class="fl">热榜数据为空</div>';

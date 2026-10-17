@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-13T21:13:55+08:00",
+    "ts": "2026-10-17T08:20:30+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8567,
+    "n_days": 8570,
     "span": [
       "1990-12-19",
-      "2026-10-13"
+      "2026-10-16"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-13T21:13:55+08:00"
+    "rebuilt_at": "2026-10-17T08:20:30+08:00"
   },
   "status": {
-    "date": "2026-10-13",
-    "close": 3800.86,
-    "ma5": 3813.2,
-    "ma20": 3879.51,
-    "ma60": 3892.48,
+    "date": "2026-10-16",
+    "close": 3716.28,
+    "ma5": 3757.82,
+    "ma20": 3847.74,
+    "ma60": 3882.25,
     "ma_bull": false,
-    "macd_hist": -21.98,
+    "macd_hist": -32.33,
     "macd_bull": false,
-    "rsi": 40.1,
-    "momentum_20d_pct": -3.54,
+    "rsi": 21.4,
+    "momentum_20d_pct": -4.42,
     "phase": "downtrend",
-    "volume_ratio": 1.02
+    "volume_ratio": 1.0
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 185,
+      "n_days": 188,
       "open": 3986.97,
-      "close": 3800.86,
+      "close": 3716.28,
       "high": 4258.86,
-      "low": 3741.11,
-      "chg_pct": -4.23,
-      "amplitude_pct": 13.84,
-      "turnover_yi": 1139.5,
+      "low": 3674.82,
+      "chg_pct": -6.36,
+      "amplitude_pct": 15.89,
+      "turnover_yi": 1153.8,
       "candles": {
         "yang": 108,
-        "yin": 77,
+        "yin": 80,
         "cross": 0
       },
-      "max_drawdown_pct": -12.16,
+      "max_drawdown_pct": -13.71,
       "first_date": "2026-01-05",
-      "last_date": "2026-10-13"
+      "last_date": "2026-10-16"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -1.08
+        "Q4": -3.28
       },
       "months_covered": 9
     }
@@ -1348,7 +1348,7 @@
         "2013",
         "2005"
       ],
-      "avg_chg": -0.3,
+      "avg_chg": -0.52,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 18.6,
+      "chg_pct": 15.36,
       "position": "补库存/上行",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1449,315 +1449,357 @@
   "demand_shift": {
     "industry_top": [
       {
-        "name": "其他数字媒体",
-        "chg_pct": 11.94,
-        "up_n": 2,
+        "name": "燃料电池",
+        "chg_pct": 6.56,
+        "up_n": 1,
         "down_n": 0,
-        "leader": "风语筑",
-        "main_net_inflow_yi": 3.47
-      },
-      {
-        "name": "印制电路板",
-        "chg_pct": 6.08,
-        "up_n": 47,
-        "down_n": 1,
-        "leader": "超声电子",
-        "main_net_inflow_yi": 20.88
-      },
-      {
-        "name": "纺织化学制品",
-        "chg_pct": 5.43,
-        "up_n": 12,
-        "down_n": 1,
-        "leader": "亚邦股份",
-        "main_net_inflow_yi": 3.67
-      },
-      {
-        "name": "元件",
-        "chg_pct": 4.77,
-        "up_n": 61,
-        "down_n": 6,
-        "leader": "超声电子",
-        "main_net_inflow_yi": 13.67
-      },
-      {
-        "name": "地面兵装Ⅲ",
-        "chg_pct": 4.54,
-        "up_n": 12,
-        "down_n": 0,
-        "leader": "国科军工",
-        "main_net_inflow_yi": 3.31
-      },
-      {
-        "name": "地面兵装Ⅱ",
-        "chg_pct": 4.54,
-        "up_n": 12,
-        "down_n": 0,
-        "leader": "国科军工",
-        "main_net_inflow_yi": 3.31
-      },
-      {
-        "name": "航海装备Ⅲ",
-        "chg_pct": 4.36,
-        "up_n": 10,
-        "down_n": 0,
-        "leader": "江龙船艇",
-        "main_net_inflow_yi": 9.89
-      },
-      {
-        "name": "航海装备Ⅱ",
-        "chg_pct": 4.36,
-        "up_n": 10,
-        "down_n": 0,
-        "leader": "江龙船艇",
-        "main_net_inflow_yi": 9.89
-      },
-      {
-        "name": "防水材料",
-        "chg_pct": 4.28,
-        "up_n": 2,
-        "down_n": 1,
-        "leader": "凯伦股份",
-        "main_net_inflow_yi": 0.04
-      },
-      {
-        "name": "电商服务",
-        "chg_pct": 4.22,
-        "up_n": 8,
-        "down_n": 0,
-        "leader": "丽人丽妆",
-        "main_net_inflow_yi": 0.94
-      },
-      {
-        "name": "期货",
-        "chg_pct": 3.65,
-        "up_n": 4,
-        "down_n": 0,
-        "leader": "瑞达期货",
-        "main_net_inflow_yi": 1.55
-      },
-      {
-        "name": "百货",
-        "chg_pct": 3.56,
-        "up_n": 17,
-        "down_n": 2,
-        "leader": "东百集团",
-        "main_net_inflow_yi": 2.7
-      },
-      {
-        "name": "人工景区",
-        "chg_pct": 3.49,
-        "up_n": 5,
-        "down_n": 0,
-        "leader": "大连圣亚",
-        "main_net_inflow_yi": 0.86
-      },
-      {
-        "name": "印染",
-        "chg_pct": 3.34,
-        "up_n": 3,
-        "down_n": 1,
-        "leader": "富春染织",
-        "main_net_inflow_yi": 0.33
-      },
-      {
-        "name": "林业Ⅲ",
-        "chg_pct": 3.32,
-        "up_n": 3,
-        "down_n": 1,
-        "leader": "福建金森",
-        "main_net_inflow_yi": 2.66
-      },
-      {
-        "name": "林业Ⅱ",
-        "chg_pct": 3.32,
-        "up_n": 3,
-        "down_n": 1,
-        "leader": "福建金森",
-        "main_net_inflow_yi": 2.66
-      },
-      {
-        "name": "互联网电商",
-        "chg_pct": 3.29,
-        "up_n": 16,
-        "down_n": 1,
-        "leader": "丽人丽妆",
-        "main_net_inflow_yi": 3.83
-      },
-      {
-        "name": "跨境电商",
-        "chg_pct": 3.25,
-        "up_n": 8,
-        "down_n": 0,
-        "leader": "跨境通",
-        "main_net_inflow_yi": 2.92
+        "leader": "亿华通-U",
+        "main_net_inflow_yi": -0.01
       },
       {
         "name": "航空装备Ⅲ",
-        "chg_pct": 3.12,
+        "chg_pct": 5.98,
         "up_n": 48,
         "down_n": 1,
-        "leader": "航发科技",
-        "main_net_inflow_yi": 7.91
+        "leader": "晨曦航空",
+        "main_net_inflow_yi": 17.55
       },
       {
         "name": "航空装备Ⅱ",
-        "chg_pct": 3.12,
+        "chg_pct": 5.98,
         "up_n": 48,
         "down_n": 1,
-        "leader": "航发科技",
-        "main_net_inflow_yi": 7.91
+        "leader": "晨曦航空",
+        "main_net_inflow_yi": 17.55
+      },
+      {
+        "name": "地面兵装Ⅲ",
+        "chg_pct": 5.97,
+        "up_n": 12,
+        "down_n": 0,
+        "leader": "长城军工",
+        "main_net_inflow_yi": 7.72
+      },
+      {
+        "name": "地面兵装Ⅱ",
+        "chg_pct": 5.97,
+        "up_n": 12,
+        "down_n": 0,
+        "leader": "长城军工",
+        "main_net_inflow_yi": 7.72
+      },
+      {
+        "name": "纺织鞋类制造",
+        "chg_pct": 4.93,
+        "up_n": 1,
+        "down_n": 0,
+        "leader": "华利集团",
+        "main_net_inflow_yi": -0.03
+      },
+      {
+        "name": "航海装备Ⅲ",
+        "chg_pct": 4.72,
+        "up_n": 10,
+        "down_n": 0,
+        "leader": "中科海讯",
+        "main_net_inflow_yi": -0.94
+      },
+      {
+        "name": "航海装备Ⅱ",
+        "chg_pct": 4.72,
+        "up_n": 10,
+        "down_n": 0,
+        "leader": "中科海讯",
+        "main_net_inflow_yi": -0.94
+      },
+      {
+        "name": "航天装备Ⅲ",
+        "chg_pct": 4.58,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "新余国科",
+        "main_net_inflow_yi": 0.8
+      },
+      {
+        "name": "航天装备Ⅱ",
+        "chg_pct": 4.58,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "新余国科",
+        "main_net_inflow_yi": 0.8
+      },
+      {
+        "name": "粘胶",
+        "chg_pct": 4.55,
+        "up_n": 2,
+        "down_n": 1,
+        "leader": "吉林化纤",
+        "main_net_inflow_yi": 2.18
+      },
+      {
+        "name": "国防军工",
+        "chg_pct": 4.46,
+        "up_n": 133,
+        "down_n": 8,
+        "leader": "长城军工",
+        "main_net_inflow_yi": 29.34
+      },
+      {
+        "name": "火电设备",
+        "chg_pct": 4.07,
+        "up_n": 4,
+        "down_n": 0,
+        "leader": "*ST华西",
+        "main_net_inflow_yi": -0.15
+      },
+      {
+        "name": "水泥制造",
+        "chg_pct": 3.71,
+        "up_n": 14,
+        "down_n": 0,
+        "leader": "福建水泥",
+        "main_net_inflow_yi": 3.18
+      },
+      {
+        "name": "其他家电Ⅲ",
+        "chg_pct": 3.62,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "奥佳华",
+        "main_net_inflow_yi": 0.84
+      },
+      {
+        "name": "其他家电Ⅱ",
+        "chg_pct": 3.62,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "奥佳华",
+        "main_net_inflow_yi": 0.84
+      },
+      {
+        "name": "民爆制品",
+        "chg_pct": 3.17,
+        "up_n": 11,
+        "down_n": 2,
+        "leader": "广东宏大",
+        "main_net_inflow_yi": 0.76
+      },
+      {
+        "name": "房产租赁经纪",
+        "chg_pct": 3.02,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "我爱我家",
+        "main_net_inflow_yi": 1.9
+      },
+      {
+        "name": "其他化学纤维",
+        "chg_pct": 2.98,
+        "up_n": 7,
+        "down_n": 1,
+        "leader": "中复神鹰",
+        "main_net_inflow_yi": 0.66
+      },
+      {
+        "name": "军工电子Ⅲ",
+        "chg_pct": 2.87,
+        "up_n": 54,
+        "down_n": 7,
+        "leader": "华力创通",
+        "main_net_inflow_yi": 4.22
       }
     ],
     "industry_n": 20,
     "concept_top": [
       {
-        "name": "冰雪经济",
-        "chg_pct": 3.31,
-        "up_n": 34,
-        "down_n": 7,
-        "leader": "冰山冷热"
-      },
-      {
-        "name": "2025三季报预减",
-        "chg_pct": 2.89,
-        "up_n": 8,
-        "down_n": 0,
-        "leader": "东岳硅材"
-      },
-      {
-        "name": "氦气概念",
-        "chg_pct": 2.86,
-        "up_n": 15,
-        "down_n": 3,
-        "leader": "凯美特气"
-      },
-      {
-        "name": "裸眼3D",
-        "chg_pct": 2.65,
-        "up_n": 16,
-        "down_n": 6,
-        "leader": "超声电子"
-      },
-      {
-        "name": "退税商店",
-        "chg_pct": 2.58,
-        "up_n": 17,
-        "down_n": 3,
-        "leader": "南宁百货"
-      },
-      {
         "name": "航天航空",
-        "chg_pct": 2.51,
-        "up_n": 49,
-        "down_n": 10,
-        "leader": "航发科技"
-      },
-      {
-        "name": "盲盒经济",
-        "chg_pct": 2.48,
-        "up_n": 10,
-        "down_n": 3,
-        "leader": "实丰文化"
-      },
-      {
-        "name": "CPO概念",
-        "chg_pct": 2.47,
-        "up_n": 81,
-        "down_n": 15,
-        "leader": "金百泽"
-      },
-      {
-        "name": "光通信模块",
-        "chg_pct": 2.42,
-        "up_n": 97,
-        "down_n": 23,
-        "leader": "超声电子"
-      },
-      {
-        "name": "F5G概念",
-        "chg_pct": 2.37,
-        "up_n": 22,
-        "down_n": 3,
-        "leader": "华脉科技"
-      },
-      {
-        "name": "2026三季报预增",
-        "chg_pct": 2.36,
-        "up_n": 20,
-        "down_n": 10,
-        "leader": "超声电子"
-      },
-      {
-        "name": "供销社概念",
-        "chg_pct": 2.22,
-        "up_n": 16,
+        "chg_pct": 4.51,
+        "up_n": 54,
         "down_n": 4,
-        "leader": "农心科技"
+        "leader": "晨曦航空"
       },
       {
-        "name": "纳米银",
-        "chg_pct": 2.21,
-        "up_n": 7,
+        "name": "飞行汽车(eVTOL)",
+        "chg_pct": 4.17,
+        "up_n": 77,
+        "down_n": 11,
+        "leader": "万丰奥威"
+      },
+      {
+        "name": "汽车一体化压铸",
+        "chg_pct": 3.75,
+        "up_n": 25,
         "down_n": 3,
-        "leader": "超声电子"
+        "leader": "万丰奥威"
       },
       {
-        "name": "旅游酒店",
-        "chg_pct": 2.16,
-        "up_n": 32,
-        "down_n": 5,
-        "leader": "大连圣亚"
+        "name": "碳纤维",
+        "chg_pct": 3.51,
+        "up_n": 40,
+        "down_n": 6,
+        "leader": "万丰奥威"
       },
       {
-        "name": "PCB",
-        "chg_pct": 2.12,
-        "up_n": 148,
-        "down_n": 53,
-        "leader": "超声电子"
+        "name": "通用航空",
+        "chg_pct": 3.46,
+        "up_n": 34,
+        "down_n": 2,
+        "leader": "万丰奥威"
       },
       {
-        "name": "昨日首板",
-        "chg_pct": 2.07,
-        "up_n": 16,
-        "down_n": 14,
-        "leader": "农心科技"
+        "name": "空间站概念",
+        "chg_pct": 3.15,
+        "up_n": 20,
+        "down_n": 4,
+        "leader": "华力创通"
+      },
+      {
+        "name": "军民融合",
+        "chg_pct": 3.14,
+        "up_n": 149,
+        "down_n": 29,
+        "leader": "长城军工"
       },
       {
         "name": "航母概念",
-        "chg_pct": 2.01,
-        "up_n": 23,
-        "down_n": 8,
-        "leader": "航发科技"
+        "chg_pct": 2.93,
+        "up_n": 29,
+        "down_n": 3,
+        "leader": "中信海直"
       },
       {
-        "name": "光纤概念",
-        "chg_pct": 1.91,
-        "up_n": 66,
-        "down_n": 16,
-        "leader": "华脉科技"
+        "name": "卫星导航",
+        "chg_pct": 2.9,
+        "up_n": 63,
+        "down_n": 14,
+        "leader": "司南导航"
       },
       {
-        "name": "快手概念",
-        "chg_pct": 1.79,
-        "up_n": 30,
-        "down_n": 6,
-        "leader": "实丰文化"
+        "name": "轮毂电机",
+        "chg_pct": 2.8,
+        "up_n": 8,
+        "down_n": 1,
+        "leader": "泉峰汽车"
       },
       {
-        "name": "谷子经济",
-        "chg_pct": 1.79,
-        "up_n": 53,
-        "down_n": 26,
-        "leader": "新经典"
+        "name": "华为汽车",
+        "chg_pct": 2.72,
+        "up_n": 104,
+        "down_n": 20,
+        "leader": "保隆科技"
+      },
+      {
+        "name": "2026三季报预减",
+        "chg_pct": 2.6,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "国机精工"
+      },
+      {
+        "name": "大飞机",
+        "chg_pct": 2.59,
+        "up_n": 93,
+        "down_n": 9,
+        "leader": "天汽模"
+      },
+      {
+        "name": "船舶制造",
+        "chg_pct": 2.58,
+        "up_n": 15,
+        "down_n": 1,
+        "leader": "国瑞科技"
+      },
+      {
+        "name": "鸡肉概念",
+        "chg_pct": 2.56,
+        "up_n": 20,
+        "down_n": 0,
+        "leader": "天马科技"
+      },
+      {
+        "name": "租售同权",
+        "chg_pct": 2.53,
+        "up_n": 20,
+        "down_n": 3,
+        "leader": "天健集团"
+      },
+      {
+        "name": "民爆概念",
+        "chg_pct": 2.52,
+        "up_n": 18,
+        "down_n": 4,
+        "leader": "广东宏大"
+      },
+      {
+        "name": "军工",
+        "chg_pct": 2.5,
+        "up_n": 337,
+        "down_n": 89,
+        "leader": "长城军工"
+      },
+      {
+        "name": "低空经济",
+        "chg_pct": 2.45,
+        "up_n": 244,
+        "down_n": 66,
+        "leader": "保隆科技"
+      },
+      {
+        "name": "小米汽车",
+        "chg_pct": 2.36,
+        "up_n": 105,
+        "down_n": 23,
+        "leader": "保隆科技"
       }
     ],
     "concept_n": 20,
     "concentration": {
-      "top5_avg_chg": 6.55,
-      "sample_avg_chg": 4.4,
-      "spread": 2.15,
+      "top5_avg_chg": 6.09,
+      "sample_avg_chg": 4.5,
+      "spread": 1.59,
       "interpretation": "主题集中行情 (头部板块显著强于平均)"
     }
-  }
+  },
+  "stocks": [
+    {
+      "code": "301357",
+      "name": "",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 5.97,
+      "leader": "长城军工",
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "600967",
+      "name": "",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 5.97,
+      "leader": "长城军工",
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "601606",
+      "name": "",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 5.97,
+      "leader": "长城军工",
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "000519",
+      "name": "",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 5.97,
+      "leader": "长城军工",
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "300979",
+      "name": "",
+      "industry": "纺织鞋类制造",
+      "chg_pct": 4.93,
+      "leader": "华利集团",
+      "reason": "当前周期需求迁移行业成分股"
+    }
+  ]
 }

@@ -1,49 +1,130 @@
 {
- "ts": "2026-10-17T04:03:09+08:00",
+ "ts": "2026-10-17T08:22:07+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
- "status": "insufficient",
- "n_scanned": 1,
- "n_scored": 0,
- "n_confirmed_divergence": 0,
- "n_no_flow": 1,
- "n_rejected": 1,
- "rejection_reasons": {
-  "source_unavailable": 1
- },
+ "status": "ok",
+ "n_scanned": 5,
+ "n_scored": 5,
+ "n_confirmed_divergence": 2,
+ "n_no_flow": 0,
+ "n_rejected": 0,
+ "rejection_reasons": {},
  "coverage": {
   "totals": {
-   "kline_days": 1,
-   "flow_days": 0,
-   "aligned_days": 0
+   "kline_days": 26072,
+   "flow_days": 300,
+   "aligned_days": 290
   },
   "by_code": [
    {
-    "code": "sz301569",
-    "kline_days": 1,
-    "flow_days": 0,
-    "aligned_days": 0,
-    "kline_date_start": "2026-10-15",
-    "kline_date_end": "2026-10-15",
-    "flow_date_start": null,
-    "flow_date_end": null
+    "code": "sz000001",
+    "kline_days": 8452,
+    "flow_days": 60,
+    "aligned_days": 58,
+    "kline_date_start": "1991-04-03",
+    "kline_date_end": "2026-10-14",
+    "flow_date_start": "2026-07-17",
+    "flow_date_end": "2026-10-16"
+   },
+   {
+    "code": "sh600036",
+    "kline_days": 5877,
+    "flow_days": 60,
+    "aligned_days": 58,
+    "kline_date_start": "2002-04-09",
+    "kline_date_end": "2026-10-14",
+    "flow_date_start": "2026-07-17",
+    "flow_date_end": "2026-10-16"
+   },
+   {
+    "code": "sz300750",
+    "kline_days": 2023,
+    "flow_days": 60,
+    "aligned_days": 58,
+    "kline_date_start": "2018-06-11",
+    "kline_date_end": "2026-10-14",
+    "flow_date_start": "2026-07-17",
+    "flow_date_end": "2026-10-16"
+   },
+   {
+    "code": "sz002594",
+    "kline_days": 3700,
+    "flow_days": 60,
+    "aligned_days": 58,
+    "kline_date_start": "2011-06-30",
+    "kline_date_end": "2026-10-14",
+    "flow_date_start": "2026-07-17",
+    "flow_date_end": "2026-10-16"
+   },
+   {
+    "code": "sh600519",
+    "kline_days": 6020,
+    "flow_days": 60,
+    "aligned_days": 58,
+    "kline_date_start": "2001-08-27",
+    "kline_date_end": "2026-10-14",
+    "flow_date_start": "2026-07-17",
+    "flow_date_end": "2026-10-16"
    }
   ],
-  "flow_source_ratio": 0.0,
+  "flow_source_ratio": 1.0,
   "minimum_flow_source_ratio": 0.8,
   "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"
  },
  "buy_side": [],
- "sell_side": [],
+ "sell_side": [
+  {
+   "code": "sz002594",
+   "date": "2026-10-14",
+   "close": 81.44,
+   "score": 6.1,
+   "signal": "派发背离",
+   "diverge": -1,
+   "price_accel_pct": 0.3438,
+   "flow_accel_norm": -0.4216,
+   "flow_persist": 0.3,
+   "vol_compress": 0.882,
+   "n_flow_days": 60,
+   "n_aligned_days": 58,
+   "flow_date_start": "2026-07-17",
+   "flow_date_end": "2026-10-16",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-14"
+   }
+  },
+  {
+   "code": "sz300750",
+   "date": "2026-10-14",
+   "close": 280.12,
+   "score": 23.7,
+   "signal": "派发背离",
+   "diverge": -1,
+   "price_accel_pct": 0.1806,
+   "flow_accel_norm": -0.1664,
+   "flow_persist": 0.3,
+   "vol_compress": 0.918,
+   "n_flow_days": 60,
+   "n_aligned_days": 58,
+   "flow_date_start": "2026-07-17",
+   "flow_date_end": "2026-10-16",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-14"
+   }
+  }
+ ],
  "meta": {
   "formula": "score = 50 + 40*D + 40*(S-0.5) + 10*(1-V/1.5)",
   "D": "价格与资金加速度反向，且资金持续性确认",
   "S": "近10个交易日主力净流入为正的天数占比",
   "V": "近20日真实波幅/近60日真实波幅; 不单独作为背离证据",
-  "source": "价格: 本地前复权日K | 资金: 东财 push2his fflow",
+  "source": "价格: 本地前复权日K | 资金: 东财 fflow，不足25日时回退新浪 MoneyFlow.ssl_qsfx_zjlrqs",
   "provenance": {
-   "source": "本地前复权日K + 东财主力净流入",
+   "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-17T04:03:09+08:00"
+   "snapshot_ts": "2026-10-17T08:22:07+08:00"
   }
  }
 }
