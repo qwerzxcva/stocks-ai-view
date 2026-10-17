@@ -333,11 +333,25 @@ def fetch_tx_sector_ranking(limit=20):
 # 腾讯 mktHs/rank 只给涨跌幅, 不给主力净额; 板块资金单独走东财 clist
 # (m:90 = 行业板块, fid=f_flow 按主力净额倒序)。
 def fetch_sector_moneyflow(limit=20):
-    url = ("https://push2.eastmoney.com/api/qt/clist/get"
-           "?fid=f_flow&po=1&pz=%d&pn=1&np=1&fltt=2&invt=2"
-           "&fs=m:90+t:2&fields=f12,f14,f3,f62,f184,f128,f136" % limit)
+    urls = [
+        "https://push2delay.eastmoney.com/api/qt/clist/get",
+        "https://push2his.eastmoney.com/api/qt/clist/get",
+        "https://push2.eastmoney.com/api/qt/clist/get",
+    ]
+    query = ("?fid=f62&po=1&pz=%d&pn=1&np=1&fltt=2&invt=2"
+             "&fs=m:90+t:2&fields=f12,f14,f3,f62,f184,f128,f136" % limit)
+    d = {}
+    headers = {"User-Agent": "Mozilla/5.0", "Referer": "https://quote.eastmoney.com/"}
+    for base in urls:
+        try:
+            req = urllib.request.Request(base + query, headers=headers)
+            body = urllib.request.urlopen(req, timeout=15).read()
+            d = json.loads(body.decode("utf-8"))
+            if ((d.get("data") or {}).get("diff")):
+                break
+        except Exception:
+            continue
     try:
-        d = json.loads(_http(url, timeout=15).decode("utf-8"))
         out = []
         for r in ((d.get("data") or {}).get("diff")) or []:
             name = str(r.get("f14", "") or "").strip()

@@ -79,8 +79,14 @@ def theme_from_impact(imp):
     return ""
 
 
-def build_themes(news, hot):
-    impacts = (news or {}).get("impacts") or []
+def build_themes(news, hot, extra=None, hot_news=None):
+    impacts = list((news or {}).get("impacts") or [])
+    for item in (extra or {}).get("items") or []:
+        impacts.append({"title": item.get("title"), "themes": item.get("themes") or [],
+                        "direction": "neutral", "stocks": [{"code": c} for c in item.get("codes") or []]})
+    for item in (hot_news or {}).get("items") or []:
+        if item.get("group"):
+            impacts.append({"title": item.get("title"), "themes": [item.get("group")], "direction": "neutral", "stocks": []})
     buckets = defaultdict(lambda: {
         "news": 0, "bull": 0, "bear": 0, "neutral": 0,
         "stocks": {}, "titles": [],
@@ -213,6 +219,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--news", default="data/news_impact.json")
     ap.add_argument("--hot", default="data/hot_impact.json")
+    ap.add_argument("--extra", default="data/news_extra.json")
+    ap.add_argument("--hot-news", default="data/hot_news.json")
     ap.add_argument("--out-themes", default="data/hot_themes.json")
     ap.add_argument("--out-mainline", default="data/mainline.json")
     args = ap.parse_args()
@@ -223,7 +231,7 @@ def main():
         print("[mainline] %s 无 impacts, 终止" % args.news)
         return 1
 
-    themes_doc = build_themes(news, hot)
+    themes_doc = build_themes(news, hot, load(args.extra), load(args.hot_news))
     mainline_doc = build_mainline(themes_doc, news)
 
     for path, doc in ((args.out_themes, themes_doc),

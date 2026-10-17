@@ -1744,7 +1744,9 @@ function renderThemes(){
   // hot_themes.json 顶层是 {ts, themes:[...]}; latest.json 里的 themes 是数组
   const themeFile=g.hot_themes||{};
   const impactReports=(g.hot_impact||{}).reports||themeFile.hot_reports||[];
-  const thRaw=(themeFile.themes&&themeFile.themes.length)?themeFile.themes:(g.themes||[]);
+  const grouped=((g.hot_news||{}).groups||{});
+  const groupThemes=Object.entries(grouped).map(([name,row])=>({name:name,count:(row.items||row.top||[]).length||row.count||0,direction:'neutral',stocks:[]}));
+  const thRaw=[].concat((themeFile.themes||[]),(g.themes||[]),groupThemes).filter((x,i,a)=>x&&x.name&&a.findIndex(y=>y.name===x.name)===i);
   const th=Array.isArray(thRaw)?thRaw:(thRaw.themes||[]);
   const ne=g.news_extra||{};
   let h='';
@@ -1936,7 +1938,9 @@ function renderPools(){
   // ⑦b 板块资金 — 东财行业主力净额 (独立池, 不是个股)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
      +'<b style="font-size:12px">⑦b 板块资金</b> <span class="sub">东财行业主力净额 · 净占比 · 5/20日涨幅</span></div>';
-  const smf=((g.latest||{}).sector_moneyflow||{}).data||[];
+  const smfRaw=((g.latest||{}).sector_moneyflow||{}).data||[];
+  const txRank=((g.market_now||{}).tx_sector_ranking)||(((g.latest||{}).westock||{}).sector_ranking||{}).data||[];
+  const smf=smfRaw.length?smfRaw:txRank.map(x=>({name:x.name,code:x.code,changePct:x.changePct,main_net_yi:x.mainNetInflow,net_pct:null,chg5d:x.chg5d,chg20d:x.chg20d,leader:x.leader}));
   if(smf.length){
     h+='<table><thead><tr><th>板块</th><th>涨跌%</th><th>主力净额</th><th>净占比</th><th>5日</th><th>20日</th></tr></thead><tbody>';
     smf.slice(0,20).forEach(x=>{
@@ -1955,7 +1959,7 @@ function renderPools(){
     h+='<div class="fl" style="font-size:9px;padding:4px 0">'+_esc2(((g.latest||{}).sector_moneyflow||{}).date)+' · '
        +inflow+'/'+smf.length+' 个板块主力净流入 · 东财 clist m:90 · Research reference only</div>';
   } else {
-    h+='<div class="fl" style="font-size:10px">暂无板块资金数据 (collect_market_extras 的 sector_moneyflow 未产出)</div>';
+    h+='<div class="fl" style="font-size:10px">板块资金与腾讯行业排行都为空</div>';
   }
 
   // ⑦c 趋势强度指数 (RTSI 个股 / TMA 板块 / MSCI 市场情绪)
@@ -2947,8 +2951,11 @@ async function render(){
   window._scenData = g.scenario;    if(g.scenario && scenRendered)    renderScenario(g.scenario);
   window._mfData = g.moneyflow;      if(g.moneyflow && mfRendered)      renderMoneyFlow(g.moneyflow);
   window._gmData = g.global_markets; if(g.global_markets && gmRendered) renderGlobalMarkets(g.global_markets);
-  window._newsData = g.news_extra;   if(g.news_extra && nfRendered)      renderNewsFlow();
-  window._hotData = g.hot_news;       if(g.hot_news && nfRendered)       renderNewsFlow();
+  window._newsData = g.news_extra;
+  window._hotData = g.hot_news;
+  if((g.news_extra||g.hot_news) && (nfRendered || document.querySelector('.c-tab.active')?.dataset.c==='7')){
+    nfRendered=true; _safe(renderNewsFlow,'newsFlow');
+  }
   window._engineV5 = g.engine_v5;
   window._multidim = g.multidim;
   window._reflect = g.reflect_latest;
