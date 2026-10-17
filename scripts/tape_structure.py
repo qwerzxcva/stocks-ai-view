@@ -10,12 +10,18 @@ import argparse
 import json
 import os
 import statistics
+import sys
 import urllib.request
 from datetime import datetime, timedelta, timezone
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+
+from indicators_ext import ema
+
 DATA = os.path.join(ROOT, "data")
 HEADERS = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
 
@@ -126,7 +132,150 @@ def catalyst_rows(news, today):
     return rows[:12]
 
 
-def structure(weekly, hourly):
+def volume_pressure(bars, window=12):
+    """量能差: rolling up-bar volume minus down-bar volume, aligned with index close.
+
+    On 5-minute bars this is the volume-differential series drawn against the
+    index line; each point keeps its window sums so the front end can render
+    the paired chart without re-deriving anything.
+    """
+    if len(bars) < window + 2:
+        return None
+    series = []
+    up_sum = down_sum = 0.0
+    for i, bar in enumerate(bars):
+        prev_close = bars[i - 1]["close"] if i else bar["open"]
+        if bar["close"] >= prev_close:
+            up_sum += bar["volume"]
+        else:
+            down_sum += bar["volume"]
+        if i >= window:
+            old = bars[i - window]
+            old_prev = bars[i - window - 1]["close"] if i - window else old["open"]
+            if old["close"] >= old_prev:
+                up_sum -= old["volume"]
+            else:
+                down_sum -= old["volume"]
+        if i < window - 1:
+            continue
+        total = up_sum + down_sum
+        series.append({"time": bar["time"], "close": bar["close"],
+                       "up_vol": round(up_sum, 1), "down_vol": round(down_sum, 1),
+                       "diff": round(up_sum - down_sum, 1),
+                       "diff_ratio": round((up_sum - down_sum) / total, 4) if total else 0.0})
+    look = min(8, len(series) - 1)
+    if look < 1:
+        return None
+    now, past = series[-1], series[-1 - look]
+    close_up = now["close"] > past["close"]
+    diff_up = now["diff"] > past["diff"]
+    if close_up and not diff_up:
+        alignment = "指数上行但量能差走弱，反弹动能存疑"
+    elif not close_up and diff_up:
+        alignment = "指数下行但量能差收敛，抛压减弱"
+    elif close_up and diff_up:
+        alignment = "量价同向向上"
+    else:
+        alignment = "量价同向向下"
+    return {"window": window, "alignment": alignment, "series": series}
+
+
+def macd_lines(closes, fast=12, slow=26, signal=9):
+    fast_ema = ema(closes, fast)
+    slow_ema = ema(closes, slow)
+    dif = [None if a is None or b is None else a - b for a, b in zip(fast_ema, slow_ema)]
+    seed = next((v for v in dif if v is not None), 0.0)
+    dea = ema([v if v is not None else seed for v in dif], signal)
+    return dif, dea
+
+
+def kdj_lines(rows, n=9):
+    ks, ds = [], []
+    k = d = 50.0
+    for i, row in enumerate(rows):
+        win = rows[max(0, i - n + 1):i + 1]
+        low_n = min(r["low"] for r in win)
+        high_n = max(r["high"] for r in win)
+        rsv = 50.0 if high_n == low_n else (row["close"] - low_n) / (high_n - low_n) * 100
+        k = 2 / 3 * k + 1 / 3 * rsv
+        d = 2 / 3 * d + 1 / 3 * k
+        ks.append(k)
+        ds.append(d)
+    return ks, ds
+
+
+def dmi_lines(rows, n=14):
+    size = len(rows)
+    tr = [0.0] * size
+    plus_dm = [0.0] * size
+    minus_dm = [0.0] * size
+    for i in range(1, size):
+        high, low = rows[i]["high"], rows[i]["low"]
+        prev_close, prev_high, prev_low = rows[i - 1]["close"], rows[i - 1]["high"], rows[i - 1]["low"]
+        tr[i] = max(high - low, abs(high - prev_close), abs(low - prev_close))
+        up, down = high - prev_high, prev_low - low
+        plus_dm[i] = up if up > down and up > 0 else 0.0
+        minus_dm[i] = down if down > up and down > 0 else 0.0
+    atr = ema(tr, n)
+    plus_s = ema(plus_dm, n)
+    minus_s = ema(minus_dm, n)
+
+    def ratio(num, den):
+        return [None if a is None or not b else 100 * a / b for a, b in zip(num, den)]
+
+    pdi = ratio(plus_s, atr)
+    ndi = ratio(minus_s, atr)
+    dx = [None if a is None or b is None or not (a + b) else 100 * abs(a - b) / (a + b)
+          for a, b in zip(pdi, ndi)]
+    adx = ema([v if v is not None else 0.0 for v in dx], n)
+    return pdi, ndi, adx
+
+
+def _swing_divergence(rows, indicator, window=60):
+    """Compare price extremes of the two half-windows against the indicator at
+    the same bars. Returns a label or None."""
+    if len(rows) < window:
+        return None
+    seg = rows[-window:]
+    ind = indicator[-window:]
+    half = window // 2
+    hi_a = max(range(half), key=lambda i: seg[i]["high"])
+    hi_b = max(range(half, window), key=lambda i: seg[i]["high"])
+    lo_a = min(range(half), key=lambda i: seg[i]["low"])
+    lo_b = min(range(half, window), key=lambda i: seg[i]["low"])
+    if ind[hi_a] is not None and ind[hi_b] is not None and \
+            seg[hi_b]["high"] > seg[hi_a]["high"] and ind[hi_b] < ind[hi_a]:
+        return "顶背离"
+    if ind[lo_a] is not None and ind[lo_b] is not None and \
+            seg[lo_b]["low"] < seg[lo_a]["low"] and ind[lo_b] > ind[lo_a]:
+        return "底背离"
+    return None
+
+
+def indicator_snapshot(rows, label):
+    """MACD / KDJ / DMI state plus swing divergence for one timeframe."""
+    if not rows:
+        return None
+    closes = [r["close"] for r in rows]
+    dif, dea = macd_lines(closes)
+    ks, ds = kdj_lines(rows)
+    pdi, ndi, adx = dmi_lines(rows)
+
+    def tail(series):
+        return round(series[-1], 3) if series[-1] is not None else None
+
+    return {
+        "timeframe": label,
+        "macd": {"dif": tail(dif), "dea": tail(dea),
+                 "divergence": _swing_divergence(rows, dif)},
+        "kdj": {"k": tail(ks), "d": tail(ds),
+                "divergence": _swing_divergence(rows, ds)},
+        "dmi": {"pdi": tail(pdi), "ndi": tail(ndi), "adx": tail(adx),
+                "divergence": _swing_divergence(rows, adx)},
+    }
+
+
+def structure(weekly, hourly, daily):
     def box(rows):
         if len(rows) < 20:
             return None
@@ -148,7 +297,7 @@ def structure(weekly, hourly):
             return "价格新低但量能放大"
         return "未确认背离"
 
-    return {"weekly_box": box(weekly), "hourly_box": box(hourly),
+    return {"weekly_box": box(weekly), "hourly_box": box(hourly), "daily_box": box(daily),
             "weekly_divergence": divergence(weekly), "hourly_divergence": divergence(hourly)}
 
 
@@ -159,14 +308,18 @@ def main():
     minute = tencent_bars("sh000001", "m5", 48)
     weekly = tencent_bars("sh000001", "week", 80)
     hourly = tencent_bars("sh000001", "m60", 80)
+    daily = tencent_bars("sh000001", "day", 120)
     news = load("news_extra.json")
     timeline = event_timeline(load("limitup_attribution.json"), load("sector_engine.json"))
-    payload = {"ts": datetime.now(CST).isoformat(timespec="seconds"), "engine": "tape_structure v2",
+    payload = {"ts": datetime.now(CST).isoformat(timespec="seconds"), "engine": "tape_structure v3",
                "index": "sh000001", "minute_events": minute_events(minute),
+               "volume_pressure": volume_pressure(minute),
                "event_timeline": timeline,
                "catalysts": catalyst_rows(news, datetime.now(CST).date()),
-               "structure": structure(weekly, hourly),
-               "meta": {"source": "Tencent 5-minute, weekly, 60-minute bars plus news_extra",
+               "structure": structure(weekly, hourly, daily),
+               "indicators": {"daily": indicator_snapshot(daily[-80:], "日线"),
+                              "hourly": indicator_snapshot(hourly, "60分钟")},
+               "meta": {"source": "Tencent 5-minute, daily, weekly, 60-minute bars plus news_extra",
                         "behavior_rule": "A bullish headline with negative main-flow evidence is marked separately by news_transmission"}}
     with open(args.out, "w", encoding="utf-8") as handle:
         json.dump(payload, handle, ensure_ascii=False, indent=1)
