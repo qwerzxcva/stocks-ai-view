@@ -345,7 +345,7 @@ def main():
     ap.add_argument('--pred-dir', default='/tmp', help='engine_v5 输出所在目录')
     ap.add_argument('--bulk', default=None, help='K线 bulk 目录 (默认 paths.BULK)')
     ap.add_argument('--data-dir', default=None, help='ai-view data 目录 (默认 paths.AI_VIEW_DATA)')
-    ap.add_argument('--horizons', default='5,10')
+    ap.add_argument('--horizons', default='1,3,5,10')
     ap.add_argument('--out', required=True)
     args = ap.parse_args()
 
