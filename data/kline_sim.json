@@ -1,10 +1,10 @@
 {
-  "ts": "2026-10-14T19:45:36+08:00",
+  "ts": "2026-10-18T03:54:44+08:00",
   "sources": {
     "predictions": {
       "dir": "/home/runner/work/stocks-ai-view/stocks-ai-view/data/predictions",
-      "files": 649,
-      "n": 64250
+      "files": 652,
+      "n": 64400
     }
   },
   "params": {
@@ -21,221 +21,71 @@
     "exit": "入场日起第N个交易日收盘价"
   },
   "n_signals_total": 3000,
-  "n_simulated": 669,
-  "n_held": 20,
+  "n_simulated": 0,
+  "n_held": 0,
   "skipped": {
-    "no_kline": 2331,
+    "no_kline": 3000,
     "no_forward_data": 0,
     "limit_up_at_entry": 0,
     "bad_price": 0
   },
   "overall": {
-    "win_rate": 0.3555,
-    "avg_return_pct": -1.173,
-    "max_drawdown_pct": 5.663,
-    "n_pairs": 2675
+    "win_rate": null,
+    "avg_return_pct": null,
+    "max_drawdown_pct": 0.0,
+    "n_pairs": 0
   },
   "by_horizon": {
     "1": {
-      "n": 669,
-      "win_rate": 0.4679,
-      "avg_ret_pct": -0.01,
-      "median_ret_pct": -0.331,
-      "stdev_pct": 6.117
+      "n": 0,
+      "win_rate": null,
+      "avg_ret_pct": null,
+      "median_ret_pct": null,
+      "stdev_pct": null
     },
     "3": {
-      "n": 669,
-      "win_rate": 0.3363,
-      "avg_ret_pct": -0.895,
-      "median_ret_pct": -1.877,
-      "stdev_pct": 8.28
+      "n": 0,
+      "win_rate": null,
+      "avg_ret_pct": null,
+      "median_ret_pct": null,
+      "stdev_pct": null
     },
     "5": {
-      "n": 669,
-      "win_rate": 0.3229,
-      "avg_ret_pct": -0.885,
-      "median_ret_pct": -2.164,
-      "stdev_pct": 10.299
+      "n": 0,
+      "win_rate": null,
+      "avg_ret_pct": null,
+      "median_ret_pct": null,
+      "stdev_pct": null
     },
     "10": {
-      "n": 668,
-      "win_rate": 0.2949,
-      "avg_ret_pct": -2.904,
-      "median_ret_pct": -4.546,
-      "stdev_pct": 12.778
+      "n": 0,
+      "win_rate": null,
+      "avg_ret_pct": null,
+      "median_ret_pct": null,
+      "stdev_pct": null
     }
   },
+  "analyzers": null,
   "equity_curve": {
     "max_day": 10,
     "values": [
       1.0,
-      0.9964,
-      0.9932,
-      0.9966,
-      1.0034,
-      1.0095,
-      0.9807,
-      0.9722,
-      0.9719,
-      0.9679,
-      0.9523
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
     ]
   },
-  "top_signals": [
-    {
-      "code": "000063",
-      "name": "",
-      "score": 86.5,
-      "source": "predictions",
-      "signal_date": "2024-02-27",
-      "entry_date": "2024-02-28",
-      "entry_price": 27.18,
-      "ret_by_day": {
-        "1": 3.545,
-        "3": 5.053,
-        "5": 2.478,
-        "10": 0.97
-      }
-    },
-    {
-      "code": "000002",
-      "name": "",
-      "score": 86.4,
-      "source": "predictions",
-      "signal_date": "2024-05-17",
-      "entry_date": "2024-05-20",
-      "entry_price": 9.003,
-      "ret_by_day": {
-        "1": 2.05,
-        "3": 6.159,
-        "5": -1.504,
-        "10": -10.165
-      }
-    },
-    {
-      "code": "688137",
-      "name": "",
-      "score": 86.2,
-      "source": "predictions",
-      "signal_date": "2026-08-07",
-      "entry_date": "2026-08-10",
-      "entry_price": 49.005,
-      "ret_by_day": {
-        "1": 15.26,
-        "3": 30.561,
-        "5": 39.598,
-        "10": 54.0
-      }
-    },
-    {
-      "code": "000034",
-      "name": "",
-      "score": 86.0,
-      "source": "predictions",
-      "signal_date": "2024-02-27",
-      "entry_date": "2024-02-28",
-      "entry_price": 21.933,
-      "ret_by_day": {
-        "1": -2.891,
-        "3": 8.113,
-        "5": 4.042,
-        "10": 2.839
-      }
-    },
-    {
-      "code": "000021",
-      "name": "",
-      "score": 86.0,
-      "source": "predictions",
-      "signal_date": "2024-03-01",
-      "entry_date": "2024-03-04",
-      "entry_price": 14.564,
-      "ret_by_day": {
-        "1": -2.943,
-        "3": -4.522,
-        "5": 0.215,
-        "10": 0.42
-      }
-    },
-    {
-      "code": "601398",
-      "name": "",
-      "score": 86.0,
-      "source": "predictions",
-      "signal_date": "2026-06-10",
-      "entry_date": "2026-06-11",
-      "entry_price": 7.712,
-      "ret_by_day": {
-        "1": 0.847,
-        "3": -3.819,
-        "5": -7.189,
-        "10": -7.319
-      }
-    },
-    {
-      "code": "300486",
-      "name": "",
-      "score": 85.9,
-      "source": "predictions",
-      "signal_date": "2026-06-02",
-      "entry_date": "2026-06-03",
-      "entry_price": 29.706,
-      "ret_by_day": {
-        "1": -6.521,
-        "3": -10.257,
-        "5": -14.733,
-        "10": -22.271
-      }
-    },
-    {
-      "code": "002083",
-      "name": "",
-      "score": 85.8,
-      "source": "predictions",
-      "signal_date": "2026-06-23",
-      "entry_date": "2026-06-24",
-      "entry_price": 12.714,
-      "ret_by_day": {
-        "1": -6.115,
-        "3": -17.595,
-        "5": -11.933,
-        "10": -26.165
-      }
-    },
-    {
-      "code": "000002",
-      "name": "",
-      "score": 85.6,
-      "source": "predictions",
-      "signal_date": "2024-05-20",
-      "entry_date": "2024-05-21",
-      "entry_price": 9.003,
-      "ret_by_day": {
-        "1": 4.382,
-        "3": -0.171,
-        "5": -5.39,
-        "10": -7.167
-      }
-    },
-    {
-      "code": "000066",
-      "name": "",
-      "score": 85.5,
-      "source": "predictions",
-      "signal_date": "2024-02-27",
-      "entry_date": "2024-02-28",
-      "entry_price": 10.603,
-      "ret_by_day": {
-        "1": -2.134,
-        "3": 2.014,
-        "5": 0.223,
-        "10": 0.883
-      }
-    }
-  ],
+  "top_signals": [],
   "coverage": {
-    "bulk_max_date": "2026-10-13",
-    "bulk_rows_loaded": 738344
+    "bulk_max_date": null,
+    "bulk_rows_loaded": 0
   },
-  "note": null
+  "note": "无有效收益样本: 可入场信号 0 个, 但各持有期出场日超出 bulk K线数据范围 (截至 None)。更新 bulk K线后重跑。"
 }
