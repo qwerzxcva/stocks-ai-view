@@ -108,14 +108,20 @@ def main():
 
     def _measure(rows, hit_is_up=True):
         n = len(rows)
-        hits = sum(1 for r in rows if (r["chg_pct"] > 0 if hit_is_up
-                                       else r["chg_pct"] < 0))
-        return {
+        n_up = sum(1 for r in rows if r["chg_pct"] > 0)
+        n_down = sum(1 for r in rows if r["chg_pct"] < 0)
+        hits = n_up if hit_is_up else n_down
+        out = {
             "n": n,
             "hit_rate_pct": round(hits / n * 100, 1) if n else None,
             "avg_ret_pct": round(sum(r["chg_pct"] for r in rows) / n, 2) if n else None,
             "rows": rows,
         }
+        # 字段语义保持旧口径: 组统计的 n_up=上涨只数; 回避榜另加 n_down=下跌只数
+        out["n_up" if hit_is_up else "n_down"] = hits
+        if not hit_is_up:
+            out["n_up"] = n_up
+        return out
 
     for g, codes in groups.items():
         rows = []
