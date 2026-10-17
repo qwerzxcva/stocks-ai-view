@@ -1478,6 +1478,13 @@ function renderDailySummary(){
 
   // ═══ 0. 早盘推股 (用户核心诉求: 开盘前给清单) ═══════════════
   h+=renderPicksCard();
+  const tape=g.tape_structure||{};
+  if(tape.minute_events||tape.structure){
+    const st=tape.structure||{}, wb=st.weekly_box||{}, hb=st.hourly_box||{};
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">盘面结构 <span class="sub">'+_t(tape.ts)+'</span></div>';
+    h+='<div class="fl" style="font-size:10px;line-height:1.6">5分钟放量: '+((tape.minute_events||[]).slice(-3).map(x=>_esc2(x.time.slice(11))+' '+_esc2(x.label)+' '+_esc2(x.move_pct)+'% / '+_esc2(x.volume_ratio)+'倍').join(' · ')||'无')+'<br>周线箱体 '+_esc2(wb.low||'—')+'–'+_esc2(wb.high||'—')+' · 60分钟箱体 '+_esc2(hb.low||'—')+'–'+_esc2(hb.high||'—')+'<br>周线量价 '+_esc2(st.weekly_divergence||'—')+' · 60分钟量价 '+_esc2(st.hourly_divergence||'—')+'</div>';
+    if((tape.catalysts||[]).length) h+='<div class="fl">催化有效期: '+tape.catalysts.slice(0,4).map(x=>_esc2(x.status)+' '+_esc2((x.age_days==null?'':x.age_days+'天'))+' '+_esc2(x.title.slice(0,28))).join('<br>')+'</div>';
+  }
 
   // ═══ 0b. 数据新鲜度横幅 ═══════════════════════════════════════
   //  2026-10-16 用户反馈「从头到尾都显示过时数据」。根因是采集只在盘中跑 +
@@ -2770,6 +2777,7 @@ const SOURCES = [
   'data/hot_news.json',        // Newsnow 聚合热点 (15平台)
   'data/daily_brief.json',     // 盘前日报
   'data/news_digest.json',     // 24h 资讯流
+  'data/tape_structure.json',  // 5分钟放量、催化有效期、周线/60分钟结构
   'data/news_transmission.json', // 消息传导 (坏消息利好谁)
   'data/enrich.json',          // 强势股/龙虎榜/大宗
   'data/index_kline.json',     // 指数K线
