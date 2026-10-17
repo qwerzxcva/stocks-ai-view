@@ -1,0 +1,83 @@
+name: fund-flow-history-backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: 'Sorted stock-universe offset'
+        required: true
+        default: '0'
+        type: string
+      count:
+        description: 'Stocks in this batch'
+        required: true
+        default: '120'
+        type: string
+      history_limit:
+        description: 'Maximum daily flow rows per stock'
+        required: true
+        default: '100000'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fund-flow-history-backfill-${{ inputs.start }}
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    if: github.repository == 'qwerzxcva/stocks-ai-view' && vars.STOCKS_FLOW_REPO != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      STOCKS_FLOW_REPO: ${{ vars.STOCKS_FLOW_REPO }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/checkout@v4
+        with:
+          repository: jiegengxiangjianxue1/db-market
+          path: market-repo
+          sparse-checkout: |
+            master/universe.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.STOCKS_FLOW_REPO }}
+          token: ${{ secrets.GH_TOKEN }}
+          path: flow-repo
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Backfill one cloud batch
+        env:
+          BATCH_START: ${{ inputs.start }}
+          BATCH_COUNT: ${{ inputs.count }}
+          HISTORY_LIMIT: ${{ inputs.history_limit }}
+        run: |
+          python3 scripts/backfill_flow_history.py \
+            --master market-repo/master/universe.json \
+            --out-root flow-repo \
+            --start "$BATCH_START" \
+            --count "$BATCH_COUNT" \
+            --history-limit "$HISTORY_LIMIT"
+      - name: Commit flow batch to cloud repository
+        working-directory: flow-repo
+        env:
+          BATCH_START: ${{ inputs.start }}
+          BATCH_COUNT: ${{ inputs.count }}
+        run: |
+          git config user.name flow-backfill-bot
+          git config user.email flow-backfill-bot@users.noreply.github.com
+          git add stocks
+          if git diff --cached --quiet; then
+            echo 'No new flow files'
+            exit 0
+          fi
+          git commit -m "data(flow): backfill batch ${BATCH_START}-${BATCH_COUNT}"
+          git push origin HEAD:main

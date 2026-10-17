@@ -9,15 +9,24 @@ from datetime import datetime, timedelta, timezone
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from collect_moneyflow import fetch_fflow
+from flow_divergence import fetch_sina_flow
 
 CST = timezone(timedelta(hours=8))
 
 
 def export_one(code, info, root, limit):
     market = info.get("market")
-    if market not in ("sh", "sz"):
+    if market not in ("sh", "sz", "bj"):
         return "unsupported_exchange"
-    rows, error = fetch_fflow(code, klt=101, lmt=limit, retries=1)
+    if market == "bj":
+        rows, error = fetch_sina_flow(code, limit)
+        rows = [{"time": row.get("date"), "main_net": row.get("main_net"),
+                 "small_net": None, "medium_net": None, "large_net": None,
+                 "xlarge_net": None} for row in rows]
+        source = "sina_moneyflow"
+    else:
+        rows, error = fetch_fflow(code, klt=101, lmt=limit, retries=1)
+        source = "eastmoney_fflow_daily"
     if not rows:
         return error or "source_empty"
     history = {}
@@ -39,7 +48,7 @@ def export_one(code, info, root, limit):
     destination = os.path.join(root, "stocks", info["shard"], code, "money", "fflow.json")
     os.makedirs(os.path.dirname(destination), exist_ok=True)
     payload = {"schema_version": 1, "code": code, "exchange": market,
-               "source": "eastmoney_fflow_daily", "captured_at": datetime.now(CST).isoformat(timespec="seconds"),
+               "source": source, "captured_at": datetime.now(CST).isoformat(timespec="seconds"),
                "first_date": min(history), "last_date": max(history), "n": len(history),
                "rows": [history[date] for date in sorted(history)]}
     temporary = destination + ".tmp"
