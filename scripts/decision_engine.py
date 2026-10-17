@@ -192,6 +192,24 @@ def main():
                          "chg_pct": row.get("chg"), "action": "avoid", "confidence": 0.65,
                          "risk": row.get("expl") or "龙虎榜卖出", "reasons": ["龙虎榜卖出席位"],
                          "why": {"资金面": "龙虎榜卖出"}})
+    news_hits = {}
+    for row in (load("news_transmission.json") or {}).get("transmissions") or []:
+        for side, bucket in (("direct_bear", "利空"), ("inverse_bear", "反向利空"), ("direct_bull", "利好"), ("inverse_bull", "反向利好")):
+            for item in row.get(side) or []:
+                for code in item.get("stocks") or []:
+                    news_hits.setdefault(str(code), []).append(f"{row.get('label')}:{bucket}:{item.get('sector')}")
+    for rec in cards + avoid:
+        hits = news_hits.get(str(rec.get("code"))) or []
+        if not hits:
+            continue
+        rec.setdefault("reasons", []).append("24h消息传导 " + "；".join(hits[:2]))
+        bearish = any("利空" in hit for hit in hits)
+        bullish = any("利好" in hit for hit in hits)
+        if bearish and rec.get("action") == "buy":
+            rec["action"] = "watch"
+            rec["risk"] = ((rec.get("risk") or "") + " 24h消息传导利空，取消买入").strip()
+        elif bullish and not bearish:
+            rec["news_bias"] = "bullish"
     seen = {x.get("code") for x in avoid}
     avoid.extend(x for x in observed if x.get("code") and x.get("code") not in seen)
     avoid.sort(key=lambda x: (x.get("composite") or 0, x.get("chg_pct") or 0))
