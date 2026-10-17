@@ -81,6 +81,7 @@ TIERS = {
     "stop_analysis.json": "daily", "overseas_live.json": "daily",
     "predict_algo.json": "daily", "risk_plan.json": "daily",
     "key_levels.json": "daily", "pick_high_track.json": "daily",
+    "shard_b.json": "intraday", "shard_c.json": "intraday",
     # weekly (8 天)
     "reflect_latest.json": "weekly", "winrate_matrix.json": "weekly",
     "kline_sim.json": "weekly", "walkforward.json": "weekly",

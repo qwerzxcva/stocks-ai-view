@@ -452,6 +452,12 @@ jobs:
           fi
 
       # ── publish to the warehouse the site reads ──
+      - name: Sync mirror shards (B/C 仓分片数据汇聚)
+        run: |
+          # B 仓 (push2 系) / C 仓 (交易所+同花顺) 各自采集落自己仓,
+          # 这里把分片数据拉回 A 仓供引擎/前端消费。公开仓 raw 拉取, 零鉴权。
+          python3 scripts/sync_mirror_shards.py || echo "mirror shard sync skipped"
+
       - name: Publish engine outputs to this repo
         run: |
           # 引擎产出必须先推回本仓 (GitHub Pages 的数据源), 再同步到数据仓。
@@ -469,6 +475,8 @@ jobs:
             data/trend_strength.json data/bull_bear_debate.json \
             data/prediction_bundle.json data/recent_mainlines.json \
             data/analysis_manifest.json data/flow_divergence.json data/ban_pick.json data/pool_audit.json \
+            data/key_levels.json data/pick_high_track.json \
+            data/shard_b.json data/shard_c.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -483,7 +491,9 @@ jobs:
             --protect data/trend_strength.json --protect data/bull_bear_debate.json \
             --protect data/prediction_bundle.json --protect data/recent_mainlines.json \
             --protect data/analysis_manifest.json --protect data/flow_divergence.json \
-            --protect data/ban_pick.json --protect data/pool_audit.json
+            --protect data/ban_pick.json --protect data/pool_audit.json \
+            --protect data/key_levels.json --protect data/pick_high_track.json \
+            --protect data/shard_b.json --protect data/shard_c.json
 
       - name: Publish to the data warehouse
         env:

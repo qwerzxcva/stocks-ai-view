@@ -4,7 +4,7 @@ deploy_mirror.py — 部署 A 仓代码到 B/C 镜像仓并按分片改 cron
 
 三账号分片采集架构:
   A 仓 (qwerzxcva/stocks-ai-view)  → shard a + e, cron mod5=2
-  B 仓 (jiegengxiangjianxue/-b)    → shard b,     cron mod5=4
+  B 仓 (jiegengxiangjianxue10/-b)  → shard b,     cron mod5=4
   C 仓 (dufuwuxin/stocks-ai-view-c)→ shard c,     cron mod5=0
 
 为什么分片而不是每仓跑全部源: 国内金融源的风控按 IP 计数
@@ -29,7 +29,7 @@ SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TOKENS = {"B": os.environ.get("MIRROR_TOKEN_B", ""),
           "C": os.environ.get("MIRROR_TOKEN_C", "")}
-OWNERS = {"B": "jiegengxiangjianxue", "C": "dufuwuxin"}
+OWNERS = {"B": "jiegengxiangjianxue10", "C": "dufuwuxin"}
 REPOS = {"B": "stocks-ai-view-b", "C": "stocks-ai-view-c"}
 
 # cron 分钟位错峰: A=mod5 2, B=mod5 4, C=mod5 0
