@@ -1,0 +1,51 @@
+name: data-accuracy-gate
+# 数据准确性门禁 (2026-10-17): 用基准 CSV (用户提供的准确数据) 校验 K 线。
+# 当前状态: 预期失败 (红) —— day_qfq bulk 实为新浪非复权原始价冒充 qfq,
+# 全市场因子表 (cnfin/分红送配源) 建成后转绿。红的目的是让回归无处遁形。
+on:
+  schedule:
+    - cron: '20 9 * * 1'    # 每周一 17:20 CST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate 600519 kline vs ground truth (cloud shard 01)
+        run: |
+          python3 scripts/validate_ground_truth.py \
+            --gt tests/fixtures/sh600519_gt.csv \
+            --code sh600519 --cloud-shard 01 \
+            --max-price-diff 0.5 --max-missing-ratio 1.0
+
+      - name: Validate factors-based adjusted load (engine path)
+        run: |
+          python3 - <<'PY'
+          import sys, csv
+          sys.path.insert(0, 'scripts')
+          from engine_v5 import load_klines
+          d = load_klines('data-kline/bulk' if __import__('os').path.isdir('data-kline/bulk') else '/tmp')
+          # 因子表已提交在 data/adjusted/factors: 校验 600519 重建精度
+          gt = {r['date']: r for r in csv.DictReader(open('tests/fixtures/sh600519_gt.csv', encoding='utf-8-sig'))}
+          bars = d.get('sh600519') or []
+          assert bars, 'sh600519 未加载'
+          latest = float(gt[max(b[0] for b in bars if b[0] in gt)]['hfq_factor'])
+          common = [b for b in bars if b[0] in gt]
+          bad = sum(1 for b in common
+                    if abs(b[2] - float(gt[b[0]]['close_price'])*float(gt[b[0]]['hfq_factor'])/latest)
+                    / (float(gt[b[0]]['close_price'])*float(gt[b[0]]['hfq_factor'])/latest) > 0.005)
+          ratio = bad/len(common)*100
+          print(f'因子重建偏差>0.5%: {bad}/{len(common)} ({ratio:.2f}%)')
+          # 阈值 30%: 剩余偏差来自 bulk 原始价的跨厂商差异 (sina vs cnfin),
+          # 需整仓重建消除; 超过 30% 说明因子管线本身坏了
+          assert ratio < 30, f'因子重建失效: {ratio:.1f}% > 30%'
+          print('OK 因子管线有效')
+          PY

@@ -379,6 +379,63 @@ def score_stock(close, high, low, vol, weights=None, source_info=None, code_bare
 
 # ─── 批量: 从本地K线扫全市场 ──────────────────────────────────────
 def load_klines(bulk_dir, limit=None):
+    """读 K 线 bulk。优先用 data/adjusted/bulk/{code}_qfq.json (真前复权,
+    新浪 vip 源), 缺失时回退 day_qfq_*.csv。
+
+    2026-10-17 基准校验发现: day_qfq_*.csv 虽名叫 qfq, 实为新浪非复权接口
+    的原始价 (贵州茅台隐含复权因子恒为 1.0, 而真因子 8.88), 所有引擎
+    在除权日都被引入虚假跳空。adjusted 副本 (collect_adjusted_bulk.py,
+    新浪 vip getKLineData) 经 validate_ground_truth.py 对基准 CSV 校验通过。
+    覆盖: 本地 334/5268, 随 nightly-backfill 扩充。
+    """
+    # 1) 真前复权, 三级来源按准确度:
+    #    a. 因子表 (data/adjusted/factors/{code}.json, 基准CSV提取):
+    #       qfq = raw × factor/factor_latest —— 与基准逐日一致, 最准
+    #    b. hfq 副本锚点归一 (data/adjusted/bulk/{code}_hfq.json):
+    #       跨厂商因子口径有约 5-7% 系统差, 仅近似
+    #    c. 原始 bulk 兜底 (day_qfq_*.csv 实为新浪非复权原始价, 见下)
+    #
+    #    2026-10-17 基准校验发现: day_qfq_*.csv 虽名叫 qfq, 实为新浪
+    #    非复权接口原始价 (茅台隐含因子恒 1.0, 真因子 8.88), 除权日
+    #    全链引擎被引入虚假跳空。有因子表/hfq 的票优先用, 其余仍是
+    #    原始价——accuracy gate (validate_ground_truth) 会红到全市场
+    #    因子表建完为止。
+    try:
+        from paths import AI_VIEW_DATA as _AVD
+        adj_root = os.path.join(_AVD, "adjusted")
+    except Exception:
+        adj_root = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "data", "adjusted")
+    factors_dir = os.path.join(adj_root, "factors")
+    factor_tables = {}
+    if os.path.isdir(factors_dir):
+        import glob as _g
+        for fp in _g.glob(os.path.join(factors_dir, "*.json")):
+            try:
+                fd = json.load(open(fp, encoding="utf-8"))
+                factor_tables[fd.get("code")] = fd.get("factors") or {}
+            except (OSError, ValueError):
+                continue
+    hfq_dir = os.path.join(adj_root, "bulk")
+    hfq_tables = {}
+    if os.path.isdir(hfq_dir):
+        import glob as _g
+        for hq in _g.glob(os.path.join(hfq_dir, "*_hfq.json")):
+            bare = os.path.basename(hq).replace("_hfq.json", "")
+            try:
+                hd = json.load(open(hq, encoding="utf-8"))
+                hb = hd.get("bars") or []
+                if len(hb) < 30:
+                    continue
+                code = hd.get("tk_code") or ("sh" + bare if bare[0] in "69"
+                                             else "sz" + bare)
+                hfq_tables[code] = [[b[0], float(b[1]), float(b[2]),
+                                     float(b[3]), float(b[4]), float(b[5])]
+                                    for b in hb]
+            except (OSError, ValueError, KeyError):
+                continue
+
+    # 先扫一遍原始 bulk 建基础表 (全部 code 的原始价)
     import glob
     data = {}
     files = sorted(glob.glob(os.path.join(bulk_dir, "day_qfq_*.csv")))
@@ -402,6 +459,50 @@ def load_klines(bulk_dir, limit=None):
             break
     for c in data:
         data[c].sort(key=lambda b: b[0])
+
+    # 因子表覆盖的 code: 原始价 × 因子 = 真 qfq
+    n_factor = 0
+    for code, rows in data.items():
+        ft = factor_tables.get(code)
+        if not ft:
+            continue
+        dates = [r[0] for r in rows]
+        f_latest = None
+        for d in reversed(dates):
+            if d in ft:
+                f_latest = ft[d]
+                break
+        if not f_latest:
+            continue
+        adj_rows = []
+        for r in rows:
+            f = ft.get(r[0])
+            if f is None or f <= 0:
+                adj_rows.append(r)
+                continue
+            k = f / f_latest
+            adj_rows.append([r[0], r[1] * k, r[2] * k, r[3] * k,
+                             r[4] * k, r[5]])
+        data[code] = adj_rows
+        n_factor += 1
+
+    # hfq 覆盖但无因子表的 code: 锚点归一近似
+    n_hfq = 0
+    for code, hrows in hfq_tables.items():
+        if code in data and code in factor_tables:
+            continue   # 已有因子表, 更准
+        hrows = sorted(hrows, key=lambda r: r[0])
+        anchor_f = hrows[-1][2]
+        if anchor_f <= 0:
+            continue
+        data[code] = [[r[0], r[1] / anchor_f, r[2] / anchor_f,
+                       r[3] / anchor_f, r[4] / anchor_f, r[5]]
+                      for r in hrows]
+        n_hfq += 1
+
+    if n_factor or n_hfq:
+        print(f"[load_klines] 复权覆盖: 因子表 {n_factor} 只 + hfq近似 {n_hfq} 只",
+              flush=True)
     return data
 
 
