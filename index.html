@@ -1493,6 +1493,74 @@ function renderDailySummary(){
     if((strength.items||[]).length) h+='<div class="fl">强度榜: '+strength.items.filter(x=>x.kind==='sector').slice(0,5).map(x=>_esc2(x.grade||'—')+' '+_esc2(x.name)+' '+_esc2(x.score)).join(' · ')+'</div>';
   }
 
+  // ═══ 0a. 实时异动: 全市场量能对比 + 个股涨速榜 (借鉴回放页) ═══
+  //  回放页三支柱里已落地两块: 今日/昨日/量能差累计曲线 + 涨速/跌速/成交榜。
+  //  数据由 realtime_minute 每轮生成: amount_curve 持久化 tick, speed_leaders
+  //  取相邻两轮快照逐股差分 (amount 为当日累计, 差即区间成交)。
+  (function(){
+    const curve=g['market/amount_curve']||{}, spd=g['market/speed_leaders']||{};
+    if(!curve.today&&!spd.gainers) return;
+    const fv=v=>(typeof v==='number'&&isFinite(v))?(Math.round(v*100)/100):'—';
+    const mins=s=>{const p=String(s).split(':').map(Number);let m=(p[0]*60+p[1])-570;if(p[0]*60+p[1]>=780)m-=90;return Math.max(0,Math.min(240,m));};
+    function amountCurveSvg(tt,pv){
+      if(!tt||tt.length<2) return '';
+      const W=320,H=64,P=5;
+      const pvMap={}; (pv||[]).forEach(x=>{if(x.amount_yi!=null)pvMap[x.t]=x.amount_yi;});
+      const pts=[],diff=[];
+      tt.forEach(x=>{ if(x.amount_yi==null)return; const m=mins(x.t); pts.push([m,x.amount_yi]); if(pvMap[x.t]!=null)diff.push([m,Math.round((x.amount_yi-pvMap[x.t])*10)/10]); });
+      if(pts.length<2) return '';
+      const ys=pts.map(p=>p[1]).concat((pv||[]).filter(x=>x.amount_yi!=null).map(x=>x.amount_yi));
+      const lo=Math.min.apply(null,ys),hi=Math.max.apply(null,ys),rng=(hi-lo)||1;
+      const X=m=>P+m/240*(W-2*P), Y=v=>H-P-(v-lo)/rng*(H-2*P);
+      let s='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:64px;display:block;margin:2px 0">';
+      if(diff.length>1){
+        const dl=Math.min.apply(null,diff.map(p=>p[1])),dh=Math.max.apply(null,diff.map(p=>p[1])),dr=(dh-dl)||1;
+        const DY=v=>H-P-(v-dl)/dr*(H-2*P);
+        s+='<polyline points="'+diff.map(p=>X(p[0]).toFixed(1)+','+DY(p[1]).toFixed(1)).join(' ')+'" fill="none" stroke="var(--amber)" stroke-width="1" stroke-dasharray="2,2"/>';
+      }
+      if(pv&&pv.length) s+='<polyline points="'+pv.filter(x=>x.amount_yi!=null).map(x=>X(mins(x.t)).toFixed(1)+','+Y(x.amount_yi).toFixed(1)).join(' ')+'" fill="none" stroke="#999" stroke-width="1" stroke-dasharray="4,3"/>';
+      s+='<polyline points="'+pts.map(p=>X(p[0]).toFixed(1)+','+Y(p[1]).toFixed(1)).join(' ')+'" fill="none" stroke="var(--up)" stroke-width="1.4"/>';
+      s+='</svg><div class="fl" style="font-size:9px"><span style="color:var(--up)">━ 今日</span> <span style="color:#999">┅ 昨日</span> <span style="color:var(--amber)">┅ 差</span> (亿, 横轴 09:30–15:00)</div>';
+      return s;
+    }
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">实时异动 <span class="sub">'+_t(curve.ts||spd.ts)+'</span></div>';
+    const tt=(curve.today&&curve.today.ticks)||[], pvt=(curve.prev&&curve.prev.ticks)||[];
+    if(tt.length){
+      const last=tt[tt.length-1];
+      let cmp='';
+      if(pvt.length&&last.amount_yi!=null){
+        let ref=null;
+        for(let i=pvt.length-1;i>=0;i--){if(pvt[i].t<=last.t&&pvt[i].amount_yi!=null){ref=pvt[i];break;}}
+        if(ref){
+          const d=Math.round((last.amount_yi-ref.amount_yi)*10)/10;
+          const pct=ref.amount_yi?Math.round(d/ref.amount_yi*1000)/10:0;
+          cmp=' (vs 昨日同时 '+(d>=0?'+':'')+fv(d)+'亿, '+(pct>=0?'+':'')+fv(pct)+'%)';
+          const elapsed=Math.max(1,mins(last.t));
+          const proj=Math.round(last.amount_yi/elapsed*240*10)/10;
+          const refFull=pvt[pvt.length-1].amount_yi;
+          if(refFull){
+            const pd=Math.round((proj-refFull)*10)/10, pp=Math.round(pd/refFull*1000)/10;
+            cmp+=' · 预计全天 '+fv(proj)+'亿 ('+(pd>=0?'+':'')+fv(pd)+'亿, '+(pp>=0?'+':'')+fv(pp)+'%)';
+          }
+        }
+      }
+      h+='<div class="fl" style="font-size:10px;line-height:1.6">全市场量能 <b>'+fv(last.amount_yi)+'亿</b>'+cmp+' · 涨/跌 '+fv(last.advance)+'/'+fv(last.decline)+' · 涨停 '+fv(last.zt)+'</div>';
+      h+=amountCurveSvg(tt,pvt);
+    }
+    const iv=spd.interval_min?spd.interval_min+'分钟':'本轮';
+    let anyBoard=false;
+    [['涨速榜',(spd.gainers||[]).slice(0,8),true],['跌速榜',(spd.losers||[]).slice(0,8),true],['成交榜',(spd.amount||[]).slice(0,8),false]].forEach(bd=>{
+      const title=bd[0],rows=bd[1],showSpeed=bd[2];
+      if(!rows.length)return; anyBoard=true;
+      h+='<div class="fl" style="font-size:10px;line-height:1.7">'+iv+title+': '+rows.map(r=>{
+        const sp=showSpeed&&r.speed!=null?' <span class="'+(r.speed>=0?'up':'dn')+'">'+(r.speed>=0?'+':'')+fv(r.speed)+'%</span>':'';
+        const am=r.interval_amount_yi?' <span class="sub">'+fv(r.interval_amount_yi)+'亿</span>':'';
+        return '<span style="white-space:nowrap">'+_esc2(r.name||r.code)+sp+am+'</span>';
+      }).join(' · ')+'</div>';
+    });
+    if(!anyBoard&&spd.note) h+='<div class="fl" style="font-size:10px">异动榜待开盘后相邻两轮差分生成 ('+_esc2(spd.note)+')</div>';
+  })();
+
   // ═══ 0b. 数据新鲜度横幅 ═══════════════════════════════════════
   //  2026-10-16 用户反馈「从头到尾都显示过时数据」。根因是采集只在盘中跑 +
   //  一批引擎周更 + GH Actions schedule 静默停跑。这里把审计结果直接摆出来:
@@ -2770,6 +2838,8 @@ const SOURCES = [
   'data/lowpool.json',         // 低位池
   'data/market_now.json',      // 实时行情 (每5分钟)
   'data/realtime_minute.json', // 分钟级 (每3分钟)
+  'data/market/amount_curve.json', // 全市场量能 今日/昨日累计对比 (realtime_minute 每轮追加)
+  'data/market/speed_leaders.json', // 个股涨速/跌速/区间成交异动榜 (相邻快照差分)
   'data/cycle_deep.json',      // 周期深析 (周一重建)
   'data/ban_prob.json',        // 打板概率
   'data/ban_pick.json',        // 打板个股判断

@@ -59,6 +59,8 @@ def _repo_root():
 AI_VIEW = os.environ.get("STOCKS_AI_VIEW") or _repo_root()
 SNAP_DIR = os.path.join(AI_VIEW, "data", "market")
 DEFAULT_OUT = os.path.join(AI_VIEW, "data", "realtime_minute.json")
+CURVE_PATH = os.path.join(AI_VIEW, "data", "market", "amount_curve.json")
+LEADERS_PATH = os.path.join(AI_VIEW, "data", "market", "speed_leaders.json")
 
 # 交易时段 (CST)
 TRADING = [(9 * 60 + 25, 11 * 60 + 30), (13 * 60 + 0, 15 * 60 + 0)]
@@ -297,6 +299,142 @@ def summarize(rows):
     }
 
 
+# ─── 量能曲线 + 个股异动榜 (回放页借鉴, 2026-10-17) ──────────
+def _load_json(path, default):
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, json.JSONDecodeError):
+        return default
+
+
+def _atomic_write(path, payload):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
+    os.replace(tmp, path)
+
+
+def update_amount_curve(summary):
+    """每轮追加一个全市场量能 tick; 跨交易日时把上一交易日归档为 prev。
+
+    回放页的"今日 vs 昨日同时"对比需要昨日逐时基线, 而滚动快照只留最近
+    12 个 (workflow 里还会裁到 12), 单日 tick (~80 个/交易日, 每个几十字节)
+    单独持久化几乎不占体积。prev 只保留最近一个交易日, 防止文件无限增长。
+    """
+    now = _now()
+    today_str = now.strftime("%Y-%m-%d")
+    curve = _load_json(CURVE_PATH, {})
+    today = curve.get("today") or {}
+    if today.get("date") and today["date"] != today_str:
+        curve["prev"] = today
+        today = {}
+    if today.get("date") != today_str:
+        today = {"date": today_str, "ticks": []}
+    today["ticks"].append({
+        "t": now.strftime("%H:%M"),
+        "amount_yi": summary.get("total_amount_yi"),
+        "advance": summary.get("advance"),
+        "decline": summary.get("decline"),
+        "zt": summary.get("limit_up_ge10"),
+        "dt": summary.get("limit_down_le-10"),
+        "main_yi": summary.get("main_net_inflow_yi"),
+    })
+    curve["today"] = today
+    curve["ts"] = now.isoformat(timespec="seconds")
+    _atomic_write(CURVE_PATH, curve)
+
+
+def _norm_code(code):
+    """统一快照 code 口径: 东财 f12 是 6 位纯数字, 新浪兜底带 sh/sz 前缀。"""
+    c = str(code or "")
+    for p in ("sh", "sz", "bj"):
+        if c.startswith(p) and c[2:].isdigit():
+            return c[2:]
+    return c
+
+
+def load_latest_snapshot():
+    """取最近一个滚动快照 (即上一轮的 quotes/timestamp/date), 供涨速差分。"""
+    try:
+        snaps = sorted(f for f in os.listdir(SNAP_DIR) if f.startswith("snapshot_"))
+    except OSError:
+        return None, None, None
+    if not snaps:
+        return None, None, None
+    payload = _load_json(os.path.join(SNAP_DIR, snaps[-1]), {})
+    return payload.get("quotes") or [], payload.get("timestamp"), payload.get("date")
+
+
+def compute_speed_leaders(rows, prev_rows, prev_date, prev_ts):
+    """相邻两轮快照逐股求差: 涨速 = 涨跌幅之差, 区间成交 = 累计成交额之差。
+
+    amount 是当日累计值, 相邻差即区间成交; 负差多为停牌或数据抖动, 丢弃。
+    跨日快照不做差分: 昨收口径不同, 差出来的是隔夜跳空而非盘中涨速。
+    """
+    now = _now()
+    interval_min = None
+    if prev_ts:
+        try:
+            prev_dt = datetime.fromisoformat(prev_ts)
+            interval_min = max(1, round((now - prev_dt).total_seconds() / 60))
+        except ValueError:
+            pass
+    boards = {"gainers": [], "losers": [], "amount": []}
+    if not prev_rows:
+        return boards, {"interval_min": interval_min,
+                        "note": "no previous snapshot", "n_compared": 0}
+    if prev_date != now.strftime("%Y-%m-%d"):
+        return boards, {"interval_min": interval_min,
+                        "note": f"prev snapshot is {prev_date}", "n_compared": 0}
+    prev_map = {}
+    for r in prev_rows:
+        c = r.get("code")
+        if c:
+            prev_map[_norm_code(c)] = r
+    out = []
+    for r in rows:
+        p = prev_map.get(_norm_code(r.get("code")))
+        if not p:
+            continue
+        speed = None
+        if isinstance(r.get("chg_pct"), (int, float)) and \
+                isinstance(p.get("chg_pct"), (int, float)):
+            speed = round(r["chg_pct"] - p["chg_pct"], 2)
+        amt_yi = None
+        if isinstance(r.get("amount"), (int, float)) and \
+                isinstance(p.get("amount"), (int, float)):
+            d = r["amount"] - p["amount"]
+            if d > 0:
+                amt_yi = round(d / 1e8, 3)
+        if speed is None and amt_yi is None:
+            continue
+        out.append({"code": r.get("code"), "name": r.get("name"),
+                    "price": r.get("price"), "chg_pct": r.get("chg_pct"),
+                    "speed": speed, "interval_amount_yi": amt_yi})
+    ranked = [r for r in out if r["speed"] is not None]
+    boards["gainers"] = sorted(ranked, key=lambda x: -x["speed"])[:15]
+    boards["losers"] = sorted(ranked, key=lambda x: x["speed"])[:15]
+    amt_ranked = [r for r in out if r["interval_amount_yi"]]
+    boards["amount"] = sorted(amt_ranked, key=lambda x: -x["interval_amount_yi"])[:15]
+    return boards, {"interval_min": interval_min, "note": None,
+                    "n_compared": len(out)}
+
+
+def write_speed_leaders(boards, meta):
+    now = _now()
+    payload = {
+        "ts": now.isoformat(timespec="seconds"),
+        "date": now.strftime("%Y-%m-%d"),
+        "interval_min": meta.get("interval_min"),
+        "note": meta.get("note"),
+        "n_compared": meta.get("n_compared"),
+        **boards,
+    }
+    _atomic_write(LEADERS_PATH, payload)
+
+
 # ─── 落盘 + 推送 ────────────────────────────────────────────
 def write_output(rows, summary, total):
     ts = _now().isoformat(timespec="seconds")
@@ -375,6 +513,7 @@ def main():
             time.sleep(args.interval)
             continue
         try:
+            prev_rows, prev_ts, prev_date = load_latest_snapshot()
             total, rows = fetch_market_snapshot()
             if not rows:
                 print(f"[{ts}] 第 {n_round} 轮: 空响应", file=sys.stderr)
@@ -382,6 +521,9 @@ def main():
                 continue
             summary = summarize(rows)
             out, snap = write_output(rows, summary, total)
+            update_amount_curve(summary)
+            boards, bmeta = compute_speed_leaders(rows, prev_rows, prev_date, prev_ts)
+            write_speed_leaders(boards, bmeta)
             print(f"[{ts}] 第 {n_round} 轮: {summary['n_stocks']} 只 "
                   f"涨{summary['advance']}/跌{summary['decline']} "
                   f"涨停{summary['limit_up_ge10']} "
