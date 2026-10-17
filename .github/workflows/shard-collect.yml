@@ -271,7 +271,7 @@ jobs:
           git config user.name "shard-collect-bot"
           git config user.email "3576982374@qq.com"
           PROTECT_ARGS=""
-          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/hot_themes.json data/mainline.json data/stock_names.json data/industry_stocks.json data/global_kline.json data/freshness_audit.json data/freshness_audit.md data/analysis_manifest.json; do
+          for f in data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/news_transmission.json data/hot_themes.json data/mainline.json data/stock_names.json data/industry_stocks.json data/global_kline.json data/freshness_audit.json data/freshness_audit.md data/analysis_manifest.json; do
             PROTECT_ARGS="$PROTECT_ARGS --protect $f"
           done
           if [ "$SHARD_EXTRA" != "$SHARD" ]; then
@@ -279,7 +279,7 @@ jobs:
           fi
           python3 scripts/git_push_retry.py \
             --msg "shard(${SHARD}): collect $(TZ=Asia/Shanghai date '+%m-%d %H:%M')" \
-            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/stock_names.json data/industry_stocks.json data/global_kline.json \
+            data/shard_${SHARD}.json data/news_extra.json data/global_markets.json data/klineshare_hq.json data/hot_news.json data/news_impact.json data/news_transmission.json data/stock_names.json data/industry_stocks.json data/global_kline.json \
             data/hot_themes.json data/mainline.json data/recent_mainlines.json \
             data/freshness_audit.json data/freshness_audit.md data/analysis_manifest.json \
             $PROTECT_ARGS

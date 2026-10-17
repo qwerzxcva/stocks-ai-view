@@ -67,7 +67,7 @@ FFLOW_FIELDS = "f51,f52,f53,f54,f55"
 # 全市场排行字段 (clist/get): 代码/名称/价/涨跌幅/主力净流入/主力净占比
 # 必须带 fltt=2 才是元/百分比; 不带时 f2/f3/f184 全部 x100
 # (实测: f2=586→5.86 元, f3=994→9.94%, f184=3998→39.98%, 已用 qt.gtimg.cn 交叉验证)
-RANK_FIELDS = "f12,f14,f2,f3,f62,f184"
+RANK_FIELDS = "f12,f14,f2,f3,f62,f184,f124"
 # 板块排行字段
 SECTOR_FIELDS = "f12,f14,f62,f184"
 # 指数资金流字段 (ulist.np/get): f62 主力净流入 f66 超大单净流入 f184 占比
@@ -249,12 +249,18 @@ def fetch_rank(direction="in", top=20, retries=2):
         return [], err
     out = []
     for r in ((d.get("data") or {}).get("diff")) or []:
+        stamp = _num(r.get("f124"))
+        quote_time = (datetime.fromtimestamp(stamp, CST).isoformat(timespec="seconds")
+                      if stamp and stamp > 1_000_000_000 else None)
         out.append({
             "code": str(r.get("f12") or ""),
             "name": r.get("f14") or "",
             "chg_pct": _num(r.get("f3")),
             "main_net": _num(r.get("f62")),
             "main_net_ratio": _num(r.get("f184")),
+            "date": quote_time[:10] if quote_time else None,
+            "snapshot_ts": quote_time,
+            "_src": "em_fflow_rank",
         })
     return out, None
 

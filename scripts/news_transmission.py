@@ -238,6 +238,9 @@ def main():
     for it in (hot.get("items") or []):
         items.append({"title": it.get("title") or "", "source": it.get("source_name") or it.get("source"),
                       "time": it.get("updated") or "", "url": it.get("url") or ""})
+    for it in (extra.get("items") or []):
+        items.append({"title": it.get("title") or "", "source": it.get("source") or "",
+                      "time": it.get("time") or "", "url": it.get("url") or ""})
     for cat, arr in (extra.get("categories") or {}).items():
         if isinstance(arr, list):
             for it in arr[:20]:
@@ -247,11 +250,23 @@ def main():
     print("[transmission] 输入 %d 条资讯 | 行业 %d | 概念 %d" % (
         len(items), len(ind_map), len(con_map)), flush=True)
 
+    money = load("moneyflow.json") or {}
+    flow_date = str(money.get("data_date") or "")[:10]
+    flow = {}
+    if not money.get("fully_degraded"):
+        for x in (money.get("top_outflow") or []) + (money.get("top_inflow") or []):
+            row_date = str(x.get("date") or "")[:10]
+            if row_date and (not flow_date or row_date == flow_date):
+                flow[str(x.get("code"))] = x
+
+    seen_events = set()
     rows = []
     for it in items:
         t = it["title"]
-        if not t:
+        event_key = ("".join(str(t).split()), str(it.get("time") or "")[:10])
+        if not t or event_key in seen_events:
             continue
+        seen_events.add(event_key)
         hit = None
         for tr in TRANS:
             if any(k in t for k in tr["trigger"]):
@@ -289,21 +304,27 @@ def main():
             cs = find_sector_stocks(name, ind_map, con_map)
             if cs:
                 rec["hedge"].append({"sector": name, "stocks": cs})
-        money = load("moneyflow.json") or {}
-        flow = {str(x.get("code")): x for x in (money.get("top_outflow") or [])}
-        flow.update({str(x.get("code")): x for x in (money.get("top_inflow") or [])})
+        event_date = str(it.get("time") or "")[:10]
+        flow_for_event = {code: row for code, row in flow.items()
+                          if event_date and str(row.get("date"))[:10] == event_date}
+        related = {str(code) for side in ("direct_bull", "direct_bear")
+                   for sector in rec[side] for code in sector.get("stocks") or []}
+        matched = related.intersection(flow_for_event)
+        rec["flow_evidence"] = {"status": "matched" if matched else "insufficient",
+                                "source": money.get("source"), "trade_date": flow_date or None,
+                                "event_date": event_date or None, "matched_codes": sorted(matched)}
         for item in rec["direct_bull"]:
             for code in item.get("stocks") or []:
-                evidence = flow.get(str(code)) or {}
+                evidence = flow_for_event.get(str(code)) or {}
                 ratio = evidence.get("main_net_ratio")
                 if ratio is not None and ratio < 0:
-                    item.setdefault("behavior", []).append({"code": code, "label": "好消息诱多嫌疑", "evidence": f"主力净占比 {ratio}%"})
+                    item.setdefault("behavior", []).append({"code": code, "label": "好消息诱多嫌疑", "evidence": f"主力净占比 {ratio}%", "source": evidence.get("_src"), "trade_date": evidence.get("date"), "snapshot_ts": evidence.get("snapshot_ts")})
         for item in rec["direct_bear"]:
             for code in item.get("stocks") or []:
-                evidence = flow.get(str(code)) or {}
+                evidence = flow_for_event.get(str(code)) or {}
                 ratio = evidence.get("main_net_ratio")
                 if ratio is not None and ratio > 0:
-                    item.setdefault("behavior", []).append({"code": code, "label": "坏消息洗盘嫌疑", "evidence": f"主力净占比 {ratio}%"})
+                    item.setdefault("behavior", []).append({"code": code, "label": "坏消息洗盘嫌疑", "evidence": f"主力净占比 {ratio}%", "source": evidence.get("_src"), "trade_date": evidence.get("date"), "snapshot_ts": evidence.get("snapshot_ts")})
         if hit.get("note"):
             rec["note"] = hit["note"]
         # 只有真的推出受益/受损方才收录
@@ -321,7 +342,10 @@ def main():
         "n_transmissions": len(rows),
         "n_rules": len(TRANS),
         "rules": [{"id": r["id"], "label": r["label"]} for r in TRANS],
-        "caveat": "传导关系是规则先验, 非实证; 资金实际流向受多重因素影响。"
+        "flow_evidence": {"source": money.get("source"), "trade_date": flow_date or None,
+                          "status": "dated_rows_available" if flow else "insufficient",
+                          "n_dated_rows": len(flow)},
+        "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。"
                   "Research reference only, not investment advice.",
         "transmissions": rows[:40],
     }

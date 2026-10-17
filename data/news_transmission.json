@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-17T10:16:54+08:00",
+ "ts": "2026-10-17T12:43:59+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 367,
- "n_transmissions": 5,
+ "n_input": 547,
+ "n_transmissions": 8,
  "n_rules": 16,
  "rules": [
   {
@@ -70,7 +70,13 @@
    "label": "疫情"
   }
  ],
- "caveat": "传导关系是规则先验, 非实证; 资金实际流向受多重因素影响。Research reference only, not investment advice.",
+ "flow_evidence": {
+  "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+  "trade_date": "2026-10-16",
+  "status": "insufficient",
+  "n_dated_rows": 0
+ },
+ "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
    "title": "航行警告：渤海执行军事任务",
@@ -105,7 +111,14 @@
      ]
     }
    ],
-   "hedge": []
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
   },
   {
    "title": "财联社10月17日电，美国总统特朗普在一项行政命令中表示，他即日起豁免适用《格雷厄姆制裁俄罗斯和伊朗法案》规定的部分制裁、限制措施及关税。",
@@ -132,6 +145,13 @@
    ],
    "inverse_bear": [],
    "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
@@ -178,6 +198,13 @@
      ]
     }
    ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
    "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   },
   {
@@ -205,7 +232,109 @@
    ],
    "inverse_bear": [],
    "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "纳斯达克综合指数（纳指）下跌540点、跌幅超过2%，标普跌超1.1%，道指跌超0.5%，纳斯达克100指数跌2.3%，生",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T01:18:13+08:00",
+   "url": "https://wallstreetcn.com/live/3180406",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "伊朗：愿意帮助解决沙特和也门（胡塞武装）之间的冲突。",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T01:42:10+08:00",
+   "url": "https://wallstreetcn.com/live/3180418",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688122"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "600250"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
   },
   {
    "title": "【早报】美股纳指大跌超500点，半导体、存储股全线跳水；黄仁勋谈“AI市场震荡”；国际油价大涨；胜宏科技、豪威集团等计划回购股份",
@@ -234,7 +363,50 @@
      ]
     }
    ],
-   "hedge": []
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "布伦特原油期货涨至110美元/桶，为5月20日以来首次。WTI原油日内涨幅达3.5%，报101.41美元/桶。",
+   "source": "wallstreetcn",
+   "time": "2026-10-17T02:33:55+08:00",
+   "url": "https://wallstreetcn.com/live/3180431",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-16",
+    "event_date": "2026-10-17",
+    "matched_codes": []
+   }
   }
  ]
 }

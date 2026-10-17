@@ -2184,6 +2184,7 @@ function renderNewsFlow(){
       h+=sec('⇄ 反向受益 (资金转移)', r.inverse_bull, 'var(--up)');
       h+=sec('⇄ 反向受害 (被抽血)', r.inverse_bear, 'var(--dn)');
       h+=sec('🛡 避险去向', r.hedge, 'var(--amber)');
+      if(r.flow_evidence&&r.flow_evidence.status!=='matched') h+='<div class="fl" style="font-size:9px;margin:2px 0 0 8px">资金证据不足 · 新闻 '+_esc2(r.flow_evidence.event_date||'日期未知')+' / 资金 '+_esc2(r.flow_evidence.trade_date||'日期未知')+'</div>';
       if(r.note) h+='<div class="fl" style="font-size:9px;margin:2px 0 0 8px">'+_esc2(r.note)+'</div>';
       h+='</div>';
     });
