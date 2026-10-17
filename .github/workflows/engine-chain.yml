@@ -314,6 +314,10 @@ jobs:
           python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
           python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
+          # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度 + 区间高点追踪
+          # full 档也要跑: 周末/盘后是 full 档, 只在 light 档会周末全断 (2026-10-17 实测)
+          python3 scripts/key_levels.py || echo "key_levels skipped"
+          python3 scripts/pick_high_track.py || echo "pick_high_track skipped"
           # 趋势强度指数族 (RTSI/TMA/MSCI), 数学模型借鉴 hengruiyun/AI-Stock-Master
           # 补 engine_v5 的盲区: 17 指标只给「信号数量」, RTSI 用回归 R²/p 值
           # 给「信号质量」—— 一条 R²=0.9 的上升趋势远比 7 个指标同时说涨可靠。
@@ -503,7 +507,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           python3 scripts/sync_reviews.py || echo "sync_reviews failed (check GH_TOKEN)"
-          python3 scripts/sync_repos.py --push || echo "sync_repos skipped"
+          python3 scripts/sync_data_layers.py --push || echo "sync_data_layers skipped"
 
       - name: Summary
         run: |
