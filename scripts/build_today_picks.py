@@ -18,6 +18,12 @@ import os
 import sys
 from datetime import datetime, timezone, timedelta
 
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+
+import empirical_edge
+
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -84,10 +90,19 @@ def main():
     lt = load("latest.json") or {}
 
     # ── signal picks: engine_v5 resonance ──
+    # 2026-10-17 起带实证校准: reflect_latest 实测全部指标 +1 票次日胜率
+    # 43-45% (负边际), 故每只 signal pick 标注 edge_pp / p_up, 看空对齐的
+    # 移入 avoid 回避榜 (实测 -1 票下跌实现度 54-60%)。
+    calibration = empirical_edge.load_edge_table()
     signals = []
+    avoid = []
     for x in (v5.get("top") or [])[:30]:
         code = bare(x.get("code"))
-        signals.append({
+        cal = empirical_edge.calibrate(x.get("votes"), calibration) \
+            if calibration else {"edge_pp": None, "dir_weight": None}
+        aligned, bear_w = empirical_edge.bear_aligned(x.get("votes"), calibration) \
+            if calibration else (False, 0.0)
+        row = {
             "code": code,
             "name": master.get(code) or "",
             "price": x.get("price"),
@@ -95,9 +110,18 @@ def main():
             "score": x.get("score"),
             "resonance": x.get("resonance"),
             "bull": x.get("bull"), "bear": x.get("bear"),
+            "edge_pp": cal["edge_pp"],
+            "p_up": (round(50 + cal["edge_pp"], 1)
+                     if cal["edge_pp"] is not None else None),
+            "bear_aligned": aligned,
             "engine": "engine_v5",
             "why": [v.get("why") for v in (x.get("votes") or []) if v.get("vote") == 1][:4],
-        })
+        }
+        if aligned:
+            row["bear_weight"] = bear_w
+            avoid.append(row)
+        else:
+            signals.append(row)
 
     # ── value picks: ai_pick_v4 with valuation + position filters ──
     values = []
@@ -208,6 +232,7 @@ def main():
             "signals": signals,
             "values": values,
             "limit_up": zt,
+            "avoid": avoid,
         },
         "winrate": {
             "horizons": winrate,
@@ -236,7 +261,7 @@ def main():
         json.dump(out, f, ensure_ascii=False, indent=1)
     print(f"[today_picks] -> {path}")
     print(f"  signals {len(signals)} / values {len(values)} / "
-          f"limit_up {len(zt)}")
+          f"limit_up {len(zt)} / avoid {len(avoid)}")
     print(f"  winrate horizons: " +
           ", ".join(f"{h}d={v.get('bull_win_rate')}%(n={v.get('n')})"
                     for h, v in sorted(winrate.items())))

@@ -171,11 +171,20 @@ def main():
             score -= 1.0
             reasons.append(f"thin, turnover {r['turnover']}%")
 
+        # 实证规则 (reflect_latest 2026-10-17, n≈6.4万): 全部指标 +1 票
+        # 次日胜率 43-45% (负边际, 不给加分); -1 票下跌实现度 54-60%,
+        # 方向票看空对齐 ≥3:1 的按回避处理, 大幅降权。
         if r["engine_v5_bull_bear"]:
             b, s2 = r["engine_v5_bull_bear"].split("/")
-            if int(b) >= 3 * max(1, int(s2)):
-                score += 0.5
-                reasons.append(f"votes {r['engine_v5_bull_bear']}")
+            b, s2 = int(b), int(s2)
+            if s2 >= 3 * max(1, b):
+                score -= 1.5
+                reasons.append(f"votes {r['engine_v5_bull_bear']}: 看空对齐 "
+                               f"(实测下跌实现度 54-60%), 回避")
+            elif b >= 3 * max(1, s2):
+                score += 0.0
+                reasons.append(f"votes {r['engine_v5_bull_bear']}: 强做多共振 "
+                               f"实测为负边际, 不加权")
 
         if r["p_zhaban_next"] and r["p_zhaban_next"] >= 15:
             score -= 1.0
@@ -232,7 +241,8 @@ def main():
         "rejected": rejected,
         "picks": tradable[:15],
         "method": ("afternoon score = morning zone position + chase penalty + "
-                   "support reclaim + turnover + vote margin + 240d position"),
+                   "support reclaim + turnover + vote evidence (bull votes no "
+                   "credit / bear-aligned demoted) + 240d position"),
         "disclaimer": DISCLAIMER,
     }
 
