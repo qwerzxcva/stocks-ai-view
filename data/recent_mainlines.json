@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-17T13:49:13+08:00",
+ "ts": "2026-10-17T17:57:23+08:00",
  "engine": "recent_mainlines.py",
  "window_days": 30,
- "history_days_available": 1,
+ "history_days_available": 4,
  "status": "sample_insufficient",
  "mainlines": [],
  "daily": [
@@ -688,7 +688,7 @@
    "close": {
     "date": "2026-10-14",
     "source": "data/review_history.jsonl",
-    "time": "2026-10-14T15:48:04+08:00",
+    "time": "2026-10-14T17:20:31+08:00",
     "summary": {
      "n_picks": 67,
      "hit_rate_all_pct": 64.2,
@@ -705,7 +705,7 @@
    },
    "actual_time": {
     "premarket": null,
-    "close": "2026-10-14T15:48:04+08:00"
+    "close": "2026-10-14T17:20:31+08:00"
    },
    "premarket_status": "missing",
    "mainlines": [],
@@ -724,14 +724,27 @@
   {
    "date": "2026-10-15",
    "premarket": null,
-   "close": null,
+   "close": {
+    "date": "2026-10-15",
+    "source": "data/review_history.jsonl",
+    "time": "2026-10-15T19:37:35+08:00",
+    "summary": {
+     "n_picks": 67,
+     "hit_rate_all_pct": 29.9,
+     "avg_ret_all_pct": -1.33,
+     "n_buyable": 50,
+     "hit_rate_buyable_pct": 22.0,
+     "avg_ret_buyable_pct": -1.6
+    },
+    "market_phase": "修复"
+   },
    "source": {
     "premarket": null,
-    "close": null
+    "close": "data/review_history.jsonl"
    },
    "actual_time": {
     "premarket": null,
-    "close": null
+    "close": "2026-10-15T19:37:35+08:00"
    },
    "premarket_status": "missing",
    "mainlines": [],
@@ -750,14 +763,27 @@
   {
    "date": "2026-10-16",
    "premarket": null,
-   "close": null,
+   "close": {
+    "date": "2026-10-16",
+    "source": "data/review_history.jsonl",
+    "time": "2026-10-16T23:05:52+08:00",
+    "summary": {
+     "n_picks": 67,
+     "hit_rate_all_pct": 41.8,
+     "avg_ret_all_pct": -0.21,
+     "n_buyable": 50,
+     "hit_rate_buyable_pct": 42.0,
+     "avg_ret_buyable_pct": -0.25
+    },
+    "market_phase": "修复"
+   },
    "source": {
     "premarket": null,
-    "close": null
+    "close": "data/review_history.jsonl"
    },
    "actual_time": {
     "premarket": null,
-    "close": null
+    "close": "2026-10-16T23:05:52+08:00"
    },
    "premarket_status": "missing",
    "mainlines": [],
@@ -777,7 +803,7 @@
    "date": "2026-10-17",
    "premarket": {
     "date": "2026-10-17",
-    "source": "data/premarket_picks.json",
+    "source": "data/review_history.jsonl",
     "time": "2026-10-17T04:03:54+08:00",
     "session": "premarket",
     "gate": {
@@ -2103,14 +2129,27 @@
      }
     }
    },
-   "close": null,
+   "close": {
+    "date": "2026-10-17",
+    "source": "data/review_history.jsonl",
+    "time": "2026-10-17T17:57:22+08:00",
+    "summary": {
+     "n_picks": 0,
+     "hit_rate_all_pct": null,
+     "avg_ret_all_pct": null,
+     "n_buyable": 15,
+     "hit_rate_buyable_pct": 0.0,
+     "avg_ret_buyable_pct": 0.0
+    },
+    "market_phase": null
+   },
    "source": {
-    "premarket": "data/premarket_picks.json",
-    "close": null
+    "premarket": "data/review_history.jsonl",
+    "close": "data/review_history.jsonl"
    },
    "actual_time": {
     "premarket": "2026-10-17T04:03:54+08:00",
-    "close": null
+    "close": "2026-10-17T17:57:22+08:00"
    },
    "premarket_status": "available",
    "mainlines": [],
@@ -2119,74 +2158,81 @@
  ],
  "current": [
   {
-   "name": "产业",
+   "name": "国际",
    "market": "A股",
    "heat": 1.0,
-   "news_count": 15,
+   "news_count": 22,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 15 条, 多 0 / 空 0; 代表: 马斯克：正在开发专用议价机器人 每年可为全球节省6万亿美元",
-   "logic": "相关新闻 15 条, 多 0 / 空 0; 代表: 马斯克：正在开发专用议价机器人 每年可为全球节省6万亿美元"
+   "reason": "相关新闻 22 条, 多 0 / 空 0; 代表: 上任仅5天 白宫新闻秘书遭特朗普“劝退”",
+   "logic": "相关新闻 22 条, 多 0 / 空 0; 代表: 上任仅5天 白宫新闻秘书遭特朗普“劝退”"
   },
   {
-   "name": "国际",
+   "name": "产业",
    "market": "A股",
    "heat": 1.0,
    "news_count": 14,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 14 条, 多 0 / 空 0; 代表: 特朗普：为确保伊朗无法获得核武器 可能会对镐山核设施发动打击",
-   "logic": "相关新闻 14 条, 多 0 / 空 0; 代表: 特朗普：为确保伊朗无法获得核武器 可能会对镐山核设施发动打击"
-  },
-  {
-   "name": "金融",
-   "market": "A股",
-   "heat": 0.75,
-   "news_count": 6,
-   "direction": "neutral",
-   "codes": [
-    "000001"
-   ],
-   "stocks": [
-    "000001"
-   ],
-   "reason": "相关新闻 6 条, 多 0 / 空 1; 代表: 多家银行严查贷款违规流入股市",
-   "logic": "相关新闻 6 条, 多 0 / 空 1; 代表: 多家银行严查贷款违规流入股市"
-  },
-  {
-   "name": "公司",
-   "market": "A股",
-   "heat": 0.62,
-   "news_count": 5,
-   "direction": "neutral",
-   "codes": [],
-   "stocks": [],
-   "reason": "相关新闻 5 条, 多 0 / 空 0; 代表: 财联社10月17日电，美联储周五隔夜逆回购协议（RRP）使用规模为1亿美元。",
-   "logic": "相关新闻 5 条, 多 0 / 空 0; 代表: 财联社10月17日电，美联储周五隔夜逆回购协议（RRP）使用规模为1亿美元。"
+   "reason": "相关新闻 14 条, 多 0 / 空 0; 代表: Anthropic秘密游说国会 推动制定前沿AI监管法案",
+   "logic": "相关新闻 14 条, 多 0 / 空 0; 代表: Anthropic秘密游说国会 推动制定前沿AI监管法案"
   },
   {
    "name": "政策",
    "market": "A股",
-   "heat": 0.5,
-   "news_count": 4,
+   "heat": 0.75,
+   "news_count": 6,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 4 条, 多 0 / 空 0; 代表: 证监会开出2张巨额罚单，3名自然人被合计罚没逾5亿元",
-   "logic": "相关新闻 4 条, 多 0 / 空 0; 代表: 证监会开出2张巨额罚单，3名自然人被合计罚没逾5亿元"
+   "reason": "相关新闻 6 条, 多 0 / 空 0; 代表: 国常会：人工智能是影响未来发展的关键变量",
+   "logic": "相关新闻 6 条, 多 0 / 空 0; 代表: 国常会：人工智能是影响未来发展的关键变量"
+  },
+  {
+   "name": "选股宝美股风向标",
+   "market": "A股",
+   "heat": 0.12,
+   "news_count": 1,
+   "direction": "neutral",
+   "codes": [],
+   "stocks": [],
+   "reason": "相关新闻 1 条, 多 0 / 空 0; 代表: 特朗普宣布暂缓实施新一轮对俄制裁",
+   "logic": "相关新闻 1 条, 多 0 / 空 0; 代表: 特朗普宣布暂缓实施新一轮对俄制裁"
+  },
+  {
+   "name": "体育概念股",
+   "market": "A股",
+   "heat": 0.12,
+   "news_count": 1,
+   "direction": "neutral",
+   "codes": [],
+   "stocks": [],
+   "reason": "相关新闻 1 条, 多 0 / 空 0; 代表: 两部门发文开展“跟着电影去运动”行动",
+   "logic": "相关新闻 1 条, 多 0 / 空 0; 代表: 两部门发文开展“跟着电影去运动”行动"
+  },
+  {
+   "name": "中国债市",
+   "market": "A股",
+   "heat": 0.12,
+   "news_count": 1,
+   "direction": "neutral",
+   "codes": [],
+   "stocks": [],
+   "reason": "相关新闻 1 条, 多 0 / 空 0; 代表: 今年1.3万亿元超长期特别国债发行收官",
+   "logic": "相关新闻 1 条, 多 0 / 空 0; 代表: 今年1.3万亿元超长期特别国债发行收官"
   },
   {
    "name": "A股",
    "market": "A股",
-   "heat": 0.38,
-   "news_count": 3,
+   "heat": 0.12,
+   "news_count": 1,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 3 条, 多 0 / 空 0; 代表: 10余家A股公司三季报预喜：覆铜板龙头预计业绩倍增",
-   "logic": "相关新闻 3 条, 多 0 / 空 0; 代表: 10余家A股公司三季报预喜：覆铜板龙头预计业绩倍增"
+   "reason": "相关新闻 1 条, 多 0 / 空 0; 代表: 10余家A股公司三季报预喜：覆铜板龙头预计业绩倍增",
+   "logic": "相关新闻 1 条, 多 0 / 空 0; 代表: 10余家A股公司三季报预喜：覆铜板龙头预计业绩倍增"
   }
  ],
  "market_window": {
@@ -2202,41 +2248,53 @@
  "windows": {
   "7": {
    "requested_days": 7,
-   "observed_days": 1,
-   "paired_days": 0,
+   "observed_days": 4,
+   "paired_days": 1,
    "status": "sample_insufficient",
    "metrics": {
-    "n_buyable": 50,
-    "hit_rate_buyable_pct": 52.0,
-    "avg_ret_buyable_pct": -0.43
+    "n_buyable": 165,
+    "hit_rate_buyable_pct": 35.2,
+    "avg_ret_buyable_pct": -0.69
    },
-   "paired_metrics": null,
+   "paired_metrics": {
+    "n_buyable": 15,
+    "hit_rate_buyable_pct": 0.0,
+    "avg_ret_buyable_pct": 0.0
+   },
    "themes": []
   },
   "30": {
    "requested_days": 30,
-   "observed_days": 1,
-   "paired_days": 0,
+   "observed_days": 4,
+   "paired_days": 1,
    "status": "sample_insufficient",
    "metrics": {
-    "n_buyable": 50,
-    "hit_rate_buyable_pct": 52.0,
-    "avg_ret_buyable_pct": -0.43
+    "n_buyable": 165,
+    "hit_rate_buyable_pct": 35.2,
+    "avg_ret_buyable_pct": -0.69
    },
-   "paired_metrics": null,
+   "paired_metrics": {
+    "n_buyable": 15,
+    "hit_rate_buyable_pct": 0.0,
+    "avg_ret_buyable_pct": 0.0
+   },
    "themes": []
   },
   "365": {
    "requested_days": 365,
-   "observed_days": 1,
-   "paired_days": 0,
+   "observed_days": 4,
+   "paired_days": 1,
    "status": "sample_insufficient",
    "metrics": {
-    "n_buyable": 50,
-    "hit_rate_buyable_pct": 52.0,
-    "avg_ret_buyable_pct": -0.43
+    "n_buyable": 165,
+    "hit_rate_buyable_pct": 35.2,
+    "avg_ret_buyable_pct": -0.69
    },
-   "paired_metrics": null,
+   "paired_metrics": {
+    "n_buyable": 15,
+    "hit_rate_buyable_pct": 0.0,
+    "avg_ret_buyable_pct": 0.0
+   },
    "themes": []
   }
  },
