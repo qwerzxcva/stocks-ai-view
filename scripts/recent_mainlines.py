@@ -279,6 +279,27 @@ def market_summary(index_doc):
             "scope": "大A指数总结，不含个股推荐验证",
         }
         previous = close
+    ordered = list(out)
+    for index, day in enumerate(ordered):
+        window = ordered[max(0, index - 19):index + 1]
+        if len(window) < 20:
+            continue
+        ma20 = sum(out[item]["close"] for item in window) / 20
+        close = out[day]["close"]
+        out[day]["ma20"] = round(ma20, 2)
+        out[day]["bias_ma20_pct"] = round((close / ma20 - 1) * 100, 2)
+        change = out[day].get("change_pct")
+        if change is None:
+            label = "数据不足"
+        elif close < ma20 and change < 0:
+            label = "指数跌破MA20且当日走弱"
+        elif close < ma20:
+            label = "指数仍在MA20下方"
+        elif change > 0:
+            label = "指数站上MA20且当日走强"
+        else:
+            label = "指数站上MA20但当日回落"
+        out[day]["market_mainline"] = label
     return out
 
 

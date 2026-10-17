@@ -1071,6 +1071,17 @@ function renderGlobalMarkets(d){
   }
   let h='';
 
+  const futures=d.futures||[];
+  if(futures.length){
+    h+='<div class="hd" style="border-top:none;padding:6px 0">期货 <span class="sub">腾讯 qt.gtimg.cn 实时报价</span></div>';
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">';
+    futures.forEach(x=>{
+      const up=(x.chg_pct||0)>=0;
+      h+='<div style="border:1px solid var(--border);border-radius:6px;padding:5px 7px;min-width:112px"><b>'+_esc2(x.name)+'</b><div style="font-size:13px;color:'+(up?'var(--up)':'var(--dn)')+'">'+_esc2(x.price)+' <span style="font-size:10px">'+(up?'+':'')+_esc2(x.chg_pct)+'%</span></div><div class="fl">'+_esc2(x.time||'')+'</div></div>';
+    });
+    h+='</div>';
+  }
+
   // 全球情绪仪表
   const gs=d.global_sentiment||{};
   if(gs.sentiment_label){
@@ -1705,7 +1716,7 @@ function renderMainline(){
         ?('09:15前有效'+(picks?' · '+picks:''))
         :(row.premarket_status==='rejected_not_before_09:15'?'记录晚于09:15，已拒绝':'无盘前归档');
       const ms=row.market_summary||{};
-      const marketText=ms.close==null?'无指数记录':('上证 '+_esc2(ms.close)+' · '+_esc2(ms.change_pct==null?'—':(ms.change_pct>0?'+':'')+ms.change_pct+'%')+' · 量 '+_esc2(ms.volume==null?'—':Math.round(ms.volume/1e6)+'百万手'));
+      const marketText=ms.close==null?'无指数记录':('上证 '+_esc2(ms.close)+' · '+_esc2(ms.change_pct==null?'—':(ms.change_pct>0?'+':'')+ms.change_pct+'%')+' · MA20 '+_esc2(ms.ma20||'—')+' · '+_esc2(ms.market_mainline||'无市场主线'));
       const closeText=close.time
         ?('选股复盘 胜率 '+_esc2(cs.hit_rate_all_pct==null?'—':cs.hit_rate_all_pct+'%')+' · 样本 '+_esc2(cs.n_picks||0)+' · 均收 '+_esc2(cs.avg_ret_all_pct==null?'—':cs.avg_ret_all_pct+'%'))
         :'无选股复盘';
@@ -1826,8 +1837,8 @@ function renderPools(){
   const cycleStocks=cv2.stocks||[];
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">股票级候选 · 当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+'</span></div>';
   if(cycleStocks.length){
-    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属行业</th><th>行业涨跌%</th><th>行业龙头</th><th>入池原因</th></tr></thead><tbody>';
-    cycleStocks.slice(0,30).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.leader||'—')+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属行业</th><th>MA20</th><th>行业涨跌%</th><th>行业龙头</th><th>入池原因</th></tr></thead><tbody>';
+    cycleStocks.slice(0,30).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.ma20==null?'—':x.ma20)+'</td><td>'+_esc2(x.chg_pct)+'</td><td>'+_esc2(x.leader||'—')+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
     h+='</tbody></table>';
   } else h+='<div class="fl">周期股票候选尚未生成；当前只有行业轮动，未把它伪装成股票池</div>';
   const regimeRows=Object.entries(cv2.regimes||{}).map(([k,v])=>({name:k,count:v.n,avg:v.avg_chg,best:v.best,worst:v.worst}));

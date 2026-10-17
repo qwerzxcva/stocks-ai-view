@@ -64,6 +64,17 @@ MARKETS = [
     ("s_usSPX", "100.SPX", "标普500", "美股", -4, "21:30-04:00"),
 ]
 
+FUTURES = [
+    ("hf_XAU", "伦敦金", "期货"),
+    ("hf_CL", "WTI原油", "期货"),
+    ("hf_GC", "COMEX黄金", "期货"),
+    ("hf_SI", "COMEX白银", "期货"),
+    ("hf_HG", "COMEX铜", "期货"),
+    ("hf_NG", "天然气", "期货"),
+    ("hf_NQ", "纳指期货", "期货"),
+    ("hf_ES", "标普期货", "期货"),
+]
+
 # 情绪周期判断: 按涨跌幅与涨跌家数给 5 档
 SENTIMENT_BANDS = [
     (3.0, "euphoria", "亢奋"),
@@ -72,6 +83,32 @@ SENTIMENT_BANDS = [
     (-3.0, "fearful", "悲观"),
     (-99, "panic", "恐慌"),
 ]
+
+
+def fetch_futures():
+    """Tencent futures quote. Price is field 0 and percent change is field 1."""
+    url = "https://qt.gtimg.cn/q=" + ",".join(code for code, _, _ in FUTURES)
+    try:
+        body = urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=12).read().decode("gbk", "replace")
+    except Exception:
+        return []
+    rows = []
+    for code, name, market in FUTURES:
+        marker = 'v_%s="' % code
+        if marker not in body:
+            continue
+        raw = body.split(marker, 1)[1].split('"', 1)[0]
+        fields = raw.split(",")
+        if len(fields) < 2:
+            continue
+        try:
+            price, change = float(fields[0]), float(fields[1])
+        except ValueError:
+            continue
+        rows.append({"code": code, "name": name, "market": market, "price": price,
+                     "chg_pct": change, "time": fields[6] if len(fields) > 6 else None,
+                     "source": "qt.gtimg.cn"})
+    return rows
 
 
 def sentiment_of(chg_pct):
@@ -284,6 +321,7 @@ def main():
         "n_indices": len(indices),
         "n_ok": sum(1 for i in indices if i["price"] is not None),
         "indices": indices,
+        "futures": fetch_futures(),
         "markets": markets,
         "global_sentiment": {
             "avg_chg_pct": round(avg, 2) if avg is not None else None,
