@@ -24,7 +24,7 @@ GROUPS = {
     "global_markets": ["global_markets.json", "global_kline.json", "overseas_linkage.json", "overseas_impact.json"],
     "hot_news": ["hot_news.json", "news_extra.json", "hot_themes.json", "mainline.json", "recent_mainlines.json", "hot_impact.json"],
     "picks": ["premarket_picks.json", "midday_picks.json", "ai_pick_v4.json", "today_picks.json", "prediction_bundle.json"],
-    "engines": ["engine_v5.json", "multidim.json", "decision.json", "trend_strength.json", "auction_engine.json", "bull_bear_debate.json", "pool_audit.json"],
+    "engines": ["engine_v5.json", "multidim.json", "decision.json", "trend_strength.json", "auction_engine.json", "bull_bear_debate.json", "pool_audit.json", "horizon_features.json"],
     "review": ["daily_brief.json", "ai_review.json", "reflect_latest.json", "winrate_matrix.json", "kline_sim.json", "walkforward.json"],
 }
 
@@ -50,7 +50,7 @@ def get_ts(data):
     if not isinstance(data, dict):
         return None
     meta = data.get("meta") if isinstance(data.get("meta"), dict) else {}
-    for key in ("ts", "timestamp", "generated", "date", "data_date"):
+    for key in ("ts", "timestamp", "generated", "generated_at", "date", "data_date"):
         value = data.get(key)
         if isinstance(value, str) and len(value) >= 8:
             return value
@@ -65,6 +65,11 @@ def parse_ts(value):
     if not value:
         return None
     s = str(value)
+    try:
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=CST)
+    except ValueError:
+        pass
     for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d", "%Y%m%d"):
         try:
             text = s if "%z" in fmt else s[:19]
