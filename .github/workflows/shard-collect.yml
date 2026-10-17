@@ -183,6 +183,9 @@ jobs:
           python3 scripts/news_impact.py --in data/hot_news.json \
             --news data/news_extra.json --out data/news_impact.json \
             || echo "::warning::news_impact 失败, 保留上一版"
+          python3 scripts/news_transmission.py --in data/hot_news.json \
+            --news data/news_extra.json --out data/news_transmission.json \
+            || echo "::warning::news_transmission 失败, 保留上一版"
           # 今日主线 + 热点主题: 从上面的映射结果聚合,
           # 供给 index.html 的「今日主线」「热点主题」两个 tab
           python3 scripts/build_mainlines.py --news data/news_impact.json \
