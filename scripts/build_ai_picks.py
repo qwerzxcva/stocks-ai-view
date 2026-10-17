@@ -173,7 +173,9 @@ def main():
                 continue
         bc = bare(r["code"])
         name = cn_names.get(bc, "")
-        if "ST" in name or "退" in name:
+        # 2026-10-17 用户要求不隐藏 ST: ST/*ST 照常入池, 前端按钮折叠+风险标注。
+        # 退市整理股 (「退」) 无法交易, 仍剔除。
+        if "退" in name:
             continue
         # 已涨停/接近涨停 → 追高风险, 剔除
         if r["pos20"] > 85:
@@ -213,12 +215,15 @@ def main():
         bc = bare(r["code"])
         q = quotes.get(bc, {})
         final_name = r.get("name") or q.get("name") or ""
-        # ST 二次过滤: cn_names 来自本地快照可能缺名/滞后, 以腾讯实时名为准
-        if "ST" in final_name or "退" in final_name:
+        is_st = bool("ST" in final_name or "*" in final_name)
+        if "退" in final_name:
             continue
         picks.append({
             "code": bc,
             "name": final_name,
+            "is_st": is_st,
+            "risk_note": ("ST/*ST 风险警示股: 涨跌幅限制 ±5%, 退市风险自负"
+                          if is_st else None),
             "price": q.get("price") or r["price"],
             "chg_pct": q.get("chg_pct"),
             "score": r["score"],
@@ -241,11 +246,13 @@ def main():
     for a in avoid_pool[:15]:
         bc = bare(a["code"])
         nm = cn_names.get(bc) or a.get("name") or ""
-        if "ST" in nm or "退" in nm:
+        if "退" in nm:
             continue
+        a_is_st = bool("ST" in nm or "*" in nm)
         avoid.append({
             "code": bc,
             "name": nm,
+            "is_st": a_is_st,
             "edge_pp": a["edge_pp"],
             "p_up": round(50 + (a["edge_pp"] or 0), 1),
             "bear_weight": a["bear_weight"],

@@ -262,7 +262,14 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="blockKpis" class="pool-kpis"></div>
       <div id="blockBody" style="padding:0 12px 8px"></div>
       <div class="hd" style="border-top:1px solid var(--border)">今日推股 <span class="sub">AI 评分 · 非投资建议</span></div>
+      <!-- 2026-10-17 用户要求: 不隐藏 ST。ST/*ST 标注入池但默认折叠, 按钮展开/收起;
+           退市整理股 (名称含「退」) 无法交易, 仍由管线剔除。 -->
+      <div style="padding:4px 12px 0">
+        <button id="stToggle" type="button"
+          style="display:none;font-size:10px;padding:3px 10px;border:1px solid var(--amber);border-radius:6px;background:transparent;color:var(--amber);cursor:pointer">ST ▾</button>
+      </div>
       <div id="pickBody" style="padding:0 12px 8px"></div>
+      <div id="avoidBox" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="7">
       <div class="hd">24h 热点资讯流 <span class="sub" id="newsSub">财联社电报 · 华尔街见闻 · 联合早报</span></div>
@@ -515,14 +522,35 @@ function valCell(v,dev){
   return '<td style="font-weight:700">'+fmt(v)+'<span style="color:'+col+';font-size:10px;margin-left:3px">'+(dev>0?'+':'')+dev+'%</span></td>';
 }
 function renderPicks(picks){
-  document.getElementById('pickBody').innerHTML=(picks||[]).slice(0,40).map(p=>{
+  const all=(picks||[]).slice(0,40);
+  // ST 折叠交互 (2026-10-17 用户要求不隐藏 ST, 给按钮展开/收起):
+  //  默认只渲染非 ST 行; 点按钮重渲染并追加 ST 行 (带 ST风险 标注);
+  //  名称含「退」的退市整理股管线已剔除, 这里兜底永不渲染。
+  const stRows=all.filter(p=>/ST|\*/.test(p.name||''));
+  const hiddenRows=all.filter(p=>/退/.test(p.name||'')&&!stRows.includes(p));
+  const normalRows=all.filter(p=>!stRows.includes(p)&&!hiddenRows.includes(p));
+  const btn=document.getElementById('stToggle');
+  if(btn){
+    if(!stRows.length){btn.style.display='none';}
+    else{
+      btn.style.display='';
+      const open=btn.getAttribute('data-open')==='1';
+      btn.textContent=(open?'收起 ST ':'ST 风险股 '+stRows.length+' 只 ▾');
+      btn.onclick=()=>{btn.setAttribute('data-open',open?'0':'1');renderPicks(all);};
+    }
+  }
+  const showSt=btn&&btn.getAttribute('data-open')==='1'&&stRows.length;
+  const rowHtml=(p,isSt)=>{
     // 字段兼容: ai_pick_v4 (ret_pct/pos240_pct/score) vs ai_picks (chg_pct/pos20/score)
     const chg=p.chg_pct!=null?p.chg_pct:p.ret_pct;
     const pos=p.pos20!=null?p.pos20:p.pos240_pct;
     const sc=(p.score??0)>1?p.score*100:p.score*100;  // v4 是0-1, 统一到0-100
     const col=sc>=70?'var(--up)':sc>=60?'var(--amber)':'var(--tx3)';
+    const pUp=(p.p_up!=null&&!isNaN(p.p_up))
+      ?'<div style="font-size:8px;color:'+(p.p_up>=50?'var(--up)':'var(--dn)')+';font-weight:700">P涨 '+p.p_up+'%</div>':'';
+    const stTag=isSt?'<div style="font-size:8px;color:#fff;background:var(--dn);border-radius:3px;padding:0 3px;display:inline-block">ST风险</div>':'';
     return `<tr class="clk" data-code="${p.code}">
-    <td>${p.code}</td><td><b>${p.name||''}</b></td><td>${fmt(p.price)}</td>
+    <td>${p.code}${stTag}</td><td><b>${p.name||''}</b></td><td>${fmt(p.price)}${pUp}</td>
     ${valCell(p.intrinsic_value,p.value_dev_pct)}
     <td class="${cls(chg)}">${chg!=null?sign(chg)+'%':'—'}</td>
     <td style="font-weight:700;color:${col}">${sc.toFixed(1)}</td>
@@ -531,7 +559,34 @@ function renderPicks(picks){
     <td class="fl">${pos!=null?pos.toFixed(0)+'%':'—'}</td>
     <td class="fl" style="font-size:10px">${(p.industry||'—').slice(0,10)}</td>
   </tr>`;
-  }).join('')||'<tr><td colspan="11" class="fl" style="text-align:center">暂无</td></tr>';
+  };
+  const rowsHtml=normalRows.map(p=>rowHtml(p,false)).join('')
+    +(showSt?stRows.map(p=>rowHtml(p,true)).join(''):'');
+  document.getElementById('pickBody').innerHTML=rowsHtml
+    ||'<tr><td colspan="11" class="fl" style="text-align:center">暂无</td></tr>';
+}
+// 回避榜: ai_picks.avoid (empirical_edge 校准产出, 2026-10-17)
+//  看空对齐 (方向票 -1 权重 >=3:1) 个股, reflect 实测 -1 票下跌实现度 54-60%。
+//  ST 同样不隐藏: 标注 ST风险 直接展示 (用户要求)。
+function renderAvoid(av){
+  const el=document.getElementById('avoidBox');
+  if(!el) return;
+  const rows=(av||[]).slice(0,15);
+  if(!rows.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="hd" style="border-top:1px solid var(--border);margin-top:6px">回避榜 <span class="sub">empirical_edge · 看空对齐 · 实测下跌实现度 54-60%</span></div>'+
+    '<table><thead><tr><th>代码</th><th>名称</th><th>期望上涨</th><th>看空权重</th><th>原始分</th><th>标注</th></tr></thead><tbody>'+
+    rows.map(a=>{
+      const isSt=/ST|\*/.test(a.name||'');
+      const pUp=a.p_up!=null?a.p_up:(a.edge_pp!=null?50+a.edge_pp:null);
+      return '<tr class="clk" data-code="'+_esc2(a.code)+'">'+
+        '<td>'+_esc2(a.code)+(isSt?'<div style="font-size:8px;color:#fff;background:var(--dn);border-radius:3px;padding:0 3px;display:inline-block">ST风险</div>':'')+'</td>'+
+        '<td><b>'+_esc2(a.name||'')+'</b></td>'+
+        '<td style="color:'+(pUp!=null&&pUp<46?'var(--dn)':'var(--tx)')+';font-weight:700">'+(pUp!=null?pUp+'%':'—')+'</td>'+
+        '<td class="fl">'+_esc2(a.bear_weight??'—')+'</td>'+
+        '<td class="fl">'+_esc2(a.score??'—')+'</td>'+
+        '<td class="fl" style="font-size:9px">'+(isSt?'ST/*ST 风险警示, 退市风险自负':'回避: 看空票对齐 ≥3:1')+'</td>'+
+      '</tr>';
+    }).join('')+'</tbody></table>';
 }
 function renderZt(zts){
   const rows=(zts||[]).slice().sort((a,b)=>(b.lianban||1)-(a.lianban||1)||String(a.zt_time||'').localeCompare(String(b.zt_time||'')));
@@ -3040,6 +3095,7 @@ async function render(){
   // 表现为「周期深析停在加载中」「资金背离无数据」。
   _safe(()=>renderTencent(d),'tencent');
   _safe(()=>renderPicks(pickList || d.ai_picks || []),'picks');
+  _safe(()=>renderAvoid((d.ai_picks||{}).avoid),'avoid');
   // index_kline.json 的 indices 是 dict (sh000001 -> [{date,close,vol}]);
   // renderVolChart 要数组, 取上证那份
   _safe(()=>renderVolChart(d.index_kline && d.index_kline.sh000001),'volChart');
