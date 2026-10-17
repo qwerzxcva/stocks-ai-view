@@ -96,7 +96,7 @@ def ts_of(d):
     for node in (d, d.get("summary"), d.get("meta")):
         if not isinstance(node, dict):
             continue
-        for key in ("ts", "timestamp", "generated_at", "generated", "rebuilt_at", "date", "data_date", "for_date"):
+        for key in ("ts", "timestamp", "generated_at", "generated", "rebuilt_at", "date", "data_date"):
             value = node.get(key)
             if isinstance(value, str) and parse_ts(value):
                 return value
@@ -129,7 +129,11 @@ def parse_ts(v):
     return None
 
 
-MARKET_SESSION_FILES = {"market_now.json", "realtime_minute.json", "moneyflow.json"}
+MARKET_SESSION_FILES = {
+    "market_now.json", "realtime_minute.json", "moneyflow.json",
+    "global_markets.json", "hot_impact.json", "enrich.json",
+    "index_kline.json", "auction_engine.json", "ticks_20261017.json",
+}
 
 
 def market_age_hours(since, until):
@@ -197,7 +201,10 @@ def main():
             status = "UNKNOWN_TIER"
         else:
             thr = THRESH_HOURS[tier]
-            status = "FUTURE_TS" if age_h < -0.01 else ("OK" if effective_age <= thr else "STALE")
+            if name in MARKET_SESSION_FILES and now.weekday() >= 5:
+                status = "EXPECTED_CLOSED"
+            else:
+                status = "FUTURE_TS" if age_h < -0.01 else ("OK" if effective_age <= thr else "STALE")
         rows.append({"file": name, "tier": tier, "ts": raw_ts,
                      "age_hours": round(age_h, 1), "effective_age_hours": round(effective_age, 1),
                      "status": status, "threshold_h": THRESH_HOURS.get(tier)})
@@ -245,7 +252,7 @@ def main():
         "|---|---|---|---|---|---|",
     ]
     order = {"STALE": 0, "UNREADABLE": 1, "NO_TS": 2, "FUTURE_TS": 2,
-             "UNKNOWN_TIER": 3, "STATIC": 4, "OK": 4}
+             "UNKNOWN_TIER": 3, "EXPECTED_CLOSED": 4, "STATIC": 5, "OK": 5}
     for r in sorted(rows, key=lambda x: (order.get(x["status"], 9),
                                          -(x.get("age_hours") or 0))):
         lines.append(
@@ -255,7 +262,7 @@ def main():
     lines += ["", "## 说明", "",
               "- STALE = 超过该档位阈值。非交易时段采集类变旧是预期, 需结合",
               "  是否交易时段判断; 真正的故障是「交易日盘中仍不更新」。",
-              "- NO_TS = 文件无 ts/date, 无法判断, 建议补时间戳。",
+              "- EXPECTED_CLOSED = 周末或非交易时段，当前文件不应被当作实时故障。",
               "- 本报告由 `scripts/audit_freshness.py` 生成, 可加 `--fail-on-stale`",
               "  作为 CI 门禁。"]
     with open(args.report, "w", encoding="utf-8") as f:
