@@ -87,7 +87,9 @@ def build_risk_plan(decision, scenario, vols):
     scen_cap = ((scenario or {}).get("config") or {}).get("position_cap", 0.6)
     n = len(buys)
     if n == 0:
-        return {"n_positions": 0, "total_position": 0,
+        return {"ts": datetime.now(CST).isoformat(timespec="seconds"),
+                "generated_at": datetime.now(CST).isoformat(timespec="seconds"),
+                "n_positions": 0, "total_position": 0,
                 "plan": [], "note": "无买入信号"}
 
     # 1. 单票风险预算
@@ -152,6 +154,7 @@ def build_risk_plan(decision, scenario, vols):
     port_vol = sum(p["risk_contribution"] for p in plan)
     return {
         "ts": datetime.now(CST).isoformat(timespec="seconds"),
+        "generated_at": datetime.now(CST).isoformat(timespec="seconds"),
         "engine": "risk_engine v1 (风险预算/波动率平价/集中度控制)",
         "n_positions": len(plan),
         "total_position": round(total_pos, 4),

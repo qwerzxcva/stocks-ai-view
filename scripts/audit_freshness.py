@@ -32,7 +32,7 @@ import glob
 import json
 import os
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, time
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -70,35 +70,47 @@ TIERS = {
     "factor_lab.json": "daily", "sector_engine.json": "daily",
     "market_phase.json": "daily", "scenario.json": "daily",
     "self_reflect.json": "daily", "rps_rotation.json": "daily",
-    "weight_calibration.json": "daily",
+    "weight_calibration.json": "daily", "all_sources.json": "daily",
+    "shard_a.json": "daily", "entry_plans.json": "daily",
+    "morning_review.json": "daily", "review_today.json": "daily",
+    "stop_analysis.json": "daily", "overseas_live.json": "daily",
+    "predict_algo.json": "daily", "risk_plan.json": "daily",
     # weekly (8 天)
     "reflect_latest.json": "weekly", "winrate_matrix.json": "weekly",
     "kline_sim.json": "weekly", "walkforward.json": "weekly",
     "engine_weights.json": "weekly", "weights_history.json": "weekly",
     "edge_report.json": "weekly", "cycle_deep.json": "weekly",
-    "cycle_pool_v2.json": "weekly",
+    "cycle_pool_v2.json": "weekly", "weights_history.json": "weekly",
+    "search_index.json": "static", "stock_names.json": "static",
 }
 
 THRESH_HOURS = {"realtime": 0.5, "intraday": 3, "daily": 30, "weekly": 8 * 24}
 
 
 def ts_of(d):
+    if isinstance(d, list):
+        return max((t for row in d if isinstance(row, dict)
+                    if (t := ts_of(row)) and parse_ts(t)), default=None)
     if not isinstance(d, dict):
         return None
-    # 注意: 不同产出用的字段名不一致 —— realtime_minute 用 timestamp,
-    # auction_engine/trend_strength 用 ts, 多数用 ts 或 date。
-    # 2026-10-16 修: 原来只认 ts/date/data_date, 导致 realtime_minute
-    # 被误判为 28.9h 前的陈旧文件 (实际它 timestamp=10-15 18:29, 只有 2.5h)。
-    for k in ("ts", "timestamp", "generated", "date", "data_date"):
-        v = d.get(k)
-        if isinstance(v, str) and len(v) >= 8:
-            return v
+    for node in (d, d.get("summary"), d.get("meta")):
+        if not isinstance(node, dict):
+            continue
+        for key in ("ts", "timestamp", "generated_at", "generated", "rebuilt_at", "date", "data_date", "for_date"):
+            value = node.get(key)
+            if isinstance(value, str) and parse_ts(value):
+                return value
     return None
 
 
 def parse_ts(v):
     """容错解析时间戳 → aware datetime (CST)。失败返回 None。"""
     s = str(v).strip()
+    try:
+        dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=CST)
+    except ValueError:
+        pass
     for fmt in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M:%S",
                 "%Y-%m-%d %H:%M:%S", "%Y-%m-%d", "%Y%m%d"):
         try:
@@ -115,6 +127,25 @@ def parse_ts(v):
         except ValueError:
             return None
     return None
+
+
+MARKET_SESSION_FILES = {"market_now.json", "realtime_minute.json", "moneyflow.json"}
+
+
+def market_age_hours(since, until):
+    since, until = since.astimezone(CST), until.astimezone(CST)
+    if since >= until:
+        return 0.0
+    total = 0.0
+    day = since.date()
+    while day <= until.date():
+        if day.weekday() < 5:
+            for start, end in ((time(9, 15), time(11, 30)), (time(13), time(15, 5))):
+                left = max(since, datetime.combine(day, start, CST))
+                right = min(until, datetime.combine(day, end, CST))
+                total += max(0.0, (right - left).total_seconds())
+        day += timedelta(days=1)
+    return total / 3600
 
 
 def main():
@@ -151,21 +182,25 @@ def main():
             else:
                 tier = "unknown"
 
+        if tier == "static":
+            rows.append({"file": name, "tier": tier, "ts": raw_ts,
+                         "status": "STATIC", "note": "静态索引不以生成时间衡量"})
+            continue
         if dt is None:
             rows.append({"file": name, "tier": tier, "ts": raw_ts,
-                         "status": "NO_TS",
-                         "note": "无 ts/date 字段, 无法判断新鲜度"})
+                         "status": "NO_TS", "note": "无可解析生成时间, 无法判断新鲜度"})
             continue
 
         age_h = (now - dt).total_seconds() / 3600
-        if tier in ("static", "unknown"):
-            status = "OK" if tier == "static" else "UNKNOWN_TIER"
+        effective_age = market_age_hours(dt, now) if name in MARKET_SESSION_FILES else age_h
+        if tier == "unknown":
+            status = "UNKNOWN_TIER"
         else:
             thr = THRESH_HOURS[tier]
-            status = "OK" if age_h <= thr else "STALE"
+            status = "FUTURE_TS" if age_h < -0.01 else ("OK" if effective_age <= thr else "STALE")
         rows.append({"file": name, "tier": tier, "ts": raw_ts,
-                     "age_hours": round(age_h, 1), "status": status,
-                     "threshold_h": THRESH_HOURS.get(tier)})
+                     "age_hours": round(age_h, 1), "effective_age_hours": round(effective_age, 1),
+                     "status": status, "threshold_h": THRESH_HOURS.get(tier)})
 
     stale = [r for r in rows if r["status"] == "STALE"]
     unreadable = [r for r in rows if r["status"] == "UNREADABLE"]
@@ -209,7 +244,8 @@ def main():
         "| 文件 | 档位 | 时间戳 | 年龄(h) | 阈值(h) | 状态 |",
         "|---|---|---|---|---|---|",
     ]
-    order = {"STALE": 0, "UNREADABLE": 1, "NO_TS": 2, "UNKNOWN_TIER": 3, "OK": 4}
+    order = {"STALE": 0, "UNREADABLE": 1, "NO_TS": 2, "FUTURE_TS": 2,
+             "UNKNOWN_TIER": 3, "STATIC": 4, "OK": 4}
     for r in sorted(rows, key=lambda x: (order.get(x["status"], 9),
                                          -(x.get("age_hours") or 0))):
         lines.append(

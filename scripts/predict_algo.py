@@ -27,7 +27,7 @@ import math
 import os
 import sys
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -38,6 +38,7 @@ except Exception:
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 LOCAL_INDEX = os.path.join(DATA_DIR, "adjusted", "index_full.json")
+CST = timezone(timedelta(hours=8))
 
 TOKEN = os.environ.get("GH_TOKEN", "")
 RAW = "https://raw.githubusercontent.com/qwerzxcva/t1/main"
@@ -218,6 +219,7 @@ def main():
     res = predict(args.date, args.up_ratio, args.zt_count, index_rows=rows)
     res["index_code"] = args.index
     res["source"] = src
+    res["generated_at"] = datetime.now(CST).isoformat(timespec="seconds")
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(res, f, ensure_ascii=False, indent=1)
