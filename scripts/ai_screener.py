@@ -684,6 +684,12 @@ def fetch_news(limit=120):
 
 def fetch_remote_news(raw_base="https://raw.githubusercontent.com/qwerzxcva/stocks-data-news/main/news", days=3):
     out, seen = [], set()
+    # B 仓分片采的 push2 新闻: 零网络读本仓副本, 与远端仓数据合并去重
+    for it in fetch_shard_b_news():
+        if it["title"] in seen:
+            continue
+        seen.add(it["title"])
+        out.append(it)
     for i in range(days):
         d = (datetime.datetime.now(datetime.timezone(datetime.timedelta(hours=8)))
              - datetime.timedelta(days=i)).strftime("%Y-%m-%d")
@@ -706,6 +712,32 @@ def fetch_remote_news(raw_base="https://raw.githubusercontent.com/qwerzxcva/stoc
 
 
 # ─── 个股 RPS (腾讯前复权日K, 批量取 top N) ──────────────────────────────
+def fetch_shard_b_news(path=None):
+    """B 仓 (镜像) shard_b.json 里的东财 push2 新闻。
+
+    采集走 B 仓独立 IP (分片架构), 这里只读本仓同步下来的副本
+    (sync_mirror_shards 随 engine-chain 每轮更新), 零网络、零风控。
+    字段对齐 fetch_remote_news 的产物: ts/title/theme/sentiment/src/digest。
+    """
+    p = path or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..",
+                             "data", "shard_b.json")
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except Exception:
+        return []
+    out, seen = [], set()
+    for it in (d.get("data") or {}).get("news") or []:
+        t = (it.get("title") or "").strip()
+        if len(t) < 6 or t in seen:
+            continue
+        seen.add(t)
+        ts = (it.get("pub_time") or "").replace(" ", "T")[:19]
+        out.append({"ts": ts, "title": t[:120],
+                    "theme": sorted(theme_of(t)), "sentiment": sentiment_of(t),
+                    "src": "shard-b-push2", "digest": (it.get("digest") or "")[:200]})
+    return out
+
+
 def fetch_rps(codes, bars=20, limit=40):
     """codes: 裸码/前缀码; 返回 {裸码: {close, chg5, chg20}}"""
     out = {}
