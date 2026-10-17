@@ -1,0 +1,79 @@
+name: historical-market-scan
+
+on:
+  schedule:
+    - cron: '50 8 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      asof:
+        description: 'Trading date YYYY-MM-DD; empty = latest common K-line date'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: historical-market-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    if: github.repository == 'qwerzxcva/stocks-ai-view'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/stocks-data-kline
+          path: kline-repo
+          sparse-checkout: |
+            data/bulk
+          sparse-checkout-cone-mode: false
+      - uses: actions/checkout@v4
+        with:
+          repository: jiegengxiangjianxue1/db-market
+          path: market-repo
+          sparse-checkout: |
+            master/universe.json
+          sparse-checkout-cone-mode: false
+      - uses: actions/checkout@v4
+        if: vars.STOCKS_FLOW_REPO != ''
+        with:
+          repository: ${{ vars.STOCKS_FLOW_REPO }}
+          path: flow-warehouse
+          sparse-checkout: |
+            stocks
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Scan the security master
+        env:
+          ASOF_INPUT: ${{ inputs.asof }}
+        run: |
+          mkdir -p flow-warehouse
+          if [ -n "$ASOF_INPUT" ]; then
+            python3 scripts/historical_market_scan.py \
+              --master market-repo/master/universe.json \
+              --bulk kline-repo/data/bulk \
+              --flow-root flow-warehouse \
+              --asof "$ASOF_INPUT" --out data/historical_scan.json || status=$?
+          else
+            python3 scripts/historical_market_scan.py \
+              --master market-repo/master/universe.json \
+              --bulk kline-repo/data/bulk \
+              --flow-root flow-warehouse \
+              --out data/historical_scan.json || status=$?
+          fi
+          python3 -c 'import json;d=json.load(open("data/historical_scan.json"));print("asof",d["asof"],"coverage",d["coverage"],"status",d["status"],"rejected",d["rejected"])'
+          if [ "${status:-0}" -ne 0 ]; then
+            echo 'Coverage insufficient; no ranked observations published'
+          fi
+      - name: Publish coverage and eligible observations
+        run: |
+          python3 scripts/git_push_retry.py --msg 'data: audit historical market scan' \
+            data/historical_scan.json --protect data/historical_scan.json
