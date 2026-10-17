@@ -179,6 +179,34 @@ CREATE TABLE IF NOT EXISTS financial_summary (
     mom           VARCHAR,
     ts            VARCHAR
 );
+
+-- 盘中事件时间线 (涨停封板时点 / 板块快照)
+CREATE TABLE IF NOT EXISTS intraday_events (
+    trade_date  VARCHAR,
+    event_time  VARCHAR,
+    kind        VARCHAR,
+    code        VARCHAR,
+    name        VARCHAR,
+    label       VARCHAR,
+    detail      VARCHAR,
+    source      VARCHAR,
+    ts          VARCHAR
+);
+
+-- 主题生命周期 (每日一条观测)
+CREATE TABLE IF NOT EXISTS theme_lifecycle (
+    theme        VARCHAR,
+    as_of        VARCHAR,
+    stage        VARCHAR,
+    observations INTEGER,
+    latest_count INTEGER,
+    peak_count   INTEGER,
+    direction    VARCHAR,
+    stock_count  INTEGER,
+    first_seen   VARCHAR,
+    last_seen    VARCHAR,
+    ts           VARCHAR
+);
 """
 
 INDEXES = [
@@ -205,6 +233,8 @@ INDEXES = [
     "CREATE INDEX IF NOT EXISTS idx_fund_nav_code ON fund_nav(fund_code, date)",
     "CREATE INDEX IF NOT EXISTS idx_fund_rebal_code ON fund_rebalance(fund_code, report_date)",
     "CREATE INDEX IF NOT EXISTS idx_fin_code_period ON financial_summary(code, report_date)",
+    "CREATE INDEX IF NOT EXISTS idx_intraday_events_date ON intraday_events(trade_date, event_time)",
+    "CREATE INDEX IF NOT EXISTS idx_theme_lifecycle_asof ON theme_lifecycle(as_of, stage)",
 ]
 
 
@@ -345,6 +375,43 @@ def load_financial_summary(con, records):
     return len(rows)
 
 
+def load_tape_snapshots(tape_path, lifecycle_path, path=None):
+    """Load the two derived snapshots. Existing rows for the same day are replaced."""
+    tape = json.load(open(tape_path, encoding="utf-8")) if tape_path and os.path.exists(tape_path) else {}
+    life = json.load(open(lifecycle_path, encoding="utf-8")) if lifecycle_path and os.path.exists(lifecycle_path) else {}
+    trade_date = str(tape.get("ts") or datetime.now(CST).isoformat())[:10]
+    as_of = life.get("as_of") or trade_date
+    now = datetime.now(CST).isoformat(timespec="seconds")
+    con = connect(path)
+    try:
+        con.execute(SCHEMA)
+        for statement in INDEXES:
+            con.execute(statement)
+        con.begin()
+        con.execute("DELETE FROM intraday_events WHERE trade_date=?", [trade_date])
+        event_rows = [(trade_date, item.get("time"), item.get("kind"), item.get("code"),
+                       item.get("name"), item.get("label"), item.get("detail"),
+                       item.get("source"), now)
+                      for item in tape.get("event_timeline") or []]
+        if event_rows:
+            con.executemany("INSERT INTO intraday_events VALUES (?,?,?,?,?,?,?,?,?)", event_rows)
+        con.execute("DELETE FROM theme_lifecycle WHERE as_of=?", [as_of])
+        theme_rows = [(item.get("name"), as_of, item.get("stage"), item.get("observations"),
+                       item.get("latest_count"), item.get("peak_count"), item.get("direction"),
+                       item.get("stock_count"), item.get("first_seen"), item.get("last_seen"), now)
+                      for item in life.get("themes") or []]
+        if theme_rows:
+            con.executemany("INSERT INTO theme_lifecycle VALUES (?,?,?,?,?,?,?,?,?,?,?)", theme_rows)
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+    print(f"[load-tape] events={len(event_rows)} themes={len(theme_rows)} date={trade_date}")
+    return len(event_rows) + len(theme_rows)
+
+
 def load_from_collect(json_path, path=None):
     """从 collect_all_sources.py 的输出导入。"""
     d = json.load(open(json_path, encoding="utf-8"))
@@ -420,6 +487,7 @@ def main():
     ap.add_argument("--init", action="store_true")
     ap.add_argument("--load", help="collect_all_sources.py 的输出 JSON")
     ap.add_argument("--bench", action="store_true")
+    ap.add_argument("--load-tape", nargs=2, metavar=("TAPE_JSON", "LIFECYCLE_JSON"))
     ap.add_argument("--query", help="执行任意 SQL")
     ap.add_argument("--path", help="DB 路径 (默认 STOCKS_DB 或 stocks-data-live/stocks.duckdb)")
     args = ap.parse_args()
@@ -435,6 +503,11 @@ def main():
         if not os.path.exists(p):
             init_db(p)
         load_from_collect(args.load, p)
+        return 0
+    if args.load_tape:
+        if not os.path.exists(p):
+            init_db(p)
+        load_tape_snapshots(args.load_tape[0], args.load_tape[1], p)
         return 0
     if args.bench:
         bench(p)

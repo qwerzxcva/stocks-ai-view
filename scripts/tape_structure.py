@@ -66,6 +66,49 @@ def minute_events(bars):
     return events[-8:]
 
 
+def event_timeline(attribution, sectors):
+    """Merge observable intraday events without inventing an exact clock time.
+
+    Limit-up rows carry the exchange seal time. Sector rows are snapshot facts,
+    so they use the engine timestamp and are labeled as snapshot events.
+    """
+    def money(value):
+        try:
+            return f"{float(value) / 1e8:.2f}亿"
+        except (TypeError, ValueError):
+            return "—"
+
+    limit_rows = []
+    for item in (attribution.get("items") or [])[:24]:
+        seal = str(item.get("seal_time") or "")
+        if not seal:
+            continue
+        limit_rows.append({
+            "time": seal.zfill(6),
+            "kind": "limit_up",
+            "code": item.get("code"),
+            "name": item.get("name"),
+            "label": item.get("seal_label") or item.get("seal_bucket") or "涨停",
+            "detail": item.get("industry") or "",
+            "source": "limitup_attribution",
+        })
+    snapshot = sectors.get("ts")
+    sector_rows = []
+    for item in (sectors.get("sectors") or [])[:12]:
+        if item.get("grade") not in ("A", "B") and not item.get("n_zt"):
+            continue
+        sector_rows.append({
+            "time": snapshot,
+            "kind": "sector_snapshot",
+            "code": item.get("code"),
+            "name": item.get("sector"),
+            "label": f"{item.get('grade')}级板块",
+            "detail": f"涨停{item.get('n_zt') or 0} 主力净额{money(item.get('capital_net'))}",
+            "source": "sector_engine",
+        })
+    return limit_rows + sector_rows[:8]
+
+
 def catalyst_rows(news, today):
     rows = []
     for item in (news.get("items") or [])[:80]:
@@ -117,8 +160,10 @@ def main():
     weekly = tencent_bars("sh000001", "week", 80)
     hourly = tencent_bars("sh000001", "m60", 80)
     news = load("news_extra.json")
-    payload = {"ts": datetime.now(CST).isoformat(timespec="seconds"), "engine": "tape_structure v1",
+    timeline = event_timeline(load("limitup_attribution.json"), load("sector_engine.json"))
+    payload = {"ts": datetime.now(CST).isoformat(timespec="seconds"), "engine": "tape_structure v2",
                "index": "sh000001", "minute_events": minute_events(minute),
+               "event_timeline": timeline,
                "catalysts": catalyst_rows(news, datetime.now(CST).date()),
                "structure": structure(weekly, hourly),
                "meta": {"source": "Tencent 5-minute, weekly, 60-minute bars plus news_extra",

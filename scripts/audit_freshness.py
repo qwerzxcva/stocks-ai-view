@@ -65,6 +65,8 @@ TIERS = {
     "news_transmission.json": "daily", "daily_brief.json": "daily",
     "ai_review.json": "daily", "overseas_linkage.json": "daily",
     "engine_fusion.json": "daily", "hot_themes.json": "daily",
+    "theme_lifecycle.json": "daily", "tape_structure.json": "intraday",
+    "concept_strength.json": "intraday", "review_versions.json": "daily",
     "mainline.json": "daily", "cloud_analysis.json": "daily",
     "trend_strength.json": "daily", "bull_bear_debate.json": "daily",
     "factor_lab.json": "daily", "sector_engine.json": "daily",

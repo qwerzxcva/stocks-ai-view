@@ -278,6 +278,8 @@ jobs:
             python3 scripts/valuation_engine.py --out data/valuation.json || echo "valuation skipped"
             python3 scripts/engine_v5.py --out data/engine_v5.json --limit 2000 || echo "engine_v5 skipped"
             python3 scripts/news_transmission.py --in data/hot_news.json --news data/news_extra.json --out data/news_transmission.json || echo "news transmission skipped"
+            python3 scripts/theme_lifecycle.py --themes data/hot_themes.json --history data/theme_lifecycle_history.json --out data/theme_lifecycle.json || echo "theme lifecycle skipped"
+            python3 scripts/concept_strength.py --out data/concept_strength.json || echo "concept strength skipped"
             python3 scripts/tape_structure.py --out data/tape_structure.json || echo "tape structure skipped"
             python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
             python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
@@ -398,6 +400,7 @@ jobs:
           if [ "$cst_hour" -gt 15 ] || { [ "$cst_hour" = "15" ] && [ "$cst_min" -ge 10 ]; }; then
             python3 scripts/close_review.py
             python3 scripts/archive_review.py
+            python3 scripts/review_versions.py || echo "review versions skipped"
             python3 - <<'PY'
           import json, sys
           with open('data/close_review.json', encoding='utf-8') as handle:

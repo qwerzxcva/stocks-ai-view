@@ -81,12 +81,16 @@ def main():
     p.add_argument("--model", default="meta-llama/llama-3.1-8b-instant")
     args = p.parse_args()
 
-    latest, hi = load_data(args.data_dir)
-    md = None
-    if args.llm == "ghc":
-        md = llm_review(latest, hi, args.model)
-    if not md:
-        md = rule_review(latest, hi)
+    # The canonical narrative review is gitcode_ai_review. This script remains
+    # only as a deterministic fallback when that artefact is absent.
+    canonical = os.path.join(args.data_dir, "ai_review.md")
+    if os.path.exists(canonical) and args.llm == "none":
+        md = open(canonical, encoding="utf-8").read()
+    else:
+        latest, hi = load_data(args.data_dir)
+        md = llm_review(latest, hi, args.model) if args.llm == "ghc" else None
+        if not md:
+            md = rule_review(latest, hi)
     ts = (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=8)).strftime("%Y-%m-%d")
     out = args.out or f"review/{ts}.md"
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
