@@ -2230,6 +2230,17 @@ function renderNewsFlow(){
   });
   h+='</div>';
   }
+  const digest=g.news_digest||{};
+  const cats=digest.categories||{};
+  const catRows=Object.entries(cats).filter(([,v])=>Array.isArray(v)?v.length:(v.items||[]).length);
+  if(catRows.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">24小时分类摘要 <span class="sub">'+_t(digest.ts)+' · '+_esc2(digest.total||0)+' 条</span></div>';
+    catRows.forEach(([name,rows])=>{
+      const arr=Array.isArray(rows)?rows:(rows.items||[]);
+      h+='<div class="fl" style="margin-top:4px">'+_esc2(name)+' '+arr.length+'</div>';
+      arr.slice(0,4).forEach(it=>h+='<div style="font-size:11px;padding:2px 0"><span class="fl">'+_esc2(it.time||"")+'</span> '+_esc2(it.title||"")+'</div>');
+    });
+  }
   if(!h){ box.innerHTML='<div class="no-data">暂无资讯</div>'; return; }
   h+='<div class="fl" style="padding:8px 0 2px;font-size:9px">Research reference only, not investment advice.</div>';
   box.innerHTML=h;
