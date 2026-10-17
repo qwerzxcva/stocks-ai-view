@@ -99,9 +99,13 @@ def decide_stock(r, regime, win1d):
         return "avoid", 0.3, [f"情绪面{sent:.0f}过低, 逆市场情绪"], "市场情绪冰点, 不宜逆势"
 
     negative_edge = win1d is not None and win1d < 0.5
-    if negative_edge:
+    flow_veto = cap < 50
+    if negative_edge or flow_veto:
         action = "watch"
-        reasons.append(f"1日验证胜率{win1d*100:.1f}%低于50%，负期望下取消买入")
+        if negative_edge:
+            reasons.append(f"1日验证胜率{win1d*100:.1f}%低于50%，技术共振只作回避过滤")
+        if flow_veto:
+            reasons.append(f"资金面{cap:.0f}<50，主力净流入未确认，取消买入")
     elif comp >= 65 and cap >= 60 and pos >= 55:
         action = "buy"
         reasons.append(f"综合{comp:.0f} 资金{cap:.0f} 位置{pos:.0f} 三高共振")
