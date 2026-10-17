@@ -49,6 +49,9 @@ TIERS = {
     "market_now.json": "realtime", "realtime_minute.json": "realtime",
     "hot_impact.json": "realtime", "global_markets.json": "realtime",
     "moneyflow.json": "realtime",
+    "market/amount_curve.json": "realtime",
+    "market/speed_leaders.json": "realtime",
+    "market/alert_events.json": "realtime",
     # intraday (2 小时)
     "auction_engine.json": "intraday", "ticks_latest.json": "intraday",
     "limitup_attribution.json": "intraday", "limitup_forecast.json": "intraday",
@@ -77,6 +80,7 @@ TIERS = {
     "morning_review.json": "daily", "review_today.json": "daily",
     "stop_analysis.json": "daily", "overseas_live.json": "daily",
     "predict_algo.json": "daily", "risk_plan.json": "daily",
+    "key_levels.json": "daily", "pick_high_track.json": "daily",
     # weekly (8 天)
     "reflect_latest.json": "weekly", "winrate_matrix.json": "weekly",
     "kline_sim.json": "weekly", "walkforward.json": "weekly",

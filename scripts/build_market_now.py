@@ -25,6 +25,11 @@ from collect_market_extras import (
     fetch_ths_strong_stocks, fetch_tx_sector_ranking)
 from ai_screener import fetch_news, theme_of, sentiment_of, THEMES, fetch_fund_rank
 
+try:
+    from paths import AI_VIEW_DATA as DATA_DIR
+except Exception:
+    DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
+
 
 def _session_state(now):
     """判断当前是否在 A 股交易时段, 返回 (state, last_trading_date)。
@@ -112,6 +117,26 @@ def main():
     # 涨停池 tc 在收盘后只统计到盘中某一时刻 (2026-10-13 实测 67 vs 实际89)
     limit_up = zdfenbu.get("zt_like") or zt["count"]
     limit_down = zdfenbu.get("dt_like") or dtn["count"]
+
+    # 指数站上均线 (借鉴 tick-stock-panel 市场看板, 2026-10-17)
+    # index_kline.json 是日线文件, 每轮重算成本可忽略。
+    indices_ma = {}
+    try:
+        ik = json.load(open(os.path.join(DATA_DIR, "index_kline.json"),
+                            encoding="utf-8"))
+        for code, arr in ((ik.get("indices") or {}).items()):
+            closes = [x["close"] for x in arr if x.get("close")]
+            if len(closes) < 60:
+                continue
+            last = closes[-1]
+            row = {"date": arr[-1].get("date"), "close": last}
+            for n in (5, 20, 60):
+                ma = sum(closes[-n:]) / n
+                row[f"ma{n}"] = round(ma, 2)
+                row[f"above_ma{n}"] = bool(last >= ma)
+            indices_ma[code] = row
+    except (OSError, json.JSONDecodeError, KeyError):
+        pass
     out = {
         "ts": now.isoformat(timespec="seconds"),
         "date": date_str,
@@ -132,6 +157,7 @@ def main():
             "turnover": turnover,
             "pool_zt_count": zt["count"],
             "pool_dt_count": dtn["count"],
+            "indices_ma": indices_ma,   # 指数站上 MA5/20/60 (借鉴市场看板)
         },
         "limit_up_pool": zt["pool"][:50],
         "limit_down_pool": dtn["pool"][:30],

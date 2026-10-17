@@ -284,6 +284,10 @@ jobs:
             python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
             python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
             python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
+            # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度
+            python3 scripts/key_levels.py || echo "key_levels skipped"
+            # 选出后7日区间高点追踪 (可证伪, 用 predictions/ 快照)
+            python3 scripts/pick_high_track.py || echo "pick_high_track skipped"
             # Only the real pre-open stage may replace the premarket record.
             cst_hour=$(TZ=Asia/Shanghai date +%H)
             cst_min=$(TZ=Asia/Shanghai date +%M)

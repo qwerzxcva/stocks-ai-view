@@ -315,6 +315,13 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False)
 
+    # 逐日存档: 区间高点追踪 (pick_high_track.py) 的可证伪数据源
+    arch_dir = os.path.join(os.path.dirname(os.path.abspath(args.out)), "predictions")
+    os.makedirs(arch_dir, exist_ok=True)
+    arch = os.path.join(arch_dir, f"ai_picks_{now.strftime('%Y-%m-%d')}.json")
+    with open(arch, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False)
+
     print(f"\n=== AI 推股 TOP10 (按 edge_pp 校准排序) ===")
     for p in picks[:10]:
         chg = f"{p['chg_pct']:+.2f}%" if p.get("chg_pct") is not None else "—"

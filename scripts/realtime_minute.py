@@ -61,6 +61,9 @@ SNAP_DIR = os.path.join(AI_VIEW, "data", "market")
 DEFAULT_OUT = os.path.join(AI_VIEW, "data", "realtime_minute.json")
 CURVE_PATH = os.path.join(AI_VIEW, "data", "market", "amount_curve.json")
 LEADERS_PATH = os.path.join(AI_VIEW, "data", "market", "speed_leaders.json")
+ALERTS_PATH = os.path.join(AI_VIEW, "data", "price_alerts.json")
+ALERT_EVENTS_PATH = os.path.join(AI_VIEW, "data", "market", "alert_events.json")
+KEY_LEVELS_PATH = os.path.join(AI_VIEW, "data", "key_levels.json")
 
 # 交易时段 (CST)
 TRADING = [(9 * 60 + 25, 11 * 60 + 30), (13 * 60 + 0, 15 * 60 + 0)]
@@ -435,6 +438,98 @@ def write_speed_leaders(boards, meta):
     _atomic_write(LEADERS_PATH, payload)
 
 
+# ─── 点位提醒 (借鉴个股关键价位页「点位提醒」, 2026-10-17) ─────
+def load_price_alerts():
+    """手工点位 (data/price_alerts.json) + 关键价位自动层 (key_levels 枢轴 R1/S1)。
+
+    手工格式: {"alerts": [{"code": "600001", "level": 12.5,
+                            "direction": "above"/"below", "note": "..."}]}
+    """
+    alerts = []
+    for a in (_load_json(ALERTS_PATH, {}) or {}).get("alerts") or []:
+        try:
+            level = float(a.get("level"))
+        except (TypeError, ValueError):
+            continue
+        direction = "above" if a.get("direction") != "below" else "below"
+        alerts.append({"key": f"manual|{_norm_code(a.get('code'))}|{level}|{direction}",
+                       "code": _norm_code(a.get("code")), "level": level,
+                       "dir": direction, "src": "manual",
+                       "note": a.get("note")})
+    for code, lv in ((_load_json(KEY_LEVELS_PATH, {}) or {}).get("stocks") or {}).items():
+        piv = lv.get("pivot") or {}
+        for k, d in (("r1", "above"), ("s1", "below")):
+            if piv.get(k) is None:
+                continue
+            alerts.append({"key": f"auto|{_norm_code(code)}|pivot.{k}",
+                           "code": _norm_code(code), "level": float(piv[k]),
+                           "dir": d, "src": "key_levels.pivot",
+                           "note": f"枢轴{k.upper()} {piv[k]}"})
+    return alerts
+
+
+def check_alerts(rows, prev_rows, alerts):
+    """逐股比较本轮 vs 上轮现价: 只有「真穿越」才触发 (上轮在界限另一侧)。
+
+    同日同 key 只报一次 (events 里去重), 防止横盘反复过线刷屏。
+    """
+    if not alerts or not prev_rows:
+        return []
+    prev_map = {}
+    for r in prev_rows:
+        c = _norm_code(r.get("code"))
+        if c:
+            prev_map[c] = r
+    cur_map = {}
+    for r in rows or []:
+        c = _norm_code(r.get("code"))
+        if c:
+            cur_map[c] = r
+    by_code = {}
+    for a in alerts:
+        by_code.setdefault(a["code"], []).append(a)
+    now = _now()
+    today_str = now.strftime("%Y-%m-%d")
+    events = _load_json(ALERT_EVENTS_PATH, {}) or {}
+    today = events.get("today") if events.get("date") == today_str else None
+    if today is None:
+        today = {"items": [], "fired": {}}
+    fired = today.get("fired") or {}
+    hit = []
+    for code, al in by_code.items():
+        cur = cur_map.get(code)
+        prev = prev_map.get(code)
+        if not cur or not prev:
+            continue
+        px, ppx = cur.get("price"), prev.get("price")
+        if not isinstance(px, (int, float)) or not isinstance(ppx, (int, float)):
+            continue
+        for a in al:
+            if fired.get(a["key"]):
+                continue
+            crossed = (px >= a["level"] > ppx) if a["dir"] == "above" \
+                else (px <= a["level"] < ppx)
+            if not crossed:
+                continue
+            ev = {"t": now.strftime("%H:%M"), "code": code,
+                  "name": cur.get("name"), "price": px, "prev_price": ppx,
+                  "level": a["level"], "dir": a["dir"], "src": a["src"],
+                  "note": a.get("note")}
+            hit.append(ev)
+            fired[a["key"]] = True
+            today["items"].append(ev)
+    if hit:
+        today["fired"] = fired
+        events["date"] = today_str
+        events["today"] = today
+        events["ts"] = now.isoformat(timespec="seconds")
+        # 只保留最近 300 条, 防文件无限增长
+        if len(today["items"]) > 300:
+            today["items"] = today["items"][-300:]
+        _atomic_write(ALERT_EVENTS_PATH, events)
+    return hit
+
+
 # ─── 落盘 + 推送 ────────────────────────────────────────────
 def write_output(rows, summary, total):
     ts = _now().isoformat(timespec="seconds")
@@ -524,6 +619,11 @@ def main():
             update_amount_curve(summary)
             boards, bmeta = compute_speed_leaders(rows, prev_rows, prev_date, prev_ts)
             write_speed_leaders(boards, bmeta)
+            hits = check_alerts(rows, prev_rows, load_price_alerts())
+            if hits:
+                print(f"[{ts}] 点位触发 {len(hits)} 条: "
+                      + ", ".join(f"{h['code']} {h['dir']}{h['level']}"
+                                   for h in hits[:5]), file=sys.stderr)
             print(f"[{ts}] 第 {n_round} 轮: {summary['n_stocks']} 只 "
                   f"涨{summary['advance']}/跌{summary['decline']} "
                   f"涨停{summary['limit_up_ge10']} "

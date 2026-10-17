@@ -109,7 +109,20 @@ def derive_signal(m, heat, in_zt):
         sig = "横盘蓄势"
         expect = f"{exp_down:.0f}% ~ +{max(exp_up, 2):.0f}%"
         why = f"20日区间位置 {pos:.0%}, 等待热点二次催化"
-    return sig, expect, why
+
+    # 证伪条件 (借鉴 AI 潜力股页「若 XX 则撤销判断」, 2026-10-17):
+    # 每条判断附可观察的撤销触发器, 让预期可证伪而不是永远正确。
+    if sig == "动量延续":
+        invalid = (f"若跌破MA20 ({m['ma20']}) 或 5日动量转负, 撤销本判断")
+    elif sig == "追高警惕":
+        invalid = (f"若热点强度降至50%以下或失守20日高点, 确认回避; "
+                   f"若放量突破20日新高则撤销警惕")
+    elif sig == "超跌修复":
+        invalid = (f"若创20日新低或热点退潮, 撤销修复预期")
+    else:
+        invalid = (f"若放量跌破MA20 -3% ({m['ma20'] and round(m['ma20']*0.97, 2)}), 撤销; "
+                   f"若突破20日高点转「动量延续」")
+    return sig, expect, why, invalid
 
 
 def main():
@@ -190,12 +203,21 @@ def main():
             m = kline_metrics(code)
             if not m:
                 continue
-            sig, expect, why = derive_signal(m, heat, in_zt)
+            sig, expect, why, invalid = derive_signal(m, heat, in_zt)
             stocks.append({"code": code, "name": name, "in_zt": in_zt, "signal": sig,
-                           "expect": expect, "why": why, **m})
+                           "expect": expect, "why": why, "invalidation": invalid,
+                           **m})
             time.sleep(0.05)
         if stocks:
+            # 扩散路径 (借鉴事件扩散路径图): 热点 → 涨停龙头 → 动量扩散标的
+            leaders = [s["name"] for s in stocks if s["in_zt"]]
+            spreaders = [s["name"] for s in sorted(
+                (s for s in stocks if not s["in_zt"]),
+                key=lambda s: -(s.get("ret_5d") or -99))[:2]]
             reports.append({"theme": t, "heat": round(heat, 2), "news_count": theme_count.get(t, 0),
+                            "path": [{"stage": "热点", "nodes": [t]},
+                                     {"stage": "龙头", "nodes": leaders},
+                                     {"stage": "扩散", "nodes": spreaders}],
                             "stocks": stocks})
 
     out = {"ts": now.isoformat(), "date": date_str,
