@@ -39,10 +39,6 @@ except Exception:
 
 FACTORS_DIR = os.path.join(DATA_DIR, "adjusted", "factors")
 UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120"}
-# 收盘价内存缓存: load_raw_close 会扫 15 个分片 (~270MB), 每只股票重扫
-# 会让全市场建表耗时放大到小时级。单进程内只读一次。
-_CLOSE_CACHE = {}
-_BULK_LINES = None
 
 
 def em_events(code, retries=3):
@@ -73,36 +69,20 @@ def em_events(code, retries=3):
     return None   # 网络失败与无数据区分: None=失败
 
 
-def _build_bulk_index():
-    """一次读完所有分片, 建 {pref_code: {date: close}}。
-
-    2026-10-19: 旧实现每只股票重扫 15 分片 (~270MB), 4 只就 9 秒;
-    全市场 4000 只会把耗时推到小时级。索引只建一次, 后续 O(1)。
-    """
-    global _BULK_LINES
-    if _BULK_LINES is not None:
-        return _BULK_LINES
+def load_raw_close(code_pref):
     import glob
-    idx = {}
+    out = {}
     for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
         with open(p, encoding="utf-8", errors="replace") as f:
             for line in f:
-                if line.startswith("#") or "|" not in line:
-                    continue
-                parts = line.strip().split("|")
-                if len(parts) < 4:
-                    continue
-                sym = parts[0].strip()
-                try:
-                    idx.setdefault(sym, {})[parts[1][:10]] = float(parts[3])
-                except ValueError:
-                    continue
-    _BULK_LINES = idx
-    return idx
-
-
-def load_raw_close(code_pref):
-    return dict(_build_bulk_index().get(code_pref, {}))
+                if line.startswith(code_pref + "|"):
+                    parts = line.strip().split("|")
+                    if len(parts) >= 4:
+                        try:
+                            out[parts[1]] = float(parts[3])
+                        except ValueError:
+                            pass
+    return out
 
 
 def build_factor(events, raw_close):
@@ -148,19 +128,20 @@ def main():
     if args.codes:
         codes = [c.strip().zfill(6) for c in args.codes.split(",") if c.strip()]
     else:
-        # 从 bulk 全集按分片取 (复用内存索引, 不再扫 15 个分片)
-        idx = _build_bulk_index()
+        # 从 bulk 全集按分片取
         raw_all = set()
-        for sym in idx:
-            bare = sym[2:] if sym[:2] in ("sh", "sz", "bj") else sym
-            if len(bare) == 6 and bare.isdigit():
-                raw_all.add(bare)
-        # 稳定分片: Python 的 hash() 跨进程随机化 (PYTHONHASHSEED),
-        # 用它分片会让不同进程拿到的子集不一致, 永远盖不全。
-        import zlib
-        def _shard_of(c):
-            return zlib.crc32(c.encode()) % args.n_shards
-        codes = sorted(c for c in raw_all if _shard_of(c) == args.shard)
+        import glob
+        for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+            with open(p, encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    if line.startswith("#") or "|" not in line:
+                        continue
+                    head = line.split("|", 1)[0]
+                    bare = head[2:] if head[:2] in ("sh", "sz", "bj") else head
+                    if len(bare) == 6 and bare.isdigit():
+                        raw_all.add(bare)
+        codes = sorted(c for c in raw_all
+                       if hash(c) % args.n_shards == args.shard)
 
     n_ok = n_fail = n_noev = 0
     for i, code in enumerate(codes):

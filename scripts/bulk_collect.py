@@ -238,56 +238,10 @@ def fetch_tencent_kline(code):
         return [], str(e)
 
 
-def latest_date(code):
-    """本地 bulk 里该 code 的最新日期 (断点续传用: 判是否已到最新交易日)。
-
-    2026-10-19 修: 旧 --resume 只看 existing_dates() 非空就跳过, 导致
-    停留在 10-13 的股票永远不补 10-16 (分片「最新日期」被少数已补票
-    抬上去, 绝大多数实际停在三日前)。现在比对是否接到最新交易日。
-    """
-    ds = _build_date_index().get(str(code).zfill(6))
-    if not ds:
-        return ""
-    return max(ds)
-
-
-def market_latest_date():
-    """本地 bulk 全集中最新交易日 (用 sh000001 上证指数推算最稳,
-    退而取全量最大日期)。大盘指数每天必更新, 个股停牌不会抬高它。"""
-    idx = latest_date("000001")
-    if len(idx) == 10:
-        return idx
-    best = ""
-    for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
-        try:
-            with open(p, encoding="utf-8", errors="replace") as f:
-                for line in f:
-                    if line.startswith("#") or "|" not in line:
-                        continue
-                    _, _, rest = line.partition("|")
-                    d = (rest.split(",")[0] if "," in rest
-                         else rest.split("|")[0]).strip()[:10]
-                    if len(d) == 10 and d > best:
-                        best = d
-        except Exception:
-            continue
-    return best
-
-
-_DATE_INDEX = None
-
-
-def _build_date_index():
-    """一次性把 bulk 全量日期索引建到内存: code -> set(date)。
-
-    2026-10-19: 旧 existing_dates() 每只股票重扫 15 个分片 (~270MB I/O),
-    4017 只就是 ~1TB 读, 实测单只 3.6s 全耗在扫文件上而不是网络。
-    索引只建一次, 后续查是 O(1); 写入后增量更新不必重建。
-    """
-    global _DATE_INDEX
-    if _DATE_INDEX is not None:
-        return _DATE_INDEX
-    idx = {}
+def existing_dates(code):
+    """本地 bulk 里该 code 已有的日期集合 (增量用)。"""
+    have = set()
+    bare = str(code).zfill(6)
     for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
         comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
         try:
@@ -297,20 +251,15 @@ def _build_date_index():
                         continue
                     head, _, rest = line.partition("|")
                     hb = head[2:] if head[:2] in ("sh", "sz", "bj") else head
+                    if hb != bare:
+                        continue
                     parts = (rest.strip().split(",") if (comma or "," in rest)
                              else rest.strip().split("|"))
                     if parts and len(parts[0]) == 10:
-                        idx.setdefault(hb, set()).add(parts[0])
+                        have.add(parts[0])
         except Exception:
             continue
-    _DATE_INDEX = idx
-    return idx
-
-
-def existing_dates(code):
-    """本地 bulk 里该 code 已有的日期集合 (增量用, 走内存索引)。"""
-    bare = str(code).zfill(6)
-    return set(_build_date_index().get(bare, ()))
+    return have
 
 
 def append_bulk(code, rows):
@@ -331,10 +280,6 @@ def append_bulk(code, rows):
     with open(p, "a", encoding="utf-8") as f:
         for r in new:
             f.write("%s|%s|%s|%s|%s|%s|%s\n" % (sym, r[0], r[1], r[2], r[3], r[4], r[5]))
-    # 索引增量更新: 不更新会让同进程内后续 existing_dates() 看不到刚写的日期,
-    # 同一股重跑时会重复追加。
-    bare = str(code).zfill(6)
-    _build_date_index().setdefault(bare, set()).update(r[0] for r in new)
     return len(new)
 
 
@@ -385,8 +330,6 @@ def rewrite_bulk(code, rows):
         f.writelines(kept)
         for r in new:
             f.write("%s|%s|%s|%s|%s|%s|%s\n" % (sym, r[0], r[1], r[2], r[3], r[4], r[5]))
-    # 重写只影响该股, 索引直接替换它的日期集合即可。
-    _build_date_index()[bare] = {r[0] for r in new}
     return len(new)
 
 
@@ -428,16 +371,8 @@ def main():
 
     stats = {"ok": 0, "empty": 0, "fail": 0, "rows": 0, "skipped": 0}
     t0 = time.time()
-    # 断点续传判据: 是否接到最新交易日, 而不是「有没有任何历史数据」。
-    # 旧逻辑会让停在 10-13 的股票永远跳过 (2026-10-19 实测 1677 只
-    # 分片内只有 157 只接到 10-16)。
-    market_asof = market_latest_date() if (args.resume and args.kind == "kline") else ""
-    if market_asof:
-        print("[bulk] 续传基准日 = %s (只有已接到该日的股票才跳过)" % market_asof,
-              flush=True)
     for i, code in enumerate(codes):
-        if (args.resume and not args.rewrite and args.kind == "kline"
-                and market_asof and latest_date(code) >= market_asof):
+        if args.resume and not args.rewrite and args.kind == "kline" and existing_dates(code):
             stats["skipped"] += 1
             continue
         try:
