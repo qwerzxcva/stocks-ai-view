@@ -56,10 +56,14 @@ W_IND_PE, W_IND_PB, W_DDM, W_MKT = 0.35, 0.25, 0.15, 0.25
 
 
 def load_snapshot():
-    """估值输入: 优先 snapshot_*.json (本地开发), 没有则用 all_sources.json
-    的 quote 组 (Actions 环境没有 snapshot, 但采集产出永远有)。
+    """估值输入三级: snapshot_*.json → all_sources.json → 腾讯实时批量报价。
 
-    返回 {symbol: record} — symbol 带 sh/sz/bj 前缀, 与 snapshot 一致。
+    2026-10-18 修复: snapshot 已停更 (t2 10-12 后无产出), all_sources.json
+    也被移出仓库 (a73480b), 旧两级在 Actions 全会失效 -> valuation.json
+    停更在 10-15 且 stocks=0。第三级直接回源腾讯零鉴权接口, 不再依赖任何
+    中间产物, 全市场 5278 只分 88 批约 15-25s。
+
+    返回 {symbol: record} — symbol 带 sh/sz/bj 前缀。
     """
     snaps = sorted(glob.glob(SNAPSHOT_GLOB))
     if snaps:
@@ -67,30 +71,38 @@ def load_snapshot():
             return json.load(open(snaps[-1], encoding="utf-8"))
         except Exception:
             pass
-    # 降级: 从 all_sources.json 的 quote 组构造
     src = os.path.join(AI_VIEW_DATA, "all_sources.json")
-    if not os.path.exists(src):
-        return {}
+    if os.path.exists(src):
+        try:
+            d = json.load(open(src, encoding="utf-8"))
+            out = {}
+            for r in (d.get("data") or {}).get("quote") or []:
+                sym = r.get("symbol") or r.get("code")
+                if sym:
+                    out[sym] = {"price": r.get("price"), "pe": r.get("pe"),
+                                "pb": r.get("pb"), "mktcap": r.get("mktcap"),
+                                "source": "all_sources.quote"}
+            if len(out) > 2000:
+                return out
+        except Exception:
+            pass
+    # 第三级: 腾讯实时批量 (零鉴权, 盘中/盘后均可用)
     try:
-        d = json.load(open(src, encoding="utf-8"))
-    except Exception:
-        return {}
-    out = {}
-    for r in (d.get("data") or {}).get("quote") or []:
-        sym = r.get("symbol") or r.get("code")
-        if not sym:
-            continue
-        out[sym] = {
-            "code": r.get("code"),
-            "name": r.get("name"),
-            "price": r.get("price"),
-            "pe": r.get("pe"),
-            "pb": r.get("pb"),
-            "mktcap": r.get("mktcap"),
-            "floatcap": r.get("floatcap"),
-            "source": "all_sources.quote",
-        }
-    return out
+        from collect_all_sources import fetch_tencent_quote
+        recs, meta = fetch_tencent_quote()   # 无参 = 指数 + 本地快照全集
+        out = {}
+        for r in recs:
+            out[r.get("symbol") or r.get("code")] = {
+                "price": r.get("price"), "pe": r.get("pe"),
+                "pb": r.get("pb"), "mktcap": r.get("mktcap"),
+                "source": "tencent_live",
+            }
+        if len(out) > 2000:
+            print(f"[valuation] 腾讯回源 {len(out)} 只", file=sys.stderr)
+            return out
+    except Exception as e:
+        print(f"[valuation] 腾讯回源失败: {e}", file=sys.stderr)
+    return {}
 
 
 def load_industry():

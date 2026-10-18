@@ -959,6 +959,11 @@ def main():
     latest = {
         "ts": now.isoformat(),
         "date": date_str,
+        # 2026-10-18 修复: 东财涨跌停池/指数在周末与非交易时段返回的是最近
+        # 交易日数据, 旧版把 date 标成当天 -> 网站显示「今日」实为 3 天前的值。
+        # 用上证指数日K最后一根日期推断真实归属日; 不一致时标 fallback=true。
+        "data_belongs_to": date_str,
+        "fallback": False,
         "market": {
             "indices": indices,
             # 家数以东财 data.tc 为准 (pool 明细可能为空, 详见 fetch_pool 注释)
@@ -1009,6 +1014,18 @@ def main():
         "meta": {"source": "tencent+eastmoney+sina+ths", "algo": "tsp-signal-v3",
                  "zero_cred": True, "ref": "shy3130/tick-stock-panel"},
     }
+
+    # 归属日校准: idx_kline 末根日期 = 最近真实交易日。周末/节假日时它早于当天,
+    # 那时必须诚实标注 fallback, 否则用户把 3 天前的行情当"今日" (2026-10-18 修)。
+    try:
+        belongs = str((idx_kline or [{}])[-1].get("date") or "")[:10].replace("-", "")
+        if len(belongs) == 8:
+            if belongs != date_str:
+                latest["data_belongs_to"] = belongs
+                latest["fallback"] = True
+            latest["market"]["data_belongs_to"] = belongs
+    except Exception:
+        pass
 
     out = json.dumps(latest, ensure_ascii=False, indent=2)
     if args.out:

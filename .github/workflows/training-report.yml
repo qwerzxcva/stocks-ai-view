@@ -1,0 +1,54 @@
+name: training-report
+# 每日拉取 t1 仓库 v7 训练结果 -> data/training_v7.json -> 网站渲染 (2026-10-18)
+# 数据源是另一台 AI 上传到 qwerzxcva/t1/meta, 只读 raw 拉取, 不改源仓。
+on:
+  schedule:
+    - cron: '25 9 * * *'      # 17:25 CST 每日 (训练结果通常凌晨上传)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: training-report
+  cancel-in-progress: true
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch and build training report
+        run: |
+          set -euo pipefail
+          python3 scripts/build_training_report.py --out data/training_v7.json
+          python3 -m py_compile scripts/build_training_report.py
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/training_v7.json', encoding='utf-8'))
+          if not d.get('publish_gate', {}).get('pass'):
+              raise SystemExit('publish gate failed: not enough fetched years')
+          print('years fetched:', len(d.get('years', {})), '/', d['publish_gate']['required_years'])
+          print('totals:', d.get('totals'))
+          PY
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "training-report-bot"
+          git config user.email "training-report-bot@users.noreply.github.com"
+          git add -- data/training_v7.json scripts/build_training_report.py
+          if git diff --cached --quiet; then
+            echo "no training report changes"
+            exit 0
+          fi
+          git commit -m "data: refresh v7 training report"
+          git -c http.version=HTTP/1.1 push origin HEAD:main

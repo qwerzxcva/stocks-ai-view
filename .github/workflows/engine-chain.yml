@@ -190,10 +190,12 @@ jobs:
 
       # The engines read bulk kline and the prediction history; both live in
       # other repos. Sparse-checkout keeps the download small.
+      # 2026-10-18: stocks-data-kline 已 301 重定向到 t1 (另一台 AI 迁移),
+      # checkout 旧名会拿到镜像仓陈旧 bulk (engine_v5 数据停 10-16 的根因)。
       - name: Checkout kline repo (sparse)
         uses: actions/checkout@v4
         with:
-          repository: qwerzxcva/stocks-data-kline
+          repository: qwerzxcva/t1
           token: ${{ secrets.GITHUB_TOKEN }}
           sparse-checkout: |
             data/bulk

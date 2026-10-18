@@ -2069,6 +2069,21 @@ function renderPools(){
   const g=window._data||{};
   const SR=window.StockRow;
   if(!SR || !Object.keys(g).length) return;
+  // ── 训练核验 v7 (github.com/qwerzxcva/t1 上传, 只读展示, 诚实标注) ──
+  //  数据来源另一台 AI 昨晚训练的 300 轮回测; 回本口径≠盈利。
+  const tr=g.training_v7||{};
+  const yrs=tr.years||{};
+  if(Object.keys(yrs).length){
+    const t=tr.totals||{};
+    const pct=v=>v==null?'—':_esc2(Math.round(v*100))+'%';
+    h+='<div style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;margin-bottom:6px;font-size:9px;line-height:1.7">'
+      +'<b>训练核验 v7 · 全程持仓引擎 (回本口径)</b> '+_t(tr.ts)+'<br>'
+      +'全历史 '+_esc2(t.rounds||0)+' 轮: 22日回本率 <b class="up">'+pct(t.recoup22_mean)+'</b> · 60日 '+pct(t.recoup60_mean)
+      +' · 期末落袋 '+pct(t.final_win_mean)+' · beat市场 '+pct(t.beat_rate)
+      +' · 回本率≥50%轮数 '+_esc2(t.recoup22_ge50||0)+'/'+_esc2(t.rounds||0)+' (2018熊市 '+pct((yrs['2018']||{}).recoup22_mean)+')<br>'
+      +'<span class="fl">'+_esc2(tr.disclaimer||'')+'</span>'
+      +'<div class="fl" style="font-size:8px;margin-top:2px">'+_esc2(tr.source||'')+' · 每日 17:25 CST 自动拉取</div></div>';
+  }
   const audit=g.pool_audit||{};
   let h='';
   if(audit.pools){
@@ -3105,6 +3120,7 @@ const SOURCES = [
   'data/overseas_impact.json',  // 海外受益/受害股票候选
   'data/pool_audit.json',       // 多池字段/时间/来源审计
   'data/good_stock_pool.json',   // 好股票评分池 (eligible/watch/insufficient)
+  'data/training_v7.json',       // v7 训练结果 (t1/meta, 每日拉取)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
   // 需要溯源时直接查 GitHub raw。
 ];
