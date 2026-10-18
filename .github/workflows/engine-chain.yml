@@ -293,6 +293,8 @@ jobs:
             python3 scripts/key_levels.py || echo "key_levels skipped"
             # 选出后7日区间高点追踪 (可证伪, 用 predictions/ 快照)
             python3 scripts/pick_high_track.py || echo "pick_high_track skipped"
+            # 站外公开信号流 (stock-web-vango, 零鉴权, 每日一次足够)
+            python3 scripts/fetch_vango_articles.py || echo "vango skipped"
             # Only the real pre-open stage may replace the premarket record.
             cst_hour=$(TZ=Asia/Shanghai date +%H)
             cst_min=$(TZ=Asia/Shanghai date +%M)
@@ -486,6 +488,7 @@ jobs:
             data/analysis_manifest.json data/flow_divergence.json data/ban_pick.json data/pool_audit.json \
             data/key_levels.json data/pick_high_track.json \
             data/shard_b.json data/shard_c.json \
+            data/vango_articles.json data/training_v7.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -502,7 +505,8 @@ jobs:
             --protect data/analysis_manifest.json --protect data/flow_divergence.json \
             --protect data/ban_pick.json --protect data/pool_audit.json \
             --protect data/key_levels.json --protect data/pick_high_track.json \
-            --protect data/shard_b.json --protect data/shard_c.json
+            --protect data/shard_b.json --protect data/shard_c.json \
+            --protect data/vango_articles.json --protect data/training_v7.json
 
       - name: Publish to the data warehouse
         env:

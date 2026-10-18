@@ -135,6 +135,19 @@ SOURCES = [
     },
     # ── 2026-10-17 逆向调研新源 (docs/research/platforms-1.md) ──
     {
+        "id": "vango_articles",
+        "name": "stock-web-vango 公开文章流 (零鉴权 GET)",
+        "url": "https://vango-member-hhjebqnncv.cn-hangzhou.fcapp.run/articles",
+        "auth": "none",
+        "status": "ok",
+        "freq": "daily",
+        "delay": "日级 (盘前贴为主)",
+        "fields": "title/visibility/minLevel/published/publicBody(仅public)",
+        "provides": ["shard_a.json:news", "data/vango_articles.json"],
+        "notes": "2026-10-18 接入; 只存公开元数据+public 正文预览, 不碰会员私有内容; "
+                 "每日 1 次, scripts/fetch_vango_articles.py",
+    },
+    {
         "id": "jrj_yaowen_daily",
         "name": "金融界每日要闻 (静态 JSON)",
         "url": "https://stockjs.jrj.com.cn/share/news/yaowen/yw{yyyy-MM-dd}.js",
@@ -2936,6 +2949,7 @@ SHARDS = {
             # 全部零鉴权、实测 200, 与已有源零重叠
             "jrj_yaowen_daily", "aigupiao_express",
             "sseinfo_qa", "sseinfo_survey", "stockstar_forecast",
+            "vango_articles",
         ],
     },
     "b": {

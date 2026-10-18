@@ -2084,6 +2084,25 @@ function renderPools(){
       +'<span class="fl">'+_esc2(tr.disclaimer||'')+'</span>'
       +'<div class="fl" style="font-size:8px;margin-top:2px">'+_esc2(tr.source||'')+' · 每日 17:25 CST 自动拉取</div></div>';
   }
+  // ── 站外公开信号流 (stock-web-vango, 零鉴权, 只展示标题与可见性) ──
+  const va=g.vango_articles||{};
+  const vaItems=va.items||[];
+  if(vaItems.length){
+    const visLabel={public:'公开',members:'会员'};
+    const lvlLabel={trial:'体验',vip:'VIP',svip:'SVIP',ssvip:'尊享',foreign:'外盘'};
+    h+='<div style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;margin-bottom:6px;font-size:9px;line-height:1.7">'
+      +'<b>站外公开信号流 · stock-web-vango</b> '+_t(va.ts)+' · '+_esc2(va.n_total||vaItems.length)+' 条 (公开 '+_esc2(va.n_public_body||0)+')'
+      +'<div style="max-height:120px;overflow-y:auto;margin-top:3px">'
+      +vaItems.slice(0,15).map(x=>{
+        const lvl=lvlLabel[x.minLevel]||x.minLevel||'—';
+        const vcol=x.visibility==='public'?'var(--up)':'var(--amber)';
+        const d=x.date?_esc2(x.date.slice(4,6))+'/'+_esc2(x.date.slice(6,8)):'—';
+        return '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+          +'<span style="color:'+vcol+';font-size:8px">['+_esc2(visLabel[x.visibility]||x.visibility)+'·'+_esc2(lvl)+']</span> '
+          +'<span class="sub">'+d+'</span> '+_esc2(x.title||'')+'</div>';
+      }).join('')+'</div>'
+      +'<div class="fl" style="font-size:8px;margin-top:2px">'+_esc2(va.field_policy||'仅公开字段')+' · 会员正文不展示</div></div>';
+  }
   const audit=g.pool_audit||{};
   let h='';
   if(audit.pools){
@@ -3121,6 +3140,7 @@ const SOURCES = [
   'data/pool_audit.json',       // 多池字段/时间/来源审计
   'data/good_stock_pool.json',   // 好股票评分池 (eligible/watch/insufficient)
   'data/training_v7.json',       // v7 训练结果 (t1/meta, 每日拉取)
+  'data/vango_articles.json',    // stock-web-vango 公开文章流 (站外信号参考)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
   // 需要溯源时直接查 GitHub raw。
 ];
