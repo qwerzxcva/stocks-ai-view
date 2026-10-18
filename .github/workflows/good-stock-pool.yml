@@ -78,12 +78,8 @@ jobs:
       - name: Commit and push pool artifact
         run: |
           set -euo pipefail
-          git config user.name "good-stock-pool-bot"
-          git config user.email "good-stock-pool-bot@users.noreply.github.com"
-          git add -- data/good_stock_pool.json
-          if git diff --cached --quiet; then
-            echo "no good-stock pool changes"
-            exit 0
-          fi
-          git commit -m "data: refresh explainable good-stock pool"
-          git -c http.version=HTTP/1.1 push origin HEAD:main
+          # 裸 git push 会被同时段的 engine-chain 推送拒 (non-fast-forward, 2026-10-18 实测)。
+          # 用 git_push_retry: fetch+rebase+protect, 与其他 bot 共存。
+          python3 scripts/git_push_retry.py --msg "good-stock-pool" \
+            data/good_stock_pool.json --user good-stock-bot \
+            --protect data/good_stock_pool.json || echo "good-stock-pool push skipped"
