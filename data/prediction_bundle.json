@@ -1,11 +1,11 @@
 {
- "ts": "2026-10-18T23:58:29+08:00",
+ "ts": "2026-10-19T00:20:40+08:00",
  "engine": "prediction_bundle.py",
- "snapshot_id": "2026-10-18T21:42:41+08:00",
+ "snapshot_id": "2026-10-18T23:58:41+08:00",
  "trading_date": "20261018",
  "pipeline_status": "partial",
  "group_status": {
-  "market_snapshot": "fresh",
+  "market_snapshot": "stale",
   "global_markets": "stale",
   "hot_news": "stale",
   "picks": "stale",
@@ -13,8 +13,8 @@
   "review": "fresh"
  },
  "today_action": {
-  "status": "candidate_only",
-  "reason": "规则引擎筛出候选；不是确定性买入指令。",
+  "status": "no_fresh_buy_signal",
+  "reason": "主快照或引擎数据未满足新鲜度门槛，只输出观察候选，不把旧数据写成今日买入信号。",
   "candidates": [
    {
     "code": "002242",
@@ -37,16 +37,16 @@
      "trend_strength"
     ],
     "contradicting_engines": [],
-    "action": "candidate",
+    "action": "watch_stale_data",
     "evidence": [
      "engine_v5=76.9",
      "trend_strength=covered"
     ],
     "data_ts": {
-     "engine_v5": "2026-10-18T23:37:42+08:00",
-     "multidim": "2026-10-18T23:47:19+08:00",
-     "trend_strength": "2026-10-18T23:38:24+08:00",
-     "debate": "2026-10-18T23:58:15+08:00"
+     "engine_v5": "2026-10-19T00:02:20+08:00",
+     "multidim": "2026-10-19T00:10:52+08:00",
+     "trend_strength": "2026-10-19T00:03:01+08:00",
+     "debate": "2026-10-19T00:20:39+08:00"
     },
     "invalidation": [
      "最新主快照/引擎超过 freshness 门槛",
@@ -78,16 +78,16 @@
     "trend_strength"
    ],
    "contradicting_engines": [],
-   "action": "candidate",
+   "action": "watch_stale_data",
    "evidence": [
     "engine_v5=76.9",
     "trend_strength=covered"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -122,10 +122,10 @@
     "trend_strength=covered"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -158,10 +158,10 @@
     "engine_v5=78.8"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -194,10 +194,10 @@
     "engine_v5=76.6"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -230,10 +230,10 @@
     "engine_v5=76.0"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -266,10 +266,10 @@
     "engine_v5=75.7"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -302,10 +302,10 @@
     "engine_v5=75.6"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -338,10 +338,10 @@
     "engine_v5=75.6"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -374,10 +374,10 @@
     "engine_v5=75.6"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -410,10 +410,10 @@
     "engine_v5=75.2"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -446,10 +446,10 @@
     "engine_v5=75.0"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -482,10 +482,10 @@
     "engine_v5=74.5"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-18T23:37:42+08:00",
-    "multidim": "2026-10-18T23:47:19+08:00",
-    "trend_strength": "2026-10-18T23:38:24+08:00",
-    "debate": "2026-10-18T23:58:15+08:00"
+    "engine_v5": "2026-10-19T00:02:20+08:00",
+    "multidim": "2026-10-19T00:10:52+08:00",
+    "trend_strength": "2026-10-19T00:03:01+08:00",
+    "debate": "2026-10-19T00:20:39+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -507,7 +507,7 @@
    "global_index_avg_pct": 0.132,
    "breadth_pct": 21.67
   },
-  "evidence_ts": "2026-10-18T20:58:58.115177+08:00",
+  "evidence_ts": "2026-10-18T23:52:05.052723+08:00",
   "global_ts": "2026-10-18T16:47:00+08:00",
   "method": "启发式方向概率，不是已完成样本外校准的确定预测; 已联动 cycle_deep 周期综合分",
   "change_conditions": [
@@ -519,14 +519,14 @@
   "cycle_deep_bias": "中性"
  },
  "evidence": {
-  "latest_ts": "2026-10-18T20:58:58.115177+08:00",
-  "market_now_ts": "2026-10-18T20:59:47+08:00",
+  "latest_ts": "2026-10-18T23:52:05.052723+08:00",
+  "market_now_ts": "2026-10-18T23:53:11+08:00",
   "global_ts": "2026-10-18T16:47:00+08:00",
-  "engine_ts": "2026-10-18T23:37:42+08:00",
-  "trend_ts": "2026-10-18T23:38:24+08:00",
-  "debate_ts": "2026-10-18T23:58:15+08:00",
+  "engine_ts": "2026-10-19T00:02:20+08:00",
+  "trend_ts": "2026-10-19T00:03:01+08:00",
+  "debate_ts": "2026-10-19T00:20:39+08:00",
   "cycle_deep_ts": null,
-  "manifest_ts": "2026-10-18T21:42:41+08:00"
+  "manifest_ts": "2026-10-18T23:58:41+08:00"
  },
  "meta": {
   "today": "today_action 只有在 market_snapshot 与 engines 均 fresh 时才允许 candidate；否则强制 watch_stale_data",
