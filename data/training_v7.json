@@ -1,0 +1,71 @@
+{
+ "ts": "2026-10-18T20:03:06+08:00",
+ "date": "2026-10-18",
+ "engine": "v7 全程持仓 (不空仓, 回本口径)",
+ "source": "qwerzxcva/t1/meta/test*_v7_rounds.json + v7_no_cash_recoup_report.md",
+ "totals": {
+  "rounds": 300,
+  "recoup22_ge50": 296
+ },
+ "years": {
+  "2016": {
+   "rounds": 60,
+   "recoup22_mean": 0.9116,
+   "recoup60_mean": 0.9547,
+   "final_win_mean": 0.5427,
+   "beat_rate": 0.5667,
+   "recoup22_ge50": 59,
+   "t0_first": "2016-01-04",
+   "t0_last": "2016-09-22"
+  },
+  "2017": {
+   "rounds": 60,
+   "recoup22_mean": 0.8739,
+   "recoup60_mean": 0.9194,
+   "final_win_mean": 0.4939,
+   "beat_rate": 0.6167,
+   "recoup22_ge50": 60,
+   "t0_first": "2017-01-03",
+   "t0_last": "2017-09-21"
+  },
+  "2018": {
+   "rounds": 60,
+   "recoup22_mean": 0.8222,
+   "recoup60_mean": 0.869,
+   "final_win_mean": 0.3441,
+   "beat_rate": 0.55,
+   "recoup22_ge50": 58,
+   "t0_first": "2018-01-02",
+   "t0_last": "2018-09-20"
+  },
+  "2019": {
+   "rounds": 60,
+   "recoup22_mean": 0.9183,
+   "recoup60_mean": 0.9542,
+   "final_win_mean": 0.6105,
+   "beat_rate": 0.8,
+   "recoup22_ge50": 59,
+   "t0_first": "2019-01-02",
+   "t0_last": "2019-09-23"
+  },
+  "2020": {
+   "rounds": 60,
+   "recoup22_mean": 0.8842,
+   "recoup60_mean": 0.9388,
+   "final_win_mean": 0.5337,
+   "beat_rate": 0.7,
+   "recoup22_ge50": 60,
+   "t0_first": "2020-01-02",
+   "t0_last": "2020-09-23"
+  }
+ },
+ "report": {
+  "head_md": "# v7 全程持仓引擎: 不空仓, 回本口径 (2016-2020, 300 轮)\n## 用户要求"
+ },
+ "publish_gate": {
+  "required_years": 5,
+  "fetched_years": 5,
+  "pass": true
+ },
+ "disclaimer": "回本口径(曾达到买入价)≠盈利; 期末强平 win 才是落袋胜率。历史回测不代表未来。"
+}
