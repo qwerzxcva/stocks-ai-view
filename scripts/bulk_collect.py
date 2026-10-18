@@ -245,12 +245,10 @@ def latest_date(code):
     停留在 10-13 的股票永远不补 10-16 (分片「最新日期」被少数已补票
     抬上去, 绝大多数实际停在三日前)。现在比对是否接到最新交易日。
     """
-    latest = ""
-    have = existing_dates(code)
-    for d in have:
-        if len(d) == 10 and d > latest:
-            latest = d
-    return latest
+    ds = _build_date_index().get(str(code).zfill(6))
+    if not ds:
+        return ""
+    return max(ds)
 
 
 def market_latest_date():
@@ -276,10 +274,20 @@ def market_latest_date():
     return best
 
 
-def existing_dates(code):
-    """本地 bulk 里该 code 已有的日期集合 (增量用)。"""
-    have = set()
-    bare = str(code).zfill(6)
+_DATE_INDEX = None
+
+
+def _build_date_index():
+    """一次性把 bulk 全量日期索引建到内存: code -> set(date)。
+
+    2026-10-19: 旧 existing_dates() 每只股票重扫 15 个分片 (~270MB I/O),
+    4017 只就是 ~1TB 读, 实测单只 3.6s 全耗在扫文件上而不是网络。
+    索引只建一次, 后续查是 O(1); 写入后增量更新不必重建。
+    """
+    global _DATE_INDEX
+    if _DATE_INDEX is not None:
+        return _DATE_INDEX
+    idx = {}
     for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
         comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
         try:
@@ -289,15 +297,20 @@ def existing_dates(code):
                         continue
                     head, _, rest = line.partition("|")
                     hb = head[2:] if head[:2] in ("sh", "sz", "bj") else head
-                    if hb != bare:
-                        continue
                     parts = (rest.strip().split(",") if (comma or "," in rest)
                              else rest.strip().split("|"))
                     if parts and len(parts[0]) == 10:
-                        have.add(parts[0])
+                        idx.setdefault(hb, set()).add(parts[0])
         except Exception:
             continue
-    return have
+    _DATE_INDEX = idx
+    return idx
+
+
+def existing_dates(code):
+    """本地 bulk 里该 code 已有的日期集合 (增量用, 走内存索引)。"""
+    bare = str(code).zfill(6)
+    return set(_build_date_index().get(bare, ()))
 
 
 def append_bulk(code, rows):
@@ -318,6 +331,10 @@ def append_bulk(code, rows):
     with open(p, "a", encoding="utf-8") as f:
         for r in new:
             f.write("%s|%s|%s|%s|%s|%s|%s\n" % (sym, r[0], r[1], r[2], r[3], r[4], r[5]))
+    # 索引增量更新: 不更新会让同进程内后续 existing_dates() 看不到刚写的日期,
+    # 同一股重跑时会重复追加。
+    bare = str(code).zfill(6)
+    _build_date_index().setdefault(bare, set()).update(r[0] for r in new)
     return len(new)
 
 
@@ -368,6 +385,8 @@ def rewrite_bulk(code, rows):
         f.writelines(kept)
         for r in new:
             f.write("%s|%s|%s|%s|%s|%s|%s\n" % (sym, r[0], r[1], r[2], r[3], r[4], r[5]))
+    # 重写只影响该股, 索引直接替换它的日期集合即可。
+    _build_date_index()[bare] = {r[0] for r in new}
     return len(new)
 
 
