@@ -526,6 +526,22 @@ def main():
     print(f"[engine_v5] all_sources {'已加载' if all_sources else '未找到 (仅用技术指标)'}", flush=True)
 
     results = []
+    # 数据新鲜度门禁: 同一 bulk 目录里的分片可能不同步 (实测 2026-10-18:
+    # shard 00/60 到 10-16, 其余 9 个停在 10-13)。拿旧K线打出的高分不能
+    # 当作「今日信号」——按最新全市场交易日算 age, 超 3 个自然日的不进 top,
+    # 但在统计里如实计数, 避免把陈旧数据静默当成新鲜。
+    all_dates = [bars[-1][0] for bars in klines.values() if bars]
+    market_asof = max(all_dates) if all_dates else ""
+    # 只看是否与最新交易日同根K线: 不同根 = 该股当日未更新, 属陈旧。
+    # 自然日会在周末/节假日误判 (周五->周日=2天), 所以不比天数。
+    stale_days_limit = 0
+
+    def _age_days(d):
+        try:
+            return (datetime.strptime(market_asof, "%Y-%m-%d")
+                    - datetime.strptime(d, "%Y-%m-%d")).days
+        except Exception:
+            return 999
     # 预提取行业标签: 从事件/涨停池中收集 (code -> industry)
     industry_map = {}
     events = (all_sources or {}).get('data', {}).get('event', []) or []
@@ -559,6 +575,9 @@ def main():
         r["date"] = bars[-1][0]
         r["price"] = close[-1]
         r["bars"] = len(bars)
+        age = _age_days(r["date"])
+        r["data_age_days"] = age
+        r["data_fresh"] = age <= stale_days_limit
         r["source_ts"] = (all_sources or {}).get('summary', {}).get('ts')
         r["data_provenance"] = {
             "technical": "indicators_ext (17 指标, 等权)",
@@ -569,15 +588,27 @@ def main():
         results.append(r)
 
     results.sort(key=lambda x: -x["score"])
+    fresh = [r for r in results if r.get("data_fresh")]
+    stale = [r for r in results if not r.get("data_fresh")]
     now = datetime.now(CST)
     out = {
         "ts": now.isoformat(timespec="seconds"),
         "engine": "v5 (多指标共振 + 自适应权重 + 外部数据增强)",
         "n_scanned": len(klines),
         "n_scored": len(results),
+        "market_asof": market_asof,
+        "freshness": {
+            "limit_days": stale_days_limit,
+            "n_fresh": len(fresh),
+            "n_stale": len(stale),
+            "stale_codes": [r["code"] for r in stale[:50]],
+            "note": "K线分片可能不同步; 旧数据不冒充今日信号",
+        },
         "indicators": 20,  # 17 tech + 3 external
         "formula": "score = 50 + 50 * (Σ w·vote·strength / Σ w) * (0.6 + 0.4*共振率)",
-        "top": results[:50],
+        # top 只给新鲜数据; 陈旧分片的股票单列, 不用旧信号冒充今日推荐
+        "top": fresh[:50],
+        "stale_top": stale[:20],
         "meta": {
             "resonance": "同向票数/方向票数, 分歧大时降权 (0.6~1.0 系数)",
             "weights": "默认等权; 可由 optimizer.py walk_forward 校准后写入",
@@ -594,10 +625,13 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
-    print(f"\n=== TOP 10 (共振度优先) ===")
-    for r in results[:10]:
+    print(f"\n=== TOP 10 (共振度优先, 仅新鲜K线) ===")
+    for r in fresh[:10]:
         print(f"  {r['code']} score={r['score']:5.1f} 共振={r['resonance']:.2f} "
-              f"多{r['bull']}/空{r['bear']}/中{r['neutral']} 价={r['price']}")
+              f"多{r['bull']}/空{r['bear']}/中{r['neutral']} 价={r['price']} "
+              f"K线={r['date']}")
+    if stale:
+        print(f"\n[陈旧] {len(stale)} 只 K线早于 {market_asof} 超 {stale_days_limit} 天, 不进 top")
     hi = [r for r in results if r["score"] >= args.min_score]
     print(f"\n≥{args.min_score}分: {len(hi)} 只")
     print(f"→ {args.out}")
