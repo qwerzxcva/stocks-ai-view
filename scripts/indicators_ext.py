@@ -270,9 +270,16 @@ def ultimate_osc(high, low, close, n1=7, n2=14, n3=28):
     for i in range(n3, len(close)):
         if tr[i] is None or bp[i] is None:
             continue
-        s1 = sum(bp[j] for j in range(i - n1 + 1, i + 1)) / sum(tr[j] for j in range(i - n1 + 1, i + 1))
-        s2 = sum(bp[j] for j in range(i - n2 + 1, i + 1)) / sum(tr[j] for j in range(i - n2 + 1, i + 1))
-        s3 = sum(bp[j] for j in range(i - n3 + 1, i + 1)) / sum(tr[j] for j in range(i - n3 + 1, i + 1))
+        # 停牌/一字板日 tr 可能全为 0 (high==low==prev_close), 分母为 0 时
+        # 跳过该点, 不能抛异常终止整只股票 (2026-10-19 全市场补齐后实测)。
+        d1 = sum(tr[j] for j in range(i - n1 + 1, i + 1))
+        d2 = sum(tr[j] for j in range(i - n2 + 1, i + 1))
+        d3 = sum(tr[j] for j in range(i - n3 + 1, i + 1))
+        if not d1 or not d2 or not d3:
+            continue
+        s1 = sum(bp[j] for j in range(i - n1 + 1, i + 1)) / d1
+        s2 = sum(bp[j] for j in range(i - n2 + 1, i + 1)) / d2
+        s3 = sum(bp[j] for j in range(i - n3 + 1, i + 1)) / d3
         out[i] = round(100 * (4 * s1 + 2 * s2 + s3) / 7, 2)
     return out
 

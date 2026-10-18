@@ -438,6 +438,12 @@ def load_klines(bulk_dir, limit=None):
     # 先扫一遍原始 bulk 建基础表 (全部 code 的原始价)
     import glob
     data = {}
+    # 2026-10-19: 分片合并必须按「每只股票取最新一根K线」, 不能按文件名
+    # 顺序叠加。实测 day_qfq_extra(10-12)/recent(10-13)/stockdb(10-09) 按
+    # 字母序排在 00-09 之后, 过期分片会把已补齐的新数据覆盖回去, 导致
+    # 全市场 4017 只里只有 159 只被判定新鲜。
+    # 做法: 先按 date 去重 (_date_idx), 后到分片只在日期更新时替换该日。
+    _date_idx = {}   # code -> {date: row}
     files = sorted(glob.glob(os.path.join(bulk_dir, "day_qfq_*.csv")))
     for p in files:
         with open(p, encoding="utf-8", errors="replace") as f:
@@ -450,13 +456,14 @@ def load_klines(bulk_dir, limit=None):
                 if len(parts) < 6:
                     continue
                 try:
-                    data.setdefault(code, []).append(
-                        [parts[0], float(parts[1]), float(parts[2]),
-                         float(parts[3]), float(parts[4]), float(parts[5])])
+                    row = [parts[0], float(parts[1]), float(parts[2]),
+                           float(parts[3]), float(parts[4]), float(parts[5])]
                 except ValueError:
                     continue
-        if limit and len(data) >= limit:
+                _date_idx.setdefault(code, {})[row[0]] = row
+        if limit and len(_date_idx) >= limit:
             break
+    data = {c: list(by_date.values()) for c, by_date in _date_idx.items()}
     for c in data:
         data[c].sort(key=lambda b: b[0])
 

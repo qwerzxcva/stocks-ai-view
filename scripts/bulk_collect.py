@@ -238,6 +238,44 @@ def fetch_tencent_kline(code):
         return [], str(e)
 
 
+def latest_date(code):
+    """本地 bulk 里该 code 的最新日期 (断点续传用: 判是否已到最新交易日)。
+
+    2026-10-19 修: 旧 --resume 只看 existing_dates() 非空就跳过, 导致
+    停留在 10-13 的股票永远不补 10-16 (分片「最新日期」被少数已补票
+    抬上去, 绝大多数实际停在三日前)。现在比对是否接到最新交易日。
+    """
+    latest = ""
+    have = existing_dates(code)
+    for d in have:
+        if len(d) == 10 and d > latest:
+            latest = d
+    return latest
+
+
+def market_latest_date():
+    """本地 bulk 全集中最新交易日 (用 sh000001 上证指数推算最稳,
+    退而取全量最大日期)。大盘指数每天必更新, 个股停牌不会抬高它。"""
+    idx = latest_date("000001")
+    if len(idx) == 10:
+        return idx
+    best = ""
+    for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
+        try:
+            with open(p, encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    if line.startswith("#") or "|" not in line:
+                        continue
+                    _, _, rest = line.partition("|")
+                    d = (rest.split(",")[0] if "," in rest
+                         else rest.split("|")[0]).strip()[:10]
+                    if len(d) == 10 and d > best:
+                        best = d
+        except Exception:
+            continue
+    return best
+
+
 def existing_dates(code):
     """本地 bulk 里该 code 已有的日期集合 (增量用)。"""
     have = set()
@@ -371,8 +409,16 @@ def main():
 
     stats = {"ok": 0, "empty": 0, "fail": 0, "rows": 0, "skipped": 0}
     t0 = time.time()
+    # 断点续传判据: 是否接到最新交易日, 而不是「有没有任何历史数据」。
+    # 旧逻辑会让停在 10-13 的股票永远跳过 (2026-10-19 实测 1677 只
+    # 分片内只有 157 只接到 10-16)。
+    market_asof = market_latest_date() if (args.resume and args.kind == "kline") else ""
+    if market_asof:
+        print("[bulk] 续传基准日 = %s (只有已接到该日的股票才跳过)" % market_asof,
+              flush=True)
     for i, code in enumerate(codes):
-        if args.resume and not args.rewrite and args.kind == "kline" and existing_dates(code):
+        if (args.resume and not args.rewrite and args.kind == "kline"
+                and market_asof and latest_date(code) >= market_asof):
             stats["skipped"] += 1
             continue
         try:
