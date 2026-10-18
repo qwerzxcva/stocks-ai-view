@@ -146,7 +146,13 @@ jobs:
                   continue
               path = f"data/shard_{tag}.json"
               if not os.path.exists(path):
-                  failures.append(f"missing {path}")
+                  # 2026-10-18: extra 分片(如 e=akshare 库)周末环境可能装不上, 
+                  # 不产出文件应降级为 warning 而不是让整条链失败 (那样主分片 a 
+                  # 也不提交了)。只 main shard 缺失才算硬失败。
+                  if tag == shard:
+                      failures.append(f"missing {path}")
+                  else:
+                      print(f"::warning::extra shard {tag} not produced, skipping")
                   continue
               try:
                   doc = json.load(open(path, encoding="utf-8"))
