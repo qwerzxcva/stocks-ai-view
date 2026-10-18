@@ -522,6 +522,55 @@ function valCell(v,dev){
   const col=dev<=-10?'var(--up)':dev>=30?'var(--dn)':'var(--tx2)';
   return '<td style="font-weight:700">'+fmt(v)+'<span style="color:'+col+';font-size:10px;margin-left:3px">'+(dev>0?'+':'')+dev+'%</span></td>';
 }
+// 五年情境估值: 只读取上游已发布字段, 不用旧估值或现价推导缺失值。
+function _scenarioRecord(r){
+  const candidates=[r&&r.scenario_valuation,r&&r.scenario_valuation_5y,
+    r&&r.scenarioValuation,r&&r.five_year_scenario,
+    r&&r.valuation&&r.valuation.scenario_valuation,
+    r&&r.valuation&&r.valuation.five_year_scenario];
+  const nested=candidates.find(v=>v&&typeof v==='object'&&!Array.isArray(v));
+  if(nested)return nested;
+  const keys=['weighted_fair_value','value_range','price_only_cagr_5y','total_return_annualized_5y','provenance','adjustment_status'];
+  if(r&&keys.some(k=>Object.prototype.hasOwnProperty.call(r,k)))return r;
+  return null;
+}
+function _scenarioNum(v){
+  if(v==null||v===''||isNaN(Number(v)))return '缺失';
+  return Number(v).toFixed(2);
+}
+function _scenarioPct(v){
+  if(v==null||v===''||isNaN(Number(v)))return '缺失';
+  const n=Number(v); return (Math.abs(n)<=1?n*100:n).toFixed(1)+'%';
+}
+function _scenarioRange(v){
+  if(v==null)return '缺失';
+  if(Array.isArray(v)&&v.length>=2)return _scenarioNum(v[0])+' ~ '+_scenarioNum(v[1]);
+  if(typeof v==='object'){
+    const lo=v.low!=null?v.low:(v.min!=null?v.min:(v.pessimistic!=null?v.pessimistic:v.bear));
+    const hi=v.high!=null?v.high:(v.max!=null?v.max:(v.optimistic!=null?v.optimistic:v.bull));
+    if(lo!=null||hi!=null)return _scenarioNum(lo)+' ~ '+_scenarioNum(hi);
+  }
+  return _scenarioNum(v);
+}
+function _scenarioProvenance(v){
+  if(v==null)return '缺失';
+  if(typeof v==='string'||typeof v==='number')return _esc2(v);
+  if(Array.isArray(v))return _esc2(v.join(' / ')||'缺失');
+  const bits=[v.source&&('来源 '+v.source),v.confidence&&('置信 '+v.confidence),v.snapshot_ts&&('快照 '+v.snapshot_ts)];
+  return _esc2(bits.filter(Boolean).join(' · ')||JSON.stringify(v));
+}
+function _scenarioCell(r){
+  const s=_scenarioRecord(r);
+  if(!s)return '<td class="fl" style="font-size:9px;line-height:1.45">五年情境：不可用（缺少情境字段）</td>';
+  const status=s.adjustment_status||s.status||'';
+  const unavailable=String(status).toLowerCase()==='insufficient_data';
+  const statusText=unavailable?'不可用（数据不足）':(status||'缺失');
+  return '<td class="fl" style="font-size:9px;line-height:1.45;min-width:180px">'+
+    '<div><b>五年情境</b> · 状态 '+_esc2(statusText)+'</div>'+
+    '<div>加权公允 '+_esc2(_scenarioNum(s.weighted_fair_value))+' · 区间 '+_esc2(_scenarioRange(s.value_range))+'</div>'+
+    '<div>价格CAGR '+_esc2(_scenarioPct(s.price_only_cagr_5y))+' · 总回报年化 '+_esc2(_scenarioPct(s.total_return_annualized_5y))+'</div>'+
+    '<div>溯源 '+_scenarioProvenance(s.provenance)+'</div></td>';
+}
 function renderPicks(picks){
   const all=(picks||[]).slice(0,40);
   // ST 折叠交互 (2026-10-17 用户要求不隐藏 ST, 给按钮展开/收起):
@@ -553,6 +602,7 @@ function renderPicks(picks){
     return `<tr class="clk" data-code="${p.code}">
     <td>${p.code}${stTag}</td><td><b>${p.name||''}</b></td><td>${fmt(p.price)}${pUp}</td>
     ${valCell(p.intrinsic_value,p.value_dev_pct)}
+    ${_scenarioCell(p)}
     <td class="${cls(chg)}">${chg!=null?sign(chg)+'%':'—'}</td>
     <td style="font-weight:700;color:${col}">${sc.toFixed(1)}</td>
     <td class="fl">${(p.resonance??0).toFixed(2)}</td>
@@ -937,11 +987,12 @@ function renderScenario(d){
   h+='<div class="chips" style="margin-bottom:6px">'+Object.entries(dw).sort((a,b)=>b[1]-a[1]).slice(0,5)
      .map(([k,v])=>'<span class="chip">'+k+' <b>'+Math.round(v*100)+'%</b></span>').join('')+'</div>';
   const actCol={buy:'var(--up)',watch:'var(--amber)',avoid:'var(--dn)'};
-  h+='<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>场景分</th><th>原综合</th><th>操作</th></tr></thead><tbody>';
+  h+='<table><thead><tr><th>代码</th><th>名称</th><th>现价</th><th>实际价值</th><th>五年情境估值</th><th>场景分</th><th>原综合</th><th>操作</th></tr></thead><tbody>';
   (d.picks||[]).slice(0,20).forEach(p=>{ h+='<tr class="clk" data-code="'+esc(p.code)+'">'+
     '<td>'+esc(p.code)+'</td><td><b>'+esc(p.name)+'</b></td><td>'+esc(p.price)+'</td>'+
     '<td style="font-weight:700">'+(p.intrinsic_value!=null?esc(p.intrinsic_value):'—')+
     (p.value_dev_pct!=null?'<span style="font-size:10px;margin-left:3px;color:'+(p.value_dev_pct<=-10?'var(--up)':p.value_dev_pct>=30?'var(--dn)':'var(--tx3)')+'">'+(p.value_dev_pct>0?'+':'')+p.value_dev_pct+'%</span>':'')+'</td>'+
+    _scenarioCell(p)+
     '<td style="font-weight:700;color:var(--accent)">'+esc(p.scenario_score)+'</td>'+
     '<td class="fl">'+esc(p.composite)+'</td>'+
     '<td style="color:'+(actCol[p.action]||'var(--tx2)')+';font-weight:700">'+esc(p.action||'观察')+'</td></tr>';
@@ -2035,13 +2086,31 @@ function renderPools(){
   ztPool.forEach(z=>{ if(z.code) ztReason[z.code]=z.industry||''; });
   const thsReason={};
   (g.enrich||{}).ths_strong&&(g.enrich.ths_strong||[]).forEach(s=>{ if(s.code&&s.reason) thsReason[s.code]=s.reason; });
+  const goodPoolRows=[].concat((g.good_stock_pool||{}).eligible||[],(g.good_stock_pool||{}).watch||[],(g.good_stock_pool||{}).insufficient||[],(g.good_stock_pool||{}).reject||[]);
+  const goodPoolByCode={};
+  goodPoolRows.forEach(x=>{const code=String(x.code||'').replace(/^(sh|sz|bj)/i,'');if(code)goodPoolByCode[code]=x;});
+  const poolQuality=s=>{
+    const x=goodPoolByCode[String(s.code||'').replace(/^(sh|sz|bj)/i,'')];
+    const e=(x&&x.engine)||x||{};
+    const status=x&&String(x.status||e.decision||'').toLowerCase();
+    const label=status==='eligible'?'eligible · 可入池':status==='watch'?'watch · 观察':(status==='insufficient_data'||status==='insufficient')?'insufficient · 数据不足':status==='reject'?'reject · 回避':'未评分';
+    const missing=(e.missing_fields||x&&x.missing_fields||[]).slice(0,2).join(' · ');
+    const risks=(e.risks||x&&x.risks||[]).slice(0,1).join(' · ');
+    return {score:e.score,grade:e.grade,decision:label,missing:missing||risks||(!x?'未接入评分池':'—')};
+  };
+  const poolQualityCols=[
+    {title:'评分',fn:s=>{const q=poolQuality(s);return q.score==null?'<span class="na">—</span>':_esc2(q.score);}},
+    {title:'等级',fn:s=>_esc2(poolQuality(s).grade||'—')},
+    {title:'结论',fn:s=>_esc2(poolQuality(s).decision)},
+    {title:'缺失/风险',fn:s=>'<span class="fl" style="font-size:9px">'+_esc2(poolQuality(s).missing)+'</span>'}
+  ];
 
   const P=(title,desc,recs,opts)=>{                  // 二级标题 + 表
     opts=opts||{};
     h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">'
        +'<b style="font-size:12px">'+title+'</b> <span class="sub">'+desc+'</span></div>';
     if(recs&&recs.length&&SR){
-      h+=SR.table(recs,{limit:opts.limit||25,extraCols:opts.extraCols});
+      h+=SR.table(recs,{limit:opts.limit||25,extraCols:poolQualityCols.concat(opts.extraCols||[])});
       if(opts.legend!==false) h+=SR.legend();
     } else {
       h+='<div class="fl" style="font-size:10px">暂无数据 (引擎未产出或数据源未覆盖)</div>';
@@ -2064,8 +2133,8 @@ function renderPools(){
   const cycleStocks=cv2.stocks||[];
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0"><b>② 周期池</b> <span class="sub">股票级候选 · 当前相位 '+_esc2(cycleStatus.phase||'—')+' · 截止 '+_esc2(cycleStatus.date||'—')+'</span></div>';
   if(cycleStocks.length){
-    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属板块</th><th>现价</th><th>涨跌%</th><th>换手%</th><th>PE</th><th>市值(亿)</th><th>主力净流入</th><th>入池原因</th></tr></thead><tbody>';
-    cycleStocks.slice(0,40).forEach(x=>h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.price==null?'—':x.price)+'</td><td class="'+(x.chg_pct>=0?'up':'dn')+'">'+_esc2(x.chg_pct==null?'—':(x.chg_pct>=0?'+':'')+x.chg_pct)+'</td><td>'+_esc2(x.turnover==null?'—':x.turnover)+'</td><td>'+_esc2(x.pe==null?'—':x.pe)+'</td><td>'+_esc2(x.mktcap_yi==null?'—':x.mktcap_yi)+'</td><td>'+_esc2(x.main_net_inflow_yi==null?'—':x.main_net_inflow_yi)+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>');
+    h+='<table><thead><tr><th>代码</th><th>名称</th><th>所属板块</th><th>现价</th><th>涨跌%</th><th>换手%</th><th>PE</th><th>市值(亿)</th><th>主力净流入</th><th>五年情境估值</th><th>评分</th><th>等级</th><th>结论</th><th>缺失/风险</th><th>入池原因</th></tr></thead><tbody>';
+    cycleStocks.slice(0,40).forEach(x=>{const q=poolQuality(x);h+='<tr><td class="clk" data-code="'+_esc2(x.code)+'"><b>'+_esc2(x.code)+'</b></td><td>'+_esc2(x.name||'—')+'</td><td>'+_esc2(x.industry||'—')+'</td><td>'+_esc2(x.price==null?'—':x.price)+'</td><td class="'+(x.chg_pct>=0?'up':'dn')+'">'+_esc2(x.chg_pct==null?'—':(x.chg_pct>=0?'+':'')+x.chg_pct)+'</td><td>'+_esc2(x.turnover==null?'—':x.turnover)+'</td><td>'+_esc2(x.pe==null?'—':x.pe)+'</td><td>'+_esc2(x.mktcap_yi==null?'—':x.mktcap_yi)+'</td><td>'+_esc2(x.main_net_inflow_yi==null?'—':x.main_net_inflow_yi)+'</td>'+_scenarioCell(x)+'<td>'+_esc2(q.score==null?'—':q.score)+'</td><td>'+_esc2(q.grade||'—')+'</td><td>'+_esc2(q.decision)+'</td><td class="fl" style="font-size:9px">'+_esc2(q.missing)+'</td><td class="fl">'+_esc2(x.reason||'')+'</td></tr>';});
     h+='</tbody></table>';
     const _sm=cv2.stocks_meta||{};
     if(_sm.n!=null) h+='<div class="fl" style="font-size:9px;margin-top:2px">候选 '+_esc2(_sm.n)+' 只 · 行情补全 '+_esc2(_sm.enriched)+' 只 · 行业/概念成分股 + 实时估值</div>';
@@ -3035,6 +3104,7 @@ const SOURCES = [
   'data/overseas_linkage.json', // 海外关联性 (相关/贝塔/滞后/隔夜)
   'data/overseas_impact.json',  // 海外受益/受害股票候选
   'data/pool_audit.json',       // 多池字段/时间/来源审计
+  'data/good_stock_pool.json',   // 好股票评分池 (eligible/watch/insufficient)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
   // 需要溯源时直接查 GitHub raw。
 ];
