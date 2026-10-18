@@ -503,6 +503,19 @@ def load_klines(bulk_dir, limit=None):
     if n_factor or n_hfq:
         print(f"[load_klines] 复权覆盖: 因子表 {n_factor} 只 + hfq近似 {n_hfq} 只",
               flush=True)
+    # 数据质量元信息: 调用方 (engine_v5/其他脚本) 靠它判定可信度,
+    # 不能只看「加载了 N 只」就当全市场复权已完备。
+    load_klines.stats = {
+        "n_codes": len(data),
+        "n_factor_table": n_factor,
+        "n_hfq_approx": n_hfq,
+        "n_raw_only": max(0, len(data) - n_factor - n_hfq),
+        "adjust_coverage_pct": round(
+            (n_factor + n_hfq) / max(1, len(data)) * 100, 2),
+        "factor_trusted": n_factor,
+        "hfq_approximate": n_hfq,
+        "note": "raw_only = 未经复权, 除权日存在虚假跳空风险",
+    }
     return data
 
 
@@ -520,6 +533,7 @@ def main():
         from paths import BULK
         bulk = BULK
     klines = load_klines(bulk, args.limit)
+    adj_stats = getattr(load_klines, "stats", {}) or {}
     print(f"[engine_v5] 加载 {len(klines)} 只K线", flush=True)
 
     all_sources = None if args.no_ext else load_all_sources()
@@ -597,6 +611,22 @@ def main():
         "n_scanned": len(klines),
         "n_scored": len(results),
         "market_asof": market_asof,
+        # 数据质量门控: 复权 / 新鲜度 / 完整性三层可视化。
+        # 任何一层不达标时, 下游 (前端/日报) 不应把本轮结果当成全市场可交易信号。
+        "data_quality": {
+            "adjustment": adj_stats,
+            "adjust_trust_level": (
+                "full" if adj_stats.get("adjust_coverage_pct", 0) >= 95 else
+                "partial" if adj_stats.get("adjust_coverage_pct", 0) >= 30 else
+                "minimal"),
+            "fresh_completeness_pct": round(
+                len(fresh) / max(1, len(results)) * 100, 2),
+            "gates": {
+                "adjust_coverage_ok": adj_stats.get("adjust_coverage_pct", 0) >= 95,
+                "freshness_ok": len(stale) <= max(10, len(results) * 0.01),
+                "min_universe_ok": len(results) >= 3000,
+            },
+        },
         "freshness": {
             "limit_days": stale_days_limit,
             "n_fresh": len(fresh),

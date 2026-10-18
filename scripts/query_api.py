@@ -289,9 +289,75 @@ def cmd_stats(_args):
             stats[t] = n
         except Exception:
             stats[t] = -1
+    # 复权因子表不在 DuckDB 里 (按股存 JSON), 单独统计
+    try:
+        import glob as _g
+        import os as _os
+        fdir = _os.path.join(_os.path.dirname(_os.path.dirname(
+            _os.path.abspath(__file__))), "data", "adjusted", "factors")
+        tables_js = [p for p in _g.glob(_os.path.join(fdir, "*.json"))
+                     if not _os.path.basename(p).startswith("_")]
+        stats["adjusted_factors"] = len(tables_js)
+    except Exception:
+        stats["adjusted_factors"] = -1
     out = {"query": "stats", "tables": stats, "timestamp": _ts()}
     print(json.dumps(out, ensure_ascii=False, indent=2))
     con.close()
+
+
+def cmd_factors(args):
+    """复权因子域: 单股/批量/覆盖率。数据源 data/adjusted/factors/*.json。"""
+    import glob as _g
+    import os as _os
+    fdir = _os.path.join(_os.path.dirname(_os.path.dirname(
+        _os.path.abspath(__file__))), "data", "adjusted", "factors")
+    if args.coverage:
+        tables = [p for p in _g.glob(_os.path.join(fdir, "*.json"))
+                  if not _os.path.basename(p).startswith("_")]
+        manifest = {}
+        for name in ("_manifest_baostock.json", "_manifest.json"):
+            fp = _os.path.join(fdir, name)
+            if _os.path.exists(fp):
+                try:
+                    manifest[name] = json.load(open(fp, encoding="utf-8"))
+                except Exception:
+                    pass
+        out = {"query": "factors.coverage", "n_tables": len(tables),
+               "codes": sorted(_os.path.basename(p)[:-5] for p in tables)[:50],
+               "manifest": manifest, "timestamp": _ts()}
+        print(json.dumps(out, ensure_ascii=False, indent=2))
+        return
+    if not args.code:
+        raise SystemExit("factors 需要 --code 或 --coverage")
+    code = args.code.strip().lower()
+    if not code[:2] in ("sh", "sz", "bj"):
+        pref = ("sh" if code[0] in "69" else
+                "bj" if code[0] in "48" else "sz") + code.zfill(6)
+    else:
+        pref = code
+    fp = _os.path.join(fdir, pref + ".json")
+    if not _os.path.exists(fp):
+        out = {"query": "factors", "code": pref, "found": False,
+               "note": "未建表; 该股可能无分红/未采集", "timestamp": _ts()}
+        print(json.dumps(out, ensure_ascii=False, indent=2))
+        return
+    d = json.load(open(fp, encoding="utf-8"))
+    fac = d.get("factors") or {}
+    dates = sorted(fac)
+    if args.start or args.end:
+        dates = [x for x in dates
+                 if (not args.start or x >= args.start)
+                 and (not args.end or x <= args.end)]
+    if args.days:
+        dates = dates[-args.days:]
+    out = {"query": "factors", "code": pref, "found": True,
+           "source": d.get("source"), "n_events": d.get("n_events"),
+           "n_total": len(fac),
+           "factor_first": fac[dates[0]] if dates else None,
+           "factor_last": fac[dates[-1]] if dates else None,
+           "series": [[x, fac[x]] for x in dates],
+           "timestamp": _ts()}
+    print(json.dumps(out, ensure_ascii=False, indent=2))
 
 
 # ─── CLI 入口 ────────────────────────────────────────────────────
@@ -382,6 +448,16 @@ def main():
     fi.add_argument("--csv", action="store_true")
     fi.add_argument("--out", help="CSV 输出路径")
     fi.set_defaults(func=cmd_financial)
+
+    # factors
+    fa = sub.add_parser("factors", help="复权因子 (单股/覆盖率)")
+    fa.add_argument("--code", help="股票代码，如 600519")
+    fa.add_argument("--days", type=int, help="取最近 N 个交易日")
+    fa.add_argument("--start", help="起始日 YYYY-MM-DD")
+    fa.add_argument("--end", help="结束日 YYYY-MM-DD")
+    fa.add_argument("--coverage", action="store_true",
+                    help="输出建表覆盖率与 manifest")
+    fa.set_defaults(func=cmd_factors)
 
     # stats
     st = sub.add_parser("stats", help="全库统计")
