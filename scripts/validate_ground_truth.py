@@ -38,7 +38,7 @@ except Exception:
     BULK = os.path.join(os.path.dirname(HERE), "..", "stocks-data-kline",
                         "data", "bulk")
 
-CLOUD_BULK = ("https://raw.githubusercontent.com/qwerzxcva/stocks-data-kline/"
+CLOUD_BULK = ("https://raw.githubusercontent.com/qwerzxcva/t1/"
               "main/data/bulk/day_qfq_%s.csv")
 
 
