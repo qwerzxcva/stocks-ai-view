@@ -221,12 +221,36 @@ def attribute(pool, ban_picks, enrich, hot_news):
     for r in rows:
         if r["industry"]:
             by_ind[r["industry"]] = by_ind.get(r["industry"], 0) + 1
+    # 价格带分布 (低位首板策略的审美观): 解读一的「22元以下八成」等价物。
+    price_bands = {"lt10": 0, "b10_22": 0, "b22_30": 0, "ge30": 0}
+    low_price = 0
+    for r in rows:
+        p = r.get("price")
+        try:
+            p = float(p) if p is not None else None
+        except (TypeError, ValueError):
+            p = None
+        if p is None or p <= 0:
+            continue
+        if p < 10:
+            price_bands["lt10"] += 1
+        elif p < 22:
+            price_bands["b10_22"] += 1
+        elif p < 30:
+            price_bands["b22_30"] += 1
+        else:
+            price_bands["ge30"] += 1
+        if p < 22:
+            low_price += 1
+    low_price_pct = round(low_price / max(1, len(rows)) * 100, 1)
 
     return rows, {
         "n_zt": len(rows),
         "by_seal_bucket": by_bucket,
         "by_lianban": by_lb,
         "by_industry": dict(sorted(by_ind.items(), key=lambda x: -x[1])[:10]),
+        "by_price_band": price_bands,
+        "low_price_lt22_pct": low_price_pct,
     }
 
 

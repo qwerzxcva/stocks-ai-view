@@ -184,7 +184,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <div class="col">
     <div class="card">
       <div class="hd">涨停板 <span class="sub" id="ladderH"></span></div>
-      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th><th>板高</th></tr></thead><tbody id="ztBody"></tbody></table></div>
+      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th><th>板高</th></tr></thead><tbody id="ztBody"></tbody></table>
+      <div id="ztAggBox" style="padding:6px 10px 8px"></div></div>
       <div class="bd" id="mainlines" hidden></div>
     </div>
   </div>
@@ -673,6 +674,24 @@ function renderZt(zts){
     <td>${z.lianban>=2?'<b class="up">'+z.lianban+'板</b>':'首板'}</td>
     <td class="fl">${fmtTime(z.zt_time)}</td>
     <td class="fl">${z.lianban>=2?z.lianban+'连板':'1板'}</td></tr>`).join('')||'<tr><td colspan="5" class="fl">暂无涨停数据</td></tr>';
+}
+// 涨停聚合 (价格带/封板时段/连板/行业), 从 limitup_attribution.json 读。
+// 解读: 价格带=低位首板审美观 (22元以下八成=低位批量上桌); 封板时段=早盘敢封是真金白银。
+function renderZtAgg(){
+  const el=document.getElementById('ztAggBox');
+  if(!el) return;
+  const d=(window._data||{}).limitup_attribution||{};
+  const ag=d.aggregate||{};
+  if(!ag.n_zt){el.innerHTML='';return;}
+  const pb=ag.by_price_band||{}, lb=ag.by_lianban||{}, seal=ag.by_seal_bucket||{};
+  const tot=Math.max(1, ag.n_zt);
+  const band=[['<10元',pb.lt10||0],['10-22元',pb.b10_22||0],['22-30元',pb.b22_30||0],['≥30元',pb.ge30||0]];
+  const first=(lb['1']||0), cont=tot-first;
+  const early=(seal.auction||0)+(seal.early||0), late=(seal.late||0);
+  el.innerHTML='<div class="fl" style="font-size:10px;line-height:1.7">'
+    +'今日涨停 '+ag.n_zt+' 只 · 价格带: '+band.map(b=>b[0]+' '+b[1]).join(' · ')+' (<22元 '+_esc2(ag.low_price_lt22_pct||0)+'%)<br>'
+    +'梯队: 首板 '+first+' 只 · 连板 '+cont+' 只 ('+Object.keys(lb).sort((a,b)=>b-a).filter(k=>k!=='1').map(k=>k+'连板 '+lb[k]+'只').join(', ')+')<br>'
+    +'封板: 早盘竞价+早段 '+early+' 只 ('+Math.round(early/tot*100)+'%) · 尾盘 '+late+' 只 · 主线: '+Object.entries(ag.by_industry||{}).slice(0,3).map(([k,v])=>k+'×'+v).join(' · ')+'</div>';
 }
 function renderFundRank(fr){
   const el=document.getElementById('fundBody');
@@ -3139,6 +3158,7 @@ const SOURCES = [
   'data/overseas_impact.json',  // 海外受益/受害股票候选
   'data/pool_audit.json',       // 多池字段/时间/来源审计
   'data/good_stock_pool.json',   // 好股票评分池 (eligible/watch/insufficient)
+  'data/limitup_attribution.json', // 涨停归因聚合 (连板/封板时段/行业/价格带)
   'data/training_v7.json',       // v7 训练结果 (t1/meta, 每日拉取)
   'data/vango_articles.json',    // stock-web-vango 公开文章流 (站外信号参考)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
@@ -3276,6 +3296,7 @@ async function render(){
   _safe(()=>renderGlobalSide(g.global_markets||null),'globalSide');
   _safe(()=>renderHotSide(g.hot_news||null),'hotSide');
   _safe(()=>renderZt(d.limit_up_pool),'zt');
+  _safe(()=>renderZtAgg(),'ztAgg');
   _safe(()=>renderFundRank((d.fund_rank && d.fund_rank.length) ? d.fund_rank
                  : ((mn && mn.fund_rank) ? mn.fund_rank : [])),'fundRank');
   _safe(()=>renderNews((newsList && newsList.length) ? newsList : d.news_recent, nd),'news');
