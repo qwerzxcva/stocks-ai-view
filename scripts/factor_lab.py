@@ -148,6 +148,34 @@ def load_all_klines(max_stocks=None):
         for k in ("dates", "open", "close", "high", "low", "vol"):
             rec[k] = [rec[k][i] for i in order]
         rec["idx"] = {d: i for i, d in enumerate(rec["dates"])}
+        # 筹码分布 (CYQ): O(n^2), 每 20 日抽样一次, 其余日期用最近样本前向填充
+        if CYQ_ENABLED:
+            try:
+                import cyq as _cyq
+                import pandas as _pd
+                df = _pd.DataFrame({
+                    "date": rec["dates"], "open": rec["open"],
+                    "high": rec["high"], "low": rec["low"],
+                    "close": rec["close"], "volume": rec["vol"]})
+                series = _cyq.cyq_factor_series(df)   # 每5日一点
+                cmap = {}
+                if not series.empty:
+                    sdates = list(series["date"])
+                    for row in series.itertuples(index=False):
+                        cmap[row.date] = {"profit_ratio": row.cyq_profit_ratio,
+                                          "conc90": row.cyq_conc90,
+                                          "cost_bias": row.cyq_cost_bias}
+                # 前向填充到每根K线
+                cyq_by_i = {}
+                last = None
+                for i, d in enumerate(rec["dates"]):
+                    if d in cmap:
+                        last = cmap[d]
+                    if last is not None:
+                        cyq_by_i[i] = last
+                rec["cyq"] = cyq_by_i
+            except Exception:
+                rec["cyq"] = {}
         cleaned[c6] = rec
 
     if max_stocks and len(cleaned) > max_stocks:
@@ -214,63 +242,97 @@ def eval_feature(name, rec, i):
     if name == "bias_ma20":
         m = _ma(c, i, 20)
         if m is None or m <= 0:
-            return None
+            return None, None
         bias = (c[i] - m) / m * 100
         return (bias < -5), (bias > 5)
     if name == "ma_golden":
         m5, m20 = _ma(c, i, 5), _ma(c, i, 20)
         if m5 is None or m20 is None:
-            return None
+            return None, None
         return (m5 > m20 and c[i] > m5), (m5 < m20 and c[i] < m5)
     if name == "vol_dry_up":
         # 缩量上涨: 涨但量能低于 5 日均量 (惜售)
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0 or i < 1:
-            return None
+            return None, None
         return (c[i] > c[i - 1] and v[i] < m5v * 0.7), None
     if name == "new_high_20":
         mx = _max(h, i, 20)
         if mx is None:
-            return None
+            return None, None
         return (c[i] >= mx), None
     if name == "breakout_60":
         mx = _max(h, i, 60)
         if mx is None:
-            return None
+            return None, None
         return (c[i] >= mx), None
     if name == "low_pos_20":
         lo, hi = _min(l, i, 20), _max(h, i, 20)
         if lo is None or hi is None or hi <= lo:
-            return None
+            return None, None
         pos = (c[i] - lo) / (hi - lo)
         return (pos < 0.2), (pos > 0.8)
+    if name == "cyq_profit_low":
+        # 获利盘低 (<30%): 多数持仓浮亏 -> 抛压小, 反弹概率高
+        v = rec.get("cyq", {}).get(i) if rec.get("cyq") else None
+        if not v:
+            return None, None
+        pr = v.get("profit_ratio")
+        if pr is None:
+            return None, None
+        return (pr < 0.30), None
+    if name == "cyq_conc_high":
+        # 筹码高度集中 (conc90 小 = 集中在窄价格带): 易被拉升
+        v = rec.get("cyq", {}).get(i) if rec.get("cyq") else None
+        if not v:
+            return None, None
+        c90 = v.get("conc90")
+        if c90 is None:
+            return None, None
+        return (c90 < 0.15), None
+    if name == "cyq_cost_bias_low":
+        # 现价低于平均成本 (cost_bias<0): 筹码套牢, 上方有解套抛压
+        v = rec.get("cyq", {}).get(i) if rec.get("cyq") else None
+        if not v:
+            return None, None
+        cb = v.get("cost_bias")
+        if cb is None:
+            return None, None
+        return (cb < 0), None
     if name == "below_ma60":
         m = _ma(c, i, 60)
         if m is None:
-            return None
+            return None, None
         return (c[i] < m * 0.95), (c[i] > m * 1.05)
     if name == "vol_ratio_high":
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0:
-            return None
+            return None, None
         return (v[i] > m5v * 2), None
     if name == "shrink_pullback":
         # 缩量回调: 跌但量能萎缩 (可能洗盘)
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0 or i < 1:
-            return None
+            return None, None
         return (c[i] < c[i - 1] and v[i] < m5v * 0.7), None
     if name == "gap_up":
         if i < 1 or c[i - 1] <= 0:
-            return None
+            return None, None
         return (o[i] > c[i - 1] * 1.02), (o[i] < c[i - 1] * 0.98)
     return None, None
 
+
+CYQ_ENABLED = os.environ.get("FACTOR_LAB_CYQ", "1") == "1"
 
 CANDIDATES = [
     "rsi_oversold", "rsi_overbought", "bias_ma20", "ma_golden", "vol_dry_up",
     "new_high_20", "breakout_60", "low_pos_20", "below_ma60", "vol_ratio_high",
     "shrink_pullback", "gap_up",
+    # 2026-10-19: 动量 vs 低吸 场景区分
+    "momentum_high_bias", "momentum_rps_like", "pullback_in_uptrend",
+    "below_ma60_excl_momentum", "below_ma60_tight",
+    # 2026-10-19: 筹码分布 (cyq) 因子
+    "cyq_profit_low", "cyq_conc_high", "cyq_cost_bias_low",
 ]
 
 

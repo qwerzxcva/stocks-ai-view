@@ -1,0 +1,122 @@
+name: factor-lab
+
+# 特征实验室: 在云端验证候选特征的预测力 (本地算力受限, 不在手机容器跑)
+# 2026-10-19: 接入筹码分布 (CYQ) 因子后, 需要重新验证 edge 才能进引擎。
+on:
+  workflow_dispatch:
+    inputs:
+      hold_days:
+        description: '持有期 (逗号分隔)'
+        default: '1,5'
+      max_stocks:
+        description: '抽样股票数 (0=全部)'
+        default: '2000'
+      min_n:
+        description: '最小样本数'
+        default: '200'
+      cyq:
+        description: '启用筹码因子 (1/0)'
+        default: '1'
+  schedule:
+    # 每周一 06:00 UTC (14:00 CST) 跑一次, 跟踪因子衰减
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: factor-lab
+  cancel-in-progress: false
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TZ: Asia/Shanghai
+      FACTOR_LAB_CYQ: ${{ github.event.inputs.cyq || '1' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+
+      - name: Link kline bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          python3 -c "
+          import sys; sys.path.insert(0, 'scripts')
+          from paths import ensure_bulk_uncompressed
+          n = ensure_bulk_uncompressed('../stocks-data-kline/data/bulk')
+          print(f'uncompressed {n} gz shards')
+          "
+          ls ../stocks-data-kline/data/bulk | grep -c 'day_qfq'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install --quiet numpy pandas
+
+      - name: Run factor lab
+        run: |
+          set -euo pipefail
+          HOLD="${{ github.event.inputs.hold_days || '1,5' }}"
+          MAXS="${{ github.event.inputs.max_stocks || '2000' }}"
+          MINN="${{ github.event.inputs.min_n || '200' }}"
+          echo "hold=$HOLD max_stocks=$MAXS min_n=$MINN cyq=$FACTOR_LAB_CYQ"
+          python3 -u scripts/factor_lab.py \
+            --hold-days "$HOLD" \
+            --max-stocks "$MAXS" \
+            --min-n "$MINN"
+
+      - name: Summarize
+        run: |
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/factor_lab.json', encoding='utf-8'))
+          print('ts:', d.get('ts'), '| stocks:', d.get('n_stocks'))
+          f = d.get('features') or {}
+          rows = []
+          for name, v in f.items():
+              for h, st in (v.get('long') or {}).items():
+                  if isinstance(st, dict):
+                      rows.append((name, h, st))
+          rows.sort(key=lambda x: -(x[2].get('edge_vs_baseline') or -99))
+          print(f"{'feature':28s} {'hold':>4s} {'n':>9s} {'win%':>6s} {'avg%':>7s} {'edge':>7s} {'verdict':>10s}")
+          for name, h, st in rows:
+              print(f"{name:28s} {h:>4s} {st.get('n',0):>9d} "
+                    f"{st.get('win_rate',0):>6.2f} {st.get('avg_ret',0):>7.2f} "
+                    f"{st.get('edge_vs_baseline',0):>7.3f} {str(st.get('verdict','')):>10s}")
+          PY
+
+      - name: Commit results
+        run: |
+          set -euo pipefail
+          git config user.name "factor-lab-bot"
+          git config user.email "factor-lab-bot@users.noreply.github.com"
+          git add -- data/factor_lab.json data/factor_lab.md || true
+          if git diff --cached --quiet; then
+            echo "no factor_lab changes"
+            exit 0
+          fi
+          git commit -m "data: factor_lab refresh $(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add -- data/factor_lab.json data/factor_lab.md || true
+            git commit -m "data: factor_lab refresh $(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')" 2>/dev/null || true
+            if git push origin HEAD:main; then echo "pushed"; break; fi
+            sleep 10
+          done
