@@ -111,23 +111,51 @@ def _mf_vote(code_bare, close):
             return float(s)
         except ValueError:
             return 0.0
-    # rows: [date, close, chg%, main_net, main_pct, xl, xl_pct, ...]
+    # 列: [0]date [1]close [2]chg% [3]主力净额 [4]主力占比
+    #     [5]超大单 [6]超大占比 [7]大单 [8]大单占比
+    #     [9]中单 [10]中单占比 [11]小单 [12]小单占比
+    # 东财分档口径: 超大单 >=100万元或>=20万股; 大单 20-100万;
+    #              中单 4-20万; 小单 <4万
     recent = rows[:3]
     main = [_num(r[3]) for r in recent if len(r) > 3]
-    big = [_num(r[5]) for r in recent if len(r) > 5]
+    xl = [_num(r[5]) for r in recent if len(r) > 5]
+    lg = [_num(r[7]) for r in recent if len(r) > 7]
+    sm = [_num(r[11]) for r in recent if len(r) > 11]
+    chg = []
+    for r in recent:
+        try:
+            chg.append(float(str(r[2]).replace("%", "")))
+        except (ValueError, IndexError):
+            chg.append(0.0)
     if not main:
         return None
     m3 = sum(main)
-    b_today = big[0] if big else 0.0
+    xl_today = xl[0] if xl else 0.0
+    lg_today = lg[0] if lg else 0.0
+    sm_today = sm[0] if sm else 0.0
+    up_today = chg[0] > 0 if chg else False
+
+    # ⚠ 小单出货: 股价上涨, 但超大单+大单净流出而小单净流入。
+    # 主力把大单拆成 <4万 的小单慢慢派发, 单一「主力净额」指标会漏掉,
+    # 因为东财的主力净额只统计超大单+大单, 拆单后计入小单。
+    # 判定: (超大单+大单) 显著为负 (< -1000万), 小单显著为正 (> +500万),
+    #       且当日上涨 —— 典型「拉高出货给散户」。
+    big2 = xl_today + lg_today
+    if up_today and big2 < -1e7 and sm_today > 5e6:
+        return (-1, min(abs(big2) / 2e8 + 0.3, 1.0),
+                f"⚠小单出货: 股价{chg[0]:+.2f}%但超大+大单 {big2/1e8:+.2f}亿"
+                f"而小单 {sm_today/1e8:+.2f}亿 (主力拆单派发)")
+
     # 主力连续净流出 + 今日仍流出 = 出货特征
-    if m3 < 0 and b_today < 0:
+    if m3 < 0 and xl_today < 0:
         return (-1, min(abs(m3) / 3e8, 1.0),
-                f"近3日主力净流出 {m3/1e8:+.2f}亿, 超大单 {b_today/1e8:+.2f}亿")
-    if m3 > 0 and b_today > 0:
+                f"近3日主力净流出 {m3/1e8:+.2f}亿, 超大单 {xl_today/1e8:+.2f}亿")
+    if m3 > 0 and xl_today > 0:
+        # 真吸筹: 超大单+大单同步流入, 且小单没有异常放大
         return (1, min(m3 / 3e8, 1.0),
-                f"近3日主力净流入 {m3/1e8:+.2f}亿, 超大单 {b_today/1e8:+.2f}亿")
+                f"近3日主力净流入 {m3/1e8:+.2f}亿, 超大单 {xl_today/1e8:+.2f}亿")
     # 主力流入但超大单流出 = 分歧, 不给票
-    return (0, 0.3, f"主力/超大单分歧 (主力{m3/1e8:+.2f}亿 超大单{b_today/1e8:+.2f}亿)")
+    return (0, 0.3, f"主力/超大单分歧 (主力{m3/1e8:+.2f}亿 超大单{xl_today/1e8:+.2f}亿)")
 
 
 def load_all_sources(data_dir=None):
