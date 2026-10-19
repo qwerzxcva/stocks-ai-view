@@ -197,10 +197,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="2">每日主线</button>
       <button class="c-tab" data-c="3">周期深析</button>
       <button class="c-tab" data-c="4">资金背离</button>
-      <button class="c-tab" data-c="5">热点主题</button>
+      <button class="c-tab" data-c="5">全球·消息</button>
       <button class="c-tab" data-c="6">多池选股</button>
-      <button class="c-tab" data-c="7">24h资讯</button>
-      <button class="c-tab" data-c="8">海外关联</button>
     </div>
     <div class="card c-card on" data-ci="0">
       <div class="hd">实时总结 <span class="sub" id="dsSub">交易日窗口 · 实时行情 · 推股验证</span></div>
@@ -273,7 +271,9 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="avoidBox" style="padding:0 12px 8px"></div>
       <div id="levelsBox" style="padding:0 12px 8px"></div>
     </div>
-    <div class="card c-card" data-ci="7">
+    <div class="card c-card" data-ci="5" style="border-top:1px solid var(--border)">
+      <div class="hd">消息流 <span class="sub">统一事件流 · 分类摘要 · 传导</span></div>
+      <div id="newsUnifiedBox" style="padding:6px 12px"></div>
       <div class="hd">24h 热点资讯流 <span class="sub" id="newsSub">财联社电报 · 华尔街见闻 · 联合早报</span></div>
       <div id="newsFlowBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
@@ -282,7 +282,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="newsCount" class="fl" style="padding:4px 12px;font-size:10px"></div>
       <div id="newsFull" style="padding:0 12px 8px"></div>
     </div>
-    <div class="card c-card" data-ci="8">
+    <div class="card c-card" data-ci="5" style="border-top:1px solid var(--border)">
       <div class="hd">海外关联 <span class="sub" id="olSub">大盘/板块 与 纳指/恒指/日经/KOSPI 的相关·贝塔·滞后·隔夜传导</span></div>
       <div id="overseasLinkageBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
@@ -2482,6 +2482,41 @@ function renderOverseasLinkage(){
   box.innerHTML=h;
 }
 
+// 统一消息事件流 (news_unified.json): 分类摘要 + 逐条传导
+// 用户要求: 24h分类摘要/实时热榜/全平台热点/财经资讯流/消息传导 合并为一
+function renderNewsUnified(){
+  const box=document.getElementById('newsUnifiedBox');
+  if(!box) return;
+  const d=(window._data||{}).news_unified||{};
+  const ev=d.events||[];
+  if(!ev.length){ box.innerHTML='<div class="fl" style="font-size:10px">统一消息流暂无数据</div>'; return; }
+  const cats=d.category_counts||{};
+  const CAT={policy:'政策',macro:'宏观',geopolitics:'地缘',overseas:'海外',industry:'行业',company:'公司',other:'其他'};
+  const sec=d.sector_transmission||{};
+  const secTop=Object.entries(sec).slice(0,8);
+  let h='<div style="border:1px solid var(--border);border-radius:5px;padding:6px 8px;margin-bottom:6px;font-size:10px;line-height:1.7">';
+  h+='<b>统一消息流</b> '+_t(d.ts)+' · '+ev.length+' 条 · 带传导 '+(d.n_with_transmission||0)+' 条<br>';
+  h+='分类: '+Object.entries(cats).map(([k,v])=>_esc2(CAT[k]||k)+' '+v).join(' · ')+'<br>';
+  if(secTop.length) h+='传导板块: '+secTop.map(([k,v])=>_esc2(k)+'×'+v).join(' · ');
+  h+='</div>';
+  // 只渲染带传导的前 25 条 (其余走 24h 资讯流)
+  const withT=ev.filter(e=>(e.transmission||{}).sectors&&e.transmission.sectors.length).slice(0,25);
+  const list=(withT.length?withT:ev.slice(0,15));
+  h+='<table style="width:100%;font-size:10px;border-collapse:collapse">';
+  list.forEach(e=>{
+    const tr=e.transmission||{};
+    const dir=tr.direction==='negative'?'<span class="dn">利空</span>':(tr.direction==='positive'?'<span class="up">利好</span>':'');
+    h+='<tr><td style="padding:3px 4px;border-bottom:1px solid var(--border);vertical-align:top">'
+      +'<div>'+_esc2((e.title||'').slice(0,58))+' '+dir+'</div>'
+      +'<div class="fl" style="font-size:9px">'+_esc2(e.source||'')+' · '+_esc2(CAT[e.category]||e.category||'')
+      +(tr.sectors&&tr.sectors.length?' · → '+_esc2(tr.sectors.slice(0,4).join('/')):'')
+      +(tr.codes&&tr.codes.length?' · '+_esc2(tr.codes.slice(0,3).join(',')):'')
+      +'</div></td></tr>';
+  });
+  h+='</table>';
+  box.innerHTML=h;
+}
+
 function renderNewsFlow(){
   const box=document.getElementById('newsFlowBox');
   if(!box) return;
@@ -3058,16 +3093,20 @@ var _el=document.getElementById('cTabs'); if(_el) _el.addEventListener('click', 
   document.querySelectorAll('.c-tab').forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
   document.querySelectorAll('.c-card').forEach(c=>c.classList.toggle('on', c.dataset.ci===b.dataset.c));
-  // 8 个面板的懒渲染 (数据已在 render() 里并行拉好)
+  // 7 个面板的懒渲染 (数据已在 render() 里并行拉好)
+  // 2026-10-19: tab 5 合并「热点主题 + 24h资讯 + 海外关联」三个信息流为一个入口
   if(b.dataset.c==='0' && !dsRendered){ dsRendered=true; _safe(renderDailySummary,'dailySummary'); }
   if(b.dataset.c==='1' && window._gmData && !gmRendered){ gmRendered=true; renderGlobalMarkets(window._gmData); }
   if(b.dataset.c==='2' && !mlRendered){ mlRendered=true; _safe(renderMainline,'mainline'); }
   if(b.dataset.c==='3' && window._cdData && !cdRendered){ cdRendered=true; renderCycleDeep(window._cdData); }
   if(b.dataset.c==='4' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
-  if(b.dataset.c==='5' && !thRendered){ thRendered=true; _safe(renderThemes,'themes'); }
+  if(b.dataset.c==='5'){
+    _safe(renderNewsUnified,'newsUnified');
+    if(!thRendered){ thRendered=true; _safe(renderThemes,'themes'); }
+    if(!nfRendered){ nfRendered=true; _safe(renderNewsFlow,'newsFlow'); }
+    if(!olRendered){ olRendered=true; _safe(renderOverseasLinkage,'overseasLinkage'); }
+  }
   if(b.dataset.c==='6' && !plRendered){ plRendered=true; _safe(renderPools,'pools'); }
-  if(b.dataset.c==='7' && !nfRendered){ nfRendered=true; _safe(renderNewsFlow,'newsFlow'); }
-  if(b.dataset.c==='8' && !olRendered){ olRendered=true; _safe(renderOverseasLinkage,'overseasLinkage'); }
 });
 // 默认显示第一张卡
 document.querySelector('.c-card[data-ci="0"]').classList.add('on');
@@ -3086,8 +3125,11 @@ function renderActiveTab(){
   else if(c==='4' && !fdRendered){ fdRendered=true; renderFlowDivergence(window._fdData||null); }
   else if(c==='5' && !thRendered){ thRendered=true; _safe(renderThemes,'themes'); }
   else if(c==='6' && !plRendered){ plRendered=true; _safe(renderPools,'pools'); }
-  else if(c==='7' && !nfRendered){ nfRendered=true; _safe(renderNewsFlow,'newsFlow'); }
-  else if(c==='8' && !olRendered){ olRendered=true; _safe(renderOverseasLinkage,'overseasLinkage'); }
+  else if(c==='5'){
+    if(!thRendered){ thRendered=true; _safe(renderThemes,'themes'); }
+    if(!nfRendered){ nfRendered=true; _safe(renderNewsFlow,'newsFlow'); }
+    if(!olRendered){ olRendered=true; _safe(renderOverseasLinkage,'overseasLinkage'); }
+  }
 }
 // ─── 数据源清单 (单一事实来源) ──────────────────────────────────
 // 每个条目: [路径, 说明]。render() 一次性并行拉全部, 不再串行 await。
@@ -3159,6 +3201,11 @@ const SOURCES = [
   'data/pool_audit.json',       // 多池字段/时间/来源审计
   'data/good_stock_pool.json',   // 好股票评分池 (eligible/watch/insufficient)
   'data/limitup_attribution.json', // 涨停归因聚合 (连板/封板时段/行业/价格带)
+  'data/news_unified.json',      // 统一消息事件流 (6源合并+逐条传导)
+  'data/picks_state.json',       // 推股账本状态 (只增不删, 改分留痕)
+  'data/index_history.json',     // 指数全历史 (大盘状态机基础)
+  'data/board_members.json',     // 板块成分股 (修复ETF污染)
+
   'data/training_v7.json',       // v7 训练结果 (t1/meta, 每日拉取)
   'data/vango_articles.json',    // stock-web-vango 公开文章流 (站外信号参考)
   // 'data/all_sources.json' 已移除: 18.37MB 全量拉取会拖死首屏。
@@ -3333,7 +3380,7 @@ async function render(){
   window._gmData = g.global_markets; if(g.global_markets && gmRendered) renderGlobalMarkets(g.global_markets);
   window._newsData = g.news_extra;
   window._hotData = g.hot_news;
-  if((g.news_extra||g.hot_news) && (nfRendered || document.querySelector('.c-tab.active')?.dataset.c==='7')){
+  if((g.news_extra||g.hot_news) && (nfRendered || ['5','7'].includes(document.querySelector('.c-tab.active')?.dataset.c))){
     nfRendered=true; _safe(renderNewsFlow,'newsFlow');
   }
   window._engineV5 = g.engine_v5;
