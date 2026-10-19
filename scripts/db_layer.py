@@ -207,6 +207,15 @@ CREATE TABLE IF NOT EXISTS theme_lifecycle (
     last_seen    VARCHAR,
     ts           VARCHAR
 );
+
+-- 复权因子 (baostock backAdjustFactor, 每股每日一行)
+CREATE TABLE IF NOT EXISTS adjust_factors (
+    code         VARCHAR NOT NULL,
+    date         VARCHAR NOT NULL,
+    factor       DOUBLE,
+    source       VARCHAR,
+    n_events     INTEGER
+);
 """
 
 INDEXES = [
@@ -373,6 +382,43 @@ def load_financial_summary(con, records):
         con.executemany(
             "INSERT INTO financial_summary VALUES (?,?,?,?,?,?,?,?)", rows)
     return len(rows)
+
+
+def load_adjust_factors(factors_dir, path=None):
+    """把 data/adjusted/factors/*.json 全量入库到 adjust_factors。
+
+    按 code 先删后插 (幂等), 避免重复跑表膨胀。
+    """
+    import glob as _g
+    if not factors_dir or not os.path.isdir(factors_dir):
+        return {"codes": 0, "rows": 0}
+    con = connect(path)
+    files = [p for p in _g.glob(os.path.join(factors_dir, "*.json"))
+             if not os.path.basename(p).startswith("_")]
+    codes = rows = 0
+    try:
+        for fp in files:
+            try:
+                d = json.load(open(fp, encoding="utf-8"))
+            except Exception:
+                continue
+            code = d.get("code")
+            fac = d.get("factors") or {}
+            if not code or not fac:
+                continue
+            con.execute("DELETE FROM adjust_factors WHERE code = ?", [code])
+            payload = [(code, dt, float(v), d.get("source"),
+                        int(d.get("n_events") or 0))
+                       for dt, v in sorted(fac.items())]
+            if payload:
+                con.executemany(
+                    "INSERT INTO adjust_factors VALUES (?,?,?,?,?)", payload)
+                rows += len(payload)
+                codes += 1
+        con.commit()
+    finally:
+        con.close()
+    return {"codes": codes, "rows": rows}
 
 
 def load_tape_snapshots(tape_path, lifecycle_path, path=None):
