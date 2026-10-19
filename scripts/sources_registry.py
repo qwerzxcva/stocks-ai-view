@@ -165,6 +165,7 @@ SOURCES = [
         "name": "爱股票 7x24 快讯 (带题材标签)",
         "url": "https://apis.aigupiao.com/Express/express_list/",
         "auth": "none",
+        "status": "ok",
         "freq": "minute",
         "delay": "秒级",
         "fields": "content/rec_time/theme/stock_infos/theme_quotes/important",
@@ -2901,11 +2902,15 @@ def all_sources():
 
 def usable():
     """状态为 ok 或 degraded 的源。"""
-    return [s for s in SOURCES if s["status"] in ("ok", "degraded")]
+    return [s for s in SOURCES if s.get("status") in ("ok", "degraded")]
 
 
 def by_status(status):
-    return [s for s in SOURCES if s["status"] == status]
+    # 2026-10-19: 并非所有源字典都有 status 字段 (新增源容易漏), 直接
+    # s["status"] 会在云端抛 KeyError: 'status', 导致 collect_all_sources
+    # 在收尾统计时崩溃 —— 所有采集都成功了但文件写不出来, 引擎因此
+    # 永远报「all_sources 未找到」。用 .get 防空键。
+    return [s for s in SOURCES if s.get("status") == status]
 
 
 # ─── 采集分片 (多平台错峰, 避免同一 IP 打全部源触发风控) ──────────
@@ -3051,7 +3056,7 @@ def unassigned():
     for v in SHARDS.values():
         assigned |= set(v["ids"])
     return [s["id"] for s in SOURCES
-            if s["id"] not in assigned and s["status"] in ("ok", "degraded")]
+            if s["id"] not in assigned and s.get("status") in ("ok", "degraded")]
 
 
 def resolve(sid):
@@ -3064,7 +3069,7 @@ def resolve(sid):
             continue
         seen.add(cur)
         s = BY_ID[cur]
-        if s["status"] == "ok":
+        if s.get("status") == "ok":
             return s
         stack.extend(s.get("degrade_to") or [])
     return None
@@ -3144,11 +3149,11 @@ def main():
     print("-" * 78)
     for s in srcs:
         icon = {"ok": "✅", "degraded": "🟡", "blocked": "❌",
-                "unauth": "🔑", "untested": "❔"}.get(s["status"], "?")
+                "unauth": "🔑", "untested": "❔"}.get(s.get("status"), "?")
         print(f"{s['id']:26s} {icon}{s['status']:8s} {s['freq']:9s} {s['name']}")
     print()
     from collections import Counter
-    c = Counter(s["status"] for s in SOURCES)
+    c = Counter(s.get("status") for s in SOURCES)
     print("统计:", dict(c), f"共 {len(SOURCES)} 个源")
     return 0
 
