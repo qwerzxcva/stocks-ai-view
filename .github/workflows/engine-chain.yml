@@ -280,8 +280,15 @@ jobs:
             # multidim / ai_pick_v4 / decision 四个引擎依赖。此前只在 full 跑,
             # 导致盘中刷新时 valuation.json 停留在上一次 full 的快照
             # (实测只剩 6 条指数, 因为 full 那轮行情快照源失败)。
+            # 2026-10-19: 云端此前 all_sources 缺失 -> engine 日志「仅用技术指标」,
+            # 外部增强(板块/资金/涨停池)全失效。这里先补采集。
+            if [ ! -f data/all_sources.json ]; then
+              python3 scripts/collect_all_sources.py --out data/all_sources.json --workers 6 \
+                || echo "::warning::all_sources 采集失败, 引擎将仅用技术指标"
+            fi
             python3 scripts/valuation_engine.py --out data/valuation.json || echo "valuation skipped"
-            python3 scripts/engine_v5.py --out data/engine_v5.json --limit 2000 || echo "engine_v5 skipped"
+            # limit 4200: 全市场 4019 只, 原 2000 只覆盖一半 (云端实测加载 2820)
+            python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only || echo "engine_v5 skipped"
             python3 scripts/news_transmission.py --in data/hot_news.json --news data/news_extra.json --out data/news_transmission.json || echo "news transmission skipped"
             python3 scripts/theme_lifecycle.py --themes data/hot_themes.json --history data/theme_lifecycle_history.json --out data/theme_lifecycle.json || echo "theme lifecycle skipped"
             python3 scripts/concept_strength.py --out data/concept_strength.json || echo "concept strength skipped"
@@ -315,7 +322,7 @@ jobs:
           python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
 
           echo "--- tier 1: resonance + AI pick + rotation ---"
-          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 500 || echo "engine_v5 skipped"
+          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only || echo "engine_v5 skipped"
           python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
           # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度 + 区间高点追踪

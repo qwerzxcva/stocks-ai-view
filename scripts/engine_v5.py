@@ -203,12 +203,17 @@ def build_votes(close, high, low, vol, source_info=None, code_bare=""):
         add("BOLL/Keltner", v, abs(pos - 0.5) * 2, f"带内位置 {pos*100:.0f}% (中轨{lm:.2f})")
 
     # 7. Donchian 位置
+    # 2026-10-19 回测修正: 原逻辑「距 20 日高 -1% 内投正票」等于追突破,
+    # 而 factor_lab 在 45,441/79,518 样本上实测 new_high_20 (win 40.76%,
+    # avg -1.43%) 与 breakout_60 (39.86%, -1.71%) 均为全历史负期望。
+    # 这里不再给突破正票, 改为中性; 真正的新高信号由 below_ma60 的反面约束。
     du, dm, dl = I.donchian(high, low, 20)
     ldu = _last(du)
     if ldu:
         dev = (close[-1] - ldu) / ldu * 100
-        v = 1 if dev > -1 else (-1 if dev < -8 else 0)
-        add("Donchian20", v, min(abs(dev) / 8, 1), f"距20日高 {dev:+.2f}%")
+        v = -1 if dev > -1 else 0
+        add("Donchian20", v, min(abs(dev) / 8, 1) * 0.5,
+            f"距20日高 {dev:+.2f}% (追突破无正edge, 不给正票)")
 
     # 8. CMO
     cmo = I.cmo(close, 14)
@@ -344,6 +349,30 @@ def build_votes(close, high, low, vol, source_info=None, code_bare=""):
             found2 = [x for x in dt_list if _code_match(c6, x.get("code", ""))]
             if found2:
                 add("InDTPool", -1, 0.9, "当日跌停池")
+
+    # 21. below_ma60 (2026-10-19 回测驱动的唯一正 edge 信号)
+    # factor_lab 2,923,687 样本 5 日: win 51.39% avg +0.29% t=60.01
+    # 对比 new_high_20 (win 40.76% avg -1.43%) / breakout_60 (39.86% / -1.71%)
+    # 这两个追突破特征是全历史负期望, 所以这里不再给它们正向票。
+    if len(close) >= 80:
+        ma60 = sum(close[-60:]) / 60
+        if ma60 > 0:
+            dev60 = (close[-1] / ma60 - 1) * 100
+            mx20 = max(high[-20:])
+            ret20 = (close[-21] / close[-1] - 1) * -100 if close[-21] > 0 else 0
+            near_high = mx20 > 0 and close[-1] >= mx20 * 0.98
+            if -10 <= dev60 < -5 and not near_high and ret20 <= 15:
+                # 主区间: 60 日线下方 5-10%, 未追高, 20 日涨幅有限
+                add("below_ma60", 1, 0.9,
+                    f"距60日线 {dev60:+.1f}% (回测正edge区), 20日{ret20:+.1f}%")
+            elif close[-1] < ma60 * 0.95 and dev60 < -25:
+                # 深跌: 可能是接刀, 反向提示
+                add("below_ma60", -1, 0.5,
+                    f"距60日线 {dev60:+.1f}% 跌深, 反弹不确定")
+            elif dev60 > 20:
+                # 远离60日线: by回测追高为负期望
+                add("momentum_overheat", -1, min(dev60 / 100, 0.8),
+                    f"距60日线 {dev60:+.1f}% 过热, 回测追突破为负edge")
     return votes
 
 
@@ -519,6 +548,21 @@ def load_klines(bulk_dir, limit=None):
     return data
 
 
+
+MAIN_BOARD_PREFIX = ("600", "601", "603", "605", "000", "001", "002")
+
+
+def _board_filter(rows):
+    """只保留沪深主板 (用户无科创/创业板交易权限)。"""
+    out = []
+    for r in rows:
+        bare = r.get("code", "")
+        bare = bare[2:] if bare[:2] in ("sh", "sz", "bj") else bare
+        if bare[:3] in MAIN_BOARD_PREFIX:
+            out.append(r)
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
@@ -526,6 +570,11 @@ def main():
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--min-score", type=float, default=60)
     ap.add_argument("--no-ext", action="store_true", help="禁用外部数据源增强 (仅指标共振)")
+    # 2026-10-19 用户约束: 无科创/创业板交易权限。打分仍覆盖全市场
+    # (训练/测试需要), 但推荐输出只留主板。
+    ap.add_argument("--main-board-only", action="store_true",
+                    help="top 只输出沪深主板 (600/601/603/605/000/001/002), "
+                         "688/300/301 仍参与打分但不进推荐")
     args = ap.parse_args()
 
     bulk = args.bulk
@@ -637,7 +686,7 @@ def main():
         "indicators": 20,  # 17 tech + 3 external
         "formula": "score = 50 + 50 * (Σ w·vote·strength / Σ w) * (0.6 + 0.4*共振率)",
         # top 只给新鲜数据; 陈旧分片的股票单列, 不用旧信号冒充今日推荐
-        "top": fresh[:50],
+        "top": _board_filter(fresh)[:50] if args.main_board_only else fresh[:50],
         "stale_top": stale[:20],
         "meta": {
             "resonance": "同向票数/方向票数, 分歧大时降权 (0.6~1.0 系数)",
