@@ -51,6 +51,9 @@ import json
 import math
 import os
 import random
+
+FLOAT_SHARES = {}   # {c6: 流通股数}, 由 load_float_shares() 填
+
 import re
 import statistics
 import sys
@@ -92,6 +95,44 @@ def limit_rate(code, name=""):
     if c.startswith(("43", "83", "87")):
         return 0.30
     return 0.10
+
+
+def load_float_shares(codes, batch=60):
+    """用腾讯实时快照的流通市值 / 价格 反推流通股本(股)。
+
+    流通市值字段 [44] 单位是亿元, 价格 [3] 是元:
+        float_shares = 流通市值(亿) * 1e8 / 价格(元)
+    实测: 600519 -> 12.50 亿股, 002242 -> 7.62 亿股, 600036 -> 206.29 亿股。
+    拿不到的股票不进表, cyq 会退回旧口径并在 turnover_source 里标注。
+    """
+    import urllib.request
+    out = {}
+    items = list(codes)
+    hdr = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120"}
+    for i in range(0, len(items), batch):
+        chunk = items[i:i + batch]
+        syms = ",".join(("sh" if c[0] in "69" else
+                         "bj" if c[0] in "48" else "sz") + c for c in chunk)
+        try:
+            req = urllib.request.Request("https://qt.gtimg.cn/q=" + syms, headers=hdr)
+            raw = urllib.request.urlopen(req, timeout=20).read().decode("gbk", "replace")
+        except Exception:
+            continue
+        for line in raw.split(";"):
+            if '="' not in line:
+                continue
+            try:
+                f = line.split('"')[1].split("~")
+                if len(f) < 46:
+                    continue
+                bare = f[2]
+                px = float(f[3])
+                fcap = float(f[44])        # 流通市值, 亿元
+                if px > 0 and fcap > 0:
+                    out[bare] = fcap * 1e8 / px
+            except (ValueError, IndexError):
+                continue
+    return out
 
 
 def load_all_klines(max_stocks=None):
@@ -157,7 +198,9 @@ def load_all_klines(max_stocks=None):
                     "date": rec["dates"], "open": rec["open"],
                     "high": rec["high"], "low": rec["low"],
                     "close": rec["close"], "volume": rec["vol"]})
-                series = _cyq.cyq_factor_series(df)   # 每5日一点
+                # 流通股本: 优先用 bulk 里的 universe 快照, 缺失时退回旧口径
+                fs = FLOAT_SHARES.get(c6)
+                series = _cyq.cyq_factor_series(df, float_shares=fs)   # 每5日一点
                 cmap = {}
                 if not series.empty:
                     sdates = list(series["date"])
@@ -177,6 +220,15 @@ def load_all_klines(max_stocks=None):
             except Exception:
                 rec["cyq"] = {}
         cleaned[c6] = rec
+
+    # 筹码计算前先取流通股本 (真实换手率口径)
+    if CYQ_ENABLED and cleaned:
+        try:
+            FLOAT_SHARES.update(load_float_shares(cleaned.keys()))
+            hit = sum(1 for c in cleaned if c in FLOAT_SHARES)
+            print(f"[factor_lab] 流通股本 {hit}/{len(cleaned)} 只", flush=True)
+        except Exception as e:
+            print(f"[factor_lab] 流通股本获取失败: {e}", flush=True)
 
     if max_stocks and len(cleaned) > max_stocks:
         rng = random.Random(RANDOM_SEED)

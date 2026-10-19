@@ -33,9 +33,15 @@ RANGE_DAYS = 120    # 参与衰减计算的回看天数
 CYQ_DAYS = 210      # 至少需要的K线数
 
 
-def cyq_distribution(df: pd.DataFrame, date=None) -> dict:
+def cyq_distribution(df: pd.DataFrame, date=None, float_shares=None) -> dict:
     """df: 单票日K(date,open,high,low,close,volume) 按日期升序。
-    返回指定date的筹码分布及指标; date=None用最后一行。"""
+    返回指定date的筹码分布及指标; date=None用最后一行。
+
+    2026-10-19 修正: 原实现用 `v / volume.mean()` 当换手率, 这是「当日量/自身
+    历史均量」而不是真实换手率 (量/流通股本)。后果是衰减系数与公司实际流通盘
+    无关, 筹码分布不反映真实成本迁移 — 大盘股会被误判成极高换手而快速清空
+    历史筹码。传入 float_shares (股数) 时才用真实换手率; 否则退回旧口径并
+    在返回值里标注 turnover_source, 不静默假装准确。"""
     df = df.reset_index(drop=True)
     if date is not None:
         idx = df.index[df["date"] == date]
@@ -68,7 +74,13 @@ def cyq_distribution(df: pd.DataFrame, date=None) -> dict:
             s = day.sum()
             if s > 0:
                 day /= s
-        turnover = v / max(d["volume"].mean(), 1.0)
+        if float_shares and float_shares > 0:
+            turnover = min(1.0, v / float(float_shares))
+            turnover_source = "float_shares"
+        else:
+            # 旧口径: 仅作相对量能近似, 不是真实换手率
+            turnover = v / max(d["volume"].mean(), 1.0)
+            turnover_source = "rel_volume_approx"
         decay = min(1.0, max(0.0, 1.0 - turnover))  # 保留比例
         chips = chips * decay + day * v
     total = chips.sum()
@@ -88,11 +100,12 @@ def cyq_distribution(df: pd.DataFrame, date=None) -> dict:
         "conc90": float((hi - lo) / max(cost, 1e-9)),            # 90%筹码集中度(区间宽/成本)
         "cost": cost,
         "cost_bias": close / cost - 1.0,                         # 成本乖离(现价/平均成本-1)
+        "turnover_source": turnover_source,
         "chips": chips, "grid": grid,
     }
 
 
-def cyq_factor_series(df: pd.DataFrame) -> pd.DataFrame:
+def cyq_factor_series(df: pd.DataFrame, float_shares=None) -> pd.DataFrame:
     """按日滚动输出三列因子(每5日抽样避免O(n^2)): date, cyq_profit_ratio, cyq_conc90, cyq_cost_bias"""
     rows = []
     n = len(df)
@@ -101,7 +114,7 @@ def cyq_factor_series(df: pd.DataFrame) -> pd.DataFrame:
     start = max(30, min(CYQ_DAYS, n // 2))  # 历史不足210日时降级起点
     for i in range(start, n, 5):
         try:
-            r = cyq_distribution(df.iloc[: i + 1])
+            r = cyq_distribution(df.iloc[: i + 1], float_shares=float_shares)
         except ValueError:
             continue
         rows.append({"date": r["date"], "cyq_profit_ratio": r["profit_ratio"],
