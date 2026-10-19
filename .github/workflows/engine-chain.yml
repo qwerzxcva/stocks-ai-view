@@ -283,7 +283,8 @@ jobs:
             # 2026-10-19: 云端此前 all_sources 缺失 -> engine 日志「仅用技术指标」,
             # 外部增强(板块/资金/涨停池)全失效。这里先补采集。
             if [ ! -f data/all_sources.json ]; then
-              python3 scripts/collect_all_sources.py --out data/all_sources.json --workers 6 \
+              timeout 600 python3 scripts/collect_all_sources.py \
+                --out data/all_sources.json --workers 6 --groups quote,event,sector \
                 || echo "::warning::all_sources 采集失败, 引擎将仅用技术指标"
             fi
             python3 scripts/valuation_engine.py --out data/valuation.json || echo "valuation skipped"
@@ -318,6 +319,15 @@ jobs:
 
           if [ "$MODE" = "full" ]; then
           echo "--- tier 0: valuation + market phase ---"
+          # 2026-10-19: full 档也要先补 all_sources, 否则引擎全线
+          # 「仅用技术指标」(板块共振/资金流/涨停池三个外部维度全失效)。
+          # 上面 light 分支的补采集条件在这里同样适用。
+          if [ ! -f data/all_sources.json ]; then
+            echo "all_sources missing -> collecting (quote+event only)"
+            timeout 600 python3 scripts/collect_all_sources.py \
+              --out data/all_sources.json --workers 6 --groups quote,event,sector \
+              || echo "::warning::all_sources 采集失败, 引擎将仅用技术指标"
+          fi
           python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
           python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
 
