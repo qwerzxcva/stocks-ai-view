@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-19T08:47:57+08:00",
+    "ts": "2026-10-19T20:43:01+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8570,
+    "n_days": 8571,
     "span": [
       "1990-12-19",
-      "2026-10-16"
+      "2026-10-19"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-19T08:47:57+08:00"
+    "rebuilt_at": "2026-10-19T20:43:01+08:00"
   },
   "status": {
-    "date": "2026-10-16",
-    "close": 3716.28,
-    "ma5": 3757.82,
-    "ma20": 3847.74,
-    "ma60": 3882.25,
+    "date": "2026-10-19",
+    "close": 3730.92,
+    "ma5": 3744.55,
+    "ma20": 3839.88,
+    "ma60": 3881.69,
     "ma_bull": false,
-    "macd_hist": -32.33,
+    "macd_hist": -28.99,
     "macd_bull": false,
-    "rsi": 21.4,
-    "momentum_20d_pct": -4.42,
+    "rsi": 15.6,
+    "momentum_20d_pct": -3.97,
     "phase": "downtrend",
-    "volume_ratio": 1.0
+    "volume_ratio": 0.9
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 188,
+      "n_days": 189,
       "open": 3986.97,
-      "close": 3716.28,
+      "close": 3730.92,
       "high": 4258.86,
       "low": 3674.82,
-      "chg_pct": -6.36,
+      "chg_pct": -5.99,
       "amplitude_pct": 15.89,
-      "turnover_yi": 1153.8,
+      "turnover_yi": 1158.0,
       "candles": {
-        "yang": 108,
+        "yang": 109,
         "yin": 80,
         "cross": 0
       },
       "max_drawdown_pct": -13.71,
       "first_date": "2026-01-05",
-      "last_date": "2026-10-16"
+      "last_date": "2026-10-19"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -3.28
+        "Q4": -2.9
       },
       "months_covered": 9
     }
@@ -1348,7 +1348,7 @@
         "2013",
         "2005"
       ],
-      "avg_chg": -0.52,
+      "avg_chg": -0.48,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 15.36,
+      "chg_pct": 15.72,
       "position": "补库存/上行",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1447,153 +1447,617 @@
     "sample_span_years": 36
   },
   "demand_shift": {
+    "industry_top": [
+      {
+        "name": "其他数字媒体",
+        "chg_pct": 12.49,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 2.81
+      },
+      {
+        "name": "地面兵装Ⅲ",
+        "chg_pct": 4.34,
+        "up_n": 11,
+        "down_n": 1,
+        "leader": "甘化科工",
+        "main_net_inflow_yi": 0.99
+      },
+      {
+        "name": "地面兵装Ⅱ",
+        "chg_pct": 4.34,
+        "up_n": 11,
+        "down_n": 1,
+        "leader": "甘化科工",
+        "main_net_inflow_yi": 0.99
+      },
+      {
+        "name": "钾肥",
+        "chg_pct": 3.39,
+        "up_n": 3,
+        "down_n": 1,
+        "leader": "亚钾国际",
+        "main_net_inflow_yi": 0.36
+      },
+      {
+        "name": "厨房电器",
+        "chg_pct": 3.35,
+        "up_n": 5,
+        "down_n": 1,
+        "leader": "亿田智能",
+        "main_net_inflow_yi": 0.81
+      },
+      {
+        "name": "涂料",
+        "chg_pct": 3.22,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "*ST亚士",
+        "main_net_inflow_yi": -0.09
+      },
+      {
+        "name": "汽车综合服务",
+        "chg_pct": 3.14,
+        "up_n": 2,
+        "down_n": 1,
+        "leader": "阿尔特",
+        "main_net_inflow_yi": 0.4
+      },
+      {
+        "name": "文化用品",
+        "chg_pct": 3.06,
+        "up_n": 4,
+        "down_n": 1,
+        "leader": "广博股份",
+        "main_net_inflow_yi": 1.45
+      },
+      {
+        "name": "机器人",
+        "chg_pct": 2.9,
+        "up_n": 18,
+        "down_n": 3,
+        "leader": "宇树科技-W",
+        "main_net_inflow_yi": 7.88
+      },
+      {
+        "name": "厨卫电器",
+        "chg_pct": 2.8,
+        "up_n": 7,
+        "down_n": 2,
+        "leader": "亿田智能",
+        "main_net_inflow_yi": 1.04
+      },
+      {
+        "name": "医美耗材",
+        "chg_pct": 2.58,
+        "up_n": 2,
+        "down_n": 1,
+        "leader": "锦波生物",
+        "main_net_inflow_yi": 0.24
+      },
+      {
+        "name": "纺织化学制品",
+        "chg_pct": 2.46,
+        "up_n": 7,
+        "down_n": 6,
+        "leader": "亚邦股份",
+        "main_net_inflow_yi": 2.49
+      },
+      {
+        "name": "航海装备Ⅲ",
+        "chg_pct": 2.37,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "中国海防",
+        "main_net_inflow_yi": 2.83
+      },
+      {
+        "name": "航海装备Ⅱ",
+        "chg_pct": 2.37,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "中国海防",
+        "main_net_inflow_yi": 2.83
+      },
+      {
+        "name": "国有大型银行Ⅲ",
+        "chg_pct": 2.25,
+        "up_n": 6,
+        "down_n": 0,
+        "leader": "农业银行",
+        "main_net_inflow_yi": 8.75
+      },
+      {
+        "name": "通信线缆及配套",
+        "chg_pct": 2.25,
+        "up_n": 11,
+        "down_n": 2,
+        "leader": "亨通光电",
+        "main_net_inflow_yi": 27.23
+      },
+      {
+        "name": "其他塑料制品",
+        "chg_pct": 2.21,
+        "up_n": 12,
+        "down_n": 7,
+        "leader": "天洋新材",
+        "main_net_inflow_yi": 2.42
+      },
+      {
+        "name": "租赁",
+        "chg_pct": 2.17,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "海南华铁",
+        "main_net_inflow_yi": -0.17
+      },
+      {
+        "name": "彩电",
+        "chg_pct": 2.02,
+        "up_n": 3,
+        "down_n": 1,
+        "leader": "高斯贝尔",
+        "main_net_inflow_yi": -0.7
+      },
+      {
+        "name": "品牌消费电子",
+        "chg_pct": 2.0,
+        "up_n": 8,
+        "down_n": 3,
+        "leader": "绿联科技",
+        "main_net_inflow_yi": 0.05
+      }
+    ],
+    "industry_n": 20,
     "concept_top": [
       {
-        "name": "2026三季报扭亏",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "历史新高",
+        "chg_pct": 3.35,
+        "up_n": 4,
+        "down_n": 1,
+        "leader": "澳弘电子"
       },
       {
-        "name": "2026三季报预减",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "机器人执行器",
+        "chg_pct": 2.95,
+        "up_n": 28,
+        "down_n": 9,
+        "leader": "宁波东力"
       },
       {
-        "name": "2026三季报预增",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "DRG/DIP",
+        "chg_pct": 2.7,
+        "up_n": 12,
+        "down_n": 4,
+        "leader": "太极股份"
       },
       {
-        "name": "2026三季报首亏",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "3D摄像头",
+        "chg_pct": 2.67,
+        "up_n": 7,
+        "down_n": 2,
+        "leader": "奥比中光-W"
       },
       {
-        "name": "光刻胶",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "2026中报预减",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "2026中报首亏",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "2026中报扭亏",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "2026中报预增",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "券商金股",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "低市净率",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "高市净率",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "高成长股",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
-      },
-      {
-        "name": "题材股",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "减速器",
+        "chg_pct": 2.61,
+        "up_n": 70,
+        "down_n": 18,
+        "leader": "宁波东力"
       },
       {
         "name": "反转股",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "chg_pct": 2.57,
+        "up_n": 3,
+        "down_n": 1,
+        "leader": "捷众科技"
       },
       {
-        "name": "趋势股",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "轮毂电机",
+        "chg_pct": 1.89,
+        "up_n": 8,
+        "down_n": 1,
+        "leader": "八方股份"
       },
       {
-        "name": "金融地产风格",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "人形机器人",
+        "chg_pct": 1.86,
+        "up_n": 213,
+        "down_n": 88,
+        "leader": "福莱新材"
       },
       {
-        "name": "科技风格",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "航母概念",
+        "chg_pct": 1.8,
+        "up_n": 26,
+        "down_n": 6,
+        "leader": "北方导航"
       },
       {
-        "name": "医药医疗风格",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "国资云概念",
+        "chg_pct": 1.76,
+        "up_n": 18,
+        "down_n": 2,
+        "leader": "太极股份"
       },
       {
-        "name": "消费风格",
-        "chg_pct": 0.0,
-        "up_n": 0,
-        "down_n": 0,
-        "leader": null
+        "name": "青蒿素",
+        "chg_pct": 1.66,
+        "up_n": 8,
+        "down_n": 3,
+        "leader": "海正药业"
+      },
+      {
+        "name": "EDA概念",
+        "chg_pct": 1.55,
+        "up_n": 8,
+        "down_n": 4,
+        "leader": "赛微电子"
+      },
+      {
+        "name": "IPv6",
+        "chg_pct": 1.39,
+        "up_n": 9,
+        "down_n": 3,
+        "leader": "国网信通"
+      },
+      {
+        "name": "同步磁阻电机",
+        "chg_pct": 1.26,
+        "up_n": 5,
+        "down_n": 2,
+        "leader": "伟创电气"
+      },
+      {
+        "name": "2026一季报扭亏",
+        "chg_pct": 1.25,
+        "up_n": 5,
+        "down_n": 6,
+        "leader": "大普微-UW"
+      },
+      {
+        "name": "PEEK材料概念",
+        "chg_pct": 1.22,
+        "up_n": 28,
+        "down_n": 20,
+        "leader": "肯特股份"
+      },
+      {
+        "name": "PLC概念",
+        "chg_pct": 1.15,
+        "up_n": 7,
+        "down_n": 4,
+        "leader": "伟创电气"
+      },
+      {
+        "name": "汽车一体化压铸",
+        "chg_pct": 1.12,
+        "up_n": 15,
+        "down_n": 13,
+        "leader": "文灿股份"
+      },
+      {
+        "name": "中特估",
+        "chg_pct": 1.06,
+        "up_n": 53,
+        "down_n": 20,
+        "leader": "太极股份"
+      },
+      {
+        "name": "裸眼3D",
+        "chg_pct": 1.05,
+        "up_n": 13,
+        "down_n": 11,
+        "leader": "凡拓数创"
       }
     ],
-    "concept_n": 20
+    "concept_n": 20,
+    "concentration": {
+      "top5_avg_chg": 5.58,
+      "sample_avg_chg": 3.29,
+      "spread": 2.3,
+      "interpretation": "主题集中行情 (头部板块显著强于平均)"
+    }
   },
-  "stocks": [],
+  "stocks": [
+    {
+      "code": "301357",
+      "name": "北方长龙",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 1.56,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 101.6,
+      "turnover": 14.11,
+      "pe": 3063.97,
+      "mktcap_yi": 63.17,
+      "pb": 8.63,
+      "quote_time": "20261019161400"
+    },
+    {
+      "code": "600967",
+      "name": "内蒙一机",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 4.39,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 14.5,
+      "turnover": 8.2,
+      "pe": 113.86,
+      "mktcap_yi": 246.76,
+      "pb": 2.09,
+      "quote_time": "20261019161500"
+    },
+    {
+      "code": "601606",
+      "name": "长城军工",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 5.01,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 33.52,
+      "turnover": 10.79,
+      "pe": -399.92,
+      "mktcap_yi": 242.76,
+      "pb": 11.36,
+      "quote_time": "20261019161447"
+    },
+    {
+      "code": "000519",
+      "name": "中兵红箭",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 4.77,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 15.17,
+      "turnover": 5.13,
+      "pe": 176.62,
+      "mktcap_yi": 211.25,
+      "pb": 2.03,
+      "quote_time": "20261019161436"
+    },
+    {
+      "code": "300875",
+      "name": "捷强装备",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": -1.83,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 31.66,
+      "turnover": 5.83,
+      "pe": -27.87,
+      "mktcap_yi": 27.79,
+      "pb": 3.73,
+      "quote_time": "20261019161415"
+    },
+    {
+      "code": "002519",
+      "name": "银河电子",
+      "industry": "地面兵装Ⅲ",
+      "chg_pct": 2.22,
+      "leader": "甘化科工",
+      "main_net_inflow_yi": 0.99,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 5.52,
+      "turnover": 3.48,
+      "pe": -125.82,
+      "mktcap_yi": 62.01,
+      "pb": 2.8,
+      "quote_time": "20261019161445"
+    },
+    {
+      "code": "002103",
+      "name": "广博股份",
+      "industry": "文化用品",
+      "chg_pct": 7.67,
+      "leader": "广博股份",
+      "main_net_inflow_yi": 1.45,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 7.58,
+      "turnover": 17.48,
+      "pe": 29.3,
+      "mktcap_yi": 29.42,
+      "pb": 3.12,
+      "quote_time": "20261019161418"
+    },
+    {
+      "code": "300703",
+      "name": "创源股份",
+      "industry": "文化用品",
+      "chg_pct": -2.08,
+      "leader": "广博股份",
+      "main_net_inflow_yi": 1.45,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 13.16,
+      "turnover": 2.99,
+      "pe": 5726.42,
+      "mktcap_yi": 22.33,
+      "pb": 3.11,
+      "quote_time": "20261019161430"
+    },
+    {
+      "code": "301101",
+      "name": "明月镜片",
+      "industry": "文化用品",
+      "chg_pct": 4.42,
+      "leader": "广博股份",
+      "main_net_inflow_yi": 1.45,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 30.0,
+      "turnover": 1.34,
+      "pe": 29.0,
+      "mktcap_yi": 58.23,
+      "pb": 3.41,
+      "quote_time": "20261019161451"
+    },
+    {
+      "code": "603899",
+      "name": "晨光股份",
+      "industry": "文化用品",
+      "chg_pct": 3.61,
+      "leader": "广博股份",
+      "main_net_inflow_yi": 1.45,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 22.69,
+      "turnover": 0.56,
+      "pe": 15.52,
+      "mktcap_yi": 207.79,
+      "pb": 2.38,
+      "quote_time": "20261019161441"
+    },
+    {
+      "code": "002301",
+      "name": "齐心集团",
+      "industry": "文化用品",
+      "chg_pct": 1.7,
+      "leader": "广博股份",
+      "main_net_inflow_yi": 1.45,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 7.18,
+      "turnover": 1.97,
+      "pe": 74.33,
+      "mktcap_yi": 51.55,
+      "pb": 1.69,
+      "quote_time": "20261019161457"
+    },
+    {
+      "code": "002035",
+      "name": "华帝股份",
+      "industry": "厨卫电器",
+      "chg_pct": 0.88,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 4.58,
+      "turnover": 1.24,
+      "pe": 19.21,
+      "mktcap_yi": 35.82,
+      "pb": 1.01,
+      "quote_time": "20261019161445"
+    },
+    {
+      "code": "002677",
+      "name": "浙江美大",
+      "industry": "厨卫电器",
+      "chg_pct": 0.67,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 6.02,
+      "turnover": 0.84,
+      "pe": -339.73,
+      "mktcap_yi": 32.86,
+      "pb": 2.69,
+      "quote_time": "20261019161430"
+    },
+    {
+      "code": "605336",
+      "name": "*ST帅电",
+      "industry": "厨卫电器",
+      "chg_pct": -2.84,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 10.6,
+      "turnover": 0.32,
+      "pe": -27.91,
+      "mktcap_yi": 19.44,
+      "pb": 1.08,
+      "quote_time": "20261019161436"
+    },
+    {
+      "code": "002508",
+      "name": "老板电器",
+      "industry": "厨卫电器",
+      "chg_pct": 2.71,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 17.05,
+      "turnover": 0.69,
+      "pe": 14.35,
+      "mktcap_yi": 159.18,
+      "pb": 1.45,
+      "quote_time": "20261019161418"
+    },
+    {
+      "code": "300894",
+      "name": "火星人",
+      "industry": "厨卫电器",
+      "chg_pct": 0.32,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 9.45,
+      "turnover": 1.15,
+      "pe": -12.64,
+      "mktcap_yi": 27.79,
+      "pb": 4.34,
+      "quote_time": "20261019161451"
+    },
+    {
+      "code": "300911",
+      "name": "亿田智能",
+      "industry": "厨卫电器",
+      "chg_pct": 18.34,
+      "leader": "亿田智能",
+      "main_net_inflow_yi": 1.04,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 33.23,
+      "turnover": 13.56,
+      "pe": -39.49,
+      "mktcap_yi": 56.94,
+      "pb": 5.72,
+      "quote_time": "20261019161442"
+    },
+    {
+      "code": "300896",
+      "name": "爱美客",
+      "industry": "医美耗材",
+      "chg_pct": -0.55,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.24,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 95.3,
+      "turnover": 1.02,
+      "pe": 26.34,
+      "mktcap_yi": 210.62,
+      "pb": 3.79,
+      "quote_time": "20261019161430"
+    },
+    {
+      "code": "920982",
+      "name": "",
+      "industry": "医美耗材",
+      "chg_pct": 2.58,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.24,
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "688363",
+      "name": "华熙生物",
+      "industry": "医美耗材",
+      "chg_pct": 1.19,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.24,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 34.0,
+      "turnover": 0.39,
+      "pe": 73.11,
+      "mktcap_yi": 163.77,
+      "pb": 2.31,
+      "quote_time": "20261019161444"
+    }
+  ],
   "stocks_meta": {
-    "n": 0,
-    "enriched": 0
+    "n": 20,
+    "enriched": 19
   }
 }
