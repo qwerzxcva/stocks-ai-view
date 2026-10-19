@@ -1,18 +1,20 @@
 {
- "ts": "2026-10-19T17:53:32+08:00",
+ "ts": "2026-10-19T18:29:10+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 175,
- "n_scored": 175,
- "n_confirmed_divergence": 34,
- "n_no_flow": 0,
- "n_rejected": 0,
- "rejection_reasons": {},
+ "n_scored": 174,
+ "n_confirmed_divergence": 33,
+ "n_no_flow": 1,
+ "n_rejected": 1,
+ "rejection_reasons": {
+  "source_unavailable": 1
+ },
  "coverage": {
   "totals": {
    "kline_days": 147714,
-   "flow_days": 10500,
-   "aligned_days": 10304
+   "flow_days": 10440,
+   "aligned_days": 10245
   },
   "by_code": [
    {
@@ -1058,12 +1060,12 @@
    {
     "code": "sz002824",
     "kline_days": 806,
-    "flow_days": 60,
-    "aligned_days": 59,
+    "flow_days": 0,
+    "aligned_days": 0,
     "kline_date_start": "2023-06-16",
     "kline_date_end": "2026-10-16",
-    "flow_date_start": "2026-07-20",
-    "flow_date_end": "2026-10-19"
+    "flow_date_start": null,
+    "flow_date_end": null
    },
    {
     "code": "sz300313",
@@ -1766,7 +1768,7 @@
     "flow_date_end": "2026-10-19"
    }
   ],
-  "flow_source_ratio": 1.0,
+  "flow_source_ratio": 0.9943,
   "minimum_flow_source_ratio": 0.8,
   "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"
  },
@@ -2404,27 +2406,6 @@
    }
   },
   {
-   "code": "sz002824",
-   "date": "2026-10-16",
-   "close": 20.45,
-   "score": 24.4,
-   "signal": "派发背离",
-   "diverge": -1,
-   "price_accel_pct": 3.0024,
-   "flow_accel_norm": -0.1272,
-   "flow_persist": 0.2,
-   "vol_compress": 0.994,
-   "n_flow_days": 60,
-   "n_aligned_days": 59,
-   "flow_date_start": "2026-07-20",
-   "flow_date_end": "2026-10-19",
-   "provenance": {
-    "source": "本地前复权日K + 东财主力净流入",
-    "confidence": "observed",
-    "snapshot_ts": "2026-10-16"
-   }
-  },
-  {
    "code": "sz300050",
    "date": "2026-10-16",
    "close": 6.69,
@@ -2497,7 +2478,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-19T17:53:32+08:00"
+   "snapshot_ts": "2026-10-19T18:29:10+08:00"
   }
  }
 }
