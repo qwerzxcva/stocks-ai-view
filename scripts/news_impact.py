@@ -86,31 +86,6 @@ def judge_direction(title):
     return "neutral", 0.2
 
 
-def load_board_members():
-    """板块 → 成分股 (board_members.json, 由 industry_map_em 反查重建)。
-
-    2026-10-19: 旧 concept_map.json 每概念只有 1 只股票, 映射器找不到成分股
-    就退化到指数 ETF —— 60 条消息里 30 条映射到 159931/512600 之类,
-    消息面选股完全失效。board_members 有 80 个行业 1050 只真实个股。
-    """
-    p = os.path.join(DATA_DIR, "board_members.json")
-    if not os.path.exists(p):
-        return {}, {}
-    try:
-        d = json.load(open(p, encoding="utf-8"))
-    except Exception:
-        return {}, {}
-    by_name, by_bk = {}, {}
-    for bk, b in (d.get("boards") or {}).items():
-        stocks = [s.get("code") for s in (b.get("stocks") or [])
-                  if isinstance(s, dict) and s.get("code")]
-        if not stocks:
-            continue
-        by_name[b.get("name") or bk] = stocks[:30]
-        by_bk[bk] = stocks[:30]
-    return by_name, by_bk
-
-
 def load_concepts():
     """加载概念板块映射 (ths_concept_list 的产物)。"""
     p = os.path.join(DATA_DIR, "concept_map.json")
@@ -227,35 +202,10 @@ def main():
     ap.add_argument("--out", default=os.path.join(DATA_DIR, "news_impact.json"))
     args = ap.parse_args()
 
-    # 板块成分优先 (真实个股), 其次概念表, 最后行业表
-    bm_by_name, _bm_by_bk = load_board_members()
     concepts = load_concepts()
     industries = load_industry_stocks()
     stock_names = load_stock_names()
-    # 合并: board_members 覆盖同名 concept (前者是 80 行业 1050 只真实个股)
-    merged = dict(concepts)
-    merged.update(industries)
-    merged.update(bm_by_name)
-    concepts = merged
-    # ETF 黑名单: 指数基金不能当个股推荐
-    ETF_PREFIX = ("159", "510", "511", "512", "513", "515", "516", "518",
-                  "560", "561", "562", "563", "588", "501", "502")
-    def _is_etf(c):
-        # stocks 可能是 dict {code,name} 或纯代码串; 之前对 dict 取 str()[:3]
-        # 得到 "{'c", 判断永远为 False, 过滤形同虚设。
-        code = str((c.get("code") if isinstance(c, dict) else c) or "")
-        # ETF/基金: 指数基金不能当个股推荐
-        if code[:3] in ETF_PREFIX:
-            return True
-        # 指数代码: 000001-000999 上证系, 399xxx 深证系 (399006=创业板指)
-        # 注意 000001 既是上证指数也是平安银行, 用前缀+长度判不准,
-        # 指数只出现在 stocks 里时通常是 399xxx 或 000300/000001/000688
-        if code.startswith("399") or code in ("000001", "000300", "000688",
-                                              "000016", "000905", "000852"):
-            return True
-        return False
-    print(f"[impact] 映射库: 板块 {len(bm_by_name)} | 概念 {len(concepts)} "
-          f"| 行业 {len(industries)} | 个股名 {len(stock_names)}")
+    print(f"[impact] 映射库: 概念 {len(concepts)} | 行业 {len(industries)} | 个股名 {len(stock_names)}")
 
     items = []
     for src in (args.inp, args.news):
@@ -297,11 +247,8 @@ def main():
             "confidence": round(conf, 2),
             "matched_by": matched_by,
             "match_detail": detail,
-            # ETF 过滤: 指数基金不能当个股推荐 (旧 concept_map 每概念只有 1 只,
-            # 映射器退化到 159931/512600 等 ETF, 30/60 条被污染)
-            "n_stocks": len([c for c in stocks if not _is_etf(c)]),
-            "stocks": [c for c in stocks if not _is_etf(c)][:10],
-            "n_etf_excluded": len([c for c in stocks if _is_etf(c)]),
+            "n_stocks": len(stocks),
+            "stocks": stocks[:10],
         })
 
     # 按 (情感强度 × 影响股票数) 排序, 重要的在前
