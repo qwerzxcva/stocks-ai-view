@@ -62,6 +62,74 @@ def _data_dir():
     return os.path.abspath(p)
 
 
+MONEYFLOW = None
+
+
+def load_moneyflow(data_dir=None):
+    """读 data/moneyflow_web.json (网页抓取的资金流, 122 天四档拆分)。
+
+    2026-10-19: 引擎此前完全没有资金面输入, 所以「主力在出货但股价还在涨」
+    这类形态看不见。实测 002242 九阳: 09-11 主力 +1.11亿启动, 10-09 起
+    每次涨停都净流出 (-1.53亿 / -4215万 / -1.39亿), 小单净流入 —— 标准出货。
+    """
+    if data_dir is None:
+        data_dir = _data_dir()
+    p = os.path.join(data_dir, "moneyflow_web.json")
+    if not os.path.exists(p):
+        return {}
+    try:
+        with open(p, encoding="utf-8") as f:
+            return (json.load(f).get("flows") or {})
+    except Exception:
+        return {}
+
+
+def _mf_vote(code_bare, close):
+    """资金流投票: 用最近 3 日主力净额方向 + 今日超大单。
+
+    返回 (vote, strength, why) 或 None。
+    """
+    if not MONEYFLOW:
+        return None
+    for pref in ("sh", "sz", "bj"):
+        flows = MONEYFLOW.get(pref + code_bare)
+        if flows:
+            break
+    else:
+        return None
+    rows = flows.get("rows") if isinstance(flows, dict) else flows
+    if not rows or len(rows) < 2:
+        return None
+    def _num(x):
+        """'1.53亿' / '-4215万' / '-1.82%' -> 元"""
+        s = str(x or "").strip().replace(",", "")
+        try:
+            if s.endswith("亿"):
+                return float(s[:-1]) * 1e8
+            if s.endswith("万"):
+                return float(s[:-1]) * 1e4
+            return float(s)
+        except ValueError:
+            return 0.0
+    # rows: [date, close, chg%, main_net, main_pct, xl, xl_pct, ...]
+    recent = rows[:3]
+    main = [_num(r[3]) for r in recent if len(r) > 3]
+    big = [_num(r[5]) for r in recent if len(r) > 5]
+    if not main:
+        return None
+    m3 = sum(main)
+    b_today = big[0] if big else 0.0
+    # 主力连续净流出 + 今日仍流出 = 出货特征
+    if m3 < 0 and b_today < 0:
+        return (-1, min(abs(m3) / 3e8, 1.0),
+                f"近3日主力净流出 {m3/1e8:+.2f}亿, 超大单 {b_today/1e8:+.2f}亿")
+    if m3 > 0 and b_today > 0:
+        return (1, min(m3 / 3e8, 1.0),
+                f"近3日主力净流入 {m3/1e8:+.2f}亿, 超大单 {b_today/1e8:+.2f}亿")
+    # 主力流入但超大单流出 = 分歧, 不给票
+    return (0, 0.3, f"主力/超大单分歧 (主力{m3/1e8:+.2f}亿 超大单{b_today/1e8:+.2f}亿)")
+
+
 def load_all_sources(data_dir=None):
     """读 data/all_sources.json (collect_all_sources.py 合并去重输出)。
     不存在或损坏时返回 None, 不影响纯技术模式。"""
@@ -374,6 +442,14 @@ def build_votes(close, high, low, vol, source_info=None, code_bare=""):
                 # 远离60日线: by回测追高为负期望
                 add("momentum_overheat", -1, min(dev60 / 100, 0.8),
                     f"距60日线 {dev60:+.1f}% 过热, 回测追突破为负edge")
+    # 22. 资金流 (网页抓取 122 天, 四档拆分)
+    # 解决「主力出货但股价上涨」看不见的问题: 九阳 10-09 起每次涨停主力都净流出
+    try:
+        mv = _mf_vote(str(code_bare), close[-1] if close else None)
+        if mv:
+            add("MoneyFlow", mv[0], mv[1], mv[2])
+    except Exception:
+        pass
     return votes
 
 
@@ -607,6 +683,10 @@ def main():
     adj_stats = getattr(load_klines, "stats", {}) or {}
     print(f"[engine_v5] 加载 {len(klines)} 只K线", flush=True)
 
+    global MONEYFLOW
+    MONEYFLOW = load_moneyflow()
+    if MONEYFLOW:
+        print(f"[engine_v5] 资金流覆盖 {len(MONEYFLOW)} 只 (网页122天)", flush=True)
     all_sources = None if args.no_ext else load_all_sources()
     print(f"[engine_v5] all_sources {'已加载' if all_sources else '未找到 (仅用技术指标)'}", flush=True)
 

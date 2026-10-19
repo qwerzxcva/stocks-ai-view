@@ -1,0 +1,90 @@
+{
+ "ts": "2026-10-19T23:41:37+08:00",
+ "engine": "review_and_reflect v1",
+ "hold_days": 1,
+ "capital_per_day": 100000.0,
+ "reviews": {
+  "premarket": {
+   "n_picks": 2,
+   "n_settled": 2,
+   "unsettled": [],
+   "capital": 100000.0,
+   "per_stock": 50000.0,
+   "hold_days": 1,
+   "win_rate_close": 100.0,
+   "win_rate_recoup": 100.0,
+   "avg_ret_pct": 3.56,
+   "total_pnl": 3565.0,
+   "total_pnl_pct": 3.56,
+   "details": [
+    {
+     "code": "600585",
+     "buy_date": "2026-10-15",
+     "sell_date": "2026-10-16",
+     "buy": 17.51,
+     "sell": 18.64,
+     "ret_pct": 6.45,
+     "recoup": true,
+     "peak_pct": 6.91,
+     "name": "海螺水泥",
+     "score": 79.2,
+     "grade": "A",
+     "pnl": 3225.0
+    },
+    {
+     "code": "600873",
+     "buy_date": "2026-10-15",
+     "sell_date": "2026-10-16",
+     "buy": 7.37,
+     "sell": 7.42,
+     "ret_pct": 0.68,
+     "recoup": true,
+     "peak_pct": 2.31,
+     "name": "梅花生物",
+     "score": 76.5,
+     "grade": "B",
+     "pnl": 340.0
+    }
+   ],
+   "base_date": "2026-10-15"
+  },
+  "tomorrow": {
+   "n_picks": 1,
+   "n_settled": 1,
+   "unsettled": [],
+   "capital": 100000.0,
+   "per_stock": 100000.0,
+   "hold_days": 1,
+   "win_rate_close": 100.0,
+   "win_rate_recoup": 100.0,
+   "avg_ret_pct": 2.54,
+   "total_pnl": 2540.0,
+   "total_pnl_pct": 2.54,
+   "details": [
+    {
+     "code": "000937",
+     "buy_date": "2026-10-15",
+     "sell_date": "2026-10-16",
+     "buy": 4.33,
+     "sell": 4.44,
+     "ret_pct": 2.54,
+     "recoup": true,
+     "peak_pct": 3.23,
+     "name": "冀中能源",
+     "score": 75.0,
+     "grade": "B",
+     "pnl": 2540.0
+    }
+   ],
+   "base_date": "2026-10-15"
+  }
+ },
+ "reflection": {
+  "findings": [
+   "premarket 期末胜率 100.0% 达标 (>=55%)",
+   "tomorrow 期末胜率 100.0% 达标 (>=55%)"
+  ],
+  "improvements": []
+ },
+ "note": "模拟盈亏按每日 10 万等分计算, 不含手续费滑点; win_rate_close=期末为正, win_rate_recoup=期间曾回本"
+}
