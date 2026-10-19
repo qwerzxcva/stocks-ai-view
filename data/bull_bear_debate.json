@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-19T17:08:41+08:00",
+ "ts": "2026-10-19T18:02:57+08:00",
  "engine": "bull_bear_debate.py",
  "origin": "架构借鉴 guangxiangdebizi/TradingAgents-MCPmode (MIT): 多智能体分工 + 看涨/看跌辩论 + 三层风控; 裁剪为 3 角色最小闭环 (token 成本约束)",
  "n_debated": 15,
@@ -326,7 +326,7 @@
    "code": "000400",
    "bull": {
     "stance": "bull",
-    "case": "engine_v5 共振分 67.2 (强)",
+    "case": "engine_v5 共振分 67.0 (强)",
     "n_evidence": 1
    },
    "bear": {
@@ -343,8 +343,8 @@
    "evidence_raw": {
     "code": "000400",
     "engine_v5": {
-     "score": 67.2,
-     "raw": 0.3732,
+     "score": 67.0,
+     "raw": 0.3703,
      "resonance": 0.8,
      "bull": 12,
      "bear": 3,
@@ -365,14 +365,14 @@
       {
        "indicator": "RSI",
        "vote": -1,
-       "strength": 0.071,
-       "why": "RSI=72.12 超买, 回踩风险"
+       "strength": 0.075,
+       "why": "RSI=72.26 超买, 回踩风险"
       },
       {
        "indicator": "MACD",
        "vote": 1,
-       "strength": 0.533,
-       "why": "DIF=+0.138 前值+0.090 走强"
+       "strength": 0.485,
+       "why": "DIF=+0.145 前值+0.098 走强"
       },
       {
        "indicator": "KDJ(RSV)",
@@ -383,7 +383,7 @@
       {
        "indicator": "BOLL/Keltner",
        "vote": 1,
-       "strength": 0.556,
+       "strength": 0.558,
        "why": "带内位置 78% (中轨21.56)"
       },
       {
@@ -426,7 +426,7 @@
        "indicator": "ElderForce",
        "vote": 1,
        "strength": 0.197,
-       "why": "EF=24523"
+       "why": "EF=24534"
       },
       {
        "indicator": "ConnorsRSI",
@@ -2113,13 +2113,13 @@
        "indicator": "RSI",
        "vote": 1,
        "strength": 0.4,
-       "why": "RSI=57.98 强势区间"
+       "why": "RSI=57.99 强势区间"
       },
       {
        "indicator": "MACD",
        "vote": 1,
        "strength": 0.3,
-       "why": "DIF=+0.139 前值+0.145 走弱"
+       "why": "DIF=+0.140 前值+0.145 走弱"
       },
       {
        "indicator": "KDJ(RSV)",
@@ -2179,7 +2179,7 @@
        "indicator": "ConnorsRSI",
        "vote": 0,
        "strength": 0.2,
-       "why": "CRSI=38.4 中性"
+       "why": "CRSI=38.06 中性"
       },
       {
        "indicator": "A/D Line",
@@ -2258,7 +2258,7 @@
        "indicator": "SuperTrend",
        "vote": 1,
        "strength": 0.9,
-       "why": "趋势多头, 线值 32.19"
+       "why": "趋势多头, 线值 31.18"
       },
       {
        "indicator": "MA5/MA20",
@@ -2270,13 +2270,13 @@
        "indicator": "RSI",
        "vote": 1,
        "strength": 0.4,
-       "why": "RSI=51.05 强势区间"
+       "why": "RSI=52.01 强势区间"
       },
       {
        "indicator": "MACD",
        "vote": 1,
        "strength": 0.3,
-       "why": "DIF=+0.424 前值+0.482 走弱"
+       "why": "DIF=+0.592 前值+0.662 走弱"
       },
       {
        "indicator": "KDJ(RSV)",
@@ -2287,8 +2287,8 @@
       {
        "indicator": "BOLL/Keltner",
        "vote": 0,
-       "strength": 0.015,
-       "why": "带内位置 51% (中轨34.56)"
+       "strength": 0.023,
+       "why": "带内位置 51% (中轨34.51)"
       },
       {
        "indicator": "Donchian20",
@@ -2330,7 +2330,7 @@
        "indicator": "ElderForce",
        "vote": -1,
        "strength": 0.134,
-       "why": "EF=-15482"
+       "why": "EF=-15471"
       },
       {
        "indicator": "ConnorsRSI",
