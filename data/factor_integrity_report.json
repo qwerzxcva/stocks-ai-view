@@ -1,22 +1,51 @@
 {
- "ts": "2026-10-19T08:59:43+08:00",
- "factor_tables": 3359,
+ "ts": "2026-10-19T09:37:04+08:00",
  "universe": 4019,
- "coverage_pct": 83.58,
- "db_adjust_factors": {
-  "rows": 42695,
-  "codes": 3359
+ "factor_tables": 3985,
+ "coverage_pct": 99.15,
+ "missing": {
+  "count": 34,
+  "all_are_b_shares": true,
+  "b_share_count": 34,
+  "sample": [
+   "sz200011",
+   "sz200012",
+   "sz200016",
+   "sz200019",
+   "sz200020",
+   "sz200025",
+   "sz200028",
+   "sz200029",
+   "sz200030",
+   "sz200037"
+  ],
+  "reason": "baostock query_adjust_factor 对 B 股返回 0 行; 东财 RPT_SHAREBONUS_DET 亦无记录; 腾讯 qfq/hfq 比值含取整噪声(中位差 0.0176)不可用于反推"
  },
- "schema_ok": true,
- "source_distribution": {
-  "baostock.query_adjust_factor/backAdjustFactor": 500
+ "db": {
+  "rows": 50155,
+  "codes": 3985,
+  "tables": {
+   "quotes": 2006,
+   "kline_daily": 23790,
+   "events": 102,
+   "margin": 30,
+   "pools": 0,
+   "announcements": 0,
+   "news_items": 0,
+   "fund_nav": 184,
+   "financial_summary": 216,
+   "adjust_factors": 50155
+  }
  },
  "checks": {
   "all_have_factors": true,
   "positive_factors": true,
-  "date_sorted": true
+  "date_sorted": true,
+  "monotonic_nondecreasing": "expected_false",
+  "monotonic_note": "后复权因子允许下降: 缩股/股改(如 600097 2000-05 缩股 1.0→0.9506)。抽样 400 只中 8 只有此情况, 均在 2000-2010 年, 属真实公司行为而非数据错误"
  },
- "note": "factors 为逐日展开表; 数据库存跳变点(除权重定价), 体积 900MB→3MB",
- "sampled": 500,
- "bad_tables": 0
+ "sources": {
+  "baostock.query_adjust_factor/backAdjustFactor": 3985
+ },
+ "note": "数据库存除权跳变点(50,155 行)而非逐日展开(1200 万行/899MB); 查询时取 <= 目标日的最近跳变点"
 }
