@@ -26,6 +26,7 @@ v5 设计:
   {code, name, score, resonance, votes:[{indicator, vote, strength, why}], ...}
 """
 import argparse
+import bisect
 import json
 import os
 import sys
@@ -408,9 +409,22 @@ def load_klines(bulk_dir, limit=None):
                                 "..", "data", "adjusted")
     factors_dir = os.path.join(adj_root, "factors")
     factor_tables = {}
-    if os.path.isdir(factors_dir):
+    # 优先读合并文件 (1.1MB, 3985 只): 逐股一个文件在 CI 里是 326MB/3985 文件,
+    # checkout 慢且易超时。合并式与逐股式可共存, 合并优先。
+    merged = os.path.join(adj_root, "factors_all.json")
+    if os.path.exists(merged):
+        try:
+            md = json.load(open(merged, encoding="utf-8"))
+            for code, fac in (md.get("factors") or {}).items():
+                if fac:
+                    factor_tables[code] = fac
+        except (OSError, ValueError):
+            factor_tables = {}
+    if not factor_tables and os.path.isdir(factors_dir):
         import glob as _g
         for fp in _g.glob(os.path.join(factors_dir, "*.json")):
+            if os.path.basename(fp).startswith("_"):
+                continue
             try:
                 fd = json.load(open(fp, encoding="utf-8"))
                 factor_tables[fd.get("code")] = fd.get("factors") or {}
@@ -461,23 +475,34 @@ def load_klines(bulk_dir, limit=None):
         data[c].sort(key=lambda b: b[0])
 
     # 因子表覆盖的 code: 原始价 × 因子 = 真 qfq
+    # 因子表有两种形式:
+    #   a) 逐日展开 ({date: factor} 每个交易日都有)
+    #   b) 跳变点表 (只存除权日, factors_all.json 用这个, 3985 只仅 50,155 行)
+    # 用 bisect 统一处理: 取 <= 目标日的最近跳变点。不用 exact get,
+    # 否则跳变点表会 99% 落空退化成原始价。
     n_factor = 0
     for code, rows in data.items():
         ft = factor_tables.get(code)
         if not ft:
             continue
+        kdates = sorted(ft)
+        if not kdates:
+            continue
+
+        def _fac_at(d, _kd=kdates, _ft=ft):
+            i = bisect.bisect_right(_kd, d) - 1
+            if i < 0:
+                return _ft[_kd[0]]          # 首跳变点之前: 用首个值
+            return _ft[_kd[i]]
+
         dates = [r[0] for r in rows]
-        f_latest = None
-        for d in reversed(dates):
-            if d in ft:
-                f_latest = ft[d]
-                break
-        if not f_latest:
+        f_latest = _fac_at(dates[-1])
+        if not f_latest or f_latest <= 0:
             continue
         adj_rows = []
         for r in rows:
-            f = ft.get(r[0])
-            if f is None or f <= 0:
+            f = _fac_at(r[0])
+            if not f or f <= 0:
                 adj_rows.append(r)
                 continue
             k = f / f_latest

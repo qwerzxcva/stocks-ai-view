@@ -214,55 +214,111 @@ def eval_feature(name, rec, i):
     if name == "bias_ma20":
         m = _ma(c, i, 20)
         if m is None or m <= 0:
-            return None
+            return None, None
         bias = (c[i] - m) / m * 100
         return (bias < -5), (bias > 5)
+    if name == "momentum_high_bias":
+        # 动量延续: 高偏离 MA20 且 MA5>MA20 且价格在 MA5 上方
+        # 对比 bias_ma20 的 long 组 (=只要偏离高), 本特征加了趋势确认
+        m5, m20 = _ma(c, i, 5), _ma(c, i, 20)
+        if m5 is None or m20 is None or m20 <= 0:
+            return None, None
+        bias = (c[i] - m20) / m20 * 100
+        rising = m5 > m20 and c[i] > m5
+        return None, (bias > 10 and rising)
+    if name == "momentum_rps_like":
+        # 动量: 近 20 日涨幅前 20% 且创 20 日新高 (九阳类形态)
+        if i < 21:
+            return None, None
+        ret20 = (c[i] / c[i - 20] - 1) * 100
+        mx = _max(h, i, 20)
+        if mx is None:
+            return None, None
+        return None, (ret20 > 15 and c[i] >= mx * 0.98)
+    if name == "pullback_in_uptrend":
+        # 低吸场景: 上升趋势中回调 (MA20 向上, 价格回踩 MA20 附近)
+        m5, m20 = _ma(c, i, 5), _ma(c, i, 20)
+        m20_prev = _ma(c, i - 5, 20) if i >= 25 else None
+        if m5 is None or m20 is None or m20_prev is None or m20 <= 0:
+            return None, None
+        uptrend = m20 > m20_prev
+        near = abs(c[i] - m20) / m20 * 100 < 3
+        return (uptrend and near), None
     if name == "ma_golden":
         m5, m20 = _ma(c, i, 5), _ma(c, i, 20)
         if m5 is None or m20 is None:
-            return None
+            return None, None
         return (m5 > m20 and c[i] > m5), (m5 < m20 and c[i] < m5)
     if name == "vol_dry_up":
         # 缩量上涨: 涨但量能低于 5 日均量 (惜售)
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0 or i < 1:
-            return None
+            return None, None
         return (c[i] > c[i - 1] and v[i] < m5v * 0.7), None
     if name == "new_high_20":
         mx = _max(h, i, 20)
         if mx is None:
-            return None
+            return None, None
         return (c[i] >= mx), None
     if name == "breakout_60":
         mx = _max(h, i, 60)
         if mx is None:
-            return None
+            return None, None
         return (c[i] >= mx), None
     if name == "low_pos_20":
         lo, hi = _min(l, i, 20), _max(h, i, 20)
         if lo is None or hi is None or hi <= lo:
-            return None
+            return None, None
         pos = (c[i] - lo) / (hi - lo)
         return (pos < 0.2), (pos > 0.8)
     if name == "below_ma60":
         m = _ma(c, i, 60)
         if m is None:
-            return None
+            return None, None
         return (c[i] < m * 0.95), (c[i] > m * 1.05)
+    if name == "below_ma60_excl_momentum":
+        # 2026-10-19 组合验证: below_ma60 是唯一正 edge 特征, 但需排除
+        # 追突破/新高(两者全历史为负 edge -1.53/-1.81pp), 并排除超跌反弹
+        # 已启动的情形 (20日涨幅>15% 说明已经反弹一段)
+        m = _ma(c, i, 60)
+        if m is None or i < 21:
+            return None, None
+        if c[i] >= m * 0.95:
+            return None, None          # 不在 60 日线下方
+        mx20 = _max(h, i, 20)
+        if mx20 is None:
+            return None, None
+        if c[i] >= mx20 * 0.98:
+            return None, None          # 接近 20 日高 = 追突破, 排除
+        ret20 = (c[i] / c[i - 20] - 1) * 100
+        if ret20 > 15:
+            return None, None          # 已大幅反弹, 不是低位
+        return True, None
+    if name == "below_ma60_tight":
+        # 更严: 60 日线下方 10% 以内, 避免接刀
+        m = _ma(c, i, 60)
+        if m is None or i < 21:
+            return None, None
+        if not (m * 0.90 <= c[i] < m * 0.95):
+            return None, None
+        mx20 = _max(h, i, 20)
+        if mx20 is not None and c[i] >= mx20 * 0.98:
+            return None, None
+        return True, None
     if name == "vol_ratio_high":
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0:
-            return None
+            return None, None
         return (v[i] > m5v * 2), None
     if name == "shrink_pullback":
         # 缩量回调: 跌但量能萎缩 (可能洗盘)
         m5v = _ma(v, i, 5)
         if m5v is None or m5v <= 0 or i < 1:
-            return None
+            return None, None
         return (c[i] < c[i - 1] and v[i] < m5v * 0.7), None
     if name == "gap_up":
         if i < 1 or c[i - 1] <= 0:
-            return None
+            return None, None
         return (o[i] > c[i - 1] * 1.02), (o[i] < c[i - 1] * 0.98)
     return None, None
 
@@ -271,6 +327,9 @@ CANDIDATES = [
     "rsi_oversold", "rsi_overbought", "bias_ma20", "ma_golden", "vol_dry_up",
     "new_high_20", "breakout_60", "low_pos_20", "below_ma60", "vol_ratio_high",
     "shrink_pullback", "gap_up",
+    # 2026-10-19 新增: 动量 vs 低吸 场景区分 (九阳股份 +101%/20日后仍涨停的教训)
+    "momentum_high_bias", "momentum_rps_like", "pullback_in_uptrend",
+    "below_ma60_excl_momentum", "below_ma60_tight",
 ]
 
 
