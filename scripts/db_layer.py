@@ -458,6 +458,91 @@ def load_tape_snapshots(tape_path, lifecycle_path, path=None):
     return len(event_rows) + len(theme_rows)
 
 
+def load_kline_from_collect(json_path, path=None):
+    """all_sources.kline 是行式 (每股每日一条)。写入 kline_daily。
+
+    列: code,date,open,close,high,low,volume,year,adj
+    """
+    d = json.load(open(json_path, encoding="utf-8"))
+    rows = (d.get("data") or {}).get("kline") or []
+    if not rows:
+        return 0
+    payload = []
+    for r in rows:
+        code = str(r.get("code") or r.get("symbol") or "").strip()
+        dt = str(r.get("date") or "")[:10]
+        if not code or not dt:
+            continue
+        try:
+            payload.append((code, dt, float(r.get("open")), float(r.get("close")),
+                            float(r.get("high")), float(r.get("low")),
+                            float(r.get("vol") or r.get("volume") or 0),
+                            dt[:4], "raw"))
+        except (TypeError, ValueError):
+            continue
+    if not payload:
+        return 0
+    con = connect(path)
+    try:
+        con.execute(SCHEMA)
+        for statement in INDEXES:
+            con.execute(statement)
+        con.begin()
+        con.executemany("DELETE FROM kline_daily WHERE code=? AND date=?",
+                        [(p[0], p[1]) for p in payload])
+        con.executemany(
+            "INSERT INTO kline_daily VALUES (?,?,?,?,?,?,?,?,?)", payload)
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+    return len(payload)
+
+
+def load_fund_from_collect(json_path, path=None):
+    """all_sources.fund -> fund_nav。
+
+    列: fund_code,fund_name,date,nav,cum_nav,change_pct,scale_yi,ts
+    """
+    d = json.load(open(json_path, encoding="utf-8"))
+    rows = (d.get("data") or {}).get("fund") or []
+    ts = datetime.now(CST).isoformat(timespec="seconds")
+    payload = []
+    for r in rows:
+        code = str(r.get("code") or r.get("symbol") or "").strip()
+        dt = str(r.get("date") or "")[:10]
+        nav = r.get("nav")
+        if not code or not dt or nav is None:
+            continue
+        try:
+            acc = r.get("acc_nav")
+            payload.append((code, r.get("name"), dt, float(nav),
+                            float(acc) if acc not in (None, "") else None,
+                            r.get("daily_chg_pct"), None, ts))
+        except (TypeError, ValueError):
+            continue
+    if not payload:
+        return 0
+    con = connect(path)
+    try:
+        con.execute(SCHEMA)
+        con.begin()
+        con.executemany(
+            "DELETE FROM fund_nav WHERE fund_code=? AND date=?",
+            [(p[0], p[2]) for p in payload])
+        con.executemany(
+            "INSERT INTO fund_nav VALUES (?,?,?,?,?,?,?,?)", payload)
+        con.commit()
+    except Exception:
+        con.rollback()
+        raise
+    finally:
+        con.close()
+    return len(payload)
+
+
 def load_from_collect(json_path, path=None):
     """从 collect_all_sources.py 的输出导入。"""
     d = json.load(open(json_path, encoding="utf-8"))
