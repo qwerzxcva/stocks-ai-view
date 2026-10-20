@@ -119,12 +119,6 @@ tr:hover td{background:rgba(137,87,229,.04)}
 .pb-ph{background:rgba(137,87,229,.15);color:var(--accent)}
 .no-data{padding:20px;text-align:center;color:var(--tx3);font-size:11px}
 
-/* ─── bottom ticker ─── */
-.ticker{background:var(--panel);border-top:1px solid var(--border);height:28px;display:flex;align-items:center;gap:10px;padding:0 16px;flex-shrink:0;overflow:hidden;font-size:10px;color:var(--tx3)}
-.ticker .lb{color:var(--accent);font-weight:700;flex-shrink:0;font-size:11px}
-.ticker .scroll{flex:1;overflow:hidden;position:relative;height:16px}
-.ticker .scroll span{position:absolute;white-space:nowrap;animation:ticker-move 35s linear infinite}
-@keyframes ticker-move{from{left:100%}to{left:-160%}}
 /* ─── L2 modal ─── */
 #l2Modal{display:none}
 .l2-input{background:var(--panel2);border:1px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--tx);font-size:12px;width:100%;outline:none}
@@ -441,11 +435,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
   </div>
-</div>
-<div class="ticker">
-  <span class="lb">📌 市场速览</span>
-  <div class="scroll"><span id="tickerScroll"></span></div>
-  <span id="tickerMeta"></span>
 </div>
 <div class="ftr">
   <span>数据源: 腾讯行情 · 东财涨跌停池 · 东财基金排行 · 新浪7x24 · 抖音热榜 · 零凭据</span>
@@ -1106,17 +1095,6 @@ function renderVolChart(kline){
       <span class="amber" style="color:var(--amber)">5日均量线</span>
       <span>${last.date.slice(5)}</span></div>`;
 }
-function renderTicker(d){
-  const items=[];
-  (d.limit_up_pool||[]).slice(0,8).forEach(z=>items.push(z.name+'('+z.code+') '+z.chg_pct+'%'));
-  (d.fund_rank||[]).slice(0,5).forEach(f=>items.push('📈'+f.name+' 1年'+f.ret_1y+'%'));
-  document.getElementById('tickerScroll').textContent=items.join('    ⏸    ');
-  const _n=v=>(typeof v==='number'&&isFinite(v))?v:'—';
-  document.getElementById('tickerMeta').textContent='涨停'+_n(d.market.limit_up)+' · 跌停'+_n(d.market.limit_down)+' · 炸板'+_n(d.market.broken);
-}
-
-
-
 /* ─── 周期深析 (cycle_deep.json) ─── */
 let cdRendered = false;
 let fdRendered = false;
@@ -3447,7 +3425,6 @@ async function render(){
   _safe(()=>renderFundRank((d.fund_rank && d.fund_rank.length) ? d.fund_rank
                  : ((mn && mn.fund_rank) ? mn.fund_rank : [])),'fundRank');
   _safe(()=>renderNews((newsList && newsList.length) ? newsList : d.news_recent, nd),'news');
-  _safe(()=>renderTicker(d),'ticker');
   if(g.hot_impact) _safe(()=>renderHotImpactData(g.hot_impact),'hotImpact');
   if(d.commentary) _safe(()=>renderCommentary(d.commentary),'commentary');
   // 强势股/龙虎榜/大宗: enrich.json 是独立文件, 不被 latest.json 的远端
