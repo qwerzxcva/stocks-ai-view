@@ -62,8 +62,17 @@ body{background:var(--bg);color:var(--tx);font:12px/1.5 "SF Pro Text","PingFang 
   .c-tabs{display:none}
 }
 @media (max-width:640px){
-  .hdr{gap:7px;padding:7px 10px;flex-wrap:wrap;height:auto;min-height:44px}
-  .logo{font-size:14px}
+  .hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"logo refresh" "meta search";gap:6px 8px;padding:7px 10px;height:auto;min-height:58px;align-items:center}
+  .logo{grid-area:logo;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hdr > #algoBadge,.hdr > #stageBadge{display:none}
+  .hdr > #refreshBtn{grid-area:refresh;margin-left:0!important;padding:5px 10px!important;white-space:nowrap}
+  .hdr-meta{grid-area:meta;display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;flex-wrap:wrap;white-space:normal}
+  .hdr-meta .upd{margin-left:0;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .hdr-meta #rtStatus{margin-left:0!important;flex-shrink:0}
+  .hdr-meta [id$="Tag"]{margin-left:0!important;flex-shrink:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .hdr > div:last-child{grid-area:search;margin-left:0!important;min-width:0;width:100%}
+  .hdr > div:last-child input{width:100%!important;min-width:0;padding:5px 9px!important}
+  .hdr > div:last-child #symResults{width:min(280px,calc(100vw - 20px))}
   .kpis{grid-template-columns:repeat(4,minmax(0,1fr));height:auto}
   .kpi{min-height:46px;padding:4px 8px}
   .main{display:flex;flex-direction:column;overflow:visible}
@@ -189,12 +198,14 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <div class="logo">Market Signal Workbench <span class="tsp">v4</span></div>
   <span class="b" id="algoBadge">tsp-signal-v4</span>
   <span class="b stage" id="stageBadge" style="display:none"></span>
-  <span class="upd" id="updTime">Loading...</span>
+  <div class="hdr-meta">
+    <span class="upd" id="updTime">Loading...</span>
+    <span id="rtStatus" title="Browser-direct tencent quotes, 60s refresh" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">RT --:--</span>
+    <span id="dataSourceTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;background:rgba(137,87,229,.18);border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;cursor:help"></span>
+    <span id="pipelineTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
+    <span id="sessionTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
+  </div>
   <span id="refreshBtn" title="重新拉取全部数据源 (绕过 Service Worker 与 HTTP 缓存)" style="margin-left:8px;padding:3px 12px;border-radius:12px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;cursor:pointer;user-select:none">⟳ 更新</span>
-  <span id="rtStatus" title="Browser-direct tencent quotes, 60s refresh" style="margin-left:8px;font-size:9px;font-weight:700;color:var(--tx3);cursor:help">RT --:--</span>
-  <span id="dataSourceTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;background:rgba(137,87,229,.18);border:1px solid var(--accent);color:var(--accent);font-size:9px;font-weight:700;cursor:help"></span>
-  <span id="pipelineTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
-  <span id="sessionTag" style="display:none;margin-left:6px;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;cursor:help"></span>
   <div style="position:relative;margin-left:8px">
     <input id="symSearch" placeholder="Search stock / ETF" autocomplete="off" style="padding:3px 10px;border-radius:12px;border:1px solid var(--bd);background:var(--bg2);color:var(--tx);font-size:11px;width:170px;outline:none">
     <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
@@ -209,7 +220,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   <!-- SIDEBAR: 量化终端固定导航 -->
   <div id="sideNav" style="width:150px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:8px 0;overflow-y:auto">
     <div class="sn-item" data-c="11" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">📊 看板</div>
-    <div class="sn-item" data-c="13" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">📈 指数</div>
     <div class="sn-item" data-c="12" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">🔍 个股分析</div>
     <div class="sn-item" data-c="2" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">📋 每日主线</div>
     <div class="sn-item" data-c="3" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">🔄 周期深析</div>
@@ -235,7 +245,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <button class="c-tab" data-c="8">海外关联</button>
       <button class="c-tab" data-c="11">看板</button>
       <button class="c-tab" data-c="12">个股分析</button>
-      <button class="c-tab" data-c="13">指数</button>
       <button class="c-tab" data-c="14">行业分析</button>
     </div>
     <div class="card c-card on" data-ci="0">
@@ -251,9 +260,16 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="commentary" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="1">
-      <div class="hd">全球股市 <span class="sub" id="gmSub">A股 · 港股 · 日股 · 韩股 · 欧股 · 美股 — 点击指数名看历年K线</span></div>
+      <div class="hd">统一市场行情 <span class="sub" id="gmSub">A股 · 港股 · 日股 · 韩股 · 欧股 · 美股 · 指数与全球市场合并</span></div>
       <div id="globalMarketsBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
+      </div>
+      <div id="marketTimeline" style="padding:0 12px 12px;border-top:1px solid var(--border)">
+        <div class="hd" style="padding:7px 0">统一 K 线时间轴 <span class="sub">完整历史范围 · 日期刻度 · 仅显示已采集数据</span></div>
+        <div id="marketTimelineControls" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px"></div>
+        <div id="marketTimelineMeta" class="fl" style="font-size:10px;margin-bottom:6px">选择指数查看历史 K 线</div>
+        <div id="marketTimelineChart" style="overflow-x:auto;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px"><div class="no-data">暂无历史 K 线数据</div></div>
+        <div id="marketTimelineSource" class="fl" style="font-size:9px;padding-top:6px"></div>
       </div>
     </div>
     <div class="card c-card" data-ci="2">
@@ -342,31 +358,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
             <div id="indDetail" style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px">
               <div style="font-size:11px;color:var(--tx3)">点击左侧行业查看成分股</div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card c-card" data-ci="13">
-      <div class="hd">指数 <span class="sub" id="idxSub">沪深300 · 上证指数 · 深证成指 · 创业板指 · 科创50</span></div>
-      <div id="panel-index" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-          <div id="idxList" style="display:flex;flex-direction:column;gap:4px;min-width:180px"></div>
-          <div style="flex:1;min-width:0">
-            <div style="display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px">
-              <span id="idxName" style="font-size:13px;font-weight:800"></span>
-              <span id="idxCode" style="font-size:11px;color:var(--tx3)"></span>
-              <span id="idxPrice" style="font-size:12px;font-weight:700"></span>
-              <span id="idxChg" style="font-size:11px"></span>
-            </div>
-            <div style="font-size:10px;color:var(--tx3);margin-bottom:4px" id="idxOHLC"></div>
-            <div id="idxChart" style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px"></div>
-            <div style="display:flex;gap:10px;margin-top:6px;font-size:10px;color:var(--tx3)">
-              <span>MA5 <span id="ma5v" style="color:var(--blue)"></span></span>
-              <span>MA10 <span id="ma10v" style="color:#f0883e"></span></span>
-              <span>MA30 <span id="ma30v" style="color:#a371f7"></span></span>
-              <span>MA60 <span id="ma60v" style="color:#3fb950"></span></span>
-            </div>
-            <div id="idxVol" style="margin-top:8px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px"></div>
           </div>
         </div>
       </div>
@@ -543,8 +534,7 @@ function renderKpis(m){
   // 数值兜底: 上游字段缺失时显示 — 而不是 NaN (realtime_minute 的
   // limit_down_le-10 曾被写成无括号属性访问, 全站跌停都显示 NaN)
   const num=v=>(typeof v==='number'&&isFinite(v))?v:'—';
-  const idx=(m.indices||[]).slice(0,4).map(i=>`<div class="kpi"><div class="n">${i.name}</div><div class="v ${cls(i.chg_pct)}">${fmt(i.price)}</div><div class="c ${cls(i.chg_pct)}">${sign(i.chg_pct)}%</div></div>`).join('');
-  document.getElementById('kpis').innerHTML=idx+`
+  document.getElementById('kpis').innerHTML=`
   <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 涨停; 与下方「涨停池」列表的家数可能不同 (列表为东财 tc 盘中口径)"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
   <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 跌停"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${num(m.broken)}</div><div class="c fl">家</div></div>
@@ -1334,10 +1324,81 @@ let dsRendered=false, mlRendered=false, thRendered=false,
 var _esc2 = s => String(s==null?'—':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 var _t = ts => ts ? String(ts).replace('T',' ').slice(5,16) : '';
 
-// ─── 1. 全球股市 (global_markets.json) ────────────────────────
-// 需求: A股/港股/日股/韩股/欧股/美股 六大市场分组展示,
-//       每个指数带现价/涨跌/当地状态(●盘中 ○盘前 ◌盘后 ×休市)/当地时间,
-//       全球情绪仪表 + 解读; 点击指数名复用 StockDetail 看历年K线。
+// ─── 1. 统一市场行情 (global_markets.json) ────────────────────
+// A股与全球指数共用一个视图；历史 K 线只消费已采集的 index_kline/global_kline。
+function renderMarketTimeline(d){
+  const controls=document.getElementById('marketTimelineControls');
+  const chart=document.getElementById('marketTimelineChart');
+  const meta=document.getElementById('marketTimelineMeta');
+  const source=document.getElementById('marketTimelineSource');
+  if(!controls||!chart) return;
+  const gk=(window._data||{}).global_kline||{};
+  const ik=(window._data||{}).index_kline||{};
+  const A_IDX={'000001':'sh000001','399001':'sz399001','000688':'sh000688','899050':'bj899050','000300':'sh000300','399006':'sz399006'};
+  const KC2SYM={'HSI':'hkHSI','HSCEI':'hkHSCEI','HSTECH':'hkHSTECH','.DJI':'usDJI.OQ','.IXIC':'usIXIC.OQ','usSPX':'usSPX.OQ','N225':'jpN225','KOSPI':'krKOSPI','FTSE':'ukFTSE','DAX':'deDAX','CAC40':'frCAC40'};
+  const rows=(d&&Array.isArray(d.indices))?d.indices:[];
+  const options=[]; const seen={};
+  rows.forEach(function(x){ if(x.kline_code&&!seen[x.kline_code]){seen[x.kline_code]=1;options.push(x);} });
+  if(!options.length){
+    controls.innerHTML=''; chart.innerHTML='<div class="no-data">暂无可用历史 K 线数据</div>';
+    if(meta) meta.textContent='当前市场快照未提供可关联的历史序列';
+    if(source) source.textContent='历史数据未采集，不使用估算或占位走势。';
+    return;
+  }
+  let selected=(window._timelineCode&&seen[window._timelineCode])?window._timelineCode:options[0].kline_code;
+  let range=window._timelineRange||'ALL';
+  const getBars=function(code){
+    const sym=KC2SYM[code]||code;
+    const raw=(gk.klines||{})[sym]||(gk.klines||{})[sym+'.OQ']||((gk.symbols||{})[sym]||{}).bars;
+    if(Array.isArray(raw)&&raw.length) return raw.map(function(b){
+      if(Array.isArray(b)) return {date:b[0],open:+b[1],close:+b[2],high:+b[3],low:+b[4],vol:+b[5]||0};
+      return {date:b.date,open:+b.open,close:+b.close,high:+b.high,low:+b.low,vol:+b.vol||0};
+    }).filter(function(b){return b.date&&isFinite(b.close)});
+    const key=A_IDX[code]||code;
+    const a=(ik.indices||{})[key]||(ik.indices||{})[code];
+    if(Array.isArray(a)&&a.length) return a.map(function(b){
+      return {date:b.date,open:+(b.open!=null?b.open:b.close),close:+b.close,high:+(b.high!=null?b.high:b.close),low:+(b.low!=null?b.low:b.close),vol:+(b.vol||0)};
+    }).filter(function(b){return b.date&&isFinite(b.close)});
+    return [];
+  };
+  const draw=function(){
+    const opt=options.filter(function(x){return x.kline_code===selected;})[0]||options[0];
+    const bars=getBars(selected);
+    const n=range==='ALL'?bars.length:Math.min(+range,bars.length);
+    const view=bars.slice(-n);
+    const name=opt.name||selected;
+    controls.innerHTML='<label style="font-size:10px;color:var(--tx2)">指数 <select id="timelineIndexSelect" style="padding:4px 7px;border:1px solid var(--border2);border-radius:6px;background:var(--panel);color:var(--tx);font-size:11px">'+
+      options.map(function(x){return '<option value="'+_esc2(x.kline_code)+'"'+(x.kline_code===selected?' selected':'')+'>'+_esc2(x.name)+' · '+_esc2(x.kline_code)+'</option>';}).join('')+'</select></label>'+
+      '<span style="font-size:10px;color:var(--tx2)">范围</span>'+['60','120','250','ALL'].map(function(r){return '<button type="button" data-timeline-range="'+r+'" style="padding:4px 8px;border:1px solid '+(r===range?'var(--accent)':'var(--border2)')+';border-radius:6px;background:'+(r===range?'var(--bg2)':'var(--panel)')+';color:'+(r===range?'var(--accent)':'var(--tx2)')+';font-size:10px;cursor:pointer">'+(r==='ALL'?'全部':'近'+r+'根')+'</button>';}).join('');
+    const select=document.getElementById('timelineIndexSelect');
+    if(select) select.onchange=function(){window._timelineCode=this.value;selected=this.value;range='ALL';window._timelineRange=range;draw();};
+    Array.prototype.forEach.call(controls.querySelectorAll('[data-timeline-range]'),function(btn){btn.onclick=function(){range=btn.getAttribute('data-timeline-range');window._timelineRange=range;draw();};});
+    if(!view.length){
+      chart.innerHTML='<div class="no-data">'+_esc2(name)+' 暂无历史 K 线数据（仅保留真实采集结果）</div>';
+      if(meta) meta.textContent=name+' · 当前没有对应历史序列';
+      if(source) source.textContent='未找到 '+_esc2(selected)+' 的历史数据；A 股需 index_kline，海外需 global_kline。';
+      return;
+    }
+    const W=Math.max(720,view.length*8),H=230,padL=34,padR=12,padT=12,padB=34;
+    let lo=Infinity,hi=-Infinity; view.forEach(function(b){lo=Math.min(lo,b.low);hi=Math.max(hi,b.high);});
+    if(!(hi>lo)){hi=lo+1;}
+    const sx=function(i){return padL+i*(W-padL-padR)/Math.max(1,view.length-1);};
+    const sy=function(v){return padT+(hi-v)/(hi-lo)*(H-padT-padB);};
+    const step=Math.max(1,Math.ceil(view.length/12));
+    let marks='',candles='';
+    view.forEach(function(b,i){
+      const x=sx(i),up=b.close>=b.open,col=up?'var(--up)':'var(--dn)';
+      candles+='<line x1="'+x.toFixed(1)+'" y1="'+sy(b.high).toFixed(1)+'" x2="'+x.toFixed(1)+'" y2="'+sy(b.low).toFixed(1)+'" stroke="'+col+'" stroke-width="1"/><rect x="'+(x-2.5).toFixed(1)+'" y="'+Math.min(sy(b.open),sy(b.close)).toFixed(1)+'" width="5" height="'+Math.max(1,Math.abs(sy(b.open)-sy(b.close))).toFixed(1)+'" fill="'+col+'"/>';
+      if(i%step===0||i===view.length-1) marks+='<line x1="'+x.toFixed(1)+'" y1="'+(H-padB+2)+'" x2="'+x.toFixed(1)+'" y2="'+(H-padB+6)+'" stroke="var(--border2)"/><text x="'+x.toFixed(1)+'" y="'+(H-10)+'" font-size="9" fill="var(--tx3)" text-anchor="middle">'+_esc2(String(b.date).slice(0,10))+'</text>';
+    });
+    chart.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="'+W+'" height="'+H+'" role="img" aria-label="'+_esc2(name)+' K线时间轴">'+
+      '<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" stroke="var(--border2)"/>'+candles+marks+'</svg>';
+    if(meta) meta.textContent=name+' · '+view[0].date+' 至 '+view[view.length-1].date+' · 显示 '+view.length+' / 全部 '+bars.length+' 根';
+    if(source) source.textContent='数据源: '+_esc2((gk.source||((window._data||{}).index_kline||{}).source||'云端已采集文件'))+' · 无数据时保持空态，不做跨指数拼接。';
+  };
+  draw();
+}
+
 function renderGlobalMarkets(d){
   const box=document.getElementById('globalMarketsBox');
   if(!box) return;
@@ -1353,8 +1414,9 @@ function renderGlobalMarkets(d){
     let closes=null;
     // 格式1: global_kline.symbols[sym].bars = [[date,o,c,h,l,v]]
     const gk=(window._data||{}).global_kline||{};
-    const v=(gk.symbols||{})[sym];
-    if(v&&v.bars&&v.bars.length>=5){ closes=v.bars.slice(-n).map(b=>b[2]); }
+    const v=(gk.symbols||{})[sym]||((gk.klines||{})[sym]);
+    if(v&&v.bars&&v.bars.length>=5){ closes=v.bars.slice(-n).map(b=>Array.isArray(b)?b[2]:b.close); }
+    if(Array.isArray(v)&&v.length>=5){ closes=v.slice(-n).map(b=>Array.isArray(b)?b[2]:b.close); }
     // 格式2: index_kline.indices[sym] = [{date,close,vol}] (A股指数)
     if(!closes){
       const ik=(window._data||{}).index_kline||{};
@@ -1439,14 +1501,14 @@ function renderGlobalMarkets(d){
 
   // 美股热门个股 (global_kline 里的 4 龙头, 不在 15 指数中)
   const gk=(window._data||{}).global_kline||{};
-  const stocks=Object.keys(gk.symbols||{}).filter(s=>/^us(AAPL|NVDA|TSLA|MSFT)$/.test(s));
+  const stocks=Object.keys(gk.symbols||gk.klines||{}).filter(s=>/^us(AAPL|NVDA|TSLA|MSFT)(\.OQ)?$/.test(s));
   if(stocks.length){
     const NM={usAAPL:'苹果',usNVDA:'英伟达',usTSLA:'特斯拉',usMSFT:'微软'};
     h+='<div class="hd" style="padding:6px 0">美股龙头 <span class="sub">近60日走势 · 点击看详情</span></div>';
     h+='<table><thead><tr><th>个股</th><th>收盘</th><th>日涨跌</th><th>近60日</th><th>K线数</th><th>区间</th></tr></thead><tbody>';
     stocks.forEach(sym=>{
-      const v=gk.symbols[sym];
-      const bars=v.bars||[];
+      const v=(gk.symbols||{})[sym]||((gk.klines||{})[sym]);
+      const bars=(v&&v.bars)||v||[];
       if(!bars.length) return;
       const last=bars[bars.length-1], prev=bars[bars.length-2]||last;
       const chg=prev[2]?((last[2]/prev[2]-1)*100):0;
@@ -1466,6 +1528,15 @@ function renderGlobalMarkets(d){
      '历史K线: 美股/港股由 collect_global_kline.py 每日增量构建 (腾讯 fqkline, 单次上限 640 根)。<br>'+
      '数据源: '+_esc2(d.source||'腾讯 sqt')+' · Research reference only, not investment advice.</div>';
   box.innerHTML=h;
+  renderMarketTimeline(d);
+  Array.prototype.forEach.call(box.querySelectorAll('.clk[data-kline]'),function(el){
+    el.onclick=function(){
+      window._timelineCode=el.getAttribute('data-kline');
+      renderMarketTimeline(d);
+      var tl=document.getElementById('marketTimeline');
+      if(tl) tl.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+  });
 }
 
 // 右侧栏: 全球情绪摘要 (与「全球股市」tab 不重复 — 这里只放总览)
@@ -4309,11 +4380,6 @@ function drawIndexChart(bars){
       '<svg viewBox="0 0 '+W+' '+VH+'" style="width:100%;height:auto;max-height:90px">'+vBars+'</svg>';
   }
 }
-
-(function bindIndex(){
-  var tab = document.querySelector('.c-tab[data-c="13"]');
-  if(tab) tab.addEventListener('click', function(){ renderIndex('sh000300'); });
-})();
 
 // ── 侧边栏导航: 点击 → 切换到对应 tab ──
 (function bindSideNav(){

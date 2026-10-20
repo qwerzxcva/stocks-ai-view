@@ -11,13 +11,13 @@
 //                                 -> _search.json (6027 code->name index)
 //                                 -> master/ universe
 //
-// Per-stock day kline lives in the shard repos:
+// Per-stock stock.json bundles live in the shard repos:
 //   jiegengxiangjianxue1/db-stocks-a -> shard 00
 //   jiegengxiangjianxue2/db-stocks-b -> shard 30
 //   jiegengxiangjianxue2/db-stocks-c -> shard 60
-//   jiegengxiangjianxue3/db-stocks-d -> shard 68 / 20
-// Per-stock quote / flow / technical are NOT in the warehouse:
-// stock-detail.js fetches those directly from Tencent -> Eastmoney -> Sina.
+//   jiegengxiangjianxue3/db-stocks-d -> shards 68 / 15 / 51 / 50 / 52 / 56 / 58
+//   jiegengxiangjianxue3/db-stocks-e -> remaining shards (coverage currently
+//   needs verification; absent bundles resolve null and callers fall back).
 (function () {
   'use strict';
 
@@ -29,9 +29,7 @@
     marketGC: GC + 'dufuwuxin/stocks-db-market/raw/main/',
   };
 
-  // Per-stock kline shard repos: code[:2] (first two digits) -> repo.
-  // Matches sync_repos.py SHARDS_* routing and the live upstream layout
-  // (verified: db-stocks-a/main/00/000001/kline/qfq.json -> 200).
+  // Per-stock bundle repos: first two digits -> repo.
   var SHARD_REPOS = {
     '00': 'jiegengxiangjianxue1/db-stocks-a/',
     '30': 'jiegengxiangjianxue2/db-stocks-b/',
@@ -43,7 +41,7 @@
     '52': 'jiegengxiangjianxue3/db-stocks-d/',
     '56': 'jiegengxiangjianxue3/db-stocks-d/',
     '58': 'jiegengxiangjianxue3/db-stocks-d/',
-    '20': 'jiegengxiangjianxue3/db-stocks-e/',
+    '20': 'jiegengxiangjianxue3/db-stocks-d/',
     '81': 'jiegengxiangjianxue3/db-stocks-e/',
     '83': 'jiegengxiangjianxue3/db-stocks-e/',
     '89': 'jiegengxiangjianxue3/db-stocks-e/',
@@ -173,13 +171,17 @@
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 
     // ── per stock ──
-    // 日 K 走分片仓 db-stocks-a/b/c/d (shard=code[2:4], 仓库内 <shard>/<code>/
-    // kline/qfq.json); 其余个股明细 (quote/flow/technical) 仓库里仍没有,
-    // 由 stock-detail.js 的腾讯→东财→新浪三源降级直取。
+    // Stock bundle fields are optional in practice. Callers must handle missing
+    // bundles/datasets and preserve live quote/provider fallbacks.
     searchIndex: function () { return get(REPOS.market + '_search.json', 600000); },
 
     stockManifest: function (code) {
-      return stockBundle(code).then(function (j) { return j && j.manifest || null; });
+      return stockBundle(code).then(function (j) {
+        if (!j || !j.manifest) return null;
+        var m = j.manifest;
+        return { code: j.code, name: j.name, ts: j.ts, datasets: m.datasets || {},
+          source: 'cloud stock.json' };
+      });
     },
     stockQuote: function (code) {
       return stockBundle(code).then(function (j) { return j && j.quote || null; });
@@ -205,6 +207,7 @@
     stockTechnical: function (code) {
       return stockBundle(code).then(function (j) { return j && j.technical || null; });
     },
+    stockBundle: function (code) { return stockBundle(code); },
 
     // ── csv helper: "# comment\ndate,open,close,high,low,volume" ──
     parseCsv: function (txt) {
