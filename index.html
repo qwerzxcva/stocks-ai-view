@@ -134,7 +134,8 @@ tr:hover td{background:rgba(137,87,229,.04)}
 .ftr{height:22px;background:var(--panel);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--tx3);flex-shrink:0;gap:12px}
 
 /* ─── v5 layout polish ─── */
-.c-tabs{display:flex;gap:0;padding:0 12px;background:var(--panel);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+/* 顶部 tab 与左侧侧边栏导航完全重复 (用户反馈 2026-10-20)，只留侧边栏 */
+.c-tabs{display:none}
 .c-tab{background:transparent;border:none;color:var(--tx3);font-size:11px;padding:8px 13px;cursor:pointer;font-weight:700;border-bottom:2px solid transparent;letter-spacing:.3px}
 .c-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .c-col .card{display:none}
@@ -153,7 +154,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
   html,body{overflow:auto}
   .main{display:block;overflow:visible}
   .col{overflow:visible;max-height:none!important;border-right:none;border-bottom:1px solid var(--border)}
-  .c-tabs{display:flex;flex-wrap:wrap}
+  .c-tabs{display:none}
 }
 @media (max-height:700px){.ftr{height:20px;font-size:8px}.kpis{height:46px}}
 </style>
