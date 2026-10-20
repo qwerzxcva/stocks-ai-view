@@ -62,6 +62,21 @@ def load_global():
     return None
 
 
+def buyability(code, quote, latest):
+    """Do not call stale or already-limit-up data an executable buy."""
+    digits = str(code).replace("sh", "").replace("sz", "").replace("bj", "")
+    for row in (latest.get("limit_up_pool") or []):
+        if isinstance(row, dict):
+            row_code = str(row.get("code", "")).replace("sh", "").replace("sz", "").replace("bj", "")
+            if row_code == digits:
+                return False, "上一快照已在涨停池；开盘前不列为可买，需竞价/盘口复核"
+    if quote is None or quote.status != "ok":
+        return None, "行情快照缺失或过期，不能确认开盘可成交"
+    if quote.session not in ("closed", "preopen"):
+        return None, "当前不在收盘/盘前复核状态，需竞价复核"
+    return True, "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核"
+
+
 def horizon_outlook():
     """明日/后日展望 — 基于历史同星期/月相统计 + 当前市场相位。"""
     out = {}
@@ -345,11 +360,14 @@ def main():
             r["risk_reward"] = round((r["target"] - upper) / (upper - r["stop"]), 2)
         r["history"] = {key: feature.get(key) for key in
                          ("ma20", "ma60", "ma120", "ma252", "length", "last_date", "conflicting_rows")}
+        r["buyable"], r["buyability_reason"] = buyability(r["code"], quote, load("latest.json") or {})
         missing = []
         if len(r["sources"]) < 2:
             missing.append("independent_engine_count")
         if not quote or quote.status != "ok" or quote.session not in ("closed", "preopen"):
             missing.append("quote_snapshot")
+        if r["buyable"] is not True:
+            missing.append("not_buyable_now")
         if not feature.get("coverage", {}).get("ma20"):
             missing.append("history_20d")
         if feature.get("conflicting_rows"):
@@ -372,6 +390,10 @@ def main():
                                  + (("%.2f" % r["stop"]) if r["stop"] else "严设"))
 
     def tier(r, idx):
+        if r.get("buyable") is False:
+            return "C"
+        if r.get("buyable") is None:
+            return "B"
         if "flow_div_sell" in r["sources"]:
             return "C"
         if r["data_quality"] != "verified":

@@ -65,6 +65,55 @@ def bare(code):
     return c[2:] if c[:2] in ("sh", "sz", "bj") else c
 
 
+def buyability(code, latest, now=None):
+    """Return current-session execution status; stale snapshots are not tradable evidence."""
+    unknown = (None, "实时可成交状态缺失，需盘前/盘口复核")
+    if any(bare(x.get("code")) == code
+           for x in (latest.get("limit_up_pool") or []) if isinstance(x, dict)):
+        return False, "最新涨停池标记为涨停，不列为普通可买候选"
+    for key in ("halted", "suspended"):
+        pool = latest.get(key) or []
+        if isinstance(pool, dict):
+            pool = pool.values()
+        if any(bare(x.get("code") if isinstance(x, dict) else x) == code
+               for x in pool):
+            return False, "最新状态标记为停牌/暂停交易"
+
+    records = []
+    for pool in latest.values():
+        if isinstance(pool, list):
+            records.extend(x for x in pool if isinstance(x, dict)
+                           and bare(x.get("code")) == code)
+    for record in records:
+        for key in ("halted", "suspended", "is_halted", "is_suspended"):
+            if record.get(key) is True:
+                return False, "最新状态标记为停牌/暂停交易"
+        status = str(record.get("trade_status") or record.get("status")
+                      or record.get("state") or "").lower()
+        if status in ("halted", "suspended", "停牌", "暂停交易", "s"):
+            return False, "最新状态标记为停牌/暂停交易"
+
+    current_quote = any(record.get("price") not in (None, 0, "", "0")
+                        and record.get("chg_pct") is not None
+                        for record in records)
+    snapshot_ts = latest.get("ts")
+    if not current_quote or not snapshot_ts:
+        return unknown
+    try:
+        snapshot_time = datetime.fromisoformat(str(snapshot_ts).replace("Z", "+00:00"))
+        reference_time = now or datetime.now(CST)
+        if snapshot_time.tzinfo is None:
+            snapshot_time = snapshot_time.replace(tzinfo=CST)
+        if reference_time.tzinfo is None:
+            reference_time = reference_time.replace(tzinfo=CST)
+        age_seconds = (reference_time - snapshot_time.astimezone(reference_time.tzinfo)).total_seconds()
+    except (TypeError, ValueError):
+        return unknown
+    if age_seconds < 0 or age_seconds > 15 * 60:
+        return None, "行情快照超过15分钟，候选仅观察；次日需重新检查涨停/停牌"
+    return True, "15分钟内行情快照未标记涨停/停牌；下单前仍需复核盘口"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--force", action="store_true",
@@ -102,6 +151,7 @@ def main():
             if calibration else {"edge_pp": None, "dir_weight": None}
         aligned, bear_w = empirical_edge.bear_aligned(x.get("votes"), calibration) \
             if calibration else (False, 0.0)
+        buyable, buyability_reason = buyability(code, lt)
         row = {
             "code": code,
             "name": master.get(code) or "",
@@ -115,6 +165,8 @@ def main():
                      if cal["edge_pp"] is not None else None),
             "bear_aligned": aligned,
             "engine": "engine_v5",
+            "buyable": buyable,
+            "buyability_reason": buyability_reason,
             "why": [v.get("why") for v in (x.get("votes") or []) if v.get("vote") == 1][:4],
         }
         if aligned:
@@ -127,6 +179,7 @@ def main():
     values = []
     for x in (v4.get("picks") or [])[:20]:
         code = bare(x.get("code"))
+        buyable, buyability_reason = buyability(code, lt)
         values.append({
             "code": code,
             "name": x.get("name") or master.get(code) or "",
@@ -136,6 +189,8 @@ def main():
             "pos240_pct": x.get("pos240_pct"),
             "score": x.get("score"),
             "engine": "ai_pick_v4",
+            "buyable": buyable,
+            "buyability_reason": buyability_reason,
         })
 
     # ── limit-up picks: ban_pick with T+1 probabilities ──

@@ -22,9 +22,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Sync remote main
         run: |
-          git fetch origin main
-          git merge --ff-only origin/main || echo "already up to date"
+          for attempt in 1 2 3; do
+            if git fetch origin main && git merge --ff-only origin/main; then
+              exit 0
+            fi
+            echo "::warning::sync remote main attempt ${attempt}/3 failed"
+            git merge --abort 2>/dev/null || true
+            [ "${attempt}" -lt 3 ] && sleep 5
+          done
+          echo "::error::sync remote main failed after 3 attempts"
+          exit 1
 
+      - uses: actions/checkout@v4
+        with:
           repository: qwerzxcva/stocks-tools
           path: tools-repo
       - uses: actions/checkout@v4
