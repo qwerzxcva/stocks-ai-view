@@ -43,6 +43,9 @@ jobs:
           git config user.email "41888888888+stocks-bot@users.noreply.github.com"
           git add -A
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          git diff --quiet HEAD && echo "no changes" || \
-            { git commit -m "pools-v4: $ts (cycle+sector+low+hotspot+multi)" && \
-              git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main
+          if git diff --quiet HEAD; then
+            echo "no changes"
+          else
+            git commit -m "pools-v4: $ts (cycle+sector+low+hotspot+multi)"
+            git -c http.version=HTTP/1.1 push origin main || git pull --rebase origin main
+          fi

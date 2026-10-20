@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """sync_mirror_shards.py — 把 B/C 镜像仓的分片数据拉回 A 仓。
 
-背景 (2026-10-17): 三账号分片采集里, B 仓 (jiegengxiangjianxue10) 跑
+背景 (2026-10-17): 三账号分片采集里, B 仓 (jiegengxiangjianxue) 跑
 shard b (东财 push2 实时系), C 仓 (dufuwuxin) 跑 shard c (交易所/同花顺),
 数据各自落在自己仓的 data/shard_<x>.json。A 仓 (本仓) 此前没有任何通道
 消费 B/C 的分片数据 —— 采集了也用不上。本脚本就是那个汇聚通道。
@@ -29,7 +29,9 @@ except Exception:
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 MIRRORS = {
-    "b": "https://raw.githubusercontent.com/jiegengxiangjianxue10/"
+    # jiegengxiangjianxue10 was suspended; its mirror was taken over by
+    # jiegengxiangjianxue, so the raw host must follow the same move.
+    "b": "https://raw.githubusercontent.com/jiegengxiangjianxue/"
          "stocks-ai-view-b/main/data/shard_b.json",
     "c": "https://raw.githubusercontent.com/dufuwuxin/"
          "stocks-ai-view-c/main/data/shard_c.json",

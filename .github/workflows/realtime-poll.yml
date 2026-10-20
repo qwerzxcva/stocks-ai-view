@@ -7,6 +7,9 @@ on:
   workflow_dispatch: {}
 permissions:
   contents: write
+concurrency:
+  group: realtime-poll
+  cancel-in-progress: false    # 不取消在跑的, 避免 export 产物被半途丢弃
 jobs:
   poll:
     runs-on: ubuntu-latest

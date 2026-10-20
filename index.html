@@ -195,15 +195,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="sn-item" data-c="5" style="padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;color:var(--tx3);border-left:3px solid transparent">🔥 热点主题</div>
     <div style="margin-top:auto;padding:8px 14px;font-size:9px;color:var(--tx3);border-top:1px solid var(--border)">Market Signal<br>Workbench v4</div>
   </div>
-  <!-- LEFT: 涨停板 (连板梯队已合并进表格) -->
-  <div class="col">
-    <div class="card">
-      <div class="hd">涨停板 <span class="sub" id="ladderH"></span></div>
-      <div class="bd" style="padding:0"><table><thead><tr><th>代码</th><th>名称</th><th>连板</th><th>首封</th><th>板高</th></tr></thead><tbody id="ztBody"></tbody></table>
-      <div id="ztAggBox" style="padding:6px 10px 8px"></div></div>
-      <div class="bd" id="mainlines" hidden></div>
-    </div>
-  </div>
   <!-- CENTER: tab 化面板 -->
   <div class="col c-col">
     <div class="c-tabs" id="cTabs">
@@ -297,6 +288,11 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       <div id="newsFlowBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
+      <!-- 实时热榜 (原右栏合入24h资讯) -->
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:0 12px 10px">
+        <div style="font-size:11px;font-weight:800;margin-bottom:4px">实时热榜 <span id="hotSideSub" style="font-weight:400;font-size:10px;color:var(--tx3)">Newsnow 15平台</span></div>
+        <div id="hotSide" style="font-size:11px;max-height:300px;overflow-y:auto"></div>
+      </div>
       <!-- renderNews 写入: 摘要计数 + 全文列表。容器缺失时整个资讯流不渲染。 -->
       <div id="newsCount" class="fl" style="padding:4px 12px;font-size:10px"></div>
       <div id="newsFull" style="padding:0 12px 8px"></div>
@@ -377,6 +373,26 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div class="card c-card" data-ci="11">
       <div class="hd">市场看板 <span class="sub" id="boardSub">指数 · 涨跌统计 · 分布 · 涨跌幅榜</span></div>
       <div id="panel-board" style="padding:10px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
+        <!-- 情绪仪表盘 (原右栏合入看板顶部) -->
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px">
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <div style="flex:1;min-width:180px">
+              <div style="font-size:11px;font-weight:800;margin-bottom:4px">市场情绪 <span id="gmSideSub" style="font-weight:400;font-size:10px;color:var(--tx3)">多空周期</span></div>
+              <div class="gauge-track"><div class="gauge-fill" id="gaugeI" style="width:0%"></div></div>
+              <div class="phase-meta"><span id="phaseStage">—</span><span id="phaseScore"></span></div>
+              <div id="phaseDesc" style="font-size:10px;color:var(--tx3);margin-top:2px"></div>
+            </div>
+            <div class="minis" id="phaseMinis" style="font-size:10px"></div>
+            <div id="gmSide" style="font-size:11px;min-width:140px"></div>
+          </div>
+        </div>
+        <!-- 涨停池 (原左栏合入看板) -->
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:800;margin-bottom:6px">涨停池 <span class="sub" id="ladderH" style="font-weight:400;font-size:10px;color:var(--tx3)"></span></div>
+          <table style="width:100%;font-size:11px"><thead><tr><th style="text-align:left">代码</th><th style="text-align:left">名称</th><th style="text-align:right">连板</th><th style="text-align:right">首封</th><th style="text-align:right">板高</th></tr></thead><tbody id="ztBody"></tbody></table>
+          <div id="ztAggBox" style="padding:4px 0 2px;font-size:10px;color:var(--tx3)"></div>
+          <div id="mainlines" hidden></div>
+        </div>
         <div class="fl" style="font-size:10px;color:var(--tx3);margin-bottom:5px">主要指数 <span id="boardIdxTs"></span></div>
         <div id="boardIdx" style="display:flex;flex-wrap:wrap;gap:8px"></div>
         <div id="boardStat" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px"></div>
@@ -422,23 +438,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <!-- RIGHT: 全球市场情绪 (已合并 A 股情绪周期) + 实时热榜 -->
-  <div class="col">
-    <div class="card">
-      <div class="hd">全球市场情绪 · A股周期 <span class="sub" id="gmSideSub">市场总体与多空周期</span></div>
-      <div class="bd gauge-box">
-        <div class="gauge-track"><div class="gauge-fill" id="gaugeI" style="width:0%"></div></div>
-        <div class="phase-meta"><span id="phaseStage">—</span><span id="phaseScore"></span></div>
-        <div id="phaseDesc" style="font-size:10px;color:var(--tx3);margin-top:3px"></div>
-        <div class="minis" id="phaseMinis" style="margin-top:8px"></div>
-        <div id="gmSide" style="font-size:11px;margin-top:8px"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="hd">实时热榜 <span class="sub" id="hotSideSub">Newsnow 15平台</span></div>
-      <div class="bd" id="hotSide" style="font-size:11px;max-height:calc(100vh - 420px);overflow-y:auto"></div>
     </div>
   </div>
 </div>

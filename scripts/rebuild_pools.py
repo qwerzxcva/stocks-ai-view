@@ -331,7 +331,21 @@ def main():
         print("[sector_pool] ❌ 腾讯行业接口不可用")
 
     # 2. 周期池
-    cp, klines = build_cycle_pool(120)
+    # 回看窗口: INDEX_KLINE_DAYS > index_history.json 里最短的可用指数长度 > 500
+    _days = int(os.environ.get("INDEX_KLINE_DAYS") or 0)
+    if not _days:
+        try:
+            with open(os.path.join(args.out_dir, "index_history.json"),
+                      encoding="utf-8") as f:
+                _ih = json.load(f)
+            _lens = [len(v) for v in (_ih.get("indices") or {}).values()
+                     if isinstance(v, list)]
+            _lens = [n for n in _lens if n > 0]
+            _days = min(_lens) if _lens else 500
+        except Exception:
+            _days = 500
+    print(f"[cycle] 回看窗口 {_days} 根 (INDEX_KLINE_DAYS={os.environ.get('INDEX_KLINE_DAYS') or '-'})")
+    cp, klines = build_cycle_pool(_days)
     if cp:
         p = os.path.join(args.out_dir, "cycle.json")
         with open(p, "w", encoding="utf-8") as f:

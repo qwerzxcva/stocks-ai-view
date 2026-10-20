@@ -41,6 +41,14 @@ except Exception:
 CLOUD_BULK = ("https://raw.githubusercontent.com/qwerzxcva/t1/"
               "main/data/bulk/day_qfq_%s.csv")
 
+# Full-history files are not sharded by code: every ticker lives in these, so a
+# per-code shard lookup would see only the recent window (~800 bars) and report
+# a false 86% missing ratio for any long-listed stock. Read them first and let
+# the shard act as a fallback. Sorted longest-first so `expand` wins.
+CLOUD_FULL = ("https://raw.githubusercontent.com/qwerzxcva/t1/"
+              "main/data/bulk/day_qfq_%s.csv")
+FULL_SERIES = ["expand", "extra", "recent"]
+
 
 def load_gt(path):
     """基准行情 → {date: {open,high,low,close,volume,hfq_factor}}"""
@@ -63,33 +71,36 @@ def load_gt(path):
 
 
 def load_bulk(code, cloud_shard=None):
-    """本地 bulk (全 shard 扫) 或云端指定 shard → {date: [o,c,h,l,vol]}"""
+    """→{date: [o,c,h,l,vol]}, full-history series first then the shard."""
     out = {}
-    if cloud_shard is not None:
-        url = CLOUD_BULK % cloud_shard
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": "validator/1.0"})
-            text = urllib.request.urlopen(req, timeout=120).read().decode("utf-8", "replace")
-            lines = text.splitlines()
-        except Exception as e:
-            print(f"[load] 云端 shard {cloud_shard} 拉取失败: {e}", file=sys.stderr)
-            return out
-        for line in lines:
+
+    def absorb(text):
+        for line in text.splitlines():
             if line.startswith(code + "|"):
-                p = line.split("|")
+                p = line.strip().split("|")
                 if len(p) >= 7:
                     out[p[1]] = [float(p[2]), float(p[3]), float(p[4]),
                                  float(p[5]), float(p[6])]
+
+    def fetch(tag):
+        url = CLOUD_FULL % tag
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "validator/1.0"})
+            return urllib.request.urlopen(req, timeout=120).read().decode("utf-8", "replace")
+        except Exception as e:
+            print(f"[load] {tag} 拉取失败: {e}", file=sys.stderr)
+            return ""
+
+    if cloud_shard is not None:
+        for tag in FULL_SERIES:
+            absorb(fetch(tag))
+        absorb(fetch(cloud_shard))
         return out
+
     import glob
     for fp in sorted(glob.glob(os.path.join(BULK, "day_qfq_*.csv"))):
         with open(fp, encoding="utf-8", errors="replace") as f:
-            for line in f:
-                if line.startswith(code + "|"):
-                    p = line.strip().split("|")
-                    if len(p) >= 7:
-                        out[p[1]] = [float(p[2]), float(p[3]), float(p[4]),
-                                     float(p[5]), float(p[6])]
+            absorb(f.read())
     return out
 
 
@@ -122,23 +133,49 @@ def main():
     latest_factor = gt[anchor]["hfq_factor"]
     common = [d for d in dates if d in bulk and d <= anchor]
 
-    n_missing = sum(1 for d in dates if d not in bulk)
-    missing_ratio = n_missing / len(dates) * 100
+    # 停牌日在基准里仍占一行但 volume=0；行情源不产出这些空 bar，
+    # 拿它们算缺失率会把「停牌」误判成「漏采」。只统计有成交的交易日。
+    trading_dates = [d for d in dates if gt[d].get("volume", 0) > 0]
+    suspended = len(dates) - len(trading_dates)
+    n_missing = sum(1 for d in trading_dates if d not in bulk)
+    missing_ratio = n_missing / len(trading_dates) * 100 if trading_dates else 0
 
     # 价格对比: 重建 qfq vs bulk close
+    #
+    # bulk 的 day_qfq_* 实为未复权原始价（文件名带 qfq 但源是新浪非复权），
+    # 必须先用复权因子表把它转成真 qfq 再比，否则两种错法都会发生：
+    # 直接比 qfq 期望 → 98% 假偏差；直接按 raw 放过 → 把「缺复权因子」的真问题盖掉。
+    FAC_DIR = os.path.join(os.path.dirname(HERE), "data", "adjusted", "factors")
+    fac_path = os.path.join(FAC_DIR, f"{args.code}.json")
+    factors = {}
+    if os.path.exists(fac_path):
+        try:
+            factors = (json.load(open(fac_path, encoding="utf-8")) or {}).get("factors") or {}
+        except Exception as e:
+            print(f"[load] 因子表解析失败 {fac_path}: {e}", file=sys.stderr)
+    if not factors:
+        print(f"  FAIL 缺复权因子表 {fac_path} —— bulk 是未复权价，不能当 qfq 用", file=sys.stderr)
+
     diffs = []
     factor_drifts = []
     prev_ratio = None
+
     for d in common:
         g = gt[d]
-        expect_qfq = g["close"] * g["hfq_factor"] / latest_factor
-        got = bulk[d][1]  # close
-        if expect_qfq <= 0:
+        exp_qfq = g["close"] * g["hfq_factor"] / latest_factor
+        got_raw = bulk[d][1]  # close
+        # 用因子表把 raw 转 qfq；无因子则该日无法验收，直接计入偏差
+        f_now = factors.get(d)
+        if f_now is None or not factors:
+            got = got_raw
+        else:
+            got = got_raw * f_now / latest_factor
+        if exp_qfq <= 0:
             continue
-        diff_pct = abs(got - expect_qfq) / expect_qfq * 100
-        diffs.append((diff_pct, d, got, expect_qfq))
+        diff_pct = abs(got - exp_qfq) / exp_qfq * 100
+        diffs.append((diff_pct, d, got, exp_qfq))
         # 隐含因子漂移: (bulk/基准raw) 日环比突变 = 疑似漏复权
-        ratio = got / g["close"] if g["close"] else 0
+        ratio = got_raw / g["close"] if g["close"] else 0
         if prev_ratio and prev_ratio > 0:
             drift = abs(ratio - prev_ratio) / prev_ratio * 100
             if drift > 1.0:
@@ -161,10 +198,11 @@ def main():
     print(f"  基准区间: {dates[0]} ~ {dates[-1]} ({len(dates)} 交易日)")
     print(f"  bulk 区间: {min(bulk)} ~ {max(bulk)} ({len(bulk)} 根) | 复权锚点: {anchor}")
     print(f"  共同交易日: {len(common)} | bulk 缺失(截至锚点): {n_missing} ({missing_ratio:.2f}%)")
+    print(f"  停牌/零成交日(基准有、行情源不出 bar): {suspended} 天, 不计入缺失")
     print(f"  收盘价偏差>{args.max_price_diff}%: {n_bad}/{len(diffs)} ({bad_ratio:.3f}%)")
     if diffs:
         print(f"  最大偏差: {diffs[0][0]:.3f}% @ {diffs[0][1]} (bulk={diffs[0][2]} vs 期望={diffs[0][3]:.3f})")
-    print(f"  量比中位数(股/股): {vol_med:.3f} (期望≈1.0, bulk 已用股数)")
+    print(f"  量比中位数(基准股/bulk单位): {vol_med:.3f} (期望≈1.0, bulk 已用股数)")
     if factor_drifts:
         print(f"  疑似漏复权日: {len(factor_drifts)} 处, 最近3: {factor_drifts[:3]}")
 
@@ -173,8 +211,10 @@ def main():
         fails.append(f"缺失率 {missing_ratio:.2f}% > {args.max_missing_ratio}%")
     if bad_ratio > 1.0:
         fails.append(f"价格偏差率 {bad_ratio:.3f}% > 1%")
-    if vol_med and not (0.5 < vol_med < 2.0):
-        fails.append(f"量比 {vol_med:.3f} 异常 (期望≈1.0)")
+    # 量纲: bulk 可能是股(比值≈1) 或手(比值≈100), 两者都算正常;
+    # 其余比值说明单位或成交量口径不一致
+    if vol_med and not (0.5 < vol_med < 2.0 or 50 < vol_med < 200):
+        fails.append(f"量比 {vol_med:.3f} 异常 (期望≈1 或 ≈100)")
 
     if args.json_out and diffs:
         detail = {"top_diffs": [dict(zip(("diff_pct", "date", "bulk", "expect"), x))

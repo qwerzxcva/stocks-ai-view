@@ -23,8 +23,6 @@ jobs:
         run: |
           git fetch origin main
           git merge --ff-only origin/main || echo "already up to date"
-
-          submodules: recursive
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
