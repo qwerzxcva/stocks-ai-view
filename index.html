@@ -62,19 +62,22 @@ body{background:var(--bg);color:var(--tx);font:12px/1.5 "SF Pro Text","PingFang 
   .c-tabs{display:none}
 }
 @media (max-width:640px){
-  .hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"logo refresh" "meta search";gap:6px 8px;padding:7px 10px;height:auto;min-height:58px;align-items:center}
+  .hdr{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"logo refresh" "meta meta" "search search";gap:6px 8px;padding:8px 10px;height:auto;min-height:92px;align-items:center}
   .logo{grid-area:logo;font-size:14px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .hdr > #algoBadge,.hdr > #stageBadge{display:none}
-  .hdr > #refreshBtn{grid-area:refresh;margin-left:0!important;padding:5px 10px!important;white-space:nowrap}
-  .hdr-meta{grid-area:meta;display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;flex-wrap:wrap;white-space:normal}
-  .hdr-meta .upd{margin-left:0;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .hdr > #refreshBtn{grid-area:refresh;margin-left:0!important;padding:5px 10px!important;white-space:nowrap;width:max-content;justify-self:end}
+  .hdr-meta{grid-area:meta;display:flex;align-items:center;gap:6px;min-width:0;max-width:100%;flex-wrap:wrap;white-space:normal;overflow:hidden}
+  .hdr-meta .upd{margin-left:0;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .hdr-meta #rtStatus{margin-left:0!important;flex-shrink:0}
-  .hdr-meta [id$="Tag"]{margin-left:0!important;flex-shrink:0;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+  .hdr-meta [id$="Tag"]{margin-left:0!important;flex-shrink:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .hdr > div:last-child{grid-area:search;margin-left:0!important;min-width:0;width:100%}
   .hdr > div:last-child input{width:100%!important;min-width:0;padding:5px 9px!important}
   .hdr > div:last-child #symResults{width:min(280px,calc(100vw - 20px))}
   .kpis{grid-template-columns:repeat(4,minmax(0,1fr));height:auto}
   .kpi{min-height:46px;padding:4px 8px}
+  #globalMarketsBox{overflow-x:auto}
+  #globalMarketsBox table{min-width:760px}
+  #globalMarketsBox .hd{min-width:760px}
   .main{display:flex;flex-direction:column;overflow:visible}
   #sideNav{flex-direction:row!important;overflow-x:auto;overflow-y:hidden;padding:0;height:42px;border-right:0;border-bottom:1px solid var(--border)}
   #sideNav .sn-item{flex:0 0 auto;padding:11px 10px!important;border-left:0!important;border-bottom:2px solid transparent;white-space:nowrap}
@@ -211,6 +214,7 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
     <div id="symResults" style="display:none;position:absolute;top:calc(100% + 3px);left:0;z-index:99;max-height:300px;overflow-y:auto;background:var(--bg2);border:1px solid var(--bd);border-radius:8px;width:280px;font-size:11px"></div>
   </div>
 </div>
+<div id="freshnessPanel" style="display:none;position:relative;z-index:15;padding:6px 12px;background:var(--panel);border-bottom:1px solid var(--border);font-size:10px;max-height:180px;overflow:auto"><div id="freshnessDetails"></div></div>
 <div class="kpis" id="kpis"></div>
 <div id="mktBreadth" style="display:none;margin:6px 0 10px;padding:6px 10px;border:1px solid var(--bd);border-radius:8px;font-size:11px">
   <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;margin-bottom:4px" id="breadthBar"></div>
@@ -535,8 +539,8 @@ function renderKpis(m){
   // limit_down_le-10 曾被写成无括号属性访问, 全站跌停都显示 NaN)
   const num=v=>(typeof v==='number'&&isFinite(v))?v:'—';
   document.getElementById('kpis').innerHTML=`
-  <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 涨停; 与下方「涨停池」列表的家数可能不同 (列表为东财 tc 盘中口径)"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
-  <div class="kpi" title="宽口径: 含 20cm(创业板/科创板) 与 30cm(北交所) 跌停"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
+  <div class="kpi" title="宽口径:含创业板/科创板/北交所，列表口径可能不同"><div class="n">涨停</div><div class="v up">${num(m.limit_up)}</div><div class="c fl">家</div></div>
+  <div class="kpi"><div class="n">跌停</div><div class="v dn">${num(m.limit_down)}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">炸板</div><div class="v" style="color:var(--amber)">${num(m.broken)}</div><div class="c fl">家</div></div>
   <div class="kpi"><div class="n">封板率</div><div class="v">${num(m.zt_rate)}</div><div class="c fl">%</div></div>`;
   // 市场宽度热力条 (market.advance/decline/turnover)
@@ -3428,7 +3432,26 @@ async function render(){
     if(!el||!man)return;
     const stale=man.stale_count||0, missing=man.missing_count||0;
     const ok=man.pipeline_status==='fresh'&&stale===0&&missing===0;
-    el.textContent=ok?'全链路新鲜':'部分数据过期 · '+stale+' stale';
+    const groups=man.groups||{};
+    const labels={market:'行情',engines:'引擎',pools:'候选池',sectors:'板块',financial:'财务',news:'新闻',global:'全球市场'};
+    const badGroups=Object.keys(groups).filter(k=>groups[k]&&groups[k].status!=='fresh');
+    const detail=badGroups.map(k=>labels[k]||k).join(' · ');
+    el.textContent=ok?'全链路新鲜':('部分数据过期 · '+stale+' 项'+(missing?' / 缺失 '+missing:'')+(detail?' · '+detail:''));
+    const freshnessPanel=document.getElementById('freshnessPanel');
+    const freshnessDetails=document.getElementById('freshnessDetails');
+    if(freshnessPanel&&freshnessDetails){
+      let rows=[];
+      badGroups.forEach(function(k){
+        const group=groups[k]||{};
+        rows.push('<b>'+_esc2(labels[k]||k)+'</b> · '+_esc2(group.status||'unknown'));
+        Object.keys(group.files||{}).forEach(function(name){
+          const file=group.files[name]||{};
+          if(file.status&&file.status!=='fresh') rows.push(_esc2(name)+' · '+_esc2(file.status)+' · '+_esc2(file.age_hours==null?'无时间戳':file.age_hours+'h'));
+        });
+      });
+      freshnessDetails.innerHTML=rows.length?rows.map(function(row){return '<div style="padding:2px 0">'+row+'</div>';}).join(''):'<div>暂无细分过期记录</div>';
+      el.onclick=function(){freshnessPanel.style.display=freshnessPanel.style.display==='none'?'block':'none';};
+    }
     el.style.display='inline-block';
     el.style.background=ok?'rgba(38,166,154,.18)':'rgba(239,83,80,.15)';
     el.style.border='1px solid '+(ok?'#26a69a':'#ef5350');
