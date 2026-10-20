@@ -81,7 +81,12 @@
   }
 
   function fetchKline(code, n, period) {
-    return fetchKlineTencent(code, n, period)
+    // 云端分片仓优先：db-stocks-a~d 有全史 1200 根, 不耗行情源配额;
+    // 空仓/失败才降级到腾讯→东财→新浪直取 (实时但只返近 60-640 根)
+    var cloudFirst = (window.DB && window.DB.stockKline)
+      ? window.DB.stockKline(code, period || 'day') : Promise.resolve([]);
+    return cloudFirst
+      .then(function (bars) { return bars && bars.length ? bars : fetchKlineTencent(code, n, period); })
       .then(function (bars) { return bars && bars.length ? bars : fetchKlineEastmoney(code, n, period); })
       .then(function (bars) { return bars && bars.length ? bars : fetchKlineSina(code, n, period); })
       .catch(function () { return []; });

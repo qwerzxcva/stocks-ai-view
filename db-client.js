@@ -11,10 +11,13 @@
 //                                 -> _search.json (6027 code->name index)
 //                                 -> master/ universe
 //
-// Per-stock detail (kline / quote / flow / technical) is NOT in the warehouse:
-// the shard repos db-stocks-a..e and db-market/data/stocks/ return 404 (the
-// bulk push never completed). stock-detail.js fetches those directly from
-// Tencent -> Eastmoney -> Sina instead.
+// Per-stock day kline lives in the shard repos:
+//   jiegengxiangjianxue1/db-stocks-a -> shard 00
+//   jiegengxiangjianxue2/db-stocks-b -> shard 30
+//   jiegengxiangjianxue2/db-stocks-c -> shard 60
+//   jiegengxiangjianxue3/db-stocks-d -> shard 68 / 20
+// Per-stock quote / flow / technical are NOT in the warehouse:
+// stock-detail.js fetches those directly from Tencent -> Eastmoney -> Sina.
 (function () {
   'use strict';
 
@@ -24,6 +27,28 @@
   var REPOS = {
     market: GH + 'jiegengxiangjianxue1/db-market/main/',
     marketGC: GC + 'dufuwuxin/stocks-db-market/raw/main/',
+  };
+
+  // Per-stock kline shard repos: code[:2] (first two digits) -> repo.
+  // Matches sync_repos.py SHARDS_* routing and the live upstream layout
+  // (verified: db-stocks-a/main/00/000001/kline/qfq.json -> 200).
+  var SHARD_REPOS = {
+    '00': 'jiegengxiangjianxue1/db-stocks-a/',
+    '30': 'jiegengxiangjianxue2/db-stocks-b/',
+    '60': 'jiegengxiangjianxue2/db-stocks-c/',
+    '68': 'jiegengxiangjianxue3/db-stocks-d/',
+    '15': 'jiegengxiangjianxue3/db-stocks-d/',
+    '51': 'jiegengxiangjianxue3/db-stocks-d/',
+    '50': 'jiegengxiangjianxue3/db-stocks-d/',
+    '52': 'jiegengxiangjianxue3/db-stocks-d/',
+    '56': 'jiegengxiangjianxue3/db-stocks-d/',
+    '58': 'jiegengxiangjianxue3/db-stocks-d/',
+    '20': 'jiegengxiangjianxue3/db-stocks-e/',
+    '81': 'jiegengxiangjianxue3/db-stocks-e/',
+    '83': 'jiegengxiangjianxue3/db-stocks-e/',
+    '89': 'jiegengxiangjianxue3/db-stocks-e/',
+    '90': 'jiegengxiangjianxue3/db-stocks-e/',
+    '92': 'jiegengxiangjianxue3/db-stocks-e/'
   };
 
   var cache = {};
@@ -47,6 +72,42 @@
       });
   }
 
+  // Like get(), but for the per-stock shard repos: no GitCode mirror exists,
+  // so on failure retry once on branch master, else resolve null.
+  // Shares the same per-session cache.
+  function getShard(url, ttl) {
+    var now = Date.now();
+    var hit = cache[url];
+    if (hit && now - hit.t < (ttl || 60000)) return Promise.resolve(hit.v);
+    return fetch(url, { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) { cache[url] = { t: now, v: j }; return j; })
+      .catch(function () {
+        if (url.indexOf('/main/') !== -1) {
+          return getShard(url.replace('/main/', '/master/'), ttl);
+        }
+        return null;
+      });
+  }
+
+  // stockBundle: read the merged per-stock object (stock.json) once and
+  // share it across kline/quote/technical/financial, so one fetch feeds every
+  // dataset instead of four separate requests against the same file.
+  var _bundleCache = {};
+  function stockBundle(code) {
+    var bare = String(code == null ? '' : code).replace(/\D/g, '').padStart(6, '0');
+    if (!/^\d{6}$/.test(bare)) return Promise.resolve(null);
+    if (_bundleCache[bare]) return _bundleCache[bare];
+    var shard = bare.slice(0, 2);
+    var repo = SHARD_REPOS[shard];
+    if (!repo) return Promise.resolve(null);
+    var url = GH + repo + 'main/' + shard + '/' + bare + '/stock.json';
+    _bundleCache[bare] = getShard(url, 600000).then(function (j) {
+      if (!j || typeof j !== 'object') return null;
+      return j;
+    });
+    return _bundleCache[bare];
+  }
   var api = {
     repos: REPOS,
     origin: function () { return origin; },
@@ -112,17 +173,38 @@
     hkStocks: function () { return get(REPOS.market + 'overseas/hk_stocks.json', 300000); },
 
     // ── per stock ──
-    // 分片仓 (db-stocks-a/b/c/d/e) 与 db-market/data/stocks/ 均未推送成功
-    // (实测全部 404, 只有 _search.json 的名称索引在)。个股明细因此不走仓库,
-    // 由 stock-detail.js 的腾讯→东财→新浪三源降级直取; 这里只保留仓库里
-    // 真实存在的数据: 名称索引 + 大盘/板块/海外。
+    // 日 K 走分片仓 db-stocks-a/b/c/d (shard=code[2:4], 仓库内 <shard>/<code>/
+    // kline/qfq.json); 其余个股明细 (quote/flow/technical) 仓库里仍没有,
+    // 由 stock-detail.js 的腾讯→东财→新浪三源降级直取。
     searchIndex: function () { return get(REPOS.market + '_search.json', 600000); },
 
-    stockManifest: function (code) { return Promise.resolve(null); },
-    stockQuote: function (code) { return Promise.resolve(null); },
+    stockManifest: function (code) {
+      return stockBundle(code).then(function (j) { return j && j.manifest || null; });
+    },
+    stockQuote: function (code) {
+      return stockBundle(code).then(function (j) { return j && j.quote || null; });
+    },
     stockFlow: function (code) { return Promise.resolve(null); },
-    stockKline: function (code, freq) { return Promise.resolve([]); },
-    stockTechnical: function (code) { return Promise.resolve(null); },
+    stockFinancial: function (code) {
+      return stockBundle(code).then(function (j) { return j && j.financial || []; });
+    },
+    // Returns [{date,open,close,high,low,vol}], same shape as parseCsv and
+    // the direct-provider fetchers in stock-detail.js. Only day freq exists
+    // in the warehouse; any failure resolves [] so the Tencent fallback in
+    // stock-detail.js keeps working.
+    stockKline: function (code, freq) {
+      if (freq && freq !== 'day') return Promise.resolve([]);
+      return stockBundle(code).then(function (j) {
+        if (!j || !Array.isArray(j.kline)) return [];
+        return j.kline.map(function (r) {
+          return { date: r[0], open: +r[1], close: +r[2],
+                   high: +r[3], low: +r[4], vol: +r[5] };
+        });
+      });
+    },
+    stockTechnical: function (code) {
+      return stockBundle(code).then(function (j) { return j && j.technical || null; });
+    },
 
     // ── csv helper: "# comment\ndate,open,close,high,low,volume" ──
     parseCsv: function (txt) {
