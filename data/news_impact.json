@@ -1,24 +1,66 @@
 {
- "ts": "2026-10-20T21:20:51+08:00",
+ "ts": "2026-10-20T23:26:23+08:00",
  "engine": "news_impact v1 (三层映射 + 规则式情感)",
  "n_input": 479,
- "n_mapped": 70,
- "n_unmapped": 356,
+ "n_mapped": 50,
+ "n_unmapped": 381,
  "match_stat": {
-  "stock": 3,
-  "concept": 5,
-  "industry": 53,
+  "stock": 1,
+  "concept": 9,
+  "industry": 37,
   "annotated": 0,
-  "theme": 9,
-  "unmapped": 356
+  "theme": 3,
+  "unmapped": 381
  },
  "direction_stat": {
-  "bull": 37,
-  "bear": 20,
-  "neutral": 367,
+  "bull": 44,
+  "bear": 14,
+  "neutral": 371,
   "mixed": 2
  },
  "impacts": [
+  {
+   "title": "周小川：应开展研究并做好预案，防范AI领域投资失败引发的金融风险",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T16:07:48+08:00",
+   "url": "https://wallstreetcn.com/live/3181711",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "bear",
+   "confidence": 0.7,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
+   "stocks": [
+    {
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
+    },
+    {
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
+    }
+   ]
+  },
+  {
+   "title": "英伟达新突破：用8192块GPU 刻下容错量子计算模拟里程碑",
+   "source": "财联社热门",
+   "time": "2026-10-20T23:26:10+08:00",
+   "url": "https://www.cls.cn/detail/2509660",
+   "channel": "",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.7,
+   "matched_by": "concept",
+   "match_detail": "概念「量子计算」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "003029",
+     "name": ""
+    }
+   ]
+  },
   {
    "title": "长江证券：2026年10月20日首次回购公司股份452.29万股，占总股本0.08%，成交价7.51元/股至7.64元/",
    "source": "wallstreetcn",
@@ -33,281 +75,80 @@
    "confidence": 0.7,
    "matched_by": "industry",
    "match_detail": "industry:金融",
-   "n_stocks": 10,
+   "n_stocks": 1,
    "stocks": [
     {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
+     "code": "000001",
+     "name": "平安银行"
     }
    ]
   },
   {
-   "title": "中国人民银行：将在10月21日至11月2日开展隔夜逆回购操作，采用固定利率、数量招标，每日操作量不超过10000亿元。",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T10:01:39+08:00",
-   "url": "https://wallstreetcn.com/live/3181527",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "周小川：应开展研究并做好预案，防范AI领域投资失败引发的金融风险",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T16:07:48+08:00",
-   "url": "https://wallstreetcn.com/live/3181711",
-   "channel": "us-stock-channel",
+   "title": "韩国AI新股上市首日暴跌 美股科技题材再度承压 | 今夜看点",
+   "source": "财联社热门",
+   "time": "2026-10-20T23:26:10+08:00",
+   "url": "https://www.cls.cn/detail/2510214",
+   "channel": "",
    "themes": [],
    "direction": "bear",
-   "confidence": 0.7,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "周小川：应开展研究并做好预案，防范AI领域投资失败引发的金融风险",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T16:07:48+08:00",
-   "url": "https://wallstreetcn.com/live/3181711",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "bear",
-   "confidence": 0.7,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "财联社10月20日电，GE航空航天首席财务官表示，有信心帮助波音将787交付量提升至月产10架的水平。",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510180",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
    "confidence": 0.6,
    "matched_by": "industry",
-   "match_detail": "industry:军工",
-   "n_stocks": 6,
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "512810",
-     "name": "军工ETF华宝"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "512680",
-     "name": "军工ETF广发"
-    },
-    {
-     "code": "512660",
-     "name": "军工ETF国泰"
-    },
-    {
-     "code": "512560",
-     "name": "军工ETF易方达"
-    },
-    {
-     "code": "512670",
-     "name": "国防ETF鹏华"
-    },
-    {
-     "code": "300900",
-     "name": "广联航空"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "【风口研报·公司】这家全球影像全栈服务商所处赛道仍处渗透率早期，短视频与AI剪辑生态不断带动市场扩容，首批备货不到24小时售罄；另有公司深耕高端装备材料，上半年新签订单同比增长超50%",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2509775",
+   "title": "CoreWeave一度涨超5.3%，美股盘初曾跌超6.3%。\n\n美股AI软件先驱指数涨幅扩大至1.1%，AI赢家指数涨幅一度扩大至0.7%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-20T23:09:09+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182015",
    "channel": "",
    "themes": [],
    "direction": "bull",
    "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "机器人概念为何突然上涨",
-   "source": "今日头条",
-   "time": "2026-10-20T20:58:03+08:00",
-   "url": "https://www.toutiao.com/trending/7698665748238962227/",
+   "title": "丰业银行：Anthropic的首次公开募股（IPO）将把谷歌母公司Alphabet和亚马逊资产负债表上最大的私有AI持股之一转化为公开定价的资产。\n\n但更关键的问题在于Anthropic作为谷歌云和亚马逊网络服务（AWS）客户的重要性日益凸显。\n\n以1.5万亿美元的估值计算，估计Anthropic的股权对Alphabet而言每股价值约16美元，约占其股票总值的5%；对亚马逊而言每股价值约27美元，相当于其股票总值的近10%。\n\n亚马逊将从其持股价值中获益更多。",
+   "source": "华尔街见闻",
+   "time": "2026-10-20T23:09:09+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182007",
    "channel": "",
    "themes": [],
    "direction": "bull",
    "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
@@ -326,27 +167,61 @@
    "confidence": 0.6,
    "matched_by": "theme",
    "match_detail": "题材「机器人概念股」→产业链「人工智能」",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
+    }
+   ]
+  },
+  {
+   "title": "CoreWeave一度涨超5.3%，美股盘初曾跌超6.3%。\n\n美股AI软件先驱指数涨幅扩大至1.1%，AI赢家指数涨幅",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T22:57:13+08:00",
+   "url": "https://wallstreetcn.com/live/3182015",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
+   "stocks": [
+    {
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "002421",
-     "name": "达实智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
+    }
+   ]
+  },
+  {
+   "title": "丰业银行：Anthropic的首次公开募股（IPO）将把谷歌母公司Alphabet和亚马逊资产负债表上最大的私有AI持股",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T22:46:29+08:00",
+   "url": "https://wallstreetcn.com/live/3182007",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
+   "stocks": [
+    {
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
@@ -361,100 +236,34 @@
    "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "英伟达新突破：用8192块GPU 刻下容错量子计算模拟里程碑",
-   "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2509660",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.7,
-   "matched_by": "concept",
-   "match_detail": "概念「量子计算」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "003029",
-     "name": "吉大正元"
-    }
-   ]
-  },
-  {
-   "title": "中国移动：首3季度股东应占利润1062亿元，同比下降7.9%",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T18:45:00+08:00",
-   "url": "https://wallstreetcn.com/live/3181876",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "A股动态滚动播报",
-    "通信概念股",
-    "5G概念股",
-    "公司财报大集合"
-   ],
-   "direction": "bear",
-   "confidence": 0.6,
-   "matched_by": "theme",
-   "match_detail": "题材「通信概念股」→产业链「通信」",
    "n_stocks": 2,
    "stocks": [
     {
-     "code": "515880",
-     "name": "通信ETF国泰"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "515050",
-     "name": "通信ETF华夏"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "宁德时代：前三季度归母净利润645.3亿元，同比增长31.60%",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T19:58:03+08:00",
-   "url": "https://wallstreetcn.com/live/3181920",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "A股动态滚动播报",
-    "锂电池概念股",
-    "公司财报大集合",
-    "这些股票业绩预增"
-   ],
-   "direction": "bull",
+   "title": "财联社10月20日电，IBM旗下的风险投资部门IBM Ventures宣布，已投资企业AI智能体平台Leena AI，旨在加速智能体AI在企业后台的部署和应用。",
+   "source": "财联社电报",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2510322",
+   "channel": "",
+   "themes": [],
+   "direction": "bear",
    "confidence": 0.6,
-   "matched_by": "theme",
-   "match_detail": "题材「锂电池概念股」→产业链「有色」",
+   "matched_by": "concept",
+   "match_detail": "概念「AI智能体」",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "512400",
-     "name": "有色金属ETF南方"
+     "code": "688023",
+     "name": ""
     }
    ]
   },
@@ -484,789 +293,101 @@
    ]
   },
   {
-   "title": "天齐锂业：预计2026年前三季度归母净利润51亿元-60亿元，同比增长2734.97%-3235.26%",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T18:49:58+08:00",
-   "url": "https://wallstreetcn.com/live/3181879",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "A股动态滚动播报",
-    "锂电池概念股",
-    "公司财报大集合",
-    "这些股票业绩预增"
-   ],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "theme",
-   "match_detail": "题材「锂电池概念股」→产业链「有色」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "港股锂电池板块跌幅扩大，宁德时代跌超8%，中创新航跌超9%。",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T13:46:52+08:00",
-   "url": "https://wallstreetcn.com/live/3181605",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "锂业分会：9月碳酸锂价格加速下跌 锂辉石进口量增长 津巴布韦锂矿陆续到港",
-   "source": "cls",
-   "time": "2026-10-20T21:17:59+08:00",
-   "url": "https://www.cls.cn/detail/2510245",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "国家统计局：第三季度金融业GDP同比增长4.1%，房地产业GDP同比下降0.4%，住宿和餐饮业GDP同比增长6.3%。",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T09:54:25+08:00",
-   "url": "https://wallstreetcn.com/live/3181525",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "mixed",
-   "confidence": 0.4,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "潘功胜金融街论坛发声释放重磅信号 短端利率调控改革有何深意？权威解读来了！",
-   "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2509402",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "今年金融街论坛释放哪些信号？券商一线解读",
-   "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2509793",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "财联社10月20日电，Arcus生物科学公司在盘前交易中下跌12%。",
+   "title": "美国人工智能事务主管称负责任开发AI的建议将很快发布",
    "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510197",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:医药",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159929",
-     "name": "医药ETF汇添富"
-    },
-    {
-     "code": "159938",
-     "name": "医药ETF广发"
-    },
-    {
-     "code": "510660",
-     "name": "医药ETF华夏"
-    },
-    {
-     "code": "512010",
-     "name": "医药ETF易方达"
-    },
-    {
-     "code": "512120",
-     "name": "医药ETF华安"
-    },
-    {
-     "code": "512170",
-     "name": "医疗ETF华宝"
-    },
-    {
-     "code": "301520",
-     "name": "万邦医药"
-    },
-    {
-     "code": "600721",
-     "name": "百花医药"
-    },
-    {
-     "code": "600613",
-     "name": "神奇制药"
-    },
-    {
-     "code": "301230",
-     "name": "泓博医药"
-    }
-   ]
-  },
-  {
-   "title": "中信银行为何成了“香饽饽”",
-   "source": "今日头条",
-   "time": "2026-10-20T20:58:03+08:00",
-   "url": "https://www.toutiao.com/trending/7698684092216249892/",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "贝达药业：注射用BPI-585771用于治疗晚期实体瘤的临床试验申请获NMPA受理。",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T19:13:36+08:00",
-   "url": "https://wallstreetcn.com/live/3181893",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "医药概念股",
-    "股市重要公告提醒"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "theme",
-   "match_detail": "题材「医药概念股」→产业链「医药」",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159929",
-     "name": "医药ETF汇添富"
-    },
-    {
-     "code": "159938",
-     "name": "医药ETF广发"
-    },
-    {
-     "code": "510660",
-     "name": "医药ETF华夏"
-    },
-    {
-     "code": "512010",
-     "name": "医药ETF易方达"
-    },
-    {
-     "code": "512120",
-     "name": "医药ETF华安"
-    },
-    {
-     "code": "512170",
-     "name": "医疗ETF华宝"
-    },
-    {
-     "code": "301520",
-     "name": "万邦医药"
-    },
-    {
-     "code": "600721",
-     "name": "百花医药"
-    },
-    {
-     "code": "600613",
-     "name": "神奇制药"
-    },
-    {
-     "code": "301230",
-     "name": "泓博医药"
-    }
-   ]
-  },
-  {
-   "title": "欣旺达：全资子公司拟出资2.25亿元参与设立储能资产私募股权基金",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T18:54:08+08:00",
-   "url": "https://wallstreetcn.com/live/3181885",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "储能概念股",
-    "股市重要公告提醒"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "泽璟制药：近日收到艾伯维基于临床试验进展支付的1000万美元近期里程碑付款，系双方就ZG006（Alveltamig）全",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T18:33:16+08:00",
-   "url": "https://wallstreetcn.com/live/3181866",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "医药概念股",
-    "股市重要公告提醒"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "theme",
-   "match_detail": "题材「医药概念股」→产业链「医药」",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159929",
-     "name": "医药ETF汇添富"
-    },
-    {
-     "code": "159938",
-     "name": "医药ETF广发"
-    },
-    {
-     "code": "510660",
-     "name": "医药ETF华夏"
-    },
-    {
-     "code": "512010",
-     "name": "医药ETF易方达"
-    },
-    {
-     "code": "512120",
-     "name": "医药ETF华安"
-    },
-    {
-     "code": "512170",
-     "name": "医疗ETF华宝"
-    },
-    {
-     "code": "301520",
-     "name": "万邦医药"
-    },
-    {
-     "code": "600721",
-     "name": "百花医药"
-    },
-    {
-     "code": "600613",
-     "name": "神奇制药"
-    },
-    {
-     "code": "301230",
-     "name": "泓博医药"
-    }
-   ]
-  },
-  {
-   "title": "无人配送车制造商新石器完成4亿美元融资 阿里巴巴旗下基金参与投资",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T10:26:28+08:00",
-   "url": "https://wallstreetcn.com/live/3181539",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    },
-    {
-     "code": "512900",
-     "name": "证券ETF南方"
-    },
-    {
-     "code": "512880",
-     "name": "证券ETF国泰"
-    },
-    {
-     "code": "512820",
-     "name": "银行ETF汇添富"
-    },
-    {
-     "code": "512800",
-     "name": "银行ETF华宝"
-    },
-    {
-     "code": "512700",
-     "name": "银行ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "远大医药满沐安®中国大陆首批处方落地",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T09:35:28+08:00",
-   "url": "https://wallstreetcn.com/live/3181511",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:医药",
-   "n_stocks": 10,
-   "stocks": [
-    {
-     "code": "159929",
-     "name": "医药ETF汇添富"
-    },
-    {
-     "code": "159938",
-     "name": "医药ETF广发"
-    },
-    {
-     "code": "510660",
-     "name": "医药ETF华夏"
-    },
-    {
-     "code": "512010",
-     "name": "医药ETF易方达"
-    },
-    {
-     "code": "512120",
-     "name": "医药ETF华安"
-    },
-    {
-     "code": "512170",
-     "name": "医疗ETF华宝"
-    },
-    {
-     "code": "301520",
-     "name": "万邦医药"
-    },
-    {
-     "code": "600721",
-     "name": "百花医药"
-    },
-    {
-     "code": "600613",
-     "name": "神奇制药"
-    },
-    {
-     "code": "301230",
-     "name": "泓博医药"
-    }
-   ]
-  },
-  {
-   "title": "市场真慌了？AI相关CDS需求出现“井喷”！",
-   "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2509620",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2510316",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "CoreWeave引爆AI融资恐慌！华尔街集体“救火”：不足以动摇整体AI交易",
-   "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2509382",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "美国股指期货走低 AI相关忧虑重返市场",
+   "title": "【电报解读】小鹏汇天陆地航母飞行器将进入沙盒试运行，机构称特斯拉新一代Roadster“飞行汽车”功能雏形将在海外推动相关场景需求释放，这家公司参与了eVTOL等智能飞行器和核心零部件的研发制造",
    "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510203",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2510315",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "【财联社早知道】重磅！国家数据集团成立，分析师称2026年数据要素价值释放和产业开花有望加速，这家公司已形成从云服务、大模型服务、数据服务到智能应用的全链路服务能力",
+   "title": "3天2板南威软件：公司已制作完成的AI短剧尚未在任何平台上线 目前未产生收入",
    "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2509816",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2510296",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "【电报解读】新央企！国资委宣布组建“国家数据集团”，机构看好制度驱动叠加AI催化下，2026年有望迎来数据要素价值释放年，这家公司的数据资产平台可以为AI Agent应用开发提供高质量数据输入",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510174",
+   "title": "美国AI事务主管称负责任开发AI的建议将很快发布",
+   "source": "华尔街见闻",
+   "time": "2026-10-20T23:09:09+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182009",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "现在 AI 短剧满天飞，怎么没见影视行业人员发声？",
    "source": "知乎热榜",
-   "time": "2026-10-20T21:20:41+08:00",
+   "time": "2026-10-20T23:11:17+08:00",
    "url": "https://www.zhihu.com/question/2090228809819862141",
    "channel": "",
    "themes": [],
@@ -1274,104 +395,45 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "如何看待 9 月 BBA 旗下无一车型零售破万？这是否意味着消费者不再单纯认豪华车标？",
+   "title": "为什么目前 AI 的设备是用 Mac 为主，而不是熟知的 Windows？",
    "source": "知乎热榜",
-   "time": "2026-10-20T21:20:41+08:00",
-   "url": "https://www.zhihu.com/question/2095630667409254223",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "如何评价 DeepSeek V4.1 Flash 1017 登顶「史上最差 AI 模型名称排行榜」?",
-   "source": "知乎热榜",
-   "time": "2026-10-20T21:20:41+08:00",
-   "url": "https://www.zhihu.com/question/2095476625228019430",
+   "time": "2026-10-20T23:11:17+08:00",
+   "url": "https://www.zhihu.com/question/2059660303915397288",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "UP主拆解爆款AI代码动画",
    "source": "B站热搜",
-   "time": "2026-10-20T20:58:42+08:00",
+   "time": "2026-10-20T22:59:43+08:00",
    "url": "https://search.bilibili.com/all?keyword=UP%E4%B8%BB%E6%8B%86%E8%A7%A3%E7%88%86%E6%AC%BEAI%E4%BB%A3%E7%A0%81%E5%8A%A8%E7%94%BB",
    "channel": "",
    "themes": [],
@@ -1379,244 +441,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "专家：房地产最危险的是不涨也不跌",
-   "source": "今日头条",
-   "time": "2026-10-20T20:58:03+08:00",
-   "url": "https://www.toutiao.com/trending/7698687758277021226/",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:地产",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159931",
-     "name": "金融地产ETF汇添富"
-    },
-    {
-     "code": "159933",
-     "name": "金融地产ETF国投瑞银"
-    },
-    {
-     "code": "159940",
-     "name": "金融地产ETF广发"
-    },
-    {
-     "code": "510650",
-     "name": "金融地产ETF华夏"
-    },
-    {
-     "code": "512640",
-     "name": "金融地产ETF嘉实"
-    }
-   ]
-  },
-  {
-   "title": "邵永灵：黄仁勋嘲讽默茨争取AI主权",
-   "source": "今日头条",
-   "time": "2026-10-20T20:58:03+08:00",
-   "url": "https://www.toutiao.com/trending/7698683773830843954/",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "使用机器人省下来的钱该归谁",
-   "source": "今日头条",
-   "time": "2026-10-20T20:58:03+08:00",
-   "url": "https://www.toutiao.com/trending/7698665412187131434/",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "瓶装饮料集体涨价",
-   "source": "百度热搜",
-   "time": "2026-10-20T20:58:02+08:00",
-   "url": "https://www.baidu.com/s?wd=%E7%93%B6%E8%A3%85%E9%A5%AE%E6%96%99%E9%9B%86%E4%BD%93%E6%B6%A8%E4%BB%B7",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "女生辞职去旅游 父母转4000支持",
-   "source": "百度热搜",
-   "time": "2026-10-20T20:58:02+08:00",
-   "url": "https://www.baidu.com/s?wd=%E5%A5%B3%E7%94%9F%E8%BE%9E%E8%81%8C%E5%8E%BB%E6%97%85%E6%B8%B8+%E7%88%B6%E6%AF%8D%E8%BD%AC4000%E6%94%AF%E6%8C%81",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "星巴克消费入座获支持 消费者变了",
-   "source": "百度热搜",
-   "time": "2026-10-20T20:58:02+08:00",
-   "url": "https://www.baidu.com/s?wd=%E6%98%9F%E5%B7%B4%E5%85%8B%E6%B6%88%E8%B4%B9%E5%85%A5%E5%BA%A7%E8%8E%B7%E6%94%AF%E6%8C%81+%E6%B6%88%E8%B4%B9%E8%80%85%E5%8F%98%E4%BA%86",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "外网评最烂AI命名榜,DS夺冠",
    "source": "贴吧热议",
-   "time": "2026-10-20T20:58:08+08:00",
+   "time": "2026-10-20T22:58:30+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367763&amp;topic_name=%E5%A4%96%E7%BD%91%E8%AF%84%E6%9C%80%E7%83%82AI%E5%91%BD%E5%90%8D%E6%A6%9C%2CDS%E5%A4%BA%E5%86%A0",
    "channel": "",
    "themes": [],
@@ -1624,34 +464,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "AI画大肥鱼翻车,鲸鱼娘遭殃",
    "source": "贴吧热议",
-   "time": "2026-10-20T20:58:08+08:00",
+   "time": "2026-10-20T22:58:30+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367596&amp;topic_name=AI%E7%94%BB%E5%A4%A7%E8%82%A5%E9%B1%BC%E7%BF%BB%E8%BD%A6%2C%E9%B2%B8%E9%B1%BC%E5%A8%98%E9%81%AD%E6%AE%83",
    "channel": "",
    "themes": [],
@@ -1659,34 +487,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "北大教授预言AI催生弃民",
    "source": "贴吧热议",
-   "time": "2026-10-20T20:58:08+08:00",
+   "time": "2026-10-20T22:58:30+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367595&amp;topic_name=%E5%8C%97%E5%A4%A7%E6%95%99%E6%8E%88%E9%A2%84%E8%A8%80AI%E5%82%AC%E7%94%9F%E5%BC%83%E6%B0%91",
    "channel": "",
    "themes": [],
@@ -1694,34 +510,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "AI同人抢跑官方,追番党忧心",
    "source": "贴吧热议",
-   "time": "2026-10-20T20:58:08+08:00",
+   "time": "2026-10-20T22:58:30+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367613&amp;topic_name=AI%E5%90%8C%E4%BA%BA%E6%8A%A2%E8%B7%91%E5%AE%98%E6%96%B9%2C%E8%BF%BD%E7%95%AA%E5%85%9A%E5%BF%A7%E5%BF%83",
    "channel": "",
    "themes": [],
@@ -1729,69 +533,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "吴清最新发言八大要点：谈中国资产、市场稳定和AI浪潮",
-   "source": "澎湃新闻",
-   "time": "2026-10-20T21:20:45+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34282373",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "众声丨AI“苦命男孩小海”收割老人，平台审核不能总是被动响应",
    "source": "澎湃新闻",
-   "time": "2026-10-20T21:20:45+08:00",
+   "time": "2026-10-20T23:26:18+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34288055",
    "channel": "",
    "themes": [],
@@ -1799,69 +556,22 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "马上评｜星巴克明确消费入座，有边界感才有体面",
-   "source": "澎湃新闻",
-   "time": "2026-10-20T21:20:45+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34288084",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "系统性变革遇上AI大爆发：报业如何面向未来再出发？业界共话破局新路径",
    "source": "澎湃新闻",
-   "time": "2026-10-20T21:20:45+08:00",
+   "time": "2026-10-20T23:26:18+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34282923",
    "channel": "",
    "themes": [],
@@ -1869,34 +579,45 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
+    }
+   ]
+  },
+  {
+   "title": "明查｜霍尔木兹海峡散落大量苹果手机？网传视频多为AI生成",
+   "source": "澎湃新闻",
+   "time": "2026-10-20T23:26:18+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34282214",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
+   "stocks": [
+    {
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
    "title": "OpenAI前工程师涉嫌窃密，疑似与沙特政界交往甚密",
    "source": "凤凰网",
-   "time": "2026-10-20T21:20:46+08:00",
+   "time": "2026-10-20T23:26:18+08:00",
    "url": "https://news.ifeng.com/c/8xNZBdFHgMK",
    "channel": "",
    "themes": [],
@@ -1904,27 +625,41 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
+    }
+   ]
+  },
+  {
+   "title": "润建股份：连续两日收盘价涨幅偏离值累计超20%，AI、算力、词元等业务占公司总营收比重仍然较低",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T20:13:47+08:00",
+   "url": "https://wallstreetcn.com/live/3181927",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "股市重要公告提醒"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 2,
+   "stocks": [
+    {
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
@@ -1943,27 +678,15 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
@@ -1982,171 +705,61 @@
    "confidence": 0.2,
    "matched_by": "theme",
    "match_detail": "题材「机器人概念股」→产业链「人工智能」",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "机器人：点石科技增资扩股引入6家投资者，合计增资1.14亿元",
+   "title": "美国AI事务主管称负责任开发AI的建议将很快发布",
    "source": "wallstreetcn",
-   "time": "2026-10-20T18:34:40+08:00",
-   "url": "https://wallstreetcn.com/live/3181867",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "机器人概念股",
-    "股市重要公告提醒"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "theme",
-   "match_detail": "题材「机器人概念股」→产业链「人工智能」",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "美国前财政部长：可考虑提高从AI中获益最多的企业的税负",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T21:09:07+08:00",
-   "url": "https://wallstreetcn.com/live/3181946",
+   "time": "2026-10-20T22:48:53+08:00",
+   "url": "https://wallstreetcn.com/live/3182009",
    "channel": "us-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "波音推出DataLiner人工智能飞机数据平台。（彭博）",
+   "title": "Citrini在测试Claude AI药物研究后押注生命科学",
    "source": "wallstreetcn",
-   "time": "2026-10-20T19:32:05+08:00",
-   "url": "https://wallstreetcn.com/live/3181901",
+   "time": "2026-10-20T22:16:40+08:00",
+   "url": "https://wallstreetcn.com/live/3181985",
    "channel": "us-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "谷歌高管驳斥欧洲对美国在人工智能领域主导地位的担忧。（英国《金融时报》）",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T12:13:18+08:00",
-   "url": "https://wallstreetcn.com/live/3181583",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
@@ -2161,185 +774,87 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "花旗：MiniMax新模型是关键里程碑 凸显行业转向企业级智能体工作流",
-   "source": "wallstreetcn",
-   "time": "2026-10-20T09:43:59+08:00",
-   "url": "https://wallstreetcn.com/live/3181518",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
-    }
-   ]
-  },
-  {
-   "title": "【财联社早知道】重磅！国家数据集团成立，分析师称2026年数据要素价值释放和产业开花有望加速，这家公司已形成从云服务、大模型服务、数据服务到智能应用的全链路服务能力",
+   "title": "【电报解读】小鹏汇天陆地航母飞行器将进入沙盒试运行，机构称特斯拉新一代Roadster“飞行汽车”功能雏形将在海外推动相关场景需求释放，这家公司参与了eVTOL等智能飞行器和核心零部件的研发制造",
    "source": "cls",
-   "time": "2026-10-20T20:43:22+08:00",
-   "url": "https://www.cls.cn/detail/2509816",
+   "time": "2026-10-20T22:47:14+08:00",
+   "url": "https://www.cls.cn/detail/2510315",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "美国股指期货走低 AI相关忧虑重返市场",
+   "title": "美国人工智能事务主管称负责任开发AI的建议将很快发布",
    "source": "cls",
-   "time": "2026-10-20T20:52:46+08:00",
-   "url": "https://www.cls.cn/detail/2510203",
+   "time": "2026-10-20T22:49:16+08:00",
+   "url": "https://www.cls.cn/detail/2510316",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 5,
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "301513",
-     "name": "尚水智能"
+     "code": "508022",
+     "name": "BOSERA ASSET MANAGEMENT CO LTD BOSERA JINKAI SCIENCE & TECH"
     },
     {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603273",
-     "name": "天元智能"
-    },
-    {
-     "code": "001266",
-     "name": "宏英智能"
+     "code": "160223",
+     "name": "GUOTAI ASSET MANAGEMENT CO"
     }
    ]
   },
   {
-   "title": "融资余额七连降！电子、通信净卖前二，1300亿股票ETF同期进场，九成子弹打向宽基",
+   "title": "半导体业绩浪来了！多家龙头净利倍增 AI红利成主要推力",
    "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2510003",
+   "time": "2026-10-20T23:26:10+08:00",
+   "url": "https://www.cls.cn/detail/2510147",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:通信",
-   "n_stocks": 2,
+   "matched_by": "concept",
+   "match_detail": "概念「半导体」",
+   "n_stocks": 1,
    "stocks": [
     {
-     "code": "515880",
-     "name": "通信ETF国泰"
-    },
-    {
-     "code": "515050",
-     "name": "通信ETF华夏"
-    }
-   ]
-  },
-  {
-   "title": "西班牙运营商提离谱要求：如果华为被禁用，华为要补偿",
-   "source": "凤凰网",
-   "time": "2026-10-20T21:20:46+08:00",
-   "url": "https://news.ifeng.com/c/8xNPD52dHME",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:通信",
-   "n_stocks": 2,
-   "stocks": [
-    {
-     "code": "515880",
-     "name": "通信ETF国泰"
-    },
-    {
-     "code": "515050",
-     "name": "通信ETF华夏"
+     "code": "688608",
+     "name": ""
     }
    ]
   },
   {
    "title": "【每日收评】科创50指数探底回升涨1%，全市场超3700股收红，机器人概念股全线爆发",
    "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
+   "time": "2026-10-20T23:26:10+08:00",
    "url": "https://www.cls.cn/detail/2509894",
    "channel": "",
    "themes": [],
@@ -2358,7 +873,7 @@
   {
    "title": "【焦点复盘】沪指日线3连涨收复5日线，物理AI概念火热依旧，大金融板块逆势走弱",
    "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
+   "time": "2026-10-20T23:26:10+08:00",
    "url": "https://www.cls.cn/detail/2509936",
    "channel": "",
    "themes": [],
@@ -2370,15 +885,53 @@
    "stocks": [
     {
      "code": "301313",
-     "name": "凡拓数创"
+     "name": ""
     }
    ]
   },
   {
-   "title": "半导体业绩浪来了！多家龙头净利倍增 AI红利成主要推力",
+   "title": "今年金融街论坛释放哪些信号？券商一线解读",
    "source": "财联社热门",
-   "time": "2026-10-20T20:58:01+08:00",
-   "url": "https://www.cls.cn/detail/2510147",
+   "time": "2026-10-20T23:26:10+08:00",
+   "url": "https://www.cls.cn/detail/2509793",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "000001",
+     "name": "平安银行"
+    }
+   ]
+  },
+  {
+   "title": "【金牌纪要库】物理AI“训练数据”存在刚性供给缺口，真实物理数据与软件AI数据获取逻辑完全不同，相关厂商具备行业独占性",
+   "source": "财联社电报",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2509800",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "concept",
+   "match_detail": "概念「物理AI」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "301313",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "title": "费城半导体指数转涨 收复此前2.3%的跌幅",
+   "source": "财联社电报",
+   "time": "2026-10-20T23:17:07+08:00",
+   "url": "https://www.cls.cn/detail/2510297",
    "channel": "",
    "themes": [],
    "direction": "neutral",
@@ -2394,100 +947,180 @@
    ]
   },
   {
-   "title": "美股盘前要闻一览：美光加码投资关键矿产；英伟达完成创纪录104量子比特容错量子计算模拟；英特尔申请豁免外国机器人禁令",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510193",
+   "title": "智元人形机器人文旅消费场景再下一城：智慧零售仓落地武汉江滩",
+   "source": "华尔街见闻",
+   "time": "2026-10-20T23:09:09+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182010",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "concept",
-   "match_detail": "概念「量子计算」",
+   "match_detail": "概念「人形机器人」",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "003029",
-     "name": "吉大正元"
+     "code": "300115",
+     "name": ""
     }
    ]
   },
   {
-   "title": "财联社10月20日电，BNP Paribas将赣锋锂业A股评级下调至中性，目标价49元；将天齐锂业A股评级下调至中性，目标价45元。",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510182",
+   "title": "半导体板块指数ETF-iShares",
+   "source": "雪球热帖",
+   "time": "2026-10-20T23:15:39+08:00",
+   "url": "https://xueqiu.com/s/SOXX",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "concept",
+   "match_detail": "概念「半导体」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "688608",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "title": "中信银行为何成了“香饽饽”",
+   "source": "今日头条",
+   "time": "2026-10-20T23:26:16+08:00",
+   "url": "https://www.toutiao.com/trending/7698684092216249892/",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:有色",
+   "match_detail": "industry:金融",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "512400",
-     "name": "有色金属ETF南方"
+     "code": "000001",
+     "name": "平安银行"
     }
    ]
   },
   {
-   "title": "2连板润建股份：目前AI、算力、词元等业务占公司总营收比重较低",
-   "source": "财联社电报",
-   "time": "2026-10-20T21:20:39+08:00",
-   "url": "https://www.cls.cn/detail/2510179",
+   "title": "连涨5年 中信银行成了香饽饽",
+   "source": "百度热搜",
+   "time": "2026-10-20T23:26:16+08:00",
+   "url": "https://www.baidu.com/s?wd=%E8%BF%9E%E6%B6%A85%E5%B9%B4+%E4%B8%AD%E4%BF%A1%E9%93%B6%E8%A1%8C%E6%88%90%E4%BA%86%E9%A6%99%E9%A5%BD%E9%A5%BD",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "stock",
-   "match_detail": "直接命中个股",
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "002929",
-     "name": "润建股份"
+     "code": "000001",
+     "name": "平安银行"
     }
    ]
   },
   {
-   "title": "润建股份：连续两日收盘价涨幅偏离值累计超20%，AI、算力、词元等业务占公司总营收比重仍然较低",
+   "title": "报道：谷歌在伦敦的云服务中断，多家银行与金融公司受影响，谷歌致歉",
    "source": "wallstreetcn",
-   "time": "2026-10-20T20:13:47+08:00",
-   "url": "https://wallstreetcn.com/live/3181927",
+   "time": "2026-10-20T22:03:03+08:00",
+   "url": "https://wallstreetcn.com/live/3181980",
+   "channel": "a-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "000001",
+     "name": "平安银行"
+    }
+   ]
+  },
+  {
+   "title": "美股盘初：费城半导体指数跌1.75%，存储芯片股、光通信股普跌，通用汽车跌约6%",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T21:32:26+08:00",
+   "url": "https://wallstreetcn.com/live/3181961",
    "channel": "a-stock-channel",
    "themes": [
     "A股7×24快讯直播",
+    "选股宝美股风向标"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "concept",
+   "match_detail": "概念「半导体」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "688608",
+     "name": ""
+    }
+   ]
+  },
+  {
+   "title": "欣旺达：全资子公司拟出资2.25亿元参与设立储能资产私募股权基金",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T18:54:08+08:00",
+   "url": "https://wallstreetcn.com/live/3181885",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "储能概念股",
     "股市重要公告提醒"
    ],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "stock",
-   "match_detail": "直接命中个股",
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "002929",
-     "name": "润建股份"
+     "code": "000001",
+     "name": "平安银行"
     }
    ]
   },
   {
-   "title": "美股盘前要闻一览：美光加码投资关键矿产；英伟达完成创纪录104量子比特容错量子计算模拟；英特尔申请豁免外国机器人禁令",
-   "source": "cls",
-   "time": "2026-10-20T20:34:35+08:00",
-   "url": "https://www.cls.cn/detail/2510193",
-   "channel": "",
+   "title": "城堡证券总裁Esposito：“主要侧重于”流量做市。（彭博电视）",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T22:42:16+08:00",
+   "url": "https://wallstreetcn.com/live/3182001",
+   "channel": "us-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「量子计算」",
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "003029",
-     "name": "吉大正元"
+     "code": "000001",
+     "name": "平安银行"
+    }
+   ]
+  },
+  {
+   "title": "无人配送车制造商新石器完成4亿美元融资 阿里巴巴旗下基金参与投资",
+   "source": "wallstreetcn",
+   "time": "2026-10-20T10:26:28+08:00",
+   "url": "https://wallstreetcn.com/live/3181539",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "000001",
+     "name": "平安银行"
     }
    ]
   }
