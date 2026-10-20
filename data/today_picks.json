@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-20T21:16:39+08:00",
+ "ts": "2026-10-20T21:39:40+08:00",
  "date": "2026-10-20",
  "session": "盘后",
  "generated_by": "build_today_picks.py",
@@ -1203,8 +1203,8 @@
  },
  "entry_plans": {
   "n_candidates": 54,
-  "n_tradable": 48,
-  "n_rejected": 6,
+  "n_tradable": 45,
+  "n_rejected": 9,
   "method": "entry zone = min(prev_close, vwap) - 0.5*ATR .. max(prev_close, vwap) + 0.3*ATR; stop = entry - 1.2*ATR; target = entry + 2.4*ATR",
   "rejected": [
    {
@@ -1243,11 +1243,26 @@
     "reason": "cross-engine veto: more bear than bull votes 4/7"
    },
    {
-    "code": "605258",
-    "name": "协和电子",
+    "code": "603386",
+    "name": "骏亚科技",
     "group": "limit_up",
-    "reason": "chase risk",
-    "chg_pct": 7.37
+    "reason": "at limit-up",
+    "chg_pct": 9.98
+   },
+   {
+    "code": "002696",
+    "name": "百洋股份",
+    "group": "limit_up",
+    "reason": "at limit-up",
+    "chg_pct": 10.01
+   },
+   {
+    "code": "920641",
+    "reason": "no quote"
+   },
+   {
+    "code": "920096",
+    "reason": "no quote"
    }
   ],
   "plans": [
@@ -2606,39 +2621,6 @@
    },
    {
     "entry_zone": [
-     10.08,
-     10.46
-    ],
-    "entry_ref": 10.27,
-    "stop_loss": 9.87,
-    "target": 11.08,
-    "risk_pct": 3.89,
-    "reward_pct": 7.89,
-    "rr_ratio": 2.02,
-    "atr": 0.336,
-    "atr_pct": 3.28,
-    "code": "002343",
-    "name": "慈文传媒",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 10.25,
-    "prev_close": 10.26,
-    "chg_pct": -0.1,
-    "turnover": 35.82,
-    "pe": -172.0,
-    "amplitude": 5.75,
-    "time": "20261020161445",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
-   },
-   {
-    "entry_zone": [
      67.0,
      72.15
     ],
@@ -2768,80 +2750,14 @@
     "overseas_bias": null,
     "vetoes": [],
     "actionable": true
-   },
-   {
-    "entry_zone": [
-     5.08,
-     5.4
-    ],
-    "entry_ref": 5.24,
-    "stop_loss": 4.74,
-    "target": 6.24,
-    "risk_pct": 9.54,
-    "reward_pct": 19.08,
-    "rr_ratio": 2.0,
-    "atr": 0.415,
-    "atr_pct": 7.84,
-    "code": "603188",
-    "name": "亚邦股份",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 5.29,
-    "prev_close": 5.56,
-    "chg_pct": -4.86,
-    "turnover": 15.72,
-    "pe": -63.49,
-    "amplitude": 6.83,
-    "time": "20261020161457",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
-   },
-   {
-    "entry_zone": [
-     21.8,
-     23.37
-    ],
-    "entry_ref": 22.59,
-    "stop_loss": 19.93,
-    "target": 27.91,
-    "risk_pct": 11.78,
-    "reward_pct": 23.55,
-    "rr_ratio": 2.0,
-    "atr": 2.216,
-    "atr_pct": 9.67,
-    "code": "001216",
-    "name": "华瓷股份",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 22.91,
-    "prev_close": 24.31,
-    "chg_pct": -5.76,
-    "turnover": 16.85,
-    "pe": 32.87,
-    "amplitude": 9.75,
-    "time": "20261020161457",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
    }
   ]
  },
  "engines": {
-  "engine_v5": "2026-10-20T20:58:18+08:00",
-  "ai_pick_v4": "2026-10-20T20:58:29+08:00",
-  "ban_pick": "2026-10-20T21:06:53+08:00",
-  "reflect_latest": "2026-10-20T21:07:59+08:00",
+  "engine_v5": "2026-10-20T21:21:19+08:00",
+  "ai_pick_v4": "2026-10-20T21:21:28+08:00",
+  "ban_pick": "2026-10-20T21:30:24+08:00",
+  "reflect_latest": "2026-10-20T21:31:08+08:00",
   "overseas_impact": "2026-10-16T18:23:35+08:00"
  },
  "disclaimer": "Rule engines on public data. Research reference only, not investment advice. Win rates are historical, not predictive."
