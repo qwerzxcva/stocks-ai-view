@@ -1,20 +1,18 @@
 {
- "ts": "2026-10-20T22:04:57+08:00",
+ "ts": "2026-10-21T04:44:11+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 143,
- "n_scored": 142,
+ "n_scored": 143,
  "n_confirmed_divergence": 21,
- "n_no_flow": 1,
- "n_rejected": 1,
- "rejection_reasons": {
-  "source_unavailable": 1
- },
+ "n_no_flow": 0,
+ "n_rejected": 0,
+ "rejection_reasons": {},
  "coverage": {
   "totals": {
    "kline_days": 122108,
-   "flow_days": 8520,
-   "aligned_days": 8372
+   "flow_days": 8580,
+   "aligned_days": 8431
   },
   "by_code": [
    {
@@ -1310,12 +1308,12 @@
    {
     "code": "sz301628",
     "kline_days": 476,
-    "flow_days": 0,
-    "aligned_days": 0,
+    "flow_days": 60,
+    "aligned_days": 59,
     "kline_date_start": "2024-10-31",
     "kline_date_end": "2026-10-19",
-    "flow_date_start": null,
-    "flow_date_end": null
+    "flow_date_start": "2026-07-21",
+    "flow_date_end": "2026-10-20"
    },
    {
     "code": "sz000028",
@@ -1448,7 +1446,7 @@
     "flow_date_end": "2026-10-20"
    }
   ],
-  "flow_source_ratio": 0.993,
+  "flow_source_ratio": 1.0,
   "minimum_flow_source_ratio": 0.8,
   "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"
  },
@@ -1906,7 +1904,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-20T22:04:57+08:00"
+   "snapshot_ts": "2026-10-21T04:44:11+08:00"
   }
  }
 }
