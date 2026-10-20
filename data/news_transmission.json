@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-20T18:35:43+08:00",
+ "ts": "2026-10-20T21:20:51+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 475,
- "n_transmissions": 5,
+ "n_input": 479,
+ "n_transmissions": 4,
  "n_rules": 16,
  "rules": [
   {
@@ -79,94 +79,42 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "法国爆发严重暴力骚乱，超 50 万人上街抗议，马克龙公开谴责，冲突的深层根源是什么？折射出法国怎样的危机？",
-   "source": "知乎热榜",
-   "time": "2026-10-20T18:35:34+08:00",
-   "url": "https://www.zhihu.com/question/2095436236819096015",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "G30首席运营官：主要发达经济体货币政策或继续维持紧缩，进一步加重政府债务偿付压力",
+   "source": "华尔街见闻",
+   "time": "2026-10-20T21:08:58+08:00",
+   "url": "https://wallstreetcn.com/livenews/3181945",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "银行",
      "stocks": [
-      "688175"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "保险",
      "stocks": [
-      "002627"
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
      ]
     }
    ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-20",
-    "event_date": "2026-10-20",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "日本共产党称美日军演像“战争前夜”",
-   "source": "今日头条",
-   "time": "2026-10-20T18:19:39+08:00",
-   "url": "https://www.toutiao.com/trending/7698602444690915866/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688175"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002627"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -279,10 +227,10 @@
    }
   },
   {
-   "title": "中国盾构机出口管制与越南地铁大单",
-   "source": "今日头条",
-   "time": "2026-10-20T18:19:39+08:00",
-   "url": "https://www.toutiao.com/trending/7698675622242946610/",
+   "title": "中国对大型隧道掘进装备实施出口管制，印度担忧",
+   "source": "凤凰网",
+   "time": "2026-10-20T21:20:46+08:00",
+   "url": "https://news.ifeng.com/c/8xNOvtwq3xc",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
    "direct_bear": [],
