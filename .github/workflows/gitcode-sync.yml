@@ -12,7 +12,7 @@
 #
 # 冲突策略: GitCode 侧历史可能与 GitHub 分叉 (双平台各自提交),
 #           push 一律 --force-with-lease, 失败先 fetch + merge -X ours 再重试。
-# 依赖: secrets.GC_TOKEN (GitCode PAT, 需 read_api + write_repository)。
+# 依赖: secrets.GITCODE_TOKEN (GitCode PAT, 需 read_api + write_repository)。
 #       未配置时各步骤都 warning 跳过并 exit 0, 不 fail 工作流。
 name: gitcode-sync
 
@@ -57,10 +57,10 @@ jobs:
 
       - name: Prepare GitCode remote
         env:
-          GC_TOKEN: ${{ secrets.GC_TOKEN }}
+          GC_TOKEN: ${{ secrets.GITCODE_TOKEN }}
         run: |
           if [ -z "$GC_TOKEN" ]; then
-            echo "::warning::GC_TOKEN 未配置, 跳过 GitCode 同步 (A/B/C 三个步骤都不会执行)"
+            echo "::warning::GITCODE_TOKEN 未配置, 跳过 GitCode 同步 (A/B/C 三个步骤都不会执行)"
             echo "配置方法: Settings → Secrets → New repository secret → Name: GC_TOKEN"
             echo "  Value: <gitcode personal access token> (需要 read_api + write_repository)"
             echo "GC_SKIP=1" >> "$GITHUB_ENV"
