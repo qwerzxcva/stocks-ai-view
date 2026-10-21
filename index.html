@@ -2391,6 +2391,10 @@ function renderPools(){
   const g=window._data||{};
   const SR=window.StockRow;
   if(!SR || !Object.keys(g).length) return;
+  // h 必须最先声明: 下面训练核验/站外信号流两个块会先做 h+=,
+  // 若把 let h 放到它们之后就是 TDZ ReferenceError, 整个函数中断,
+  // 表现就是「多池选股几个池全都不显示」。
+  let h='';
   // ── 训练核验 v7 (github.com/qwerzxcva/t1 上传, 只读展示, 诚实标注) ──
   //  数据来源另一台 AI 昨晚训练的 300 轮回测; 回本口径≠盈利。
   const tr=g.training_v7||{};
@@ -2426,7 +2430,6 @@ function renderPools(){
       +'<div class="fl" style="font-size:8px;margin-top:2px">'+_esc2(va.field_policy||'仅公开字段')+' · 会员正文不展示</div></div>';
   }
   const audit=g.pool_audit||{};
-  let h='';
   if(audit.pools){
     const stale=Object.entries(audit.pools).filter(([k,v])=>v.status!=='fresh');
     h+='<div style="border:1px solid '+(stale.length?'var(--amber)':'var(--up)')+';border-radius:5px;padding:6px 8px;margin-bottom:6px;font-size:9px">'
