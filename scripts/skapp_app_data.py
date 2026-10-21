@@ -48,7 +48,12 @@ def gjt(url, timeout=30):
     except Exception:
         return None
 
-def bare6(code):
+def norm_code(code):
+    """A 股: 6 位(000001); 港股: hk+5 位(hk00700) — app 自选里两种都有。"""
+    s = str(code or "").strip().lower()
+    if s.startswith("hk"):
+        d = re.sub(r"\D", "", s).zfill(5)
+        return f"hk{d}" if d != "00000" else None
     b = re.sub(r"\D", "", str(code or "")).zfill(6)
     return b if len(b) == 6 else None
 
@@ -68,7 +73,7 @@ def load_local(path, default):
 # ---------- per-stock bundle detail ----------
 
 def bundle_detail(code):
-    b6 = bare6(code)
+    b6 = norm_code(code)
     if not b6:
         return None
     repo = SHARD.get(b6[:2])
@@ -159,6 +164,10 @@ def main():
         nm = v.get("n") if isinstance(v, dict) else v
         if nm:
             names[str(code)] = nm
+    # skapp-data symbols.json 也带 code->name(含港股 hk00700), 合并进来
+    for e in (gj(f"{GH}/jiegengxiangjianxue/skapp-data/main/data/search/symbols.json") or []):
+        if isinstance(e, dict) and (e.get("s") or e.get("symbol")) and (e.get("n") or e.get("name")):
+            names.setdefault(str(e.get("s") or e.get("symbol")), e.get("n") or e.get("name"))
     boards_map = {}
     if isinstance(boards_raw, dict):
         for code, v in boards_raw.items():
@@ -184,22 +193,48 @@ def main():
         if isinstance(lst, list):
             for e in lst[:40]:
                 codes.add(e.get("code") if isinstance(e, dict) else e)
-    codes = {bare6(c) for c in codes if bare6(c)}
-    print(f"universe: {len(codes)} codes", flush=True)
+    # 用户常问的自选股/权重股种子(与 app 默认自选一致): 保证这些一定有详情和 AI 问答
+    SEED_CODES = os.environ.get("SEED_CODES", "").split(",") + [
+        "600519", "300750", "002594", "600941", "hk00700", "000001", "601318",
+        "600036", "000858", "601888", "600900", "000651", "002415", "300059",
+        "601012", "600276", "000333", "002304", "600030", "601166", "600887", "601398",
+    ]
+    for c in SEED_CODES:
+        codes.add(norm_code(c))
+    codes.discard(None)
+
+    # 名称兜底: db-market/symbols 不覆盖港股, 用腾讯行情接口(与 app 同源)补真实名称
+    missing = [c for c in sorted(codes) if not names.get(c)]
+    for i in range(0, len(missing), 20):
+        batch = missing[i:i + 20]
+        q = ",".join(c if c.startswith("hk") else ("sh" + c if c[0] == "6" else "sz" + c) for c in batch)
+        try:
+            req = urllib.request.Request(f"https://qt.gtimg.cn/q={q}", headers={"User-Agent": "skapp-builder"})
+            txt = urllib.request.urlopen(req, timeout=20).read().decode("gbk", errors="replace")
+            for c in batch:
+                key = c if c.startswith("hk") else ("sh" + c if c[0] == "6" else "sz" + c)
+                m = re.search(rf'v_{key}="[^~"]*~([^~]+)~', txt)
+                if m and m.group(1).strip():
+                    names[c] = m.group(1).strip()
+        except Exception as e:
+            print(f"tencent name fallback failed: {e}", flush=True)
+            break
+
+    print(f"universe: {len(codes)} codes (incl. {len(SEED_CODES)} seeds)", flush=True)
 
     # engine scores per code (real, from engine outputs)
     scores = {}
     for grp in ("signals", "values"):
         for e in pk.get(grp, []) or []:
-            b = bare6(e.get("code"))
+            b = norm_code(e.get("code"))
             if b and e.get("score") is not None:
                 scores.setdefault(b, {})[e.get("engine", grp)] = e.get("score")
     for e in (ev5.get("top") or []):
-        b = bare6(e.get("code"))
+        b = norm_code(e.get("code"))
         if b:
             scores.setdefault(b, {})["engine_v5"] = e.get("score")
     for c in decision.get("cards", []) or []:
-        b = bare6(c.get("code"))
+        b = norm_code(c.get("code"))
         if b and c.get("composite") is not None:
             scores.setdefault(b, {})["composite"] = c.get("composite")
 
@@ -219,10 +254,13 @@ def main():
     n_ok = sum(1 for r in records.values() if (r.get("detail") or {}).get("status") == "ok")
     print(f"bundles resolved: {n_ok}/{len(records)}", flush=True)
 
-    # AI Q&A: incremental, only for stocks without a cached qa file
+    # AI Q&A: incremental; 顺序=推股/决策/自选种子优先, 其余按代码序, 保证热点股先有问答
     qa_budget = int(os.environ.get("QA_BATCH", "8"))
-    n_new_qa = 0
+    prio, rest = [], []
     for c in sorted(codes):
+        (prio if (records[c].get("engine_scores") or c in SEED_CODES) else rest).append(c)
+    n_new_qa = 0
+    for c in prio + rest:
         qa_path = f"data/api/qa/{c}.json"
         qa = load_local(qa_path, None)
         if qa and qa.get("status") == "ok":
@@ -244,7 +282,7 @@ def main():
 
     # AI why lines appended into app-visible why/reasons (strings the app renders)
     for c in decision.get("cards", []) or []:
-        b = bare6(c.get("code"))
+        b = norm_code(c.get("code"))
         qa = records.get(b, {}).get("ai_qa") if b else None
         if qa and qa.get("status") == "ok" and qa.get("why"):
             c.setdefault("reasons", [])
@@ -253,7 +291,7 @@ def main():
         c["detail"] = records.get(b, {}).get("detail")
     for grp in ("signals", "values"):
         for e in pk.get(grp, []) or []:
-            b = bare6(e.get("code"))
+            b = norm_code(e.get("code"))
             qa = records.get(b, {}).get("ai_qa") if b else None
             if qa and qa.get("status") == "ok":
                 line = qa.get("why", "")
