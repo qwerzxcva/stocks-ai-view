@@ -1,5 +1,5 @@
 # LLM 辅助复盘 (每日 16:15 CST)
-# 两种模式: --llm ghc (GitHub Models 免费额度, GPT-4o-mini/Llama) / --llm none (确定性规则)
+# LLM: GitCode 免费 AI (deepseek-ai/DeepSeek-V4-Flash, 备选 Qwen/Qwen3-30B-A3B-Instruct-2507)
 name: daily-llm-review
 on:
   schedule:
@@ -24,21 +24,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Setup ghc (GitHub Models CLI)
-        run: |
-          set -e
-          curl -fsSL https://github.com/github/ghc-cli/releases/download/v0.35.3/ghc_0.35.3_linux_amd64.tar.gz \
-            | tar -xz -C /tmp
-          sudo mv /tmp/ghc /usr/local/bin/
-          ghc --version
       - name: Run hot_impact
         run: python3 scripts/hot_impact.py --out-dir data
-      - name: LLM 复盘 (GPT-4o-mini via GitHub Models)
+      - name: LLM 复盘 (GitCode 免费 AI: DeepSeek-V4-Flash, 备选 Qwen3-30B)
+        env:
+          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
         run: |
           set -e
-          # ghc model run --model gpt-4o-mini --size medium --prompt ...
           python3 << 'PYEOF'
-          import os, json, subprocess
+          import os, json, urllib.request
           data=json.load(open('data/latest.json'))
           try:
               hi=json.load(open('data/hot_impact.json'))
@@ -62,12 +56,22 @@ jobs:
           数据:
           {ctx}
           """
-          r=subprocess.run(["ghc","model","run","--model","gpt-4o-mini","--size","medium",
-                            "--prompt",prompt], capture_output=True, text=True, timeout=180)
-          if r.returncode != 0:
-              print("llm err:", r.stderr[:200], flush=True)
-              exit(0)
-          md=f"# 每日LLM复盘 {__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}\n\n"+r.stdout
+          def chat(prompt, model):
+              body=json.dumps({"model":model,"messages":[{"role":"user","content":prompt}],"temperature":0.3}).encode()
+              req=urllib.request.Request("https://gitcode.com/api/v5/chat/completions", data=body, method="POST",
+                  headers={"Authorization":f"Bearer {os.environ['GITCODE_TOKEN']}","Content-Type":"application/json"})
+              with urllib.request.urlopen(req, timeout=180) as r:
+                  return json.loads(r.read())["choices"][0]["message"]["content"]
+          try:
+              out=chat(prompt, os.environ.get("LLM_MODEL","deepseek-ai/DeepSeek-V4-Flash"))
+          except Exception as e:
+              print("primary model failed, fallback:", str(e)[:200], flush=True)
+              try:
+                  out=chat(prompt, "Qwen/Qwen3-30B-A3B-Instruct-2507")
+              except Exception as e2:
+                  print("llm err:", str(e2)[:200], flush=True)
+                  exit(0)
+          md=f"# 每日LLM复盘 {__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}\n\n"+out
           os.makedirs("review", exist_ok=True)
           open(f"review/{__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}.md","w").write(md)
           print("llm review done", flush=True)
