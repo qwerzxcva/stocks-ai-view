@@ -2,7 +2,7 @@ name: skapp-app-data
 # skapp Android app 供数 workflow:
 #   - data/data/*.json     app 实际读取的四个文件(双 data 路径, pctChg 别名)
 #   - data/api/*           HTTP 风格的静态 API: market / stocks/<code> / qa/<code>
-#   - AI 问答: GitHub Models (gpt-4o-mini via ghc), 每次增量 QA_BATCH 只股票, 只基于真实数据
+#   - AI 问答: GitCode 免费 AI (deepseek-ai/DeepSeek-V4-Flash, 备选 Qwen3-30B), 每次增量 QA_BATCH 只股票, 只基于真实数据
 # 频率: 每 10 分钟(GitHub cron 最快 5 分钟; 站点主链 A=mod5=2, 此处独立不冲突)
 on:
   schedule:
@@ -35,17 +35,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Setup ghc (GitHub Models CLI)
-        run: |
-          set -e
-          curl -fsSL https://github.com/github/ghc-cli/releases/download/v0.35.3/ghc_0.35.3_linux_amd64.tar.gz \
-            | tar -xz -C /tmp
-          sudo mv /tmp/ghc /usr/local/bin/
-          ghc --version
       - name: Build app data + API + AI Q&A
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITCODE_TOKEN: ${{ secrets.GC_TOKEN }}
+          GC_TOKEN: ${{ secrets.GC_TOKEN }}
           QA_BATCH: ${{ github.event.inputs.qa_batch || '8' }}
         run: python3 scripts/skapp_app_data.py
       - name: Commit & push (targeted paths only)
