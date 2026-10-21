@@ -27,9 +27,9 @@ SHARD = {
     "15": "jiegengxiangjianxue3/db-stocks-d", "51": "jiegengxiangjianxue3/db-stocks-d",
     "50": "jiegengxiangjianxue3/db-stocks-d", "52": "jiegengxiangjianxue3/db-stocks-d",
     "56": "jiegengxiangjianxue3/db-stocks-d", "58": "jiegengxiangjianxue3/db-stocks-d",
-    "20": "jiegengxiangjianxue3/db-stocks-d", "81": "jiegengxiangjianxue3/db-stocks-e",
-    "83": "jiegengxiangjianxue3/db-stocks-e", "89": "jiegengxiangjianxue3/db-stocks-e",
-    "90": "jiegengxiangjianxue3/db-stocks-e", "92": "jiegengxiangjianxue3/db-stocks-e",
+    "20": "jiegengxiangjianxue3/db-stocks-d",
+    # shards 81/83/89/90/92 无 bundle 仓 (db-stocks-e 已于 2026-10-21 删除,
+    # 该仓 0 个 stock.json); 这些代码走实时源, 不查分片仓。
 }
 
 def gj(url, timeout=30):

@@ -15,9 +15,12 @@
 //   jiegengxiangjianxue1/db-stocks-a -> shard 00
 //   jiegengxiangjianxue2/db-stocks-b -> shard 30
 //   jiegengxiangjianxue2/db-stocks-c -> shard 60
-//   jiegengxiangjianxue3/db-stocks-d -> shards 68 / 15 / 51 / 50 / 52 / 56 / 58
-//   jiegengxiangjianxue3/db-stocks-e -> remaining shards (coverage currently
-//   needs verification; absent bundles resolve null and callers fall back).
+//   jiegengxiangjianxue3/db-stocks-d -> shards 68 / 15 / 51 / 50 / 52 / 56 / 58 / 20
+// Shards 81/83/89/90/92 have no bundle warehouse (db-stocks-e was removed
+// 2026-10-21 after carrying zero stock.json); those codes resolve null and
+// callers fall back to live quote sources.
+// Note: jiegengxiangjianxue2/db-stocks-a is a deprecated older layout with no
+// stock.json and is deliberately NOT routed here.
 (function () {
   'use strict';
 
@@ -30,6 +33,8 @@
   };
 
   // Per-stock bundle repos: first two digits -> repo.
+  // Shards absent from this map have NO built bundle warehouse; stockBundle()
+  // resolves null for them and callers must fall back to live quote sources.
   var SHARD_REPOS = {
     '00': 'jiegengxiangjianxue1/db-stocks-a/',
     '30': 'jiegengxiangjianxue2/db-stocks-b/',
@@ -41,13 +46,13 @@
     '52': 'jiegengxiangjianxue3/db-stocks-d/',
     '56': 'jiegengxiangjianxue3/db-stocks-d/',
     '58': 'jiegengxiangjianxue3/db-stocks-d/',
-    '20': 'jiegengxiangjianxue3/db-stocks-d/',
-    '81': 'jiegengxiangjianxue3/db-stocks-e/',
-    '83': 'jiegengxiangjianxue3/db-stocks-e/',
-    '89': 'jiegengxiangjianxue3/db-stocks-e/',
-    '90': 'jiegengxiangjianxue3/db-stocks-e/',
-    '92': 'jiegengxiangjianxue3/db-stocks-e/'
+    '20': 'jiegengxiangjianxue3/db-stocks-d/'
   };
+
+  // Shards that used to route to a warehouse with zero stock.json bundles.
+  // Kept as an explicit list so the UI can say "not built" instead of
+  // silently retrying a path that can never resolve.
+  var SHARDS_WITHOUT_BUNDLES = { '81': 1, '83': 1, '89': 1, '90': 1, '92': 1 };
 
   var cache = {};
   var origin = 'github';
@@ -97,6 +102,10 @@
     if (!/^\d{6}$/.test(bare)) return Promise.resolve(null);
     if (_bundleCache[bare]) return _bundleCache[bare];
     var shard = bare.slice(0, 2);
+    if (SHARDS_WITHOUT_BUNDLES[shard]) {
+      _bundleCache[bare] = Promise.resolve(null);
+      return _bundleCache[bare];
+    }
     var repo = SHARD_REPOS[shard];
     if (!repo) return Promise.resolve(null);
     var url = GH + repo + 'main/' + shard + '/' + bare + '/stock.json';

@@ -48,12 +48,7 @@ DEFAULT_TREE_REPOS = {
     "52": "jiegengxiangjianxue3/db-stocks-d",
     "56": "jiegengxiangjianxue3/db-stocks-d",
     "58": "jiegengxiangjianxue3/db-stocks-d",
-    "20": "jiegengxiangjianxue3/db-stocks-e",
-    "81": "jiegengxiangjianxue3/db-stocks-e",
-    "83": "jiegengxiangjianxue3/db-stocks-e",
-    "89": "jiegengxiangjianxue3/db-stocks-e",
-    "90": "jiegengxiangjianxue3/db-stocks-e",
-    "92": "jiegengxiangjianxue3/db-stocks-e",
+    "20": "jiegengxiangjianxue3/db-stocks-d",
 }
 DEFAULT_BUNDLE_REPOS = {
     "00": "jiegengxiangjianxue1/db-stocks-a",
@@ -66,12 +61,7 @@ DEFAULT_BUNDLE_REPOS = {
     "52": "jiegengxiangjianxue3/db-stocks-d",
     "56": "jiegengxiangjianxue3/db-stocks-d",
     "58": "jiegengxiangjianxue3/db-stocks-d",
-    "20": "jiegengxiangjianxue3/db-stocks-e",
-    "81": "jiegengxiangjianxue3/db-stocks-e",
-    "83": "jiegengxiangjianxue3/db-stocks-e",
-    "89": "jiegengxiangjianxue3/db-stocks-e",
-    "90": "jiegengxiangjianxue3/db-stocks-e",
-    "92": "jiegengxiangjianxue3/db-stocks-e",
+    "20": "jiegengxiangjianxue3/db-stocks-d",
 }
 ENGINE_FILES = (
     "engine_v5.json",
