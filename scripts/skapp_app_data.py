@@ -327,6 +327,38 @@ def main():
             mk["indices"] = idx
         picks["market_source"] = "data/market_now.json"
 
+    # ── 分层新鲜度: 分别记录每类上游的实际 ts 与年龄, 让 app 能区分
+    #    「实时行情还在更新」与「引擎已收盘停跑」, 而不是只显示一个总 ts。
+    now = __import__('datetime').datetime.now(
+        __import__('datetime').timezone(__import__('datetime').timedelta(hours=8)))
+    def _age(ts):
+        if not ts:
+            return None
+        try:
+            from datetime import datetime as _dt
+            t = _dt.fromisoformat(str(ts).replace('Z', '+00:00'))
+            if t.tzinfo is None:
+                t = t.replace(tzinfo=now.tzinfo)
+            return max(0, int((now - t).total_seconds() // 60))
+        except Exception:
+            return None
+    layers = {
+        "realtime": (mn or {}).get("ts"),
+        "engine": decision.get("ts"),
+        "picks": picks.get("ts"),
+        "news": (hot_news or {}).get("ts"),
+    }
+    freshness = {k: {"ts": v, "age_min": _age(v)} for k, v in layers.items()}
+    freshness["generated_at"] = now.isoformat()
+    freshness["note"] = (
+        "引擎类数据(engine/picks)在 A 股收盘后不再刷新属正常; "
+        "realtime 为盘中实时行情, 收盘后转为收盘快照。"
+    )
+    decision["data_freshness"] = freshness
+    picks["data_freshness"] = freshness
+    print("freshness:", {k: v.get("age_min") for k, v in freshness.items()
+                          if isinstance(v, dict)}, flush=True)
+
     src = {
         "generated_by": "scripts/skapp_app_data.py (CI)",
         "upstream": sorted(set([
