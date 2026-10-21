@@ -256,9 +256,11 @@ def main():
 
     # AI Q&A: incremental; 顺序=推股/决策/自选种子优先, 其余按代码序, 保证热点股先有问答
     qa_budget = int(os.environ.get("QA_BATCH", "8"))
-    prio, rest = [], []
-    for c in sorted(codes):
-        (prio if (records[c].get("engine_scores") or c in SEED_CODES) else rest).append(c)
+    seed_set = {norm_code(c) for c in SEED_CODES}
+    scored = [c for c in sorted(codes) if records[c].get("engine_scores")]
+    prio = [c for c in sorted(codes) if c in seed_set] + [c for c in scored if c not in seed_set]
+    prio_set = set(prio)
+    rest = [c for c in sorted(codes) if c not in prio_set]
     n_new_qa = 0
     for c in prio + rest:
         qa_path = f"data/api/qa/{c}.json"
