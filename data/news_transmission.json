@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-22T04:31:48+08:00",
+ "ts": "2026-10-22T04:38:45+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 474,
- "n_transmissions": 13,
+ "n_transmissions": 12,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,9 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "财联社10月22日电，利弗莫尔中概股龙头指数收涨跌1.12%，热门中概股普跌。",
+   "title": "利弗莫尔中概股龙头指数收涨跌1.12% 热门中概股普跌",
    "source": "财联社电报",
-   "time": "2026-10-22T04:07:02+08:00",
+   "time": "2026-10-22T04:38:33+08:00",
    "url": "https://www.cls.cn/detail/2511601",
    "transmission_id": "market_broad_down",
    "label": "大盘普跌",
@@ -232,7 +232,7 @@
   {
    "title": "解放军台海开展军事行动",
    "source": "抖音热点",
-   "time": "2026-10-22T04:03:41+08:00",
+   "time": "2026-10-22T04:38:37+08:00",
    "url": "https://www.douyin.com/hot/2705896",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -377,62 +377,9 @@
    }
   },
   {
-   "title": "利弗莫尔中概股龙头指数收涨跌1.12% 热门中概股普跌",
-   "source": "cls",
-   "time": "2026-10-22T04:02:26+08:00",
-   "url": "https://www.cls.cn/detail/2511601",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
    "title": "美国对伊朗实施新一轮制裁",
    "source": "财联社电报",
-   "time": "2026-10-22T04:07:02+08:00",
+   "time": "2026-10-22T04:38:33+08:00",
    "url": "https://www.cls.cn/detail/2511579",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -559,7 +506,7 @@
   {
    "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
    "source": "澎湃新闻",
-   "time": "2026-10-22T04:31:42+08:00",
+   "time": "2026-10-22T04:38:40+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -587,7 +534,7 @@
   {
    "title": "菲防长召回驻华武官，专家：受制裁后的卖惨行为",
    "source": "凤凰网",
-   "time": "2026-10-22T04:31:43+08:00",
+   "time": "2026-10-22T04:24:49+08:00",
    "url": "https://original.ifeng.com/c/8xPWyUWc5tF",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
