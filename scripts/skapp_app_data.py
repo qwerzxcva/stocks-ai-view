@@ -156,6 +156,19 @@ def main():
     lowpool = gj(f"{A}/lowpool.json") or {}
     hot_news = gj(f"{A}/hot_news.json") or {}
     digest = gj(f"{A}/news_digest.json") or {}
+    # 消息面: 情绪/影响/传导/主线(站点已有的四个引擎产出)
+    news_extra = gj(f"{A}/news_extra.json") or {}
+    news_impact = gj(f"{A}/news_impact.json") or {}
+    news_trans = gj(f"{A}/news_transmission.json") or {}
+    hot_themes = gj(f"{A}/hot_themes.json") or {}
+    hot_impact = gj(f"{A}/hot_impact.json") or {}
+    # 板块: db-market 的行业/概念/TradingView 分组 + 站点板块引擎
+    industries = gj(f"{MARKET}/sector/industry.json") or {}
+    concepts = gj(f"{MARKET}/sector/concept.json") or {}
+    tv_groups = gj(f"{MARKET}/sector/tv_groups.json") or {}
+    sector_pool = gj(f"{A}/sector_pool.json") or {}
+    industry_map = gj(f"{A}/industry_map_em.json") or {}
+    industry_stocks = gj(f"{A}/industry_stocks.json") or {}
     names_raw = gj(f"{MARKET}/_search.json") or {}
     boards_raw = gj(f"{MARKET}/sector/stock_to_board.json") or {}
 
@@ -367,12 +380,17 @@ def main():
             "stocks-ai-view:data/engine_weights.json", "stocks-ai-view:data/engine_v5.json",
             "stocks-ai-view:data/ai_pick_v4.json", "stocks-ai-view:data/lowpool.json",
             "stocks-ai-view:data/hot_news.json", "stocks-ai-view:data/news_digest.json",
+            "stocks-ai-view:data/news_extra.json", "stocks-ai-view:data/news_impact.json",
+            "stocks-ai-view:data/news_transmission.json", "stocks-ai-view:data/hot_themes.json",
+            "stocks-ai-view:data/sector_pool.json", "stocks-ai-view:data/industry_map_em.json",
+            "db-market:sector/industry.json", "db-market:sector/concept.json",
+            "db-market:sector/tv_groups.json",
             "db-market:_search.json", "db-market:sector/stock_to_board.json",
             "skapp-data:data/search/symbols.json",
         ] + [f"shard-bundle:{c}" for c in codes
              if (records[c].get("detail") or {}).get("status") == "ok"])),
         "registered_sources": 89,
-        "note": "engine outputs are products of the 89+ registered collection sources; AI Q&A via GitHub Models gpt-4o-mini (only from provided real data)",
+        "note": "engine outputs are products of the 89+ registered collection sources; news/sectors mirror the site's own engine outputs; AI Q&A via GitCode free AI (only from provided real data)",
     }
     decision["sources"] = src
     picks["sources"] = src
@@ -381,6 +399,135 @@ def main():
     dump("data/data/decision.json", decision)
     dump("data/data/today_picks.json", picks)
     dump("data/data/stock_names.json", names)
+
+    # ── API: 消息面(移植站点 news_* 四个引擎产出) ──
+    news_api = {
+        "ts": digest.get("ts") or (hot_news or {}).get("ts"),
+        "digest": {
+            "ts": digest.get("ts"),
+            "date": digest.get("date"),
+            "stale": digest.get("stale"),
+            "total": digest.get("total"),
+            "sentiment": digest.get("sentiment"),
+            "global_score": digest.get("global_score"),
+            "global_mood": digest.get("global_mood"),
+            "cat_counts": digest.get("cat_counts"),
+            # categories 实际是 dict: 分类名 -> 该分类新闻列表
+            "categories": {
+                k: (v[:10] if isinstance(v, list) else v)
+                for k, v in (digest.get("categories") or {}).items()
+            } if isinstance(digest.get("categories"), dict) else [],
+        },
+        "hot_news": {
+            "ts": hot_news.get("ts"),
+            "n_items": hot_news.get("n_items"),
+            "sources_ok": hot_news.get("sources_ok"),
+            "items": (hot_news.get("items") or [])[:40],
+            "groups": (hot_news.get("groups") or [])[:20] if isinstance(hot_news.get("groups"), list) else (hot_news.get("groups") or {}),
+        },
+        "impact": {
+            "ts": news_impact.get("ts"),
+            "engine": news_impact.get("engine"),
+            "n_input": news_impact.get("n_input"),
+            "n_mapped": news_impact.get("n_mapped"),
+            "impacts": (news_impact.get("impacts") or [])[:30] if isinstance(news_impact.get("impacts"), list) else [],
+        },
+        "transmission": {
+            "ts": news_trans.get("ts"),
+            "items": ((news_trans.get("items") or news_trans.get("transmissions") or [])[:30]
+                      if isinstance(news_trans.get("items") or news_trans.get("transmissions"), list) else []),
+        },
+        "themes": {
+            "ts": hot_themes.get("ts"),
+            "engine": hot_themes.get("engine"),
+            "n_themes": hot_themes.get("n_themes"),
+            "themes": (hot_themes.get("themes") or [])[:20] if isinstance(hot_themes.get("themes"), list) else [],
+            "hot_reports": (hot_themes.get("hot_reports") or [])[:10] if isinstance(hot_themes.get("hot_reports"), list) else [],
+        },
+        "extra": {
+            "ts": news_extra.get("ts"),
+            "items": (news_extra.get("items") or [])[:20] if isinstance(news_extra.get("items"), list) else [],
+        },
+        "sources": [
+            "stocks-ai-view:data/hot_news.json", "stocks-ai-view:data/news_digest.json",
+            "stocks-ai-view:data/news_impact.json", "stocks-ai-view:data/news_transmission.json",
+            "stocks-ai-view:data/hot_themes.json", "stocks-ai-view:data/news_extra.json",
+            "stocks-ai-view:data/hot_impact.json",
+        ],
+    }
+    dump("data/api/news.json", news_api)
+
+    def _board_list(raw):
+        """db-market sector/*.json 形状: {generated_at, source, n, boards:[{bk,name,total_mktcap,n_stocks}]}"""
+        if not isinstance(raw, dict):
+            return []
+        boards = raw.get("boards")
+        if not isinstance(boards, list):
+            return []
+        return [b for b in boards if isinstance(b, dict)][:200]
+
+    # 预生成 Top N 板块成分股(db-market sector/<kind>_constituents/<bk>.json)
+    board_members = {}
+    _ind_boards = _board_list(industries)
+    _con_boards = _board_list(concepts)
+    for b, kind in ([(x, "industry") for x in _ind_boards[:15]] +
+                    [(x, "concept") for x in _con_boards[:15]]):
+        bk = b.get("bk")
+        if not bk:
+            continue
+        c = gj(f"{MARKET}/sector/{kind}_constituents/{bk}.json")
+        if isinstance(c, dict) and isinstance(c.get("members"), list):
+            board_members[bk] = {
+                "name": b.get("name"),
+                "kind": kind,
+                "n": c.get("n"),
+                "members": [
+                    {"code": m.get("code"), "name": m.get("name")}
+                    for m in c["members"][:60] if isinstance(m, dict)
+                ],
+            }
+    print(f"board_members prebuilt: {len(board_members)}", flush=True)
+
+    # ── API: 板块(移植站点的行业/概念/板块池) ──
+    def _industry_list(raw):
+        """db-market sector/industry.json 或站点 industry_map_em.json → 统一列表"""
+        out = []
+        if isinstance(raw, dict):
+            for k, v in raw.items():
+                if isinstance(v, dict):
+                    out.append({"name": v.get("name") or k, "code": k,
+                                "chg": v.get("chg_pct") or v.get("pct") or v.get("chg"),
+                                "n": v.get("n") or v.get("count")})
+                elif isinstance(v, list):
+                    out.append({"name": k, "code": k, "members": v[:50]})
+        elif isinstance(raw, list):
+            out = [x for x in raw if isinstance(x, dict)]
+        return out
+    def _board_list(raw):
+        """db-market sector/*.json 形状: {generated_at, source, n, boards:[{bk,name,total_mktcap,n_stocks}]}"""
+        if not isinstance(raw, dict):
+            return []
+        boards = raw.get("boards")
+        if not isinstance(boards, list):
+            return []
+        return [b for b in boards if isinstance(b, dict)][:200]
+    sectors_api = {
+        "ts": sector_pool.get("ts") or picks.get("ts"),
+        "industries": _ind_boards,
+        "concepts": _con_boards,
+        "industry_map_em": _industry_list(industry_map)[:80],
+        "sector_pool": sector_pool,
+        "industry_stocks": industry_stocks if isinstance(industry_stocks, dict) else {},
+        # 预生成 Top 板块的成分股(全量 200+ 板块逐一拉太大, 按市值/数量取前 30)
+        "board_members": board_members,
+        "sources": [
+            "db-market:sector/industry.json", "db-market:sector/concept.json",
+            "db-market:sector/tv_groups.json", "db-market:sector/stock_to_board.json",
+            "stocks-ai-view:data/sector_pool.json", "stocks-ai-view:data/industry_map_em.json",
+            "stocks-ai-view:data/industry_stocks.json",
+        ],
+    }
+    dump("data/api/sectors.json", sectors_api)
 
     # API: market
     mkt = {
@@ -410,6 +557,8 @@ def main():
             "decision": "data/data/decision.json",
             "today_picks": "data/data/today_picks.json",
             "stock_names": "data/data/stock_names.json",
+            "news": "data/api/news.json",
+            "sectors": "data/api/sectors.json",
         },
         "universe": len(codes),
         "bundles_ok": n_ok,
