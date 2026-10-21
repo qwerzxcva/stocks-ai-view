@@ -11,7 +11,7 @@ on:
     inputs:
       qa_batch:
         description: '本轮 AI 问答生成股票数(增量)'
-        default: '8'
+        default: '6'
 permissions:
   contents: write
 concurrency:
@@ -20,7 +20,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     env:
       TZ: Asia/Shanghai
     steps:
@@ -39,7 +39,7 @@ jobs:
         env:
           GITCODE_TOKEN: ${{ secrets.GC_TOKEN }}
           GC_TOKEN: ${{ secrets.GC_TOKEN }}
-          QA_BATCH: ${{ github.event.inputs.qa_batch || '8' }}
+          QA_BATCH: ${{ github.event.inputs.qa_batch || '6' }}
         run: python3 scripts/skapp_app_data.py
       - name: Commit & push (targeted paths only)
         run: |
