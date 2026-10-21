@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-21T04:31:13+08:00",
+    "ts": "2026-10-21T09:30:30+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8572,
+    "n_days": 8573,
     "span": [
       "1990-12-19",
-      "2026-10-20"
+      "2026-10-21"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-21T04:31:13+08:00"
+    "rebuilt_at": "2026-10-21T09:30:30+08:00"
   },
   "status": {
-    "date": "2026-10-20",
-    "close": 3735.37,
-    "ma5": 3731.46,
-    "ma20": 3832.38,
-    "ma60": 3880.68,
+    "date": "2026-10-21",
+    "close": 3732.46,
+    "ma5": 3724.5,
+    "ma20": 3825.79,
+    "ma60": 3878.48,
     "ma_bull": false,
-    "macd_hist": -24.19,
+    "macd_hist": -19.6,
     "macd_bull": false,
-    "rsi": 16.2,
-    "momentum_20d_pct": -3.34,
+    "rsi": 16.9,
+    "momentum_20d_pct": -4.09,
     "phase": "downtrend",
-    "volume_ratio": 0.91
+    "volume_ratio": 0.02
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 190,
+      "n_days": 191,
       "open": 3986.97,
-      "close": 3735.37,
+      "close": 3732.46,
       "high": 4258.86,
       "low": 3674.82,
-      "chg_pct": -5.88,
+      "chg_pct": -5.96,
       "amplitude_pct": 15.89,
-      "turnover_yi": 1162.0,
+      "turnover_yi": 1162.1,
       "candles": {
         "yang": 110,
-        "yin": 80,
+        "yin": 81,
         "cross": 0
       },
       "max_drawdown_pct": -13.71,
       "first_date": "2026-01-05",
-      "last_date": "2026-10-20"
+      "last_date": "2026-10-21"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -2.78
+        "Q4": -2.86
       },
       "months_covered": 9
     }
@@ -1348,7 +1348,7 @@
         "2013",
         "2005"
       ],
-      "avg_chg": -0.47,
+      "avg_chg": -0.48,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 16.56,
+      "chg_pct": 16.47,
       "position": "补库存/上行",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1446,10 +1446,624 @@
     },
     "sample_span_years": 36
   },
-  "demand_shift": {},
-  "stocks": [],
+  "demand_shift": {
+    "industry_top": [
+      {
+        "name": "其他数字媒体",
+        "chg_pct": 4.74,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 0.27
+      },
+      {
+        "name": "诊断服务",
+        "chg_pct": 2.67,
+        "up_n": 5,
+        "down_n": 0,
+        "leader": "贝瑞基因",
+        "main_net_inflow_yi": 0.32
+      },
+      {
+        "name": "大众出版",
+        "chg_pct": 2.19,
+        "up_n": 17,
+        "down_n": 1,
+        "leader": "出版传媒",
+        "main_net_inflow_yi": 0.16
+      },
+      {
+        "name": "照明设备Ⅲ",
+        "chg_pct": 1.97,
+        "up_n": 12,
+        "down_n": 1,
+        "leader": "海洋王",
+        "main_net_inflow_yi": 0.46
+      },
+      {
+        "name": "照明设备Ⅱ",
+        "chg_pct": 1.97,
+        "up_n": 12,
+        "down_n": 1,
+        "leader": "海洋王",
+        "main_net_inflow_yi": 0.46
+      },
+      {
+        "name": "燃料电池",
+        "chg_pct": 1.91,
+        "up_n": 1,
+        "down_n": 0,
+        "leader": "亿华通-U",
+        "main_net_inflow_yi": 0.0
+      },
+      {
+        "name": "电视广播Ⅲ",
+        "chg_pct": 1.9,
+        "up_n": 13,
+        "down_n": 0,
+        "leader": "湖北广电",
+        "main_net_inflow_yi": 0.04
+      },
+      {
+        "name": "电视广播Ⅱ",
+        "chg_pct": 1.9,
+        "up_n": 13,
+        "down_n": 0,
+        "leader": "湖北广电",
+        "main_net_inflow_yi": 0.04
+      },
+      {
+        "name": "出版",
+        "chg_pct": 1.84,
+        "up_n": 27,
+        "down_n": 1,
+        "leader": "出版传媒",
+        "main_net_inflow_yi": 0.18
+      },
+      {
+        "name": "数字媒体",
+        "chg_pct": 1.83,
+        "up_n": 14,
+        "down_n": 0,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 0.29
+      },
+      {
+        "name": "其他医疗服务",
+        "chg_pct": 1.77,
+        "up_n": 5,
+        "down_n": 0,
+        "leader": "诺禾致源",
+        "main_net_inflow_yi": 0.02
+      },
+      {
+        "name": "通信网络设备及器件",
+        "chg_pct": 1.6,
+        "up_n": 36,
+        "down_n": 1,
+        "leader": "光库科技",
+        "main_net_inflow_yi": 2.29
+      },
+      {
+        "name": "门户网站",
+        "chg_pct": 1.58,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "卓创资讯",
+        "main_net_inflow_yi": -0.01
+      },
+      {
+        "name": "医疗研发外包",
+        "chg_pct": 1.58,
+        "up_n": 29,
+        "down_n": 0,
+        "leader": "泓博医药",
+        "main_net_inflow_yi": 0.8
+      },
+      {
+        "name": "教育运营及其他",
+        "chg_pct": 1.55,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "博瑞传播",
+        "main_net_inflow_yi": 0.02
+      },
+      {
+        "name": "涤纶",
+        "chg_pct": 1.53,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "苏州龙杰",
+        "main_net_inflow_yi": -0.01
+      },
+      {
+        "name": "体育Ⅲ",
+        "chg_pct": 1.51,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "力盛体育",
+        "main_net_inflow_yi": 0.01
+      },
+      {
+        "name": "体育Ⅱ",
+        "chg_pct": 1.51,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "力盛体育",
+        "main_net_inflow_yi": 0.01
+      },
+      {
+        "name": "传媒",
+        "chg_pct": 1.48,
+        "up_n": 123,
+        "down_n": 3,
+        "leader": "出版传媒",
+        "main_net_inflow_yi": 0.94
+      },
+      {
+        "name": "文字媒体",
+        "chg_pct": 1.44,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "中文在线",
+        "main_net_inflow_yi": 0.02
+      }
+    ],
+    "industry_n": 20,
+    "concept_top": [
+      {
+        "name": "昨日连板",
+        "chg_pct": 4.64,
+        "up_n": 6,
+        "down_n": 1,
+        "leader": "福莱新材"
+      },
+      {
+        "name": "昨日连板_含一字",
+        "chg_pct": 4.14,
+        "up_n": 11,
+        "down_n": 3,
+        "leader": "海洋王"
+      },
+      {
+        "name": "昨日涨停_含一字",
+        "chg_pct": 2.68,
+        "up_n": 40,
+        "down_n": 15,
+        "leader": "日海智能"
+      },
+      {
+        "name": "昨日打二板以上表现",
+        "chg_pct": 2.66,
+        "up_n": 4,
+        "down_n": 3,
+        "leader": "海洋王"
+      },
+      {
+        "name": "昨日涨停",
+        "chg_pct": 2.26,
+        "up_n": 36,
+        "down_n": 14,
+        "leader": "日海智能"
+      },
+      {
+        "name": "昨日首板",
+        "chg_pct": 1.94,
+        "up_n": 26,
+        "down_n": 11,
+        "leader": "日海智能"
+      },
+      {
+        "name": "题材股",
+        "chg_pct": 1.79,
+        "up_n": 23,
+        "down_n": 16,
+        "leader": "泰尔股份"
+      },
+      {
+        "name": "国资云概念",
+        "chg_pct": 1.66,
+        "up_n": 17,
+        "down_n": 3,
+        "leader": "深桑达Ａ"
+      },
+      {
+        "name": "CRO",
+        "chg_pct": 1.43,
+        "up_n": 50,
+        "down_n": 1,
+        "leader": "泓博医药"
+      },
+      {
+        "name": "知识产权",
+        "chg_pct": 1.41,
+        "up_n": 38,
+        "down_n": 3,
+        "leader": "出版传媒"
+      },
+      {
+        "name": "东方财富热股",
+        "chg_pct": 1.4,
+        "up_n": 58,
+        "down_n": 41,
+        "leader": "深桑达Ａ"
+      },
+      {
+        "name": "数据确权",
+        "chg_pct": 1.38,
+        "up_n": 35,
+        "down_n": 3,
+        "leader": "太极股份"
+      },
+      {
+        "name": "基因测序",
+        "chg_pct": 1.37,
+        "up_n": 45,
+        "down_n": 1,
+        "leader": "贝瑞基因"
+      },
+      {
+        "name": "DRG/DIP",
+        "chg_pct": 1.36,
+        "up_n": 14,
+        "down_n": 2,
+        "leader": "太极股份"
+      },
+      {
+        "name": "彩票概念",
+        "chg_pct": 1.35,
+        "up_n": 17,
+        "down_n": 1,
+        "leader": "粤 传 媒"
+      },
+      {
+        "name": "F5G概念",
+        "chg_pct": 1.34,
+        "up_n": 25,
+        "down_n": 1,
+        "leader": "春秋电子"
+      },
+      {
+        "name": "地热能",
+        "chg_pct": 1.34,
+        "up_n": 7,
+        "down_n": 1,
+        "leader": "盾安环境"
+      },
+      {
+        "name": "氦气概念",
+        "chg_pct": 1.29,
+        "up_n": 16,
+        "down_n": 2,
+        "leader": "冰轮环境"
+      },
+      {
+        "name": "减肥药",
+        "chg_pct": 1.25,
+        "up_n": 40,
+        "down_n": 3,
+        "leader": "泓博医药"
+      },
+      {
+        "name": "重组蛋白",
+        "chg_pct": 1.23,
+        "up_n": 34,
+        "down_n": 1,
+        "leader": "泰诺麦博-U"
+      }
+    ],
+    "concept_n": 20,
+    "concentration": {
+      "top5_avg_chg": 2.71,
+      "sample_avg_chg": 1.92,
+      "spread": 0.78,
+      "interpretation": "结构性分化"
+    }
+  },
+  "stocks": [
+    {
+      "code": "000710",
+      "name": "贝瑞基因",
+      "industry": "诊断服务",
+      "chg_pct": 6.05,
+      "leader": "贝瑞基因",
+      "main_net_inflow_yi": 0.32,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 11.05,
+      "turnover": 0.98,
+      "pe": -18.29,
+      "mktcap_yi": 37.08,
+      "pb": 2.75,
+      "quote_time": "20261021093027"
+    },
+    {
+      "code": "603882",
+      "name": "金域医学",
+      "industry": "诊断服务",
+      "chg_pct": -0.06,
+      "leader": "贝瑞基因",
+      "main_net_inflow_yi": 0.32,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 31.51,
+      "turnover": 0.21,
+      "pe": 143.45,
+      "mktcap_yi": 144.33,
+      "pb": 2.31,
+      "quote_time": "20261021093026"
+    },
+    {
+      "code": "301060",
+      "name": "兰卫医学",
+      "industry": "诊断服务",
+      "chg_pct": 4.0,
+      "leader": "贝瑞基因",
+      "main_net_inflow_yi": 0.32,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 11.18,
+      "turnover": 0.23,
+      "pe": 115.91,
+      "mktcap_yi": 40.27,
+      "pb": 2.89,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "300244",
+      "name": "迪安诊断",
+      "industry": "诊断服务",
+      "chg_pct": 2.11,
+      "leader": "贝瑞基因",
+      "main_net_inflow_yi": 0.32,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 22.25,
+      "turnover": 1.56,
+      "pe": 29.62,
+      "mktcap_yi": 111.57,
+      "pb": 2.07,
+      "quote_time": "20261021093027"
+    },
+    {
+      "code": "300676",
+      "name": "华大基因",
+      "industry": "诊断服务",
+      "chg_pct": 0.33,
+      "leader": "贝瑞基因",
+      "main_net_inflow_yi": 0.32,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 42.12,
+      "turnover": 0.1,
+      "pe": -30.64,
+      "mktcap_yi": 175.23,
+      "pb": 2.07,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "603999",
+      "name": "读者传媒",
+      "industry": "大众出版",
+      "chg_pct": -0.59,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 6.75,
+      "turnover": 0.41,
+      "pe": 49.07,
+      "mktcap_yi": 38.88,
+      "pb": 1.88,
+      "quote_time": "20261021093025"
+    },
+    {
+      "code": "301025",
+      "name": "读客文化",
+      "industry": "大众出版",
+      "chg_pct": 3.44,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 10.83,
+      "turnover": 0.3,
+      "pe": 319.66,
+      "mktcap_yi": 30.02,
+      "pb": 6.92,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "603230",
+      "name": "内蒙新华",
+      "industry": "大众出版",
+      "chg_pct": 3.85,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 12.42,
+      "turnover": 0.81,
+      "pe": 60.86,
+      "mktcap_yi": 43.91,
+      "pb": 1.6,
+      "quote_time": "20261021093025"
+    },
+    {
+      "code": "301052",
+      "name": "果麦文化",
+      "industry": "大众出版",
+      "chg_pct": 1.64,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 32.92,
+      "turnover": 1.28,
+      "pe": -67.26,
+      "mktcap_yi": 26.41,
+      "pb": 4.99,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "600229",
+      "name": "城市传媒",
+      "industry": "大众出版",
+      "chg_pct": 0.65,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 6.19,
+      "turnover": 0.69,
+      "pe": -8.9,
+      "mktcap_yi": 40.9,
+      "pb": 1.51,
+      "quote_time": "20261021093025"
+    },
+    {
+      "code": "300788",
+      "name": "中信出版",
+      "industry": "大众出版",
+      "chg_pct": 1.87,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.16,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 29.45,
+      "turnover": 0.06,
+      "pe": 65.15,
+      "mktcap_yi": 56.0,
+      "pb": 2.5,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "601811",
+      "name": "新华文轩",
+      "industry": "出版",
+      "chg_pct": 2.91,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 23.66,
+      "turnover": 0.36,
+      "pe": 21.36,
+      "mktcap_yi": 187.36,
+      "pb": 1.91,
+      "quote_time": "20261021093025"
+    },
+    {
+      "code": "300148",
+      "name": "天舟文化",
+      "industry": "出版",
+      "chg_pct": 1.37,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 3.7,
+      "turnover": 0.22,
+      "pe": 72.67,
+      "mktcap_yi": 31.18,
+      "pb": 2.97,
+      "quote_time": "20261021093027"
+    },
+    {
+      "code": "300654",
+      "name": "世纪天鸿",
+      "industry": "出版",
+      "chg_pct": 0.39,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 10.19,
+      "turnover": 0.12,
+      "pe": 169.03,
+      "mktcap_yi": 35.93,
+      "pb": 4.47,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "601098",
+      "name": "中南传媒",
+      "industry": "出版",
+      "chg_pct": 0.92,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 10.99,
+      "turnover": 0.03,
+      "pe": 13.07,
+      "mktcap_yi": 197.38,
+      "pb": 1.21,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "601928",
+      "name": "凤凰传媒",
+      "industry": "出版",
+      "chg_pct": 0.77,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 9.11,
+      "turnover": 0.01,
+      "pe": 17.81,
+      "mktcap_yi": 231.84,
+      "pb": 1.16,
+      "quote_time": "20261021093025"
+    },
+    {
+      "code": "601921",
+      "name": "浙版传媒",
+      "industry": "出版",
+      "chg_pct": 0.89,
+      "leader": "出版传媒",
+      "main_net_inflow_yi": 0.18,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 7.97,
+      "turnover": 0.02,
+      "pe": 14.11,
+      "mktcap_yi": 177.11,
+      "pb": 1.24,
+      "quote_time": "20261021093024"
+    },
+    {
+      "code": "000681",
+      "name": "视觉中国",
+      "industry": "数字媒体",
+      "chg_pct": 0.56,
+      "leader": "凡拓数创",
+      "main_net_inflow_yi": 0.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 16.3,
+      "turnover": 0.07,
+      "pe": 81.36,
+      "mktcap_yi": 110.21,
+      "pb": 3.12,
+      "quote_time": "20261021093027"
+    },
+    {
+      "code": "603466",
+      "name": "风语筑",
+      "industry": "数字媒体",
+      "chg_pct": 3.02,
+      "leader": "凡拓数创",
+      "main_net_inflow_yi": 0.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 14.66,
+      "turnover": 1.54,
+      "pe": -3187.53,
+      "mktcap_yi": 87.2,
+      "pb": 4.16,
+      "quote_time": "20261021093026"
+    },
+    {
+      "code": "301313",
+      "name": "凡拓数创",
+      "industry": "数字媒体",
+      "chg_pct": 6.88,
+      "leader": "凡拓数创",
+      "main_net_inflow_yi": 0.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 50.02,
+      "turnover": 4.71,
+      "pe": -30.95,
+      "mktcap_yi": 39.37,
+      "pb": 8.91,
+      "quote_time": "20261021093024"
+    }
+  ],
   "stocks_meta": {
-    "n": 0,
-    "enriched": 0
+    "n": 20,
+    "enriched": 20
   }
 }
