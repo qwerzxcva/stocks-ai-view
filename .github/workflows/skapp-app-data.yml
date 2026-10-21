@@ -14,6 +14,7 @@ on:
         default: '6'
 permissions:
   contents: write
+  actions: write   # 唤醒 engine-chain 用
 concurrency:
   group: skapp-app-data
   cancel-in-progress: true
@@ -35,6 +36,28 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Wake engine-chain (this repo's cron is rate-limited)
+        env:
+          GH_TOKEN: ${{ secrets.GHUB_TOKEN }}
+        run: |
+          # 背景: 本仓 cron 有软限流, scheduler.yml(心跳) 曾静默停跑 4.5 小时,
+          #   导致 engine-chain 无人唤醒、引擎数据冻在 14:07 (2026-10-21 实测)。
+          #   skapp-app-data 自身 cron 稳定, 由它顺带唤醒 engine-chain,
+          #   不依赖 scheduler 这条链。engine-chain 自带时间窗/年龄守卫,
+          #   盘中跑 light、盘后跑 full, 重复唤醒是安全的。
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 -X POST \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows/engine-chain.yml/dispatches" \
+            -d "{\"ref\":\"${GITHUB_REF_NAME}\"}")
+          echo "engine-chain dispatch http=$code"
+          # 204=已唤醒; 404=工作流不存在; 其它(如并发上限)不阻断本 job
+          case "$code" in
+            204) echo "woke engine-chain" ;;
+            404) echo "::warning::engine-chain.yml 不存在" ;;
+            *)   echo "::warning::engine-chain dispatch http=$code (忽略, 下游有自己的 cron 兜底)" ;;
+          esac
+
       - name: Build app data + API + AI Q&A
         env:
           GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
@@ -47,4 +70,5 @@ jobs:
             --dir data/data --dir data/api --user skapp-bot \
             --protect data/data/decision.json --protect data/data/today_picks.json \
             --protect data/data/stock_names.json --protect data/api/index.json \
-            --protect data/api/market.json --protect data/api/qa --protect data/api/stocks
+            --protect data/api/market.json --protect data/api/qa --protect data/api/stocks \
+            --protect data/api/news.json --protect data/api/sectors.json
