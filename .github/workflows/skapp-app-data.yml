@@ -1,0 +1,57 @@
+name: skapp-app-data
+# skapp Android app 供数 workflow:
+#   - data/data/*.json     app 实际读取的四个文件(双 data 路径, pctChg 别名)
+#   - data/api/*           HTTP 风格的静态 API: market / stocks/<code> / qa/<code>
+#   - AI 问答: GitHub Models (gpt-4o-mini via ghc), 每次增量 QA_BATCH 只股票, 只基于真实数据
+# 频率: 每 10 分钟(GitHub cron 最快 5 分钟; 站点主链 A=mod5=2, 此处独立不冲突)
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+    inputs:
+      qa_batch:
+        description: '本轮 AI 问答生成股票数(增量)'
+        default: '8'
+permissions:
+  contents: write
+concurrency:
+  group: skapp-app-data
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Setup ghc (GitHub Models CLI)
+        run: |
+          set -e
+          curl -fsSL https://github.com/github/ghc-cli/releases/download/v0.35.3/ghc_0.35.3_linux_amd64.tar.gz \
+            | tar -xz -C /tmp
+          sudo mv /tmp/ghc /usr/local/bin/
+          ghc --version
+      - name: Build app data + API + AI Q&A
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          QA_BATCH: ${{ github.event.inputs.qa_batch || '8' }}
+        run: python3 scripts/skapp_app_data.py
+      - name: Commit & push (targeted paths only)
+        run: |
+          python3 scripts/git_push_retry.py --msg "skapp app data $(date -u +%FT%TZ)" \
+            --dir data/data --dir data/api --user skapp-bot \
+            --protect data/data/decision.json --protect data/data/today_picks.json \
+            --protect data/data/stock_names.json --protect data/api/index.json \
+            --protect data/api/market.json
