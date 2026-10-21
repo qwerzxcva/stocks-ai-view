@@ -87,10 +87,29 @@ def bundle_detail(code):
         "financial_latest": (fin[0] if isinstance(fin, list) and fin else None),
     }
 
-# ---------- AI Q&A ----------
+# ---------- AI Q&A (GitCode free AI, user mandate: NOT GitHub Models) ----------
+
+GITCODE_TOKEN = os.environ.get("GITCODE_TOKEN") or os.environ.get("GC_TOKEN") or ""
+LLM_MODEL = os.environ.get("LLM_MODEL", "deepseek-ai/DeepSeek-V4-Flash")
+LLM_FALLBACK_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+
+def _gitcode_chat(prompt, model, timeout=90):
+    if not GITCODE_TOKEN:
+        return None
+    body = {"model": model, "messages": [{"role": "user", "content": prompt}], "temperature": 0.2}
+    req = urllib.request.Request(
+        "https://gitcode.com/api/v5/chat/completions",
+        data=json.dumps(body).encode(), method="POST",
+        headers={"Authorization": f"Bearer {GITCODE_TOKEN}", "Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            d = json.loads(r.read())
+            return (d.get("choices") or [{}])[0].get("message", {}).get("content", "")
+    except Exception:
+        return None
 
 def llm_qa(code, record):
-    """One ghc call -> strict JSON {why, risk, focus}. Missing ghc or failure -> insufficient."""
+    """One GitCode AI call -> strict JSON {why, risk, focus}. No token / failure -> insufficient."""
     ctx = json.dumps({
         "code": code,
         "name": record.get("name"),
@@ -105,22 +124,19 @@ def llm_qa(code, record):
         '"why"(为何被选中/关注, 120字内), "risk"(主要风险, 100字内), "focus"(后续观察点, 100字内)。\n'
         f"数据: {ctx}"
     )
-    try:
-        r = subprocess.run(["ghc", "model", "run", "--model", "gpt-4o-mini", "--size", "medium",
-                            "--prompt", prompt], capture_output=True, text=True, timeout=180)
-    except Exception:
-        return {"status": "insufficient", "reason": "ghc unavailable"}
-    if r.returncode != 0:
-        return {"status": "insufficient", "reason": "llm error"}
-    out = (r.stdout or "").strip()
-    m = re.search(r"\{.*\}", out, re.S)
+    out = _gitcode_chat(prompt, LLM_MODEL)
+    if out is None:
+        out = _gitcode_chat(prompt, LLM_FALLBACK_MODEL)
+    if out is None:
+        return {"status": "insufficient", "reason": "llm unavailable"}
+    m = re.search(r"\{.*\}", out or "", re.S)
     if not m:
         return {"status": "insufficient", "reason": "llm output not json"}
     try:
         qa = json.loads(m.group(0))
     except Exception:
         return {"status": "insufficient", "reason": "llm json parse failed"}
-    return {"status": "ok", **{k: str(qa.get(k, ""))[:400] for k in ("why", "risk", "focus")}}
+    return {"status": "ok", "model": LLM_MODEL, **{k: str(qa.get(k, ""))[:400] for k in ("why", "risk", "focus")}}
 
 # ---------- main ----------
 
