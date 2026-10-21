@@ -2290,12 +2290,42 @@ function renderConceptHeat(){
     return p>0?'rgba(239,83,80,'+(0.12+a*0.78).toFixed(3)+')'
                 :'rgba(38,166,154,'+(0.12+a*0.78).toFixed(3)+')';
   };
+  // 题材标签筛选 (图1右侧那列): 源数据不带分类字段, 这里按概念名做关键词归组,
+  // 点击只做行过滤, 不改变任何数值。未命中的概念归「其他」。
+  const TAGS=[
+    {k:'tech',label:'科技',re:/云|互联|大数据|物联|智能|电子|软件|AI|3D|网络|信息|导航|穿戴|电视|安防/},
+    {k:'fin',label:'金融',re:/银行|证券|保险|期货|创投|新三板|支付宝|支付/},
+    {k:'med',label:'医药',re:/医|药|疫苗|病毒|生物|独家|养老|婴童/},
+    {k:'energy',label:'能源',re:/电|核能|光伏|风能|油气|页岩|煤|燃料|地热|超导|新材料/},
+    {k:'mil',label:'军工',re:/军工|航天|航空|卫星|海工|北斗/},
+    {k:'cons',label:'消费',re:/酒|旅游|酒店|食品|造纸|彩票|婴童|家居|家电/},
+    {k:'res',label:'资源',re:/黄金|稀土|稀缺|土地|水利|基建|铁路|工程|滨海|长江|西部|成渝|浦东|特区|自贸/}
+  ];
+  const tagOf=name=>{for(const t of TAGS){if(t.re.test(name))return t.k;}return 'other';};
+  rows.forEach(r=>{r.tag=tagOf(r.b.name);});
+  let activeTag=(window._heatTag&&TAGS.some(t=>t.k===window._heatTag))?window._heatTag:'all';
+  const counts={all:rows.length};
+  TAGS.forEach(t=>{counts[t.k]=rows.filter(r=>r.tag===t.k).length;});
+  counts.other=rows.filter(r=>r.tag==='other').length;
   let h='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">'
     +'<b style="font-size:11px">概念热力矩阵</b>'
     +'<span class="fl" style="font-size:9px">'+_esc2(d.n_boards)+' 个概念 × 近 '+_esc2(d.window_days)+' 个交易日 · '
     +_esc2(dates[0]||'')+' 至 '+_esc2(last)+'</span>'
     +'<span class="fl" style="font-size:9px;color:var(--amber)">最新数据 '+_esc2(last)+'，非实时</span>'
     +'</div>';
+  // 题材标签栏 (参考图右侧那一列改成顶部芯片, 移动端更可用)
+  h+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">';
+  h+='<span class="heat-tag'+(activeTag==='all'?' on':'')+'" data-tag="all" style="cursor:pointer;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;border:1px solid var(--border2);background:'+(activeTag==='all'?'var(--accent)':'transparent')+';color:'+(activeTag==='all'?'#fff':'var(--tx2)')+'">全部 '+counts.all+'</span>';
+  TAGS.forEach(t=>{
+    if(!counts[t.k])return;
+    const on=activeTag===t.k;
+    h+='<span class="heat-tag'+(on?' on':'')+'" data-tag="'+_esc2(t.k)+'" style="cursor:pointer;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;border:1px solid var(--border2);background:'+(on?'var(--accent)':'transparent')+';color:'+(on?'#fff':'var(--tx2)')+'">'+_esc2(t.label)+' '+counts[t.k]+'</span>';
+  });
+  if(counts.other){
+    const on=activeTag==='other';
+    h+='<span class="heat-tag'+(on?' on':'')+'" data-tag="other" style="cursor:pointer;padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;border:1px solid var(--border2);background:'+(on?'var(--accent)':'transparent')+';color:'+(on?'#fff':'var(--tx2)')+'">其他 '+counts.other+'</span>';
+  }
+  h+='</div>';
   h+='<div style="overflow-x:auto"><table class="heat-matrix" style="border-collapse:separate;border-spacing:1px;font-size:9px">';
   h+='<thead><tr><th style="position:sticky;left:0;background:var(--panel);z-index:2;min-width:96px;text-align:left;padding:2px 6px">概念</th>';
   dates.forEach(dt=>{
@@ -2304,6 +2334,7 @@ function renderConceptHeat(){
   });
   h+='<th style="padding:2px 4px;min-width:44px">区间</th></tr></thead><tbody>';
   rows.forEach(r=>{
+    if(activeTag!=='all' && r.tag!==activeTag) return;
     const byDate={}; (r.b.cells||[]).forEach(c=>{byDate[c.d]=c.p;});
     const col=r.sum>=0?'var(--up)':'var(--dn)';
     h+='<tr><td style="position:sticky;left:0;background:var(--panel);z-index:1;padding:2px 6px;white-space:nowrap">'
@@ -2318,6 +2349,13 @@ function renderConceptHeat(){
     h+='<td style="font-weight:700;color:'+col+'">'+(r.sum>0?'+':'')+r.sum.toFixed(1)+'%</td></tr>';
   });
   h+='</tbody></table></div>';
+  // 标签点击: 只改过滤, 重渲染同一份数据, 不重新请求
+  Array.prototype.forEach.call(box.querySelectorAll('.heat-tag'),function(el){
+    el.onclick=function(){
+      window._heatTag=el.getAttribute('data-tag');
+      renderConceptHeat();
+    };
+  });
   h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:9px;color:var(--tx3)">'
     +'<span>色阶</span>'
     +'<span style="display:inline-block;width:26px;height:10px;background:rgba(239,83,80,.85)"></span><span>≥+3%</span>'
