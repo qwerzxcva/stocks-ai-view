@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-21T14:06:57+08:00",
+ "ts": "2026-10-21T18:44:53+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 477,
- "n_transmissions": 9,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -79,107 +79,9 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "美联储的通胀战争，正在把美国楼市推入寒冬",
-   "source": "财联社热门",
-   "time": "2026-10-21T13:45:56+08:00",
-   "url": "https://www.cls.cn/detail/2510415",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688011"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-21",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "雷霆马刺大冲突",
-   "source": "微博热搜",
-   "time": "2026-10-21T13:43:43+08:00",
-   "url": "https://s.weibo.com/weibo?q=%23%E9%9B%B7%E9%9C%86%E9%A9%AC%E5%88%BA%E5%A4%A7%E5%86%B2%E7%AA%81%23&t=31&band_rank=9&Refer=top",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688011"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-21",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "NBA揭幕战马刺雷霆爆发冲突",
    "source": "抖音热点",
-   "time": "2026-10-21T14:06:46+08:00",
+   "time": "2026-10-21T18:44:45+08:00",
    "url": "https://www.douyin.com/hot/2705933",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -226,42 +128,36 @@
    }
   },
   {
-   "title": "马刺雷霆爆发冲突",
-   "source": "今日头条",
-   "time": "2026-10-21T13:47:23+08:00",
-   "url": "https://www.toutiao.com/trending/7698941993317057051/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "WTI原油期货升破100美元 布伦特原油期货站上111美元",
+   "source": "财联社电报",
+   "time": "2026-10-21T18:44:41+08:00",
+   "url": "https://www.cls.cn/detail/2511264",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
    "direct_bull": [
     {
-     "sector": "军工",
+     "sector": "油服工程",
      "stocks": [
-      "688011"
+      "002207"
      ]
     }
    ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
+      "900945"
      ]
     }
    ],
@@ -275,42 +171,36 @@
    }
   },
   {
-   "title": "日军事评论家：日本军国主义风险加剧",
-   "source": "今日头条",
-   "time": "2026-10-21T13:47:23+08:00",
-   "url": "https://www.toutiao.com/trending/7698948636165390355/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "布伦特原油日内涨幅达2.0%，报110.97美元/桶；WTI原油日内涨幅达2.0%，报99.82美元/桶。",
+   "source": "华尔街见闻",
+   "time": "2026-10-21T18:44:42+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182641",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
    "direct_bull": [
     {
-     "sector": "军工",
+     "sector": "油服工程",
      "stocks": [
-      "688011"
+      "002207"
      ]
     }
    ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
+      "900945"
      ]
     }
    ],
@@ -324,46 +214,54 @@
    }
   },
   {
-   "title": "马刺雷霆爆发大面积冲突",
-   "source": "百度热搜",
-   "time": "2026-10-21T14:06:51+08:00",
-   "url": "https://www.baidu.com/s?wd=%E9%A9%AC%E5%88%BA%E9%9B%B7%E9%9C%86%E7%88%86%E5%8F%91%E5%A4%A7%E9%9D%A2%E7%A7%AF%E5%86%B2%E7%AA%81",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
+   "title": "格里芬警告AI泡沫 金融高管反驳并呼吁加快数据中心建设",
+   "source": "华尔街见闻",
+   "time": "2026-10-21T18:44:42+08:00",
+   "url": "https://wallstreetcn.com/livenews/3182620",
+   "transmission_id": "ai_down",
+   "label": "AI/算力下跌",
+   "direct_bear": [
     {
-     "sector": "军工",
+     "sector": "算力",
      "stocks": [
-      "688011"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
+      "603636",
+      "300096"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "计算机",
      "stocks": [
-      "600593"
+      "002835",
+      "600330"
+     ]
+    },
+    {
+     "sector": "软件",
+     "stocks": [
+      "301159"
      ]
     }
    ],
-   "hedge": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
@@ -373,10 +271,10 @@
    }
   },
   {
-   "title": "伊朗总统称谈判前提是美方解除施压、威胁和制裁 | 环球市场",
-   "source": "财联社热门",
-   "time": "2026-10-21T13:45:56+08:00",
-   "url": "https://www.cls.cn/detail/2510457",
+   "title": "两部门发布公告，对盾构机、挖泥船、高端无人机等实施出口管制，释放了哪些信号？",
+   "source": "知乎热榜",
+   "time": "2026-10-21T18:44:43+08:00",
+   "url": "https://www.zhihu.com/question/2095840965227561820",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
    "direct_bear": [],
@@ -401,45 +299,9 @@
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "日本央行副行长冰见野良三：人工智能需求旺盛推高资本支出和出口。\n\n基础通胀率非常接近日本央行2%的目标，预计基础通胀率将趋向至与日本央行目标一致的水平。\n\n中长期通胀预期持续上升。",
-   "source": "华尔街见闻",
-   "time": "2026-10-21T13:41:21+08:00",
-   "url": "https://wallstreetcn.com/livenews/3182338",
-   "transmission_id": "rate_cut",
-   "label": "降息/宽松",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-21",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "显卡断供,DIY玩家输麻了",
    "source": "贴吧热议",
-   "time": "2026-10-21T14:06:52+08:00",
+   "time": "2026-10-21T18:44:47+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
