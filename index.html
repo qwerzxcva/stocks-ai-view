@@ -291,7 +291,8 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
       </div>
     </div>
     <div class="card c-card" data-ci="5">
-      <div class="hd">热点主题 <span class="sub" id="themesSub">题材聚合 · 关联个股</span></div>
+      <div class="hd">热点主题 <span class="sub" id="themesSub">题材聚合 · 概念热力矩阵 · 关联个股</span></div>
+      <div id="conceptHeatBox" style="padding:8px 12px"></div>
       <div id="themeBox" style="padding:8px 12px;overflow-y:auto;max-height:calc(100vh - 235px)">
         <div class="fl" style="text-align:center">加载中…</div>
       </div>
@@ -2263,8 +2264,78 @@ function renderMainline(){
   box.innerHTML=h;
 }
 
+// ─── 4a. 概念热力矩阵 (concept_heat.json) ────────────────────
+// 需求(图1): 每行一个概念, 每列一个交易日, 格子颜色=当日板块指数涨跌幅,
+//   右侧图例说明; 不显示涨停家数 — 那需要成分股日线, 数据里没有, 不用缺失值伪造。
+function renderConceptHeat(){
+  const box=document.getElementById('conceptHeatBox');
+  if(!box) return;
+  const d=(window._data||{}).concept_heat;
+  if(!d||d.status!=='ok'||!d.boards||!d.boards.length){
+    box.innerHTML='<div class="fl" style="padding:4px 0">概念热力矩阵：数据不足，未渲染。'
+      +(_esc2(d&&d.reason?d.reason:'concept_heat.json 缺失或 status 非 ok')+'）</div>');
+    return;
+  }
+  const dates=d.dates||[];
+  const last=dates[dates.length-1]||'';
+  // 每个板块按「窗口内累计涨跌幅」排序, 强的在上 — 与参考图按近期强度排一致
+  const rows=d.boards.map(b=>{
+    const sum=(b.cells||[]).reduce((a,c)=>a+(c.p||0),0);
+    return {b:b,sum:sum};
+  }).sort((x,y)=>y.sum-x.sum);
+  // 涨红跌绿 (A股习惯, 与站点 --up/--dn 一致)
+  const cellColor=p=>{
+    if(p==null||!isFinite(p)) return 'transparent';
+    const a=Math.min(1,Math.abs(p)/3);       // ±3% 以上即满色
+    return p>0?'rgba(239,83,80,'+(0.12+a*0.78).toFixed(3)+')'
+                :'rgba(38,166,154,'+(0.12+a*0.78).toFixed(3)+')';
+  };
+  let h='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">'
+    +'<b style="font-size:11px">概念热力矩阵</b>'
+    +'<span class="fl" style="font-size:9px">'+_esc2(d.n_boards)+' 个概念 × 近 '+_esc2(d.window_days)+' 个交易日 · '
+    +_esc2(dates[0]||'')+' 至 '+_esc2(last)+'</span>'
+    +'<span class="fl" style="font-size:9px;color:var(--amber)">最新数据 '+_esc2(last)+'，非实时</span>'
+    +'</div>';
+  h+='<div style="overflow-x:auto"><table class="heat-matrix" style="border-collapse:separate;border-spacing:1px;font-size:9px">';
+  h+='<thead><tr><th style="position:sticky;left:0;background:var(--panel);z-index:2;min-width:96px;text-align:left;padding:2px 6px">概念</th>';
+  dates.forEach(dt=>{
+    const md=String(dt).slice(5);
+    h+='<th style="padding:2px 1px;min-width:22px;font-weight:400;color:var(--tx3)">'+_esc2(md)+'</th>';
+  });
+  h+='<th style="padding:2px 4px;min-width:44px">区间</th></tr></thead><tbody>';
+  rows.forEach(r=>{
+    const byDate={}; (r.b.cells||[]).forEach(c=>{byDate[c.d]=c.p;});
+    const col=r.sum>=0?'var(--up)':'var(--dn)';
+    h+='<tr><td style="position:sticky;left:0;background:var(--panel);z-index:1;padding:2px 6px;white-space:nowrap">'
+      +'<span class="clk" data-bk="'+_esc2(r.b.bk)+'" style="cursor:pointer;color:var(--accent)" title="'+_esc2(r.b.name)+' · '+_esc2(r.b.n_stocks||'—')+' 只成分股">'+_esc2(r.b.name)+'</span></td>';
+    dates.forEach(dt=>{
+      const p=byDate[dt];
+      const has=p!=null;
+      h+='<td style="background:'+cellColor(has?p:null)+';height:20px;text-align:center;color:'+(has?(p>=0?'#fff':'#fff'):'var(--tx3)')+'"'
+        +' title="'+_esc2(r.b.name)+' '+_esc2(dt)+(has?(' · '+(p>0?'+':'')+p+'%'):' · 无数据')+'">'
+        +(has?((p>0?'+':'')+p.toFixed(1)):'·')+'</td>';
+    });
+    h+='<td style="font-weight:700;color:'+col+'">'+(r.sum>0?'+':'')+r.sum.toFixed(1)+'%</td></tr>';
+  });
+  h+='</tbody></table></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px;font-size:9px;color:var(--tx3)">'
+    +'<span>色阶</span>'
+    +'<span style="display:inline-block;width:26px;height:10px;background:rgba(239,83,80,.85)"></span><span>≥+3%</span>'
+    +'<span style="display:inline-block;width:26px;height:10px;background:rgba(239,83,80,.35)"></span><span>+1%</span>'
+    +'<span style="display:inline-block;width:26px;height:10px;background:rgba(38,166,154,.35)"></span><span>-1%</span>'
+    +'<span style="display:inline-block;width:26px;height:10px;background:rgba(38,166,154,.85)"></span><span>≤-3%</span>'
+    +'<span>· 涨红跌绿 · 数值为板块指数日涨跌幅%</span></div>';
+  if(d.missing&&d.missing.length){
+    h+='<div class="fl" style="font-size:9px;margin-top:4px">未纳入 '+_esc2(d.missing.length)+' 个概念：'
+      +_esc2(d.missing.map(m=>m.name).slice(0,12).join('、'))+(d.missing.length>12?' 等':'')+'（源端无可用K线）</div>';
+  }
+  h+='<div class="fl" style="font-size:9px;margin-top:2px">'+_esc2(d.caveat||'')+'</div>';
+  box.innerHTML=h;
+}
+
 // ─── 4. 热点主题 ───────────────────────────────────────────────
 function renderThemes(){
+  renderConceptHeat();
   const box=document.getElementById('themeBox');
   if(!box) return;
   const g=window._data||{};
@@ -3389,6 +3460,7 @@ const SOURCES = [
   'data/sample_balance.json',  // 样本均衡
   'data/global_fx.json',       // 全球汇率
   'data/hot_themes.json',      // 热点主题 (build_mainlines 产出)
+  'data/concept_heat.json',      // 概念热力矩阵 (build_concept_heat 产出)
   'data/mainline.json',        // 今日主线 + 明日预测 (保留兼容)
   'data/recent_mainlines.json', // 近30日稳定主线
   'data/prediction_bundle.json', // 今日行动/明日候选/大盘方向统一预测包
