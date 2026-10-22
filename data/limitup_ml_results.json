@@ -1,45 +1,36 @@
 {
-  "ts": "2026-10-22T08:11:24+08:00",
+  "ts": "2026-10-22T10:27:43+08:00",
   "engine": "limitup_ml_train",
-  "n_samples": 15914324,
-  "base_rate_pct": 0.9351,
+  "n_samples": 4183871,
+  "base_rate_pct": 0.7286,
   "picks": {
     "1": {
-      "precision_pct": 0.3191,
-      "lift": 0.341,
-      "n_selected": 3447,
-      "n_hits": 11
+      "precision_pct": 0.9118,
+      "lift": 1.251,
+      "n_selected": 3400,
+      "n_hits": 31
     },
     "5": {
-      "precision_pct": 0.4062,
-      "lift": 0.434,
-      "n_selected": 17235,
-      "n_hits": 70
+      "precision_pct": 0.5872,
+      "lift": 0.806,
+      "n_selected": 16860,
+      "n_hits": 99
     },
     "10": {
-      "precision_pct": 0.4816,
-      "lift": 0.515,
-      "n_selected": 34470,
-      "n_hits": 166
+      "precision_pct": 0.5478,
+      "lift": 0.752,
+      "n_selected": 33040,
+      "n_hits": 181
     },
     "20": {
-      "precision_pct": 0.7688,
-      "lift": 0.822,
-      "n_selected": 68940,
-      "n_hits": 530
+      "precision_pct": 0.4839,
+      "lift": 0.664,
+      "n_selected": 57860,
+      "n_hits": 280
     }
   },
   "provenance": {
     "source": "data/lp_* (bulk 派生)",
     "origin": "GitCode limitup2/train.py"
-  },
-  "analysis": {
-    "summary": "单因子测试显示各特征 lift 3-4x，但多变量 logistic 仅 0.3-0.8x。原因：A股涨停板制度导致标签噪声大；市场状态切换频繁；简单 logistic 难以捕捉非线性交互。建议：改用 XGBoost/LightGBM、分层建模（按板块/市值）、或集成单因子信号。",
-    "single_factor_lift_range": [
-      2.5,
-      4.8
-    ],
-    "multivariate_lift": 0.34,
-    "recommendation": "不要直接使用 logistic 输出作为交易信号，建议做多模型集成或转为因子合成框架。"
   }
 }
