@@ -1,6 +1,6 @@
 # workflows/limitup-ml.yml — 次日涨停 ML 模型每日训练
 # 数据源: qwerzxcva/t1 仓的 data/bulk（稀疏检出）
-# 输出: data/lp_*（中间文件）、data/limitup_ml_results.json、data/limitup_ml_model.json
+# 输出: data/lp_*（中间文件）、data/limitup_ml_results.json（正式产出，入库）
 name: LimitUp-ML Pipeline
 on:
   schedule:
@@ -53,7 +53,7 @@ jobs:
         run: |
           git config user.name "limitup-ml-bot"
           git config user.email "limitup-ml-bot@users.noreply.github.com"
-          git add data/lp_meta.json data/limitup_ml_results.json data/limitup_ml_model.json || true
+          git add data/lp_meta.json data/limitup_ml_results.json || true
           if git diff --cached --quiet; then
             echo "no changes"
             exit 0
@@ -62,7 +62,7 @@ jobs:
           for i in 1 2 3; do
             git fetch origin main
             git reset --soft origin/main
-            git add data/lp_meta.json data/limitup_ml_results.json data/limitup_ml_model.json || true
+            git add data/lp_meta.json data/limitup_ml_results.json || true
             git commit -m "[CI] limitup-ML refresh $(date +%Y%m%d_%H%M)" 2>/dev/null || true
             if git push origin HEAD:main; then echo pushed; break; fi
             sleep 10
