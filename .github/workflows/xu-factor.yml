@@ -1,0 +1,53 @@
+# workflows/xu-factor.yml — 干支五行对照实验（负控制，禁止用于实盘）
+name: Xu Factor Control
+on:
+  schedule:
+    - cron: "0 12 * * *"   # 每天中午验证因子失效（对照实验）
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: xu-factor
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+      - name: Link bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run Xu factor
+        run: |
+          python3 scripts/xu_factor.py \
+            --bulk ../stocks-data-kline/data/bulk \
+            --out data/xu_factor_results.json
+          python3 -c "import json; d=json.load(open('data/xu_factor_results.json')); print(d['verdict'], 'mean IC:', d['mean_ic'])"
+      - name: Commit
+        run: |
+          git config user.name "xu-factor-bot"
+          git config user.email "xu-factor-bot@users.noreply.github.com"
+          git add data/xu_factor_results.json || true
+          if [ -n "$(git diff --cached)" ]; then
+            git commit -m "[CI] Xu factor control $(date +%Y%m%d_%H%M)"
+            for i in 1 2 3; do git push origin main || { sleep 5; git push origin main; } && break; done
+          fi

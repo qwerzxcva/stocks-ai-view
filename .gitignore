@@ -19,3 +19,10 @@ data/adjusted/index_full.json
 *.duckdb
 *.duckdb.wal
 # data/all_sources.json 2026-10-19: 云端引擎需要它做外部增强, 不再忽略
+
+# limitup-ML 中间产物: 300MB+ 二进制特征, 本地/CI 生成不入库
+data/lp_feat.f32
+data/lp_label.b
+data/lp_ret.f4
+data/lp_date.i4
+data/lp_sym.i4

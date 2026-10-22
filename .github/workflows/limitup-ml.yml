@@ -1,0 +1,64 @@
+# workflows/limitup-ml.yml — 次日涨停 ML 模型每日训练
+# 数据源: qwerzxcva/t1 仓的 data/bulk（稀疏检出）
+# 输出: data/lp_*（中间文件）、data/limitup_ml_results.json、data/limitup_ml_model.json
+name: LimitUp-ML Pipeline
+on:
+  schedule:
+    - cron: "0 6 * * *"    # 每天 06:00 UTC（北京 14:00）
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: limitup-ml
+  cancel-in-progress: false
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+      - name: Link bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import BULK; print('bulk:', BULK); import glob; n = len(glob.glob(BULK+'/day_qfq_*.csv')); print(f'{n} shards')"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install --quiet numpy pandas
+      - name: Build features
+        run: |
+          python3 scripts/limitup_ml_build.py --out data
+          python3 -c "import os,json; m=json.load(open('data/lp_meta.json')); print(f'symbols={m[\"n_symbols\"]}, samples={m[\"n_samples\"]}, positive={m[\"n_positive\"]}, base_rate={m[\"base_rate_pct\"]:.4f}%')"
+      - name: Train model
+        run: |
+          python3 scripts/limitup_ml_train.py --data data --out data/limitup_ml_results.json
+          python3 -c "import json;d=json.load(open('data/limitup_ml_results.json'));print('base_rate=%.4f%%'%d['base_rate_pct']);[print('  TopK=%s: precision=%.3f%% lift=%.2fx n=%d'%(k,d['picks'][k]['precision_pct'],d['picks'][k]['lift'],d['picks'][k]['n_selected'])) for k in sorted(d['picks'].keys(),key=int)]"
+      - name: Commit results
+        run: |
+          git config user.name "limitup-ml-bot"
+          git config user.email "limitup-ml-bot@users.noreply.github.com"
+          git add data/lp_meta.json data/limitup_ml_results.json data/limitup_ml_model.json || true
+          if [ -n "$(git diff --cached --quiet)" ]; then
+            echo "no changes"
+          else
+            git commit -m "[CI] limitup-ML refresh $(date +%Y%m%d_%H%M)"
+            for i in 1 2 3; do
+              git push origin main || { sleep 5; git push origin main; } && break
+            done
+          fi

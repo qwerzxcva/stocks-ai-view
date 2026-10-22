@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Engine Migration Report</title>
+<style>body{font-family:Arial,sans-serif;margin:40px;line-height:1.6}h1{color:#333}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#f5f5f5}.bad{color:red}.good{color:green}.warn{color:orange}</style>
+</head><body>
+<h1>A 股引擎迁移报告 (2026-10-22)</h1>
+<h2>1. 总体状态</h2>
+<ul>
+<li><strong>已迁移引擎</strong>: 3 个 (limitup-ML, PEAD, Xu-Factor)</li>
+<li><strong>数据源</strong>: bulk 日 K 线 (3998 只股票, 1591 万样本)</li>
+<li><strong>GitHub 凭据</strong>: dufuwuxin (主), qwerzxcva (镜像), github-actions (CI)</li>
+<li><strong>工作流</strong>: 3 个 (limitup-ml.yml, pead-daily.yml, xu-factor.yml)</li>
+</ul>
+
+<h2>2. 各引擎结果</h2>
+
+<h3>2.1 LimitUp-ML (次日涨停预测)</h3>
+<table>
+<tr><th>Metric</th><th>Value</th><th>Notes</th></tr>
+<tr><td>样本数</td><td>15,914,324</td><td></td></tr>
+<tr><td>基准涨停率</td><td>0.9351%</td><td></td></tr>
+<tr><td>Top1 lift</td><td class="bad">0.34x</td><td>单因子 lift > 4x，多变量 logistic 退化</td></tr>
+<tr><td>Top20 lift</td><td class="warn">0.82x</td><td>有所改善但仍&lt;1</td></tr>
+</table>
+<p><strong>分析</strong>: 单因子测试显示各特征 lift 3-4x，但多变量 logistic 仅 0.3-0.8x。原因：A股涨停板制度导致标签噪声大；市场状态切换频繁；简单 logistic 难以捕捉非线性交互。建议：改用 XGBoost/LightGBM、分层建模（按板块/市值）、或集成单因子信号。</p>
+
+<h3>2.2 PEAD (财报后漂移)</h3>
+<p>事件数: 18</p>
+<p>有效收益数据: 18</p>
+<p>平均 SUE: 0.724</p>
+<p>警告: 财报数据仅覆盖 18 只股票（data/fin/），远低于全市场约 5000 只；PEAD 结论不具备统计代表性，仅作管线验证。, 有效事件仅 18 个，无法做十分位分层。</p>
+<p><em>注：财报数据仅覆盖少量股票 (data/fin/)，结论不具备统计代表性。</em></p>
+
+<h3>2.3 Xu-Factor (干支五行)</h3>
+<p><span class="warn">无效因子（噪声）</span></p>
+<p>Mean IC: -0.00143, IR: -0.023</p>
+<p><strong>结论</strong>: 无效因子，仅用作对照实验，禁止用于实盘。</p>
+
+<h2>3. 下一步行动</h2>
+<ol>
+<li><strong>LimitUp-ML 优化</strong>: 改用 LightGBM/XGBoost，分层建模（按板块/市值），或集成单因子信号</li>
+<li><strong>PEAD 数据扩充</strong>: 需要全市场财报数据 (data/fin/ 目前仅 20 只)</li>
+<li><strong>工作流上线</strong>: 触发 CI 运行，验证端到端流程</li>
+<li><strong>engine-chain.yml 集成</strong>: 将新引擎接入每日调度</li>
+</ol>
+
+<p><small>Generated: 2026-10-22 08:12:30 CST</small></p>
+</body></html>

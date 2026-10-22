@@ -1,0 +1,55 @@
+# workflows/pead-daily.yml — PEAD 事件每日更新
+name: PEAD Daily
+on:
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: pead-daily
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+      - name: Link bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          python3 -c "import glob; print(len(glob.glob('../stocks-data-kline/data/bulk/day_qfq_*.csv')), 'shards')"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run PEAD engine
+        run: |
+          python3 scripts/pead_engine.py \
+            --fin data/fin \
+            --bulk ../stocks-data-kline/data/bulk \
+            --out data/pead_events.json
+          python3 -c "import json; d=json.load(open('data/pead_events.json')); print('events:', d['coverage'], 'warnings:', d.get('warnings', []))"
+      - name: Commit
+        run: |
+          git config user.name "pead-bot"
+          git config user.email "pead-bot@users.noreply.github.com"
+          git add data/pead_events.json || true
+          if [ -n "$(git diff --cached)" ]; then
+            git commit -m "[CI] PEAD daily update $(date +%Y%m%d_%H%M)"
+            for i in 1 2 3; do git push origin main || { sleep 5; git push origin main; } && break; done
+          fi
