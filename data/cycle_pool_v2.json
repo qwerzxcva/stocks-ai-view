@@ -1,7 +1,7 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-22T09:28:53+08:00",
+    "ts": "2026-10-22T14:02:29+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
     "n_days": 8574,
@@ -11,21 +11,21 @@
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-22T09:28:53+08:00"
+    "rebuilt_at": "2026-10-22T14:02:29+08:00"
   },
   "status": {
     "date": "2026-10-22",
-    "close": 3714.48,
-    "ma5": 3722.02,
-    "ma20": 3815.96,
-    "ma60": 3875.61,
+    "close": 3680.47,
+    "ma5": 3715.21,
+    "ma20": 3814.26,
+    "ma60": 3875.05,
     "ma_bull": false,
-    "macd_hist": -18.68,
+    "macd_hist": -23.02,
     "macd_bull": false,
-    "rsi": 19.0,
-    "momentum_20d_pct": -4.16,
+    "rsi": 16.7,
+    "momentum_20d_pct": -5.03,
     "phase": "downtrend",
-    "volume_ratio": 0.01
+    "volume_ratio": 0.84
   },
   "yearly_kline": {
     "1991": {
@@ -661,18 +661,18 @@
     "2026": {
       "n_days": 192,
       "open": 3986.97,
-      "close": 3714.48,
+      "close": 3680.47,
       "high": 4258.86,
-      "low": 3674.82,
-      "chg_pct": -6.41,
-      "amplitude_pct": 15.89,
-      "turnover_yi": 1165.9,
+      "low": 3649.86,
+      "chg_pct": -7.27,
+      "amplitude_pct": 16.69,
+      "turnover_yi": 1169.2,
       "candles": {
         "yang": 110,
-        "yin": 81,
-        "cross": 1
+        "yin": 82,
+        "cross": 0
       },
-      "max_drawdown_pct": -13.71,
+      "max_drawdown_pct": -14.3,
       "first_date": "2026-01-05",
       "last_date": "2026-10-22"
     }
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -3.32
+        "Q4": -4.21
       },
       "months_covered": 9
     }
@@ -1344,11 +1344,11 @@
         "1991",
         "2023",
         "1998",
-        "2026",
         "2013",
+        "2026",
         "2005"
       ],
-      "avg_chg": -0.52,
+      "avg_chg": -0.61,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 15.0,
+      "chg_pct": 13.94,
       "position": "库存周期中性",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1446,10 +1446,438 @@
     },
     "sample_span_years": 36
   },
-  "demand_shift": {},
-  "stocks": [],
+  "demand_shift": {
+    "industry_top": [
+      {
+        "name": "电机Ⅲ",
+        "chg_pct": 4.92,
+        "up_n": 22,
+        "down_n": 5,
+        "leader": "兆威机电",
+        "main_net_inflow_yi": 9.94
+      },
+      {
+        "name": "电机Ⅱ",
+        "chg_pct": 4.92,
+        "up_n": 22,
+        "down_n": 5,
+        "leader": "兆威机电",
+        "main_net_inflow_yi": 9.94
+      },
+      {
+        "name": "医美耗材",
+        "chg_pct": 2.97,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "锦波生物",
+        "main_net_inflow_yi": 0.63
+      },
+      {
+        "name": "医疗美容",
+        "chg_pct": 2.44,
+        "up_n": 4,
+        "down_n": 1,
+        "leader": "锦波生物",
+        "main_net_inflow_yi": 0.61
+      },
+      {
+        "name": "机器人",
+        "chg_pct": 2.07,
+        "up_n": 15,
+        "down_n": 7,
+        "leader": "巨能股份",
+        "main_net_inflow_yi": 1.19
+      },
+      {
+        "name": "工程机械整机",
+        "chg_pct": 1.65,
+        "up_n": 15,
+        "down_n": 7,
+        "leader": "山河智能",
+        "main_net_inflow_yi": 1.75
+      },
+      {
+        "name": "医美服务",
+        "chg_pct": 1.65,
+        "up_n": 1,
+        "down_n": 1,
+        "leader": "朗姿股份",
+        "main_net_inflow_yi": -0.02
+      },
+      {
+        "name": "电信运营商",
+        "chg_pct": 1.49,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "中国移动",
+        "main_net_inflow_yi": -1.29
+      },
+      {
+        "name": "集成电路封测",
+        "chg_pct": 1.47,
+        "up_n": 8,
+        "down_n": 5,
+        "leader": "华天科技",
+        "main_net_inflow_yi": 1.0
+      },
+      {
+        "name": "工程机械",
+        "chg_pct": 1.21,
+        "up_n": 23,
+        "down_n": 12,
+        "leader": "山河智能",
+        "main_net_inflow_yi": 2.09
+      },
+      {
+        "name": "涂料",
+        "chg_pct": 1.19,
+        "up_n": 1,
+        "down_n": 1,
+        "leader": "*ST亚士",
+        "main_net_inflow_yi": -0.01
+      },
+      {
+        "name": "玻璃制造",
+        "chg_pct": 1.14,
+        "up_n": 5,
+        "down_n": 3,
+        "leader": "三峡新材",
+        "main_net_inflow_yi": 0.36
+      },
+      {
+        "name": "地面兵装Ⅲ",
+        "chg_pct": 1.04,
+        "up_n": 8,
+        "down_n": 3,
+        "leader": "内蒙一机",
+        "main_net_inflow_yi": 0.18
+      },
+      {
+        "name": "地面兵装Ⅱ",
+        "chg_pct": 1.04,
+        "up_n": 8,
+        "down_n": 3,
+        "leader": "内蒙一机",
+        "main_net_inflow_yi": 0.18
+      },
+      {
+        "name": "机床工具",
+        "chg_pct": 0.97,
+        "up_n": 15,
+        "down_n": 4,
+        "leader": "日发精机",
+        "main_net_inflow_yi": 1.63
+      },
+      {
+        "name": "国有大型银行Ⅲ",
+        "chg_pct": 0.9,
+        "up_n": 3,
+        "down_n": 1,
+        "leader": "工商银行",
+        "main_net_inflow_yi": -2.48
+      },
+      {
+        "name": "光伏主材",
+        "chg_pct": 0.77,
+        "up_n": 1,
+        "down_n": 1,
+        "leader": "隆基绿能",
+        "main_net_inflow_yi": 1.32
+      },
+      {
+        "name": "其他石化",
+        "chg_pct": 0.66,
+        "up_n": 4,
+        "down_n": 10,
+        "leader": "博汇股份",
+        "main_net_inflow_yi": 1.75
+      },
+      {
+        "name": "工程机械器件",
+        "chg_pct": 0.48,
+        "up_n": 8,
+        "down_n": 5,
+        "leader": "恒立钻具",
+        "main_net_inflow_yi": 0.34
+      },
+      {
+        "name": "照明设备Ⅲ",
+        "chg_pct": 0.43,
+        "up_n": 6,
+        "down_n": 9,
+        "leader": "海洋王",
+        "main_net_inflow_yi": -0.0
+      }
+    ],
+    "industry_n": 20,
+    "concept_top": [
+      {
+        "name": "昨日打二板以上表现",
+        "chg_pct": 5.77,
+        "up_n": 4,
+        "down_n": 1,
+        "leader": "海洋王"
+      },
+      {
+        "name": "机器人执行器",
+        "chg_pct": 2.09,
+        "up_n": 27,
+        "down_n": 10,
+        "leader": "奕帆传动"
+      },
+      {
+        "name": "反转股",
+        "chg_pct": 1.91,
+        "up_n": 5,
+        "down_n": 3,
+        "leader": "兆威机电"
+      },
+      {
+        "name": "轮毂电机",
+        "chg_pct": 1.29,
+        "up_n": 5,
+        "down_n": 4,
+        "leader": "安乃达"
+      },
+      {
+        "name": "减速器",
+        "chg_pct": 1.28,
+        "up_n": 63,
+        "down_n": 27,
+        "leader": "兆威机电"
+      },
+      {
+        "name": "2026一季报扭亏",
+        "chg_pct": 1.11,
+        "up_n": 3,
+        "down_n": 8,
+        "leader": "博汇股份"
+      },
+      {
+        "name": "工程机械概念",
+        "chg_pct": 0.72,
+        "up_n": 29,
+        "down_n": 27,
+        "leader": "赛福天"
+      },
+      {
+        "name": "同步磁阻电机",
+        "chg_pct": 0.44,
+        "up_n": 4,
+        "down_n": 3,
+        "leader": "卧龙电驱"
+      },
+      {
+        "name": "PLC概念",
+        "chg_pct": 0.31,
+        "up_n": 6,
+        "down_n": 5,
+        "leader": "睿能科技"
+      },
+      {
+        "name": "人形机器人",
+        "chg_pct": -0.04,
+        "up_n": 137,
+        "down_n": 165,
+        "leader": "赛福天"
+      },
+      {
+        "name": "工业母机",
+        "chg_pct": -0.05,
+        "up_n": 45,
+        "down_n": 44,
+        "leader": "巨能股份"
+      },
+      {
+        "name": "题材股",
+        "chg_pct": -0.08,
+        "up_n": 21,
+        "down_n": 25,
+        "leader": "海洋王"
+      },
+      {
+        "name": "稀土永磁",
+        "chg_pct": -0.16,
+        "up_n": 21,
+        "down_n": 25,
+        "leader": "英思特"
+      },
+      {
+        "name": "GDR",
+        "chg_pct": -0.17,
+        "up_n": 4,
+        "down_n": 7,
+        "leader": "乐普医疗"
+      },
+      {
+        "name": "昨日涨停_含一字",
+        "chg_pct": -0.19,
+        "up_n": 22,
+        "down_n": 27,
+        "leader": "海洋王"
+      },
+      {
+        "name": "3D摄像头",
+        "chg_pct": -0.19,
+        "up_n": 3,
+        "down_n": 5,
+        "leader": "豪威集团"
+      },
+      {
+        "name": "茅指数",
+        "chg_pct": -0.24,
+        "up_n": 20,
+        "down_n": 22,
+        "leader": "隆基绿能"
+      },
+      {
+        "name": "低碳冶金",
+        "chg_pct": -0.28,
+        "up_n": 2,
+        "down_n": 5,
+        "leader": "中钢国际"
+      },
+      {
+        "name": "传感器",
+        "chg_pct": -0.29,
+        "up_n": 50,
+        "down_n": 83,
+        "leader": "安乃达"
+      },
+      {
+        "name": "植物照明",
+        "chg_pct": -0.3,
+        "up_n": 7,
+        "down_n": 11,
+        "leader": "ST长方"
+      }
+    ],
+    "concept_n": 20,
+    "concentration": {
+      "top5_avg_chg": 3.46,
+      "sample_avg_chg": 1.67,
+      "spread": 1.79,
+      "interpretation": "主题集中行情 (头部板块显著强于平均)"
+    }
+  },
+  "stocks": [
+    {
+      "code": "300896",
+      "name": "爱美客",
+      "industry": "医美耗材",
+      "chg_pct": 1.63,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.63,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 97.46,
+      "turnover": 1.37,
+      "pe": 26.93,
+      "mktcap_yi": 215.4,
+      "pb": 3.88,
+      "quote_time": "20261022140221"
+    },
+    {
+      "code": "920982",
+      "name": "",
+      "industry": "医美耗材",
+      "chg_pct": 2.97,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.63,
+      "reason": "当前周期需求迁移行业成分股"
+    },
+    {
+      "code": "688363",
+      "name": "华熙生物",
+      "industry": "医美耗材",
+      "chg_pct": 0.7,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.63,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 34.54,
+      "turnover": 0.42,
+      "pe": 74.27,
+      "mktcap_yi": 166.37,
+      "pb": 2.35,
+      "quote_time": "20261022140225"
+    },
+    {
+      "code": "002612",
+      "name": "朗姿股份",
+      "industry": "医疗美容",
+      "chg_pct": 5.21,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.61,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 15.56,
+      "turnover": 3.94,
+      "pe": 8.27,
+      "mktcap_yi": 40.67,
+      "pb": 2.45,
+      "quote_time": "20261022140224"
+    },
+    {
+      "code": "000615",
+      "name": "*ST美谷",
+      "industry": "医疗美容",
+      "chg_pct": -1.91,
+      "leader": "锦波生物",
+      "main_net_inflow_yi": 0.61,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 3.08,
+      "turnover": 0.27,
+      "pe": -9.43,
+      "mktcap_yi": 28.5,
+      "pb": 3.35,
+      "quote_time": "20261022140224"
+    },
+    {
+      "code": "601728",
+      "name": "中国电信",
+      "industry": "电信运营商",
+      "chg_pct": 1.66,
+      "leader": "中国移动",
+      "main_net_inflow_yi": -1.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 6.73,
+      "turnover": 0.15,
+      "pe": 20.7,
+      "mktcap_yi": 5224.48,
+      "pb": 1.35,
+      "quote_time": "20261022140224"
+    },
+    {
+      "code": "600941",
+      "name": "中国移动",
+      "industry": "电信运营商",
+      "chg_pct": 2.55,
+      "leader": "中国移动",
+      "main_net_inflow_yi": -1.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 99.05,
+      "turnover": 1.89,
+      "pe": 16.8,
+      "mktcap_yi": 894.19,
+      "pb": 1.54,
+      "quote_time": "20261022140225"
+    },
+    {
+      "code": "600050",
+      "name": "中国联通",
+      "industry": "电信运营商",
+      "chg_pct": 0.23,
+      "leader": "中国移动",
+      "main_net_inflow_yi": -1.29,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 4.32,
+      "turnover": 0.43,
+      "pe": 19.53,
+      "mktcap_yi": 1338.79,
+      "pb": 0.79,
+      "quote_time": "20261022140223"
+    }
+  ],
   "stocks_meta": {
-    "n": 0,
-    "enriched": 0
+    "n": 8,
+    "enriched": 7
   }
 }
