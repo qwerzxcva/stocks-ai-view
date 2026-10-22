@@ -41,8 +41,10 @@ ban_prob.py — 打板概率引擎 (实证, 非拍脑袋)
 """
 import argparse
 import json
+import math
 import os
 import sys
+from array import array
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
@@ -273,6 +275,70 @@ def layered_stats(klines):
     return {"events": n, "layers": out}
 
 
+# ─── ML 模型推理 (可选, 需 data/limitup_ml_model.json) ──────────
+def load_ml_model(data_dir):
+    """加载 limitup_ml_train.py 保存的逻辑回归模型与样本索引。
+
+    模型文件不存在或字段不齐时返回 None (静默降级为纯规则模式)。
+    """
+    p = os.path.join(data_dir, "limitup_ml_model.json")
+    if not os.path.exists(p):
+        return None
+    try:
+        m = json.load(open(p, encoding="utf-8"))
+        nf = m["n_features"]
+        if not (len(m["w"]) == len(m["mu"]) == len(m["sd"]) == nf):
+            return None
+        syms = json.load(open(os.path.join(data_dir, "lp_syms.json"), encoding="utf-8"))
+        sym_idx = array("i")
+        sym_idx.frombytes(open(os.path.join(data_dir, "lp_sym.i4"), "rb").read())
+        dates = array("i")
+        dates.frombytes(open(os.path.join(data_dir, "lp_date.i4"), "rb").read())
+        latest = {}  # sym 索引 -> (最大日期, 样本下标)
+        for i in range(len(sym_idx)):
+            si = sym_idx[i]
+            d = dates[i]
+            cur = latest.get(si)
+            if cur is None or d > cur[0]:
+                latest[si] = (d, i)
+        return {
+            "model": m,
+            "code_to_si": {c: j for j, c in enumerate(syms)},
+            "latest": latest,
+            "feat_path": os.path.join(data_dir, "lp_feat.f32"),
+        }
+    except Exception:
+        return None
+
+
+def ml_probability(ml, code):
+    """对该股票最新样本算 logistic 次日涨停分数, 返回 0-100 的百分数。
+
+    找不到该股票的样本时返回 None。
+    """
+    if not ml:
+        return None
+    si = ml["code_to_si"].get(code)
+    if si is None:
+        return None
+    ent = ml["latest"].get(si)
+    if not ent:
+        return None
+    m = ml["model"]
+    nf = m["n_features"]
+    a = array("f")
+    with open(ml["feat_path"], "rb") as f:
+        f.seek(ent[1] * nf * 4)
+        a.frombytes(f.read(nf * 4))
+    if len(a) != nf:
+        return None
+    s = m["bias"]
+    for k in range(nf):
+        s += m["w"][k] * (a[k] - m["mu"][k]) / m["sd"][k]
+    p = 1.0 / (1.0 + math.exp(-max(-30, min(30, s))))
+    return round(p * 100, 2)
+
+
 # ─── C. 个股级: 打板池每只股票 ──────────────────────────────────
 def stock_prob(code, bars, base, layers):
     """给定股票, 基准概率(按连板数) × 因子调整(封板强度/量比/前期涨幅)。
@@ -409,6 +475,18 @@ def main():
             if r:
                 stocks.append(r)
         stocks.sort(key=lambda x: -(x["p_zt_next"] or 0))
+
+    # ML 模型集成: 模型文件存在则给每只股票增加 ml_probability 字段,
+    # 不存在则静默降级为纯规则模式 (不报错, 不改变原有字段)。
+    ml = load_ml_model(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data"))
+    if ml:
+        n_ml = 0
+        for r in stocks:
+            mp = ml_probability(ml, r["code"])
+            if mp is not None:
+                r["ml_probability"] = mp
+                n_ml += 1
+        print(f"[ban_prob] ML 模型已加载, {n_ml}/{len(stocks)} 只股票得到 ml_probability", flush=True)
 
     out = {
         "ts": now.isoformat(timespec="seconds"),

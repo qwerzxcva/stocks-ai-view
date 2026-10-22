@@ -110,6 +110,7 @@ def main():
     start = int(nd * 0.6)
     span = nd - start
     step = max(1, span // folds)
+    last = None  # (w, bias, mu, sd, train_rows, train_pos)
 
     for f in range(folds):
         a = int(start + f * step)
@@ -127,6 +128,7 @@ def main():
         mu, sd = scaler(rows, NF)
         X = [[(rows[j][k] - mu[k]) / sd[k] for k in range(NF)] for j in range(len(rows))]
         w, bias = fit(X, [lab[i] for i in tr], NF)
+        last = (w, bias, mu, sd, len(tr), len(pos))
 
         for d in days[a:b]:
             idxs = byday[d]
@@ -160,6 +162,22 @@ def main():
     os.makedirs(os.path.dirname(args.out), exist_ok=True)
     json.dump(out, open(args.out, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
     print(f"→ {args.out}")
+
+    if last:
+        w, bias, mu, sd, tr_rows, tr_pos = last
+        model = {
+            "w": [round(x, 8) for x in w],
+            "bias": round(bias, 8),
+            "mu": [round(x, 8) for x in mu],
+            "sd": [round(x, 8) for x in sd],
+            "n_features": NF,
+            "trained_at": datetime.now(CST).isoformat(timespec="seconds"),
+            "train_rows": tr_rows,
+            "train_pos": tr_pos,
+        }
+        model_path = os.path.join(os.path.dirname(args.out), "limitup_ml_model.json")
+        json.dump(model, open(model_path, "w", encoding="utf-8"))
+        print(f"→ {model_path} (最后一折参数, train_rows={tr_rows:,}, pos={tr_pos:,})")
     return 0
 
 
