@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-22T13:56:37+08:00",
+ "ts": "2026-10-22T14:07:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 473,
- "n_transmissions": 7,
+ "n_transmissions": 8,
  "n_rules": 16,
  "rules": [
   {
@@ -72,12 +72,100 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-10-21",
+  "trade_date": "2026-10-22",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
+  {
+   "title": "秋冬换季别只防流感",
+   "source": "今日头条",
+   "time": "2026-10-22T14:07:08+08:00",
+   "url": "https://www.toutiao.com/trending/7699335921065410579/",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "301363"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002023"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-22",
+    "event_date": "2026-10-22",
+    "matched_codes": []
+   }
+  },
   {
    "title": "世卫组织：刚果（金）埃博拉疫情出现反弹",
    "source": "wallstreetcn",
@@ -153,8 +241,7 @@
       "000721",
       "002186",
       "605108",
-      "002306",
-      "600754"
+      "002306"
      ]
     }
    ],
@@ -162,7 +249,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    }
@@ -179,8 +266,7 @@
     {
      "sector": "军工",
      "stocks": [
-      "300045",
-      "600698"
+      "300045"
      ]
     }
    ],
@@ -212,7 +298,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    }
@@ -220,7 +306,7 @@
   {
    "title": "显卡断供,DIY玩家输麻了",
    "source": "贴吧热议",
-   "time": "2026-10-22T13:56:31+08:00",
+   "time": "2026-10-22T13:53:10+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -236,7 +322,7 @@
     {
      "sector": "自主可控",
      "stocks": [
-      "300003"
+      "688396"
      ]
     }
    ],
@@ -245,7 +331,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    },
@@ -254,7 +340,7 @@
   {
    "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
    "source": "澎湃新闻",
-   "time": "2026-10-22T13:56:32+08:00",
+   "time": "2026-10-22T14:07:10+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -270,7 +356,7 @@
     {
      "sector": "自主可控",
      "stocks": [
-      "300003"
+      "688396"
      ]
     }
    ],
@@ -279,7 +365,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    },
@@ -304,7 +390,7 @@
     {
      "sector": "自主可控",
      "stocks": [
-      "300003"
+      "688396"
      ]
     }
    ],
@@ -313,7 +399,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    },
@@ -357,7 +443,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    }
@@ -400,7 +486,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
+    "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
    }
