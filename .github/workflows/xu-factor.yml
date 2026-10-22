@@ -47,7 +47,16 @@ jobs:
           git config user.name "xu-factor-bot"
           git config user.email "xu-factor-bot@users.noreply.github.com"
           git add data/xu_factor_results.json || true
-          if [ -n "$(git diff --cached)" ]; then
-            git commit -m "[CI] Xu factor control $(date +%Y%m%d_%H%M)"
-            for i in 1 2 3; do git push origin main || { sleep 5; git push origin main; } && break; done
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
           fi
+          git commit -m "[CI] Xu factor control $(date +%Y%m%d_%H%M)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/xu_factor_results.json || true
+            git commit -m "[CI] Xu factor control $(date +%Y%m%d_%H%M)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done

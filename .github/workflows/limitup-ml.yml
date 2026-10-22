@@ -56,10 +56,14 @@ jobs:
           git add data/lp_meta.json data/limitup_ml_results.json data/limitup_ml_model.json || true
           if git diff --cached --quiet; then
             echo "no changes"
-          else
-            git commit -m "[CI] limitup-ML refresh $(date +%Y%m%d_%H%M)"
-            for i in 1 2 3; do
-              git push origin main && break
-              sleep 5
-            done
+            exit 0
           fi
+          git commit -m "[CI] limitup-ML refresh $(date +%Y%m%d_%H%M)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/lp_meta.json data/limitup_ml_results.json data/limitup_ml_model.json || true
+            git commit -m "[CI] limitup-ML refresh $(date +%Y%m%d_%H%M)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done

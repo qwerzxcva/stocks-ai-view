@@ -49,7 +49,16 @@ jobs:
           git config user.name "pead-bot"
           git config user.email "pead-bot@users.noreply.github.com"
           git add data/pead_events.json || true
-          if [ -n "$(git diff --cached)" ]; then
-            git commit -m "[CI] PEAD daily update $(date +%Y%m%d_%H%M)"
-            for i in 1 2 3; do git push origin main || { sleep 5; git push origin main; } && break; done
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
           fi
+          git commit -m "[CI] PEAD daily update $(date +%Y%m%d_%H%M)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/pead_events.json || true
+            git commit -m "[CI] PEAD daily update $(date +%Y%m%d_%H%M)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done
