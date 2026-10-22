@@ -1,0 +1,64 @@
+# workflows/metaphysics.yml — 字辈分组 + 玄学因子对照实验（每周）
+name: Metaphysics Weekly
+on:
+  schedule:
+    - cron: "0 6 * * 3"   # 每周三 06:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: metaphysics
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+      - name: Link bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          cd ../stocks-data-kline/data/bulk && for gz in *.gz; do [ -f "$gz" ] || continue; [ -f "${gz%.gz}" ] || gzip -dkq "$gz" 2>/dev/null || true; done; cd - >/dev/null
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Name groups report
+        run: |
+          python3 scripts/metaphysics_report.py || echo "metaphysics_report failed"
+      - name: Xu factor control
+        run: |
+          python3 scripts/xu_factor.py --bulk ../stocks-data-kline/data/bulk --out data/xu_factor_results.json
+          python3 -c "import json; d=json.load(open('data/xu_factor_results.json')); print(d['verdict'], '| IC:', d['mean_ic'])"
+      - name: Commit
+        run: |
+          git config user.name "metaphysics-bot"
+          git config user.email "metaphysics-bot@users.noreply.github.com"
+          git add data/name_groups.json data/xu_factor_results.json || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "[CI] metaphysics weekly $(date +%Y%m%d)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/name_groups.json data/xu_factor_results.json || true
+            git commit -m "[CI] metaphysics weekly $(date +%Y%m%d)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done

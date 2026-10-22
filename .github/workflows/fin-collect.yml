@@ -1,0 +1,48 @@
+# workflows/fin-collect.yml — 全市场财报数据采集（每日凌晨，供 PEAD 使用）
+name: Fin Collect
+on:
+  schedule:
+    - cron: "0 3 * * *"   # 每日 03:00 UTC（北京 11:00，盘前）
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: fin-collect
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Collect financial data
+        run: |
+          python3 scripts/collect_fin.py --sleep 0.5
+          python3 -c "import os; n=len([f for f in os.listdir('data/fin') if f.endswith('.json')]); print(f'fin files: {n}')"
+      - name: Commit
+        run: |
+          git config user.name "fin-bot"
+          git config user.email "fin-bot@users.noreply.github.com"
+          git add data/fin/ || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "[CI] fin collect $(date +%Y%m%d)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/fin/ || true
+            git commit -m "[CI] fin collect $(date +%Y%m%d)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done
