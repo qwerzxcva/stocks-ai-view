@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-22T14:07:14+08:00",
+ "ts": "2026-10-22T18:48:02+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 473,
- "n_transmissions": 8,
+ "n_input": 474,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "秋冬换季别只防流感",
-   "source": "今日头条",
-   "time": "2026-10-22T14:07:08+08:00",
-   "url": "https://www.toutiao.com/trending/7699335921065410579/",
+   "title": "原来手机也有这么多病毒",
+   "source": "贴吧热议",
+   "time": "2026-10-22T18:25:05+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367942&amp;topic_name=%E5%8E%9F%E6%9D%A5%E6%89%8B%E6%9C%BA%E4%B9%9F%E6%9C%89%E8%BF%99%E4%B9%88%E5%A4%9A%E7%97%85%E6%AF%92",
    "transmission_id": "epidemic",
    "label": "疫情",
    "direct_bear": [],
@@ -105,7 +105,7 @@
     {
      "sector": "医疗器械",
      "stocks": [
-      "301363"
+      "688151"
      ]
     },
     {
@@ -129,7 +129,7 @@
     {
      "sector": "旅游",
      "stocks": [
-      "000610"
+      "002627"
      ]
     },
     {
@@ -153,7 +153,8 @@
       "000721",
       "002186",
       "605108",
-      "002306"
+      "002306",
+      "600754"
      ]
     }
    ],
@@ -167,98 +168,10 @@
    }
   },
   {
-   "title": "世卫组织：刚果（金）埃博拉疫情出现反弹",
-   "source": "wallstreetcn",
-   "time": "2026-10-22T12:42:40+08:00",
-   "url": "https://wallstreetcn.com/live/3183170",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "301363"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000610"
-     ]
-    },
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002023"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-22",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "韩国国防部：为避免意外冲突 朝鲜必须回到对话桌前",
-   "source": "财联社电报",
-   "time": "2026-10-22T13:45:29+08:00",
-   "url": "https://www.cls.cn/detail/2512026",
+   "title": "曼联8天2次内部冲突",
+   "source": "B站热搜",
+   "time": "2026-10-22T18:47:54+08:00",
+   "url": "https://search.bilibili.com/all?keyword=%E6%9B%BC%E8%81%948%E5%A4%A92%E6%AC%A1%E5%86%85%E9%83%A8%E5%86%B2%E7%AA%81",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -290,7 +203,56 @@
     {
      "sector": "旅游",
      "stocks": [
-      "000610"
+      "002627"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-22",
+    "event_date": "2026-10-22",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "伊朗官员：已做好应对全面战争准备",
+   "source": "今日头条",
+   "time": "2026-10-22T18:25:02+08:00",
+   "url": "https://www.toutiao.com/trending/7699092788410860083/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300045"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002023"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
      ]
     }
    ],
@@ -306,7 +268,7 @@
   {
    "title": "显卡断供,DIY玩家输麻了",
    "source": "贴吧热议",
-   "time": "2026-10-22T13:53:10+08:00",
+   "time": "2026-10-22T18:25:05+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -316,47 +278,13 @@
     {
      "sector": "半导体设备",
      "stocks": [
-      "301666"
+      "002185"
      ]
     },
     {
      "sector": "自主可控",
      "stocks": [
-      "688396"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-22",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
-   "source": "澎湃新闻",
-   "time": "2026-10-22T14:07:10+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "301666"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "688396"
+      "600406"
      ]
     }
    ],
@@ -374,7 +302,7 @@
   {
    "title": "菲防长召回驻华武官，专家：受制裁后的卖惨行为",
    "source": "凤凰网",
-   "time": "2026-10-22T13:44:26+08:00",
+   "time": "2026-10-22T18:35:31+08:00",
    "url": "https://original.ifeng.com/c/8xPWyUWc5tF",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -384,13 +312,13 @@
     {
      "sector": "半导体设备",
      "stocks": [
-      "301666"
+      "002185"
      ]
     },
     {
      "sector": "自主可控",
      "stocks": [
-      "688396"
+      "600406"
      ]
     }
    ],
@@ -406,90 +334,57 @@
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "布伦特原油期货涨幅扩大至2%",
-   "source": "财联社电报",
-   "time": "2026-10-22T13:45:29+08:00",
-   "url": "https://www.cls.cn/detail/2512008",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
+   "title": "美股盘前：特斯拉跌约5%，半导体股、光通信股普跌",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T16:01:58+08:00",
+   "url": "https://wallstreetcn.com/live/3183307",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "油服工程",
+     "sector": "银行",
      "stocks": [
-      "300164"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "inverse_bear": [],
+   "hedge": [
     {
-     "sector": "航空机场",
+     "sector": "银行",
      "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
      ]
     }
    ],
-   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-22",
     "event_date": "2026-10-22",
     "matched_codes": []
-   }
-  },
-  {
-   "title": "布伦特原油日内涨幅达2.0%，报111美元/桶。",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T13:45:20+08:00",
-   "url": "https://wallstreetcn.com/livenews/3183177",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "300164"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-22",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   }
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   }
  ]
 }
