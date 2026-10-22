@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-22T04:38:45+08:00",
+ "ts": "2026-10-22T09:31:38+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 474,
- "n_transmissions": 12,
+ "n_input": 475,
+ "n_transmissions": 7,
  "n_rules": 16,
  "rules": [
   {
@@ -79,63 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "利弗莫尔中概股龙头指数收涨跌1.12% 热门中概股普跌",
+   "title": "渤海部分海域执行军事任务 禁止驶入",
    "source": "财联社电报",
-   "time": "2026-10-22T04:38:33+08:00",
-   "url": "https://www.cls.cn/detail/2511601",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "美国总统特朗普：更加接近解决俄罗斯与乌克兰的冲突。\n\n现在可能是我们距离结束冲突最近的一次。\n\n（关于哈伯德从俄罗斯获释）我们没有做出任何交换。",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T04:13:03+08:00",
-   "url": "https://wallstreetcn.com/livenews/3182925",
+   "time": "2026-10-22T09:23:45+08:00",
+   "url": "https://www.cls.cn/detail/2511723",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -143,7 +90,8 @@
     {
      "sector": "军工",
      "stocks": [
-      "688011"
+      "688682",
+      "603516"
      ]
     }
    ],
@@ -161,13 +109,13 @@
       "603885",
       "600115",
       "002928",
-      "688237"
+      "605123"
      ]
     },
     {
      "sector": "旅游",
      "stocks": [
-      "600593"
+      "002627"
      ]
     }
    ],
@@ -181,10 +129,10 @@
    }
   },
   {
-   "title": "美国芝加哥商业交易所集团（CME Group）CEO Terry Duffy：地缘政治紧张局势对（美国）通胀“有太大的影响”。（彭博电视）",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T04:13:03+08:00",
-   "url": "https://wallstreetcn.com/livenews/3182924",
+   "title": "伊朗最高领袖会见议长 讨论战争影响",
+   "source": "财联社电报",
+   "time": "2026-10-22T09:23:45+08:00",
+   "url": "https://www.cls.cn/detail/2511672",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -192,7 +140,8 @@
     {
      "sector": "军工",
      "stocks": [
-      "688011"
+      "688682",
+      "603516"
      ]
     }
    ],
@@ -210,13 +159,13 @@
       "603885",
       "600115",
       "002928",
-      "688237"
+      "605123"
      ]
     },
     {
      "sector": "旅游",
      "stocks": [
-      "600593"
+      "002627"
      ]
     }
    ],
@@ -232,7 +181,7 @@
   {
    "title": "解放军台海开展军事行动",
    "source": "抖音热点",
-   "time": "2026-10-22T04:38:37+08:00",
+   "time": "2026-10-22T09:13:06+08:00",
    "url": "https://www.douyin.com/hot/2705896",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -241,7 +190,8 @@
     {
      "sector": "军工",
      "stocks": [
-      "688011"
+      "688682",
+      "603516"
      ]
     }
    ],
@@ -259,13 +209,13 @@
       "603885",
       "600115",
       "002928",
-      "688237"
+      "605123"
      ]
     },
     {
      "sector": "旅游",
      "stocks": [
-      "600593"
+      "002627"
      ]
     }
    ],
@@ -279,45 +229,23 @@
    }
   },
   {
-   "title": "美国总统特朗普：更加接近解决俄罗斯与乌克兰的冲突。\n\n现在可能是我们距离结束冲突最近的一次。\n\n（关于哈伯德从俄罗斯获释",
-   "source": "wallstreetcn",
-   "time": "2026-10-22T03:16:12+08:00",
-   "url": "https://wallstreetcn.com/live/3182925",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "显卡断供,DIY玩家输麻了",
+   "source": "贴吧热议",
+   "time": "2026-10-22T09:06:08+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "半导体设备",
      "stocks": [
-      "688011"
+      "688286"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -325,48 +253,27 @@
     "trade_date": "2026-10-21",
     "event_date": "2026-10-22",
     "matched_codes": []
-   }
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "美国芝加哥商业交易所集团（CME Group）CEO Terry Duffy：地缘政治紧张局势对（美国）通胀“有太大的影",
-   "source": "wallstreetcn",
-   "time": "2026-10-22T03:15:35+08:00",
-   "url": "https://wallstreetcn.com/live/3182924",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
+   "source": "澎湃新闻",
+   "time": "2026-10-22T09:31:33+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "半导体设备",
      "stocks": [
-      "688011"
+      "688286"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688237"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -374,13 +281,14 @@
     "trade_date": "2026-10-21",
     "event_date": "2026-10-22",
     "matched_codes": []
-   }
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "美国对伊朗实施新一轮制裁",
-   "source": "财联社电报",
-   "time": "2026-10-22T04:38:33+08:00",
-   "url": "https://www.cls.cn/detail/2511579",
+   "title": "菲防长召回驻华武官，专家：受制裁后的卖惨行为",
+   "source": "凤凰网",
+   "time": "2026-10-22T09:11:29+08:00",
+   "url": "https://original.ifeng.com/c/8xPWyUWc5tF",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
    "direct_bear": [],
@@ -406,9 +314,9 @@
   },
   {
    "title": "美债价格短线跳水，有关中东局势的报道刺激油价上涨",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T04:13:03+08:00",
-   "url": "https://wallstreetcn.com/livenews/3182940",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T03:52:27+08:00",
+   "url": "https://wallstreetcn.com/live/3182940",
    "transmission_id": "oil_up",
    "label": "油价上涨",
    "direct_bear": [],
@@ -416,7 +324,7 @@
     {
      "sector": "油服工程",
      "stocks": [
-      "002207"
+      "603727"
      ]
     }
    ],
@@ -446,118 +354,6 @@
     "event_date": "2026-10-22",
     "matched_codes": []
    }
-  },
-  {
-   "title": "两部门发布公告，对盾构机、挖泥船、高端无人机等实施出口管制，释放了哪些信号？",
-   "source": "知乎热榜",
-   "time": "2026-10-22T04:13:01+08:00",
-   "url": "https://www.zhihu.com/question/2095840965227561820",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688286"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "显卡断供,DIY玩家输麻了",
-   "source": "贴吧热议",
-   "time": "2026-10-22T04:13:26+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688286"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
-   "source": "澎湃新闻",
-   "time": "2026-10-22T04:38:40+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688286"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "菲防长召回驻华武官，专家：受制裁后的卖惨行为",
-   "source": "凤凰网",
-   "time": "2026-10-22T04:24:49+08:00",
-   "url": "https://original.ifeng.com/c/8xPWyUWc5tF",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688286"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-21",
-    "event_date": "2026-10-22",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   }
  ]
 }
