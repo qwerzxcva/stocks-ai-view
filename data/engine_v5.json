@@ -1,5 +1,5 @@
 {
-  "ts": "2026-10-22T09:32:49+08:00",
+  "ts": "2026-10-22T14:06:45+08:00",
   "engine": "v5 (多指标共振 + 自适应权重 + 外部数据增强)",
   "n_scanned": 5322,
   "n_scored": 5308,
@@ -77,7 +77,7 @@
       "sh688018",
       "sh600575",
       "sz301231",
-      "sh600436"
+      "sh688552"
     ],
     "note": "K线分片可能不同步; 旧数据不冒充今日信号"
   },
@@ -201,7 +201,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -330,7 +330,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -459,7 +459,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -588,7 +588,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -717,7 +717,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -846,7 +846,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -975,7 +975,154 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
+      "data_provenance": {
+        "technical": "indicators_ext (17 指标, 等权)",
+        "external": "collect_all_sources/all_sources.json",
+        "resonance_new": [
+          "SectorResonance",
+          "CapitalFlowConsistency",
+          "InZTPool"
+        ],
+        "industry_from": "unknown"
+      }
+    },
+    {
+      "score": 65.8,
+      "raw": 0.3628,
+      "resonance": 0.684,
+      "bull": 13,
+      "bear": 6,
+      "neutral": 1,
+      "votes": [
+        {
+          "indicator": "SuperTrend",
+          "vote": 1,
+          "strength": 0.9,
+          "why": "趋势多头, 线值 3.61"
+        },
+        {
+          "indicator": "MA5/MA20",
+          "vote": 1,
+          "strength": 1,
+          "why": "MA5=4.17 MA20=3.81 偏离+9.50%"
+        },
+        {
+          "indicator": "RSI",
+          "vote": -1,
+          "strength": 0.897,
+          "why": "RSI=96.92 超买, 回踩风险"
+        },
+        {
+          "indicator": "MACD",
+          "vote": 1,
+          "strength": 0.305,
+          "why": "DIF=+0.234 前值+0.179 走强"
+        },
+        {
+          "indicator": "KDJ(RSV)",
+          "vote": 1,
+          "strength": 1.0,
+          "why": "RSV=100.0 (9日)"
+        },
+        {
+          "indicator": "BOLL/Keltner",
+          "vote": 1,
+          "strength": 1,
+          "why": "带内位置 107% (中轨3.88)"
+        },
+        {
+          "indicator": "Donchian20",
+          "vote": -1,
+          "strength": 0.0,
+          "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
+        },
+        {
+          "indicator": "CMO",
+          "vote": 1,
+          "strength": 1,
+          "why": "CMO=100.0"
+        },
+        {
+          "indicator": "Vortex",
+          "vote": 1,
+          "strength": 1,
+          "why": "VI+=1.1158 VI-=0.8859"
+        },
+        {
+          "indicator": "UltimateOsc",
+          "vote": 1,
+          "strength": 0.4,
+          "why": "UO=58.52"
+        },
+        {
+          "indicator": "Choppiness",
+          "vote": 0,
+          "strength": 0.1,
+          "why": "CHOP=51.7 震荡市, 不追趋势信号"
+        },
+        {
+          "indicator": "HullMA",
+          "vote": 1,
+          "strength": 1,
+          "why": "HMA=4.09 价格上方"
+        },
+        {
+          "indicator": "ElderForce",
+          "vote": 1,
+          "strength": 0.244,
+          "why": "EF=32201"
+        },
+        {
+          "indicator": "ConnorsRSI",
+          "vote": -1,
+          "strength": 0.916,
+          "why": "CRSI=98.31 极度超买"
+        },
+        {
+          "indicator": "A/D Line",
+          "vote": -1,
+          "strength": 0.494,
+          "why": "10日派发 -3674272"
+        },
+        {
+          "indicator": "Pivot",
+          "vote": -1,
+          "strength": 0.4,
+          "why": "价格在枢轴 4.75 下方, 压力 4.75"
+        },
+        {
+          "indicator": "VWMA",
+          "vote": 1,
+          "strength": 1,
+          "why": "VWMA=3.79 (量均价)"
+        },
+        {
+          "indicator": "SectorResonance",
+          "vote": 1,
+          "strength": 1.0,
+          "why": "板块[] 当日 +13.66% 领涨, 板块联动"
+        },
+        {
+          "indicator": "InZTPool",
+          "vote": 1,
+          "strength": 0.5,
+          "why": "当日涨停池, 连板3板"
+        },
+        {
+          "indicator": "momentum_overheat",
+          "vote": -1,
+          "strength": 0.386,
+          "why": "距60日线 +38.6% 过热, 回测追突破为负edge"
+        }
+      ],
+      "code": "sh600293",
+      "date": "2026-10-21",
+      "price": 4.75,
+      "bars": 4000,
+      "data_age_days": 0,
+      "data_fresh": true,
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1104,7 +1251,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1233,142 +1380,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
-      "data_provenance": {
-        "technical": "indicators_ext (17 指标, 等权)",
-        "external": "collect_all_sources/all_sources.json",
-        "resonance_new": [
-          "SectorResonance",
-          "CapitalFlowConsistency",
-          "InZTPool"
-        ],
-        "industry_from": "unknown"
-      }
-    },
-    {
-      "score": 63.7,
-      "raw": 0.3198,
-      "resonance": 0.647,
-      "bull": 11,
-      "bear": 6,
-      "neutral": 1,
-      "votes": [
-        {
-          "indicator": "SuperTrend",
-          "vote": 1,
-          "strength": 0.9,
-          "why": "趋势多头, 线值 3.61"
-        },
-        {
-          "indicator": "MA5/MA20",
-          "vote": 1,
-          "strength": 1,
-          "why": "MA5=4.17 MA20=3.81 偏离+9.50%"
-        },
-        {
-          "indicator": "RSI",
-          "vote": -1,
-          "strength": 0.897,
-          "why": "RSI=96.92 超买, 回踩风险"
-        },
-        {
-          "indicator": "MACD",
-          "vote": 1,
-          "strength": 0.305,
-          "why": "DIF=+0.234 前值+0.179 走强"
-        },
-        {
-          "indicator": "KDJ(RSV)",
-          "vote": 1,
-          "strength": 1.0,
-          "why": "RSV=100.0 (9日)"
-        },
-        {
-          "indicator": "BOLL/Keltner",
-          "vote": 1,
-          "strength": 1,
-          "why": "带内位置 107% (中轨3.88)"
-        },
-        {
-          "indicator": "Donchian20",
-          "vote": -1,
-          "strength": 0.0,
-          "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
-        },
-        {
-          "indicator": "CMO",
-          "vote": 1,
-          "strength": 1,
-          "why": "CMO=100.0"
-        },
-        {
-          "indicator": "Vortex",
-          "vote": 1,
-          "strength": 1,
-          "why": "VI+=1.1158 VI-=0.8859"
-        },
-        {
-          "indicator": "UltimateOsc",
-          "vote": 1,
-          "strength": 0.4,
-          "why": "UO=58.52"
-        },
-        {
-          "indicator": "Choppiness",
-          "vote": 0,
-          "strength": 0.1,
-          "why": "CHOP=51.7 震荡市, 不追趋势信号"
-        },
-        {
-          "indicator": "HullMA",
-          "vote": 1,
-          "strength": 1,
-          "why": "HMA=4.09 价格上方"
-        },
-        {
-          "indicator": "ElderForce",
-          "vote": 1,
-          "strength": 0.244,
-          "why": "EF=32201"
-        },
-        {
-          "indicator": "ConnorsRSI",
-          "vote": -1,
-          "strength": 0.916,
-          "why": "CRSI=98.31 极度超买"
-        },
-        {
-          "indicator": "A/D Line",
-          "vote": -1,
-          "strength": 0.494,
-          "why": "10日派发 -3674272"
-        },
-        {
-          "indicator": "Pivot",
-          "vote": -1,
-          "strength": 0.4,
-          "why": "价格在枢轴 4.75 下方, 压力 4.75"
-        },
-        {
-          "indicator": "VWMA",
-          "vote": 1,
-          "strength": 1,
-          "why": "VWMA=3.79 (量均价)"
-        },
-        {
-          "indicator": "momentum_overheat",
-          "vote": -1,
-          "strength": 0.386,
-          "why": "距60日线 +38.6% 过热, 回测追突破为负edge"
-        }
-      ],
-      "code": "sh600293",
-      "date": "2026-10-21",
-      "price": 4.75,
-      "bars": 4000,
-      "data_age_days": 0,
-      "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1497,7 +1509,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1626,7 +1638,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1755,7 +1767,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -1884,7 +1896,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2013,7 +2025,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2142,7 +2154,7 @@
       "bars": 5602,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2271,7 +2283,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2400,7 +2412,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2529,7 +2541,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2658,7 +2670,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2787,7 +2799,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2916,7 +2928,7 @@
       "bars": 5721,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -2926,6 +2938,147 @@
           "InZTPool"
         ],
         "industry_from": "N/A"
+      }
+    },
+    {
+      "score": 58.3,
+      "raw": 0.1842,
+      "resonance": 0.75,
+      "bull": 9,
+      "bear": 3,
+      "neutral": 7,
+      "votes": [
+        {
+          "indicator": "SuperTrend",
+          "vote": -1,
+          "strength": 0.9,
+          "why": "趋势空头, 线值 2.67"
+        },
+        {
+          "indicator": "MA5/MA20",
+          "vote": 0,
+          "strength": 0.082,
+          "why": "MA5=2.45 MA20=2.44 偏离+0.25%"
+        },
+        {
+          "indicator": "RSI",
+          "vote": 1,
+          "strength": 0.4,
+          "why": "RSI=55.38 强势区间"
+        },
+        {
+          "indicator": "MACD",
+          "vote": 1,
+          "strength": 0.551,
+          "why": "DIF=+0.001 前值-0.005 走强"
+        },
+        {
+          "indicator": "KDJ(RSV)",
+          "vote": 1,
+          "strength": 0.077,
+          "why": "RSV=53.8 (9日)"
+        },
+        {
+          "indicator": "BOLL/Keltner",
+          "vote": 0,
+          "strength": 0.19,
+          "why": "带内位置 59% (中轨2.44)"
+        },
+        {
+          "indicator": "Donchian20",
+          "vote": 0,
+          "strength": 0.42,
+          "why": "距20日高 -6.72% (追突破无正edge, 不给正票)"
+        },
+        {
+          "indicator": "CMO",
+          "vote": 0,
+          "strength": 0.061,
+          "why": "CMO=3.03"
+        },
+        {
+          "indicator": "Vortex",
+          "vote": 1,
+          "strength": 0.728,
+          "why": "VI+=1.005 VI-=0.8593"
+        },
+        {
+          "indicator": "UltimateOsc",
+          "vote": 0,
+          "strength": 0.2,
+          "why": "UO=39.73"
+        },
+        {
+          "indicator": "Choppiness",
+          "vote": 0,
+          "strength": 0.1,
+          "why": "CHOP=61.75 震荡市, 不追趋势信号"
+        },
+        {
+          "indicator": "HullMA",
+          "vote": 1,
+          "strength": 1,
+          "why": "HMA=2.43 价格上方"
+        },
+        {
+          "indicator": "ElderForce",
+          "vote": 1,
+          "strength": 0.037,
+          "why": "EF=3835"
+        },
+        {
+          "indicator": "ConnorsRSI",
+          "vote": 0,
+          "strength": 0.2,
+          "why": "CRSI=78.43 中性"
+        },
+        {
+          "indicator": "A/D Line",
+          "vote": -1,
+          "strength": 0.016,
+          "why": "10日派发 -1268939"
+        },
+        {
+          "indicator": "Pivot",
+          "vote": -1,
+          "strength": 0.4,
+          "why": "价格在枢轴 2.55 下方, 压力 2.62"
+        },
+        {
+          "indicator": "VWMA",
+          "vote": 1,
+          "strength": 0.856,
+          "why": "VWMA=2.46 (量均价)"
+        },
+        {
+          "indicator": "SectorResonance",
+          "vote": 1,
+          "strength": 1.0,
+          "why": "板块[] 当日 +13.66% 领涨, 板块联动"
+        },
+        {
+          "indicator": "InZTPool",
+          "vote": 1,
+          "strength": 0.167,
+          "why": "当日涨停池, 连板1板"
+        }
+      ],
+      "code": "sz002535",
+      "date": "2026-10-21",
+      "price": 2.5,
+      "bars": 4003,
+      "data_age_days": 0,
+      "data_fresh": true,
+      "source_ts": "2026-10-22T13:54:25+08:00",
+      "data_provenance": {
+        "technical": "indicators_ext (17 指标, 等权)",
+        "external": "collect_all_sources/all_sources.json",
+        "resonance_new": [
+          "SectorResonance",
+          "CapitalFlowConsistency",
+          "InZTPool"
+        ],
+        "industry_from": "unknown"
       }
     },
     {
@@ -3045,7 +3198,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3174,7 +3327,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3303,7 +3456,7 @@
       "bars": 5602,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3432,7 +3585,7 @@
       "bars": 6522,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3561,7 +3714,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3690,7 +3843,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3819,7 +3972,7 @@
       "bars": 5602,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -3948,7 +4101,7 @@
       "bars": 5602,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4077,7 +4230,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4206,136 +4359,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
-      "data_provenance": {
-        "technical": "indicators_ext (17 指标, 等权)",
-        "external": "collect_all_sources/all_sources.json",
-        "resonance_new": [
-          "SectorResonance",
-          "CapitalFlowConsistency",
-          "InZTPool"
-        ],
-        "industry_from": "unknown"
-      }
-    },
-    {
-      "score": 56.0,
-      "raw": 0.1372,
-      "resonance": 0.7,
-      "bull": 7,
-      "bear": 3,
-      "neutral": 7,
-      "votes": [
-        {
-          "indicator": "SuperTrend",
-          "vote": -1,
-          "strength": 0.9,
-          "why": "趋势空头, 线值 2.67"
-        },
-        {
-          "indicator": "MA5/MA20",
-          "vote": 0,
-          "strength": 0.082,
-          "why": "MA5=2.45 MA20=2.44 偏离+0.25%"
-        },
-        {
-          "indicator": "RSI",
-          "vote": 1,
-          "strength": 0.4,
-          "why": "RSI=55.38 强势区间"
-        },
-        {
-          "indicator": "MACD",
-          "vote": 1,
-          "strength": 0.551,
-          "why": "DIF=+0.001 前值-0.005 走强"
-        },
-        {
-          "indicator": "KDJ(RSV)",
-          "vote": 1,
-          "strength": 0.077,
-          "why": "RSV=53.8 (9日)"
-        },
-        {
-          "indicator": "BOLL/Keltner",
-          "vote": 0,
-          "strength": 0.19,
-          "why": "带内位置 59% (中轨2.44)"
-        },
-        {
-          "indicator": "Donchian20",
-          "vote": 0,
-          "strength": 0.42,
-          "why": "距20日高 -6.72% (追突破无正edge, 不给正票)"
-        },
-        {
-          "indicator": "CMO",
-          "vote": 0,
-          "strength": 0.061,
-          "why": "CMO=3.03"
-        },
-        {
-          "indicator": "Vortex",
-          "vote": 1,
-          "strength": 0.728,
-          "why": "VI+=1.005 VI-=0.8593"
-        },
-        {
-          "indicator": "UltimateOsc",
-          "vote": 0,
-          "strength": 0.2,
-          "why": "UO=39.73"
-        },
-        {
-          "indicator": "Choppiness",
-          "vote": 0,
-          "strength": 0.1,
-          "why": "CHOP=61.75 震荡市, 不追趋势信号"
-        },
-        {
-          "indicator": "HullMA",
-          "vote": 1,
-          "strength": 1,
-          "why": "HMA=2.43 价格上方"
-        },
-        {
-          "indicator": "ElderForce",
-          "vote": 1,
-          "strength": 0.037,
-          "why": "EF=3835"
-        },
-        {
-          "indicator": "ConnorsRSI",
-          "vote": 0,
-          "strength": 0.2,
-          "why": "CRSI=78.43 中性"
-        },
-        {
-          "indicator": "A/D Line",
-          "vote": -1,
-          "strength": 0.016,
-          "why": "10日派发 -1268939"
-        },
-        {
-          "indicator": "Pivot",
-          "vote": -1,
-          "strength": 0.4,
-          "why": "价格在枢轴 2.55 下方, 压力 2.62"
-        },
-        {
-          "indicator": "VWMA",
-          "vote": 1,
-          "strength": 0.856,
-          "why": "VWMA=2.46 (量均价)"
-        }
-      ],
-      "code": "sz002535",
-      "date": "2026-10-21",
-      "price": 2.5,
-      "bars": 4003,
-      "data_age_days": 0,
-      "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4470,7 +4494,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4599,7 +4623,7 @@
       "bars": 5721,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4728,7 +4752,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4857,7 +4881,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -4986,7 +5010,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5115,7 +5139,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5244,7 +5268,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5373,7 +5397,7 @@
       "bars": 5721,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5502,7 +5526,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5631,7 +5655,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5760,7 +5784,7 @@
       "bars": 6522,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -5889,7 +5913,7 @@
       "bars": 4003,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6018,7 +6042,7 @@
       "bars": 3203,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6153,7 +6177,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6282,7 +6306,7 @@
       "bars": 5601,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6411,7 +6435,7 @@
       "bars": 6402,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6540,7 +6564,7 @@
       "bars": 6522,
       "data_age_days": 0,
       "data_fresh": true,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6671,7 +6695,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6800,7 +6824,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -6929,7 +6953,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7058,7 +7082,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7187,7 +7211,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7316,7 +7340,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7445,7 +7469,7 @@
       "bars": 240,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7574,7 +7598,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7709,7 +7733,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7838,7 +7862,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -7967,7 +7991,7 @@
       "bars": 240,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8096,7 +8120,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8225,7 +8249,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8354,7 +8378,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8483,7 +8507,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8612,7 +8636,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8741,7 +8765,7 @@
       "bars": 120,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8870,7 +8894,7 @@
       "bars": 240,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -8999,7 +9023,7 @@
       "bars": 240,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
@@ -9128,7 +9152,7 @@
       "bars": 240,
       "data_age_days": 7,
       "data_fresh": false,
-      "source_ts": "2026-10-22T08:54:56+08:00",
+      "source_ts": "2026-10-22T13:54:25+08:00",
       "data_provenance": {
         "technical": "indicators_ext (17 指标, 等权)",
         "external": "collect_all_sources/all_sources.json",
