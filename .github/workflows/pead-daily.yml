@@ -33,6 +33,7 @@ jobs:
         run: |
           mkdir -p ../stocks-data-kline/data
           cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          cd ../stocks-data-kline/data/bulk && for gz in *.gz; do [ -f "$gz" ] || continue; [ -f "${gz%.gz}" ] || gzip -dkq "$gz" 2>/dev/null || true; done; cd - >/dev/null
           python3 -c "import glob; print(len(glob.glob('../stocks-data-kline/data/bulk/day_qfq_*.csv')), 'shards')"
       - uses: actions/setup-python@v5
         with:

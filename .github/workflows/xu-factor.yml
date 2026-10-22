@@ -41,6 +41,7 @@ jobs:
           python3 scripts/xu_factor.py \
             --bulk ../stocks-data-kline/data/bulk \
             --out data/xu_factor_results.json
+          cd ../stocks-data-kline/data/bulk && for gz in *.gz; do [ -f "$gz" ] || continue; [ -f "${gz%.gz}" ] || gzip -dkq "$gz" 2>/dev/null || true; done; cd - >/dev/null
           python3 -c "import json; d=json.load(open('data/xu_factor_results.json')); print(d['verdict'], 'mean IC:', d['mean_ic'])"
       - name: Commit
         run: |

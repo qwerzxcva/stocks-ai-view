@@ -35,7 +35,15 @@ jobs:
         run: |
           mkdir -p ../stocks-data-kline/data
           cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
-          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import BULK; print('bulk:', BULK); import glob; n = len(glob.glob(BULK+'/day_qfq_*.csv')); print(f'{n} shards')"
+          # 解压 t1 仓中的 .gz 文件（补充缺失的 csv）
+          cd ../stocks-data-kline/data/bulk
+          for gz in *.gz; do
+            [ -f "$gz" ] || continue
+            base="${gz%.gz}"
+            [ -f "$base" ] || gzip -dkq "$gz" || true
+          done
+          cd - >/dev/null
+          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import BULK; import os; files=[f for f in os.listdir(BULK) if f.startswith('day_qfq_') and f.endswith('.csv')]; n=sum(sum(1 for _ in open(os.path.join(BULK,f))) for f in files); print(f'{len(files)} shards, {n:,} rows')"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
