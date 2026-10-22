@@ -1,0 +1,45 @@
+{
+  "ts": "2026-10-22T13:24:35+08:00",
+  "engine": "xu_factor_v2",
+  "status": "CONTROL_EXPERIMENT_DO_NOT_USE",
+  "n_symbols": 600,
+  "dimensions": {
+    "jianchu": {
+      "mean_ic": null,
+      "n": 0
+    },
+    "shengke": {
+      "mean_ic": -0.00266,
+      "std_ic": 0.06559,
+      "ir": -0.0405,
+      "positive_rate_pct": 48.74,
+      "n_cross_sections": 7988,
+      "verdict": "无效因子（噪声）"
+    },
+    "zibei": {
+      "mean_ic": -0.00087,
+      "std_ic": 0.07307,
+      "ir": -0.0119,
+      "positive_rate_pct": 49.67,
+      "n_cross_sections": 7988,
+      "verdict": "无效因子（噪声）"
+    },
+    "total": {
+      "mean_ic": -0.00271,
+      "std_ic": 0.06856,
+      "ir": -0.0395,
+      "positive_rate_pct": 48.96,
+      "n_cross_sections": 7988,
+      "verdict": "无效因子（噪声）"
+    }
+  },
+  "reference": {
+    "gitcode_ic": -0.008,
+    "note": "GitCode 原版单维 IC"
+  },
+  "warning": "对照实验：|IC|<0.02 视为无预测力，禁止纳入引擎权重或实盘决策",
+  "provenance": {
+    "source": "bulk/day_qfq_*.csv + data/data/stock_names.json",
+    "origin": "GitCode stock_analysis/metaphysics/ + name_matching.py"
+  }
+}

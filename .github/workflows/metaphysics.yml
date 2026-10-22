@@ -42,13 +42,13 @@ jobs:
           python3 scripts/metaphysics_report.py || echo "metaphysics_report failed"
       - name: Xu factor control
         run: |
-          python3 scripts/xu_factor.py --bulk ../stocks-data-kline/data/bulk --out data/xu_factor_results.json
-          python3 -c "import json; d=json.load(open('data/xu_factor_results.json')); print(d['verdict'], '| IC:', d['mean_ic'])"
+          python3 scripts/xu_factor_v2.py --bulk ../stocks-data-kline/data/bulk --out data/xu_factor_v2.json
+          python3 -c "import json; d=json.load(open('data/xu_factor_v2.json')); [print(k, v.get('mean_ic'), v.get('verdict')) for k,v in d['dimensions'].items()]"
       - name: Commit
         run: |
           git config user.name "metaphysics-bot"
           git config user.email "metaphysics-bot@users.noreply.github.com"
-          git add data/name_groups.json data/xu_factor_results.json || true
+          git add data/name_groups.json data/xu_factor_v2.json || true
           if git diff --cached --quiet; then
             echo "no changes"
             exit 0
@@ -57,7 +57,7 @@ jobs:
           for i in 1 2 3; do
             git fetch origin main
             git reset --soft origin/main
-            git add data/name_groups.json data/xu_factor_results.json || true
+            git add data/name_groups.json data/xu_factor_v2.json || true
             git commit -m "[CI] metaphysics weekly $(date +%Y%m%d)" 2>/dev/null || true
             if git push origin HEAD:main; then echo pushed; break; fi
             sleep 10
