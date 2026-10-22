@@ -1,151 +1,1800 @@
 {
- "ts": "2026-10-22T09:31:38+08:00",
+ "ts": "2026-10-22T13:56:36+08:00",
  "engine": "news_impact v1 (三层映射 + 规则式情感)",
- "n_input": 475,
- "n_mapped": 34,
- "n_unmapped": 399,
+ "n_input": 473,
+ "n_mapped": 77,
+ "n_unmapped": 341,
  "match_stat": {
-  "stock": 2,
-  "concept": 6,
-  "industry": 25,
+  "stock": 14,
+  "concept": 2,
+  "industry": 50,
   "annotated": 0,
-  "theme": 1,
-  "unmapped": 399
+  "theme": 11,
+  "unmapped": 341
  },
  "direction_stat": {
-  "bull": 27,
-  "bear": 10,
-  "neutral": 396,
-  "mixed": 0
+  "bull": 33,
+  "bear": 2,
+  "neutral": 382,
+  "mixed": 1
  },
  "impacts": [
   {
-   "title": "14家银行叫停或限制个人异地存款",
-   "source": "百度热搜",
-   "time": "2026-10-22T09:12:53+08:00",
-   "url": "https://www.baidu.com/s?wd=14%E5%AE%B6%E9%93%B6%E8%A1%8C%E5%8F%AB%E5%81%9C%E6%88%96%E9%99%90%E5%88%B6%E4%B8%AA%E4%BA%BA%E5%BC%82%E5%9C%B0%E5%AD%98%E6%AC%BE",
+   "title": "银行板块局部回暖 工商银行涨超2%创历史新高",
+   "source": "cls",
+   "time": "2026-10-22T13:53:13+08:00",
+   "url": "https://www.cls.cn/detail/2512074",
    "channel": "",
    "themes": [],
-   "direction": "bear",
-   "confidence": 0.7,
+   "direction": "bull",
+   "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:金融",
-   "n_stocks": 1,
+   "n_stocks": 10,
    "stocks": [
     {
-     "code": "000001",
-     "name": "平安银行"
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
     }
    ]
   },
   {
-   "title": "个人养老金基金突破350只",
+   "title": "泰格医药：控股子公司方达控股（01521.HK）于2026年10月22日在香港联交所短暂停牌。",
    "source": "wallstreetcn",
-   "time": "2026-10-22T06:23:58+08:00",
-   "url": "https://wallstreetcn.com/live/3183010",
+   "time": "2026-10-22T12:41:58+08:00",
+   "url": "https://wallstreetcn.com/live/3183169",
    "channel": "a-stock-channel",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.7,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "【玩转ETF】机器人发展最卡脖子领域之一，机构称该领域或爆发在即，市场空间将充分打开，有望拉动这些环节规模快速提升",
-   "source": "财联社电报",
-   "time": "2026-10-22T09:23:45+08:00",
-   "url": "https://www.cls.cn/detail/2511540",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "【电报解读】OpenAI、谷歌、腾讯云相继发布PHP漏洞风险声明，机构称网络安全进入“AI对抗AI”的阶段，这家公司产品针对AIAgent攻击实现跨越",
-   "source": "财联社电报",
-   "time": "2026-10-22T09:23:45+08:00",
-   "url": "https://www.cls.cn/detail/2511675",
-   "channel": "",
-   "themes": [],
+   "themes": [
+    "A股7×24快讯直播",
+    "今天哪些股票停牌或复牌了？",
+    "港股快讯",
+    "股市重要公告提醒"
+   ],
    "direction": "bear",
    "confidence": 0.6,
-   "matched_by": "concept",
-   "match_detail": "概念「网络安全」",
-   "n_stocks": 1,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
    "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "特斯拉CFO：数据中心对Megapack的需求“极其强劲”。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T05:47:27+08:00",
+   "url": "https://wallstreetcn.com/live/3182996",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
     {
      "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "【风口研报·公司】材料龙头跨界布局3D打印，分析师强call公司相关业务已进入多家头部火箭企业供应链，叠加募投产能释放在即，盈利弹性可观",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511932",
+   "channel": "",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:化工",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "600319",
+     "name": "亚星化学"
+    }
+   ]
+  },
+  {
+   "title": "银行板块局部回暖，工商银行涨超2%，股价再创创历史新高，建设银行、农业银行、渝农商行、兴业银行跟涨。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T13:53:49+08:00",
+   "url": "https://wallstreetcn.com/live/3183212",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报",
+    "银行概念股"
+   ],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "theme",
+   "match_detail": "题材「银行概念股」→概念「银行概念」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "601398",
      "name": ""
     }
    ]
   },
   {
-   "title": "AI基建扩张加速，光通信锁定高增长预期",
+   "title": "韩国央行行长申铉松：相对于芯片制造商股价，最好更关注芯片价格。芯片价格没有下跌的迹象，可能会进一步上涨。",
    "source": "wallstreetcn",
-   "time": "2026-10-22T06:20:54+08:00",
-   "url": "https://wallstreetcn.com/live/3183007",
+   "time": "2026-10-22T10:58:20+08:00",
+   "url": "https://wallstreetcn.com/live/3183122",
    "channel": "a-stock-channel",
-   "themes": [],
+   "themes": [
+    "A股7×24快讯直播",
+    "半导体概念股"
+   ],
    "direction": "bull",
    "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "matched_by": "theme",
+   "match_detail": "题材「半导体概念股」→概念「半导体」",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "301666",
+     "name": ""
     }
    ]
   },
   {
-   "title": "【玩转ETF】机器人发展最卡脖子领域之一，机构称该领域或爆发在即，市场空间将充分打开，有望拉动这些环节规模快速提升",
-   "source": "cls",
-   "time": "2026-10-22T08:45:13+08:00",
-   "url": "https://www.cls.cn/detail/2511540",
+   "title": "券商股被当红利资产来配置？百亿红包落地，17家中期派发113亿",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511448",
    "channel": "",
    "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
+   "direction": "neutral",
+   "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
     }
    ]
   },
   {
-   "title": "上证指数开盘报3714.48点，涨0.04%。\n\n深证成指开盘报11690.34点，跌0.12%。\n\n创业板指开盘报26",
+   "title": "易方达基金将自购旗下首只主动ETF 金额达2亿",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512035",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "印尼股市反弹 主权财富基金出手托市",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512039",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "易方达基金将自购旗下首只主动ETF 金额达2亿",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183190",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "易方达基金将自购旗下首只主动ETF，金额达2亿",
    "source": "wallstreetcn",
-   "time": "2026-10-22T09:25:05+08:00",
-   "url": "https://wallstreetcn.com/live/3183062",
+   "time": "2026-10-22T13:26:10+08:00",
+   "url": "https://wallstreetcn.com/live/3183192",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "中国9月Swift人民币在全球支付中占比 3.33%，前值 3.26%。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T09:00:00+08:00",
+   "url": "https://wallstreetcn.com/live/3183051",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "易方达基金将自购旗下首只主动ETF 金额达2亿",
+   "source": "cls",
+   "time": "2026-10-22T13:23:19+08:00",
+   "url": "https://www.cls.cn/detail/2512035",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    },
+    {
+     "code": "512570",
+     "name": "证券ETF易方达"
+    }
+   ]
+  },
+  {
+   "title": "创新药、CRO概念持续下挫 凯莱英逼近跌停",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512042",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "财联社10月22日电，港股CXO板块午后走低，昭衍新药跌超10%，凯莱英跌近9%，药明生物、泰格医药、金斯瑞生物科技、药明康德跌超5%。",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512022",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "A股创新药、CRO概念持续下挫，凯莱英逼近跌停，近岸蛋白跌超16%，百花医药、万邦医药、金石亚药、昭衍新药、康希诺、药明康德等多股跌超5%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183191",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "港股CXO板块午后走低，昭衍新药跌超10%，凯莱英跌近9%，药明生物、泰格医药、金斯瑞生物科技、药明康德跌超5%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183178",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "世卫组织：刚果（金）埃博拉疫情出现反弹",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T12:42:40+08:00",
+   "url": "https://wallstreetcn.com/live/3183170",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "医药概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「医药概念股」→产业链「医药」",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "创新药概念股震荡调整，近岸蛋白跌超12%，莱美药业、华北制药、万邦医药、百花医药、透景生命跌超5%。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:10:38+08:00",
+   "url": "https://wallstreetcn.com/live/3183102",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报",
+    "医药概念股",
+    "创新药概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「医药概念股」→产业链「医药」",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "港股CXO板块午后走低，昭衍新药跌超10%，凯莱英跌近9%，药明生物、泰格医药、金斯瑞生物科技、药明康德跌超5%。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T13:07:02+08:00",
+   "url": "https://wallstreetcn.com/live/3183178",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "创新药、CRO概念持续下挫 凯莱英逼近跌停",
+   "source": "cls",
+   "time": "2026-10-22T13:25:00+08:00",
+   "url": "https://www.cls.cn/detail/2512042",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:医药",
+   "n_stocks": 7,
+   "stocks": [
+    {
+     "code": "159929",
+     "name": "医药ETF汇添富"
+    },
+    {
+     "code": "510660",
+     "name": "医药ETF华夏"
+    },
+    {
+     "code": "512010",
+     "name": "医药ETF易方达"
+    },
+    {
+     "code": "512120",
+     "name": "医药ETF华安"
+    },
+    {
+     "code": "512170",
+     "name": "医疗ETF华宝"
+    },
+    {
+     "code": "300314",
+     "name": "戴维医疗"
+    },
+    {
+     "code": "000788",
+     "name": "北大医药"
+    }
+   ]
+  },
+  {
+   "title": "女子地铁站内看书 5 个小时被扣 15 元，怎么看待地铁超时收费？其中读书空间等消费场景的设置合理吗？",
+   "source": "知乎热榜",
+   "time": "2026-10-22T13:56:27+08:00",
+   "url": "https://www.zhihu.com/question/2096527240208938063",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "揭露骗局 红军伟大长征不容消费",
+   "source": "今日头条",
+   "time": "2026-10-22T13:36:13+08:00",
+   "url": "https://www.toutiao.com/trending/7699083351987011627/",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "开心果价格狂飙 消费者直呼吃不起",
+   "source": "今日头条",
+   "time": "2026-10-22T13:36:13+08:00",
+   "url": "https://www.toutiao.com/trending/7699322664024129578/",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "揭露骗局 红军伟大长征不容消费",
+   "source": "百度热搜",
+   "time": "2026-10-22T13:36:13+08:00",
+   "url": "https://www.baidu.com/s?wd=%E6%8F%AD%E9%9C%B2%E9%AA%97%E5%B1%80+%E7%BA%A2%E5%86%9B%E4%BC%9F%E5%A4%A7%E9%95%BF%E5%BE%81%E4%B8%8D%E5%AE%B9%E6%B6%88%E8%B4%B9",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "星巴克“消费入座”新规已实施",
+   "source": "百度热搜",
+   "time": "2026-10-22T13:36:13+08:00",
+   "url": "https://www.baidu.com/s?wd=%E6%98%9F%E5%B7%B4%E5%85%8B%E2%80%9C%E6%B6%88%E8%B4%B9%E5%85%A5%E5%BA%A7%E2%80%9D%E6%96%B0%E8%A7%84%E5%B7%B2%E5%AE%9E%E6%96%BD",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "【早报】科技股火力全开，纳指领涨美股；中办、国办发文！事关人工智能；泽连斯基：愿在保留至少75%领土控制权的基础上达成和平协议",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511640",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "特斯拉Q3财报出炉：加码AI和机器人汽车主业承压，资本支出远逊预期！",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511667",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "八部门：加强产业基础领域通用大模型和行业大模型研发布局 推动工业机理与智能体决策模型融合",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511817",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "物理AI进入爆发前夜？王兴兴、黄仁勋齐发声 机器人成重要落地场景",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511957",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "10月22日投资避雷针：4连板人气股公告 机器人腱绳产品目前尚未批量生产",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511669",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "Kpler数据显示：中东石油运输量已恢复到战前水平",
+   "source": "财联社热门",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511590",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "韩国国防部：为避免意外冲突 朝鲜必须回到对话桌前",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512026",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:军工",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "512810",
+     "name": "军工ETF华宝"
+    },
+    {
+     "code": "512560",
+     "name": "军工ETF易方达"
+    },
+    {
+     "code": "512670",
+     "name": "国防ETF鹏华"
+    }
+   ]
+  },
+  {
+   "title": "【金牌纪要库·风口会议】物理AI训练走向规模化：第一视角数据推动采集方式变化，机器人有望率先在工业场景放量",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511922",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "韩国国防部：为避免意外冲突　朝鲜必须回到对话桌前",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183182",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:军工",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "512810",
+     "name": "军工ETF华宝"
+    },
+    {
+     "code": "512560",
+     "name": "军工ETF易方达"
+    },
+    {
+     "code": "512670",
+     "name": "国防ETF鹏华"
+    }
+   ]
+  },
+  {
+   "title": "多款 3A 老游戏被 AI 光速反编译并移植网页端，将对游戏行业带来哪些冲击？",
+   "source": "知乎热榜",
+   "time": "2026-10-22T13:56:27+08:00",
+   "url": "https://www.zhihu.com/question/2094620721343481537",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "国家癌症中心发布数据，甲状腺癌跃居发病第 3 位，20～39 岁男女发病率最高，为什么会这样？",
+   "source": "知乎热榜",
+   "time": "2026-10-22T13:56:27+08:00",
+   "url": "https://www.zhihu.com/question/2096183185604399797",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "广州白云代孕窝点无人开门难处置",
+   "source": "微博热搜",
+   "time": "2026-10-22T13:44:32+08:00",
+   "url": "https://s.weibo.com/weibo?q=%E5%B9%BF%E5%B7%9E%E7%99%BD%E4%BA%91%E4%BB%A3%E5%AD%95%E7%AA%9D%E7%82%B9%E6%97%A0%E4%BA%BA%E5%BC%80%E9%97%A8%E9%9A%BE%E5%A4%84%E7%BD%AE&t=31&band_rank=17&Refer=top",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "国家数据集团成立有何意义",
+   "source": "B站热搜",
+   "time": "2026-10-22T13:42:42+08:00",
+   "url": "https://search.bilibili.com/all?keyword=%E5%9B%BD%E5%AE%B6%E6%95%B0%E6%8D%AE%E9%9B%86%E5%9B%A2%E6%88%90%E7%AB%8B%E6%9C%89%E4%BD%95%E6%84%8F%E4%B9%89",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "宇树发布功夫传奇机器人",
+   "source": "B站热搜",
+   "time": "2026-10-22T13:42:42+08:00",
+   "url": "https://search.bilibili.com/all?keyword=%E5%AE%87%E6%A0%91%E5%8F%91%E5%B8%83%E5%8A%9F%E5%A4%AB%E4%BC%A0%E5%A5%87%E6%9C%BA%E5%99%A8%E4%BA%BA",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "外网评最烂AI命名榜,DS夺冠",
+   "source": "贴吧热议",
+   "time": "2026-10-22T13:56:31+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367763&amp;topic_name=%E5%A4%96%E7%BD%91%E8%AF%84%E6%9C%80%E7%83%82AI%E5%91%BD%E5%90%8D%E6%A6%9C%2CDS%E5%A4%BA%E5%86%A0",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "雷军：汽车没安全其他都是0，所有的智能性能和创新设计都失去了意义",
+   "source": "澎湃新闻",
+   "time": "2026-10-22T13:56:32+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34301600",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "解读｜国家数据集团成立，能给数据资源流通和交易带来什么",
+   "source": "澎湃新闻",
+   "time": "2026-10-22T13:56:32+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34302482",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "经纬度：组建数据要素“国家队”，有何考量？",
+   "source": "澎湃新闻",
+   "time": "2026-10-22T13:56:32+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34297694",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "黄仁勋“教育”英德：发展AI别想太多 ，“你们光动口不动手”",
+   "source": "澎湃新闻",
+   "time": "2026-10-22T13:56:32+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34300727",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "越来越觉得10.1当天兴致勃勃地去拿mate90 pro max的我像个啥b，真有些后悔换华为了，当初也不知道怎么想的脑子一热就换了，你说跟我的旧机mate80pm没有区别吧，也不至于，信号好了，续航好了一丝丝？但是比80pm更热啊，更新了一个系统好一些，但还是不如80pm，尤其我受不了一个点就是软件内部卡顿扔没有解决，尤其是京东，美团，美团外卖，淘宝等等。虽然这些软件本身就卡顿，但是和ios的差远了，ios就很流畅，我当初为什么不换18promax，我给我对象换的18pro她用这些软件都很流畅，woc越说越后悔，苹果这代除了信号和长焦其余体验都很好，当初为什么要换华为……越说我越想哭，现在拿我的90pm置换18pm还要添3000块钱，我真的呜呜呜呜[流泪]",
+   "source": "酷安话题",
+   "time": "2026-10-22T13:36:14+08:00",
+   "url": "https://www.coolapk.com/feed/74505553",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "《广播电视和网络视听“十五五”规划》印发：强化人工智能能力建设和应用，加快超高清创新发展",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T12:17:49+08:00",
+   "url": "https://wallstreetcn.com/live/3183163",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "人工智能概念股",
+    "广电系混改概念股",
+    "超高清视频概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「人工智能概念股」→产业链「人工智能」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "宇树王兴兴：非常害怕浪费每一天，机器人行业竞争很惨烈",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T11:56:04+08:00",
+   "url": "https://wallstreetcn.com/live/3183158",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "人工智能概念股",
+    "机器人概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「人工智能概念股」→产业链「人工智能」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "宇树科技王兴兴：宇树G1机器人已经累计生产下线约1-2万台",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T11:49:57+08:00",
+   "url": "https://wallstreetcn.com/live/3183154",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "机器人概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「机器人概念股」→产业链「人工智能」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "上证指数早盘收报3679.86点，跌0.89%。\n\n深证成指早盘收报11496.07点，跌1.78%。\n\n创业板指早盘收",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T11:31:00+08:00",
+   "url": "https://wallstreetcn.com/live/3183142",
    "channel": "a-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "stock",
    "match_detail": "直接命中个股",
-   "n_stocks": 2,
+   "n_stocks": 3,
    "stocks": [
+    {
+     "code": "000001",
+     "name": "上证指数"
+    },
     {
      "code": "399001",
      "name": "深证成指"
@@ -157,124 +1806,347 @@
    ]
   },
   {
-   "title": "【早报】科技股火力全开，纳指领涨美股；中办、国办发文！事关人工智能；泽连斯基：愿在保留至少75%领土控制权的基础上达成和平协议",
-   "source": "财联社热门",
-   "time": "2026-10-22T09:31:26+08:00",
-   "url": "https://www.cls.cn/detail/2511640",
-   "channel": "",
+   "title": "PHP现严重安全漏洞波及全球",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T11:25:36+08:00",
+   "url": "https://wallstreetcn.com/live/3183136",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "人工智能概念股",
+    "网络安全概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「人工智能概念股」→产业链「人工智能」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "军工板块局部异动，湖南天雁冲击涨停，江龙船艇、长城军工、甘化科工、北方长龙、东安动力等纷纷冲高。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:45:07+08:00",
+   "url": "https://wallstreetcn.com/live/3183120",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报",
+    "军工概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「军工概念股」→产业链「军工」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "512810",
+     "name": "军工ETF华宝"
+    },
+    {
+     "code": "512560",
+     "name": "军工ETF易方达"
+    },
+    {
+     "code": "512670",
+     "name": "国防ETF鹏华"
+    }
+   ]
+  },
+  {
+   "title": "工信部等八部门：推动人工智能赋能产业基础创新",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:07:05+08:00",
+   "url": "https://wallstreetcn.com/live/3183095",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "人工智能概念股",
+    "智能制造概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「人工智能概念股」→产业链「人工智能」",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    }
+   ]
+  },
+  {
+   "title": "德国软件巨头SAP单季度营收首破100亿欧元大关，上调2026年业绩展望",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T07:20:49+08:00",
+   "url": "https://wallstreetcn.com/live/3182950",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:计算机",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "603636",
+     "name": "南威软件"
+    },
+    {
+     "code": "603138",
+     "name": "海量数据"
+    },
+    {
+     "code": "688651",
+     "name": "盛邦安全"
+    }
+   ]
+  },
+  {
+   "title": "OpenAI：更新我们的使用政策，自11月20日起生效，以明确安全模型开发和人工智能敏感用途的相关规则。\n\n正在努力引入",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T05:51:59+08:00",
+   "url": "https://wallstreetcn.com/live/3182998",
+   "channel": "us-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 1,
+   "n_stocks": 3,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
     }
    ]
   },
   {
-   "title": "黄仁勋GTC柏林演讲：AI工厂部署最快缩至14天 智能体与物理AI加速落地",
-   "source": "财联社热门",
-   "time": "2026-10-22T09:31:26+08:00",
-   "url": "https://www.cls.cn/detail/2511348",
-   "channel": "",
+   "title": "工信部等八部门：加快人工智能在产品研发、设计仿真、中试验证、生产运营等全环节落地应用",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:07:26+08:00",
+   "url": "https://wallstreetcn.com/live/3183096",
+   "channel": "hk-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 1,
+   "n_stocks": 3,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "002313",
+     "name": "Sunsea AIoT Technology Co., Ltd. Class A"
+    },
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
     }
    ]
   },
   {
-   "title": "白马蓝筹集体回调，重仓基金受伤有多深？",
+   "title": "乌首都基辅遭弹道导弹袭击，多次传出强烈爆炸声",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T05:07:32+08:00",
+   "url": "https://wallstreetcn.com/live/3182973",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:军工",
+   "n_stocks": 3,
+   "stocks": [
+    {
+     "code": "512810",
+     "name": "军工ETF华宝"
+    },
+    {
+     "code": "512560",
+     "name": "军工ETF易方达"
+    },
+    {
+     "code": "512670",
+     "name": "国防ETF鹏华"
+    }
+   ]
+  },
+  {
+   "title": "【数读IPO】背靠中国移动、中国联通等巨头，通信接入设备领域单项冠军今日上市",
    "source": "财联社热门",
-   "time": "2026-10-22T09:31:26+08:00",
-   "url": "https://www.cls.cn/detail/2511346",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2511645",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
+   "match_detail": "industry:通信",
+   "n_stocks": 2,
    "stocks": [
     {
-     "code": "000001",
-     "name": "平安银行"
+     "code": "515880",
+     "name": "通信ETF国泰"
+    },
+    {
+     "code": "515050",
+     "name": "通信ETF华夏"
     }
    ]
   },
   {
-   "title": "券商股被当红利资产来配置？百亿红包落地，17家中期派发113亿",
-   "source": "财联社热门",
-   "time": "2026-10-22T09:31:26+08:00",
-   "url": "https://www.cls.cn/detail/2511448",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "特斯拉Q3财报出炉：加码AI和机器人汽车主业承压，资本支出远逊预期！",
-   "source": "财联社热门",
-   "time": "2026-10-22T09:31:26+08:00",
-   "url": "https://www.cls.cn/detail/2511667",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "【盘中宝】AI大模型底座能力，全球头部厂商加码该行业，相关订单单月环比翻倍，未来市场规模或超300亿元，这家企业发布了全栈服务体系",
+   "title": "财联社10月22日电，现货黄金日内跌1.51%，失守4080美元/盎司；现货白银日内跌3.38%，下破56美元/盎司。",
    "source": "财联社电报",
-   "time": "2026-10-22T09:23:45+08:00",
-   "url": "https://www.cls.cn/detail/2511734",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512060",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "match_detail": "industry:有色",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "512400",
+     "name": "有色金属ETF南方"
     }
    ]
   },
   {
-   "title": "【九点特供】宇树科技发布人形机器人\"H2-X功夫传奇\"，分析师看好随着真实操作数据增加，机器人处理复杂任务的能力有望持续改善；推动低空经济健康有序发展！《关于推动科技创新和产业创新深度融合的意见》发布",
+   "title": "创业板指跌逾4%",
    "source": "财联社电报",
-   "time": "2026-10-22T09:23:45+08:00",
-   "url": "https://www.cls.cn/detail/2511565",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512044",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "创业板指跌破2600点 较6月高点跌超40%",
+   "source": "财联社电报",
+   "time": "2026-10-22T13:45:29+08:00",
+   "url": "https://www.cls.cn/detail/2512029",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "沪深300指数日内跌幅达2%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183198",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "000300",
+     "name": "沪深300"
+    }
+   ]
+  },
+  {
+   "title": "创业板指跌超4%，全市场超4800只个股下跌。",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183194",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "创业板指午后失守2600点，日内跌超3.5%，较历史高点已回撤超40%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-22T13:45:20+08:00",
+   "url": "https://wallstreetcn.com/livenews/3183180",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "马斯克：人形机器人数量将超过人类",
+   "source": "百度热搜",
+   "time": "2026-10-22T13:36:13+08:00",
+   "url": "https://www.baidu.com/s?wd=%E9%A9%AC%E6%96%AF%E5%85%8B%EF%BC%9A%E4%BA%BA%E5%BD%A2%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E9%87%8F%E5%B0%86%E8%B6%85%E8%BF%87%E4%BA%BA%E7%B1%BB",
    "channel": "",
    "themes": [],
    "direction": "neutral",
@@ -284,209 +2156,35 @@
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "603278",
+     "code": "301023",
      "name": ""
     }
    ]
   },
   {
-   "title": "中国9月Swift人民币在全球支付中占比 3.33%，前值 3.26%。",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T09:14:41+08:00",
-   "url": "https://wallstreetcn.com/livenews/3183051",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "中国即将发行或正在发行的国债和政策性金融债",
-   "source": "华尔街见闻",
-   "time": "2026-10-22T09:14:41+08:00",
-   "url": "https://wallstreetcn.com/livenews/3183035",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "多款 3A 老游戏被 AI 光速反编译并移植网页端，将对游戏行业带来哪些冲击？",
-   "source": "知乎热榜",
-   "time": "2026-10-22T09:11:29+08:00",
-   "url": "https://www.zhihu.com/question/2094620721343481537",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "宇树机器人展示举起汽车救人",
-   "source": "微博热搜",
-   "time": "2026-10-22T09:23:45+08:00",
-   "url": "https://s.weibo.com/weibo?q=%E5%AE%87%E6%A0%91%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%B1%95%E7%A4%BA%E4%B8%BE%E8%B5%B7%E6%B1%BD%E8%BD%A6%E6%95%91%E4%BA%BA&t=31&band_rank=4&Refer=top",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "张益唐的数学难题被AI化为习题",
-   "source": "B站热搜",
-   "time": "2026-10-22T09:31:30+08:00",
-   "url": "https://search.bilibili.com/all?keyword=%E5%BC%A0%E7%9B%8A%E5%94%90%E7%9A%84%E6%95%B0%E5%AD%A6%E9%9A%BE%E9%A2%98%E8%A2%ABAI%E5%8C%96%E4%B8%BA%E4%B9%A0%E9%A2%98",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "揭秘机器人数据采集行业内幕",
-   "source": "B站热搜",
-   "time": "2026-10-22T09:31:30+08:00",
-   "url": "https://search.bilibili.com/all?keyword=%E6%8F%AD%E7%A7%98%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%95%B0%E6%8D%AE%E9%87%87%E9%9B%86%E8%A1%8C%E4%B8%9A%E5%86%85%E5%B9%95",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "宇树发布功夫传奇机器人",
-   "source": "B站热搜",
-   "time": "2026-10-22T09:31:30+08:00",
-   "url": "https://search.bilibili.com/all?keyword=%E5%AE%87%E6%A0%91%E5%8F%91%E5%B8%83%E5%8A%9F%E5%A4%AB%E4%BC%A0%E5%A5%87%E6%9C%BA%E5%99%A8%E4%BA%BA",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "外网评最烂AI命名榜,DS夺冠",
-   "source": "贴吧热议",
-   "time": "2026-10-22T09:06:08+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367763&amp;topic_name=%E5%A4%96%E7%BD%91%E8%AF%84%E6%9C%80%E7%83%82AI%E5%91%BD%E5%90%8D%E6%A6%9C%2CDS%E5%A4%BA%E5%86%A0",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "雷军：汽车没安全其他都是0，所有的智能性能和创新设计都失去了意义",
+   "title": "日本关键稀土元素储备即将耗尽，外交部：中方依法依规对日实施出口管制",
    "source": "澎湃新闻",
-   "time": "2026-10-22T09:31:33+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34301600",
+   "time": "2026-10-22T13:56:32+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34299680",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "match_detail": "industry:有色",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "512400",
+     "name": "有色金属ETF南方"
     }
    ]
   },
   {
-   "title": "数据安全概念开盘活跃，天融信竞价涨停，盛邦安全涨超10%，绿盟科技、中新赛克、麒麟信安、中孚信息纷纷高开。",
+   "title": "创业板指跌超4%，沪指跌1.5%，深成指跌2.89%，算力硬件、影视传媒、贵金属、半导体芯片等方向跌幅居前，沪深京三市下",
    "source": "wallstreetcn",
-   "time": "2026-10-22T09:29:49+08:00",
-   "url": "https://wallstreetcn.com/live/3183065",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股板块异动播报",
-    "网络安全概念股"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "theme",
-   "match_detail": "题材「网络安全概念股」→概念「网络安全」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "688651",
-     "name": ""
-    }
-   ]
-  },
-  {
-   "title": "三大指数开盘涨跌不一，沪指高开0.04%，深成指低开0.12%，创业板指低开0.25%。",
-   "source": "wallstreetcn",
-   "time": "2026-10-22T09:25:58+08:00",
-   "url": "https://wallstreetcn.com/live/3183063",
+   "time": "2026-10-22T13:28:43+08:00",
+   "url": "https://wallstreetcn.com/live/3183193",
    "channel": "a-stock-channel",
    "themes": [
     "A股动态滚动播报",
@@ -505,59 +2203,154 @@
    ]
   },
   {
-   "title": "多家中小银行首席合规官任职资格获核准",
+   "title": "创业板指午后失守2600点，日内跌超3.5%，较今年6月的历史高点跌幅超40%。",
    "source": "wallstreetcn",
-   "time": "2026-10-22T06:40:09+08:00",
-   "url": "https://wallstreetcn.com/live/3183015",
+   "time": "2026-10-22T13:12:41+08:00",
+   "url": "https://wallstreetcn.com/live/3183181",
    "channel": "a-stock-channel",
-   "themes": [],
+   "themes": [
+    "A股动态滚动播报",
+    "A股板块异动播报"
+   ],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "000001",
-     "name": "平安银行"
+     "code": "399006",
+     "name": "创业板指"
     }
    ]
   },
   {
-   "title": "OpenAI：更新我们的使用政策，自11月20日起生效，以明确安全模型开发和人工智能敏感用途的相关规则。\n\n正在努力引入",
+   "title": "10月22日午间收评：创业板指半日跌2.77%，机器人概念股逆势走强",
    "source": "wallstreetcn",
-   "time": "2026-10-22T05:51:59+08:00",
-   "url": "https://wallstreetcn.com/live/3182998",
-   "channel": "us-stock-channel",
-   "themes": [],
+   "time": "2026-10-22T11:30:53+08:00",
+   "url": "https://wallstreetcn.com/live/3183140",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股动态滚动播报",
+    "A股板块异动播报"
+   ],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "399006",
+     "name": "创业板指"
     }
    ]
   },
   {
-   "title": "中国9月Swift人民币在全球支付中占比 3.33%，前值 3.26%。",
+   "title": "整点回顾：市场早间震荡调整，沪指跌超1%，深成指跌超2%，创业板指跌超3%，影视传媒、算力硬件、煤炭、半导体等方向跌幅居",
    "source": "wallstreetcn",
-   "time": "2026-10-22T09:00:00+08:00",
-   "url": "https://wallstreetcn.com/live/3183051",
-   "channel": "hk-stock-channel",
-   "themes": [],
+   "time": "2026-10-22T11:00:34+08:00",
+   "url": "https://wallstreetcn.com/live/3183124",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报"
+   ],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "000001",
-     "name": "平安银行"
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "上海钢联发布数据显示，今日MMLC电池级碳酸锂（早盘）中间价报98800元/吨，较上日16:30价格下跌1750元/吨。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:42:45+08:00",
+   "url": "https://wallstreetcn.com/live/3183116",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股7×24快讯直播",
+    "锂电池概念股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "theme",
+   "match_detail": "题材「锂电池概念股」→产业链「有色」",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "512400",
+     "name": "有色金属ETF南方"
+    }
+   ]
+  },
+  {
+   "title": "近端次新股局部异动，中塑股份涨超15%，沈鼓集团此前涨停，大普微、世纪数码、新睿电子、晨光电机涨超5%。",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:39:29+08:00",
+   "url": "https://wallstreetcn.com/live/3183114",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报",
+    "次新股"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "601091",
+     "name": "沈鼓集团"
+    }
+   ]
+  },
+  {
+   "title": "创业板指跌超3%，沪指跌超1%，深成指跌超2%，影视传媒、算力硬件、煤炭、半导体等方向跌幅居前，沪深京三市下跌个股超48",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:20:35+08:00",
+   "url": "https://wallstreetcn.com/live/3183106",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股动态滚动播报",
+    "A股板块异动播报"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
+    }
+   ]
+  },
+  {
+   "title": "整点回顾：市场早间震荡调整，创业板指盘中跌超2%，算力硬件、文化传媒、白酒、煤炭等方向跌幅居前，机器人、工程机械、MLC",
+   "source": "wallstreetcn",
+   "time": "2026-10-22T10:00:23+08:00",
+   "url": "https://wallstreetcn.com/live/3183090",
+   "channel": "a-stock-channel",
+   "themes": [
+    "A股板块异动播报"
+   ],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
+   "n_stocks": 1,
+   "stocks": [
+    {
+     "code": "399006",
+     "name": "创业板指"
     }
    ]
   },
@@ -575,103 +2368,46 @@
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "688286",
+     "code": "301666",
      "name": ""
     }
    ]
   },
   {
-   "title": "纳指收涨1%，半导体指数涨约2%",
+   "title": "周三（10月21日）纽约尾盘，现货黄金涨0.38%，报4140.82美元/盎司，北京时间02:30以来出现一波V形反转行",
    "source": "wallstreetcn",
-   "time": "2026-10-22T04:00:05+08:00",
-   "url": "https://wallstreetcn.com/live/3182944",
+   "time": "2026-10-22T05:03:01+08:00",
+   "url": "https://wallstreetcn.com/live/3182972",
    "channel": "hk-stock-channel",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「半导体」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "688286",
-     "name": ""
-    }
-   ]
-  },
-  {
-   "title": "中概指数收跌超2.3%，KWEB跌2.5%，禾赛、小鹏跌超5%，腾讯ADR跌4%，日月光半导体涨4%",
-   "source": "wallstreetcn",
-   "time": "2026-10-22T04:00:02+08:00",
-   "url": "https://wallstreetcn.com/live/3182943",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「半导体」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "688286",
-     "name": ""
-    }
-   ]
-  },
-  {
-   "title": "【盘中宝】AI大模型底座能力，全球头部厂商加码该行业，相关订单单月环比翻倍，未来市场规模或超300亿元，这家企业发布了全栈服务体系",
-   "source": "cls",
-   "time": "2026-10-22T09:21:26+08:00",
-   "url": "https://www.cls.cn/detail/2511734",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
    "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "match_detail": "industry:有色",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
+     "code": "512400",
+     "name": "有色金属ETF南方"
     }
    ]
   },
   {
-   "title": "港股物理AI概念股延续涨势 五一视界涨超4%",
+   "title": "创业板指跌逾4%",
    "source": "cls",
-   "time": "2026-10-22T09:24:06+08:00",
-   "url": "https://www.cls.cn/detail/2511741",
+   "time": "2026-10-22T13:32:22+08:00",
+   "url": "https://www.cls.cn/detail/2512044",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
+   "matched_by": "stock",
+   "match_detail": "直接命中个股",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "508008",
-     "name": "GFUND MANAGEMENT CO LTD CICC CHINA RAILWAY CONSTRUCTION REIT"
-    }
-   ]
-  },
-  {
-   "title": "网络安全概念大幅高开 天融信一字涨停",
-   "source": "cls",
-   "time": "2026-10-22T09:30:59+08:00",
-   "url": "https://www.cls.cn/detail/2511745",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「网络安全」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "688651",
-     "name": ""
+     "code": "399006",
+     "name": "创业板指"
     }
    ]
   }
