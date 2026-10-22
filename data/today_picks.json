@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-22T20:15:04+08:00",
+ "ts": "2026-10-22T21:38:00+08:00",
  "date": "2026-10-22",
  "session": "盘后",
  "generated_by": "build_today_picks.py",
@@ -1192,9 +1192,9 @@
   ]
  },
  "entry_plans": {
-  "n_candidates": 54,
-  "n_tradable": 51,
-  "n_rejected": 3,
+  "n_candidates": 52,
+  "n_tradable": 48,
+  "n_rejected": 4,
   "method": "entry zone = min(prev_close, vwap) - 0.5*ATR .. max(prev_close, vwap) + 0.3*ATR; stop = entry - 1.2*ATR; target = entry + 2.4*ATR",
   "rejected": [
    {
@@ -1217,6 +1217,13 @@
     "group": "limit_up",
     "reason": "at limit-up",
     "chg_pct": 10.05
+   },
+   {
+    "code": "000530",
+    "name": "冰山冷热",
+    "group": "limit_up",
+    "reason": "at limit-up",
+    "chg_pct": 9.97
    }
   ],
   "plans": [
@@ -2543,39 +2550,6 @@
    {
     "entry_zone": [
      9.55,
-     10.01
-    ],
-    "entry_ref": 9.78,
-    "stop_loss": 9.15,
-    "target": 11.04,
-    "risk_pct": 6.44,
-    "reward_pct": 12.88,
-    "rr_ratio": 2.0,
-    "atr": 0.524,
-    "atr_pct": 5.34,
-    "code": "002696",
-    "name": "百洋股份",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 9.81,
-    "prev_close": 10.52,
-    "chg_pct": -6.75,
-    "turnover": 39.36,
-    "pe": -63.17,
-    "amplitude": 18.44,
-    "time": "20261022161445",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
-   },
-   {
-    "entry_zone": [
-     9.55,
      10.23
     ],
     "entry_ref": 9.89,
@@ -2836,80 +2810,14 @@
     "overseas_bias": null,
     "vetoes": [],
     "actionable": true
-   },
-   {
-    "entry_zone": [
-     7.67,
-     8.28
-    ],
-    "entry_ref": 7.97,
-    "stop_loss": 6.9,
-    "target": 10.11,
-    "risk_pct": 13.43,
-    "reward_pct": 26.85,
-    "rr_ratio": 2.0,
-    "atr": 0.89,
-    "atr_pct": 10.96,
-    "code": "300006",
-    "name": "莱美药业",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 8.12,
-    "prev_close": 9.3,
-    "chg_pct": -12.69,
-    "turnover": 23.82,
-    "pe": -67.65,
-    "amplitude": 9.57,
-    "time": "20261022161415",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
-   },
-   {
-    "entry_zone": [
-     24.09,
-     26.07
-    ],
-    "entry_ref": 25.08,
-    "stop_loss": 22.42,
-    "target": 30.4,
-    "risk_pct": 10.61,
-    "reward_pct": 21.21,
-    "rr_ratio": 2.0,
-    "atr": 2.216,
-    "atr_pct": 8.67,
-    "code": "001216",
-    "name": "华瓷股份",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 25.56,
-    "prev_close": 25.2,
-    "chg_pct": 1.43,
-    "turnover": 20.56,
-    "pe": 36.68,
-    "amplitude": 10.79,
-    "time": "20261022161436",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
    }
   ]
  },
  "engines": {
-  "engine_v5": "2026-10-22T19:46:18+08:00",
-  "ai_pick_v4": "2026-10-22T19:46:28+08:00",
-  "ban_pick": "2026-10-22T19:57:51+08:00",
-  "reflect_latest": "2026-10-22T19:58:44+08:00",
+  "engine_v5": "2026-10-22T21:10:57+08:00",
+  "ai_pick_v4": "2026-10-22T21:11:06+08:00",
+  "ban_pick": "2026-10-22T21:21:31+08:00",
+  "reflect_latest": "2026-10-22T21:22:17+08:00",
   "overseas_impact": "2026-10-16T18:23:35+08:00"
  },
  "disclaimer": "Rule engines on public data. Research reference only, not investment advice. Win rates are historical, not predictive."
