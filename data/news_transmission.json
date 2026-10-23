@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-24T00:00:53+08:00",
+ "ts": "2026-10-24T04:16:27+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 471,
- "n_transmissions": 5,
+ "n_input": 466,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "特朗普：美国可以“非常迅速地”结束伊朗战争",
-   "source": "财联社电报",
-   "time": "2026-10-23T23:41:49+08:00",
-   "url": "https://www.cls.cn/detail/2514047",
+   "title": "美国总统特朗普：伊朗伊斯兰共和国会告诉你，我们拥有最好的军事装备。",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T03:52:30+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185005",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -123,64 +123,15 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-23",
-    "event_date": "2026-10-23",
+    "event_date": "2026-10-24",
     "matched_codes": []
    }
   },
   {
    "title": "美国总统特朗普：我们可能会很快结束伊朗战争。",
-   "source": "华尔街见闻",
-   "time": "2026-10-23T23:51:01+08:00",
-   "url": "https://wallstreetcn.com/livenews/3184914",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688011"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688586"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002707"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-23",
-    "event_date": "2026-10-23",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "美国商品期货交易委员会（CFTC）主席迈克尔·塞利格（Michael Selig）：CFTC正在审查伊朗战争期间发生的3",
    "source": "wallstreetcn",
-   "time": "2026-10-23T22:09:02+08:00",
-   "url": "https://wallstreetcn.com/live/3184882",
+   "time": "2026-10-23T22:57:05+08:00",
+   "url": "https://wallstreetcn.com/live/3184914",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -226,42 +177,29 @@
    }
   },
   {
-   "title": "中东与欧洲八国外长反对扩大地区冲突 呼吁外交对话",
-   "source": "cls",
-   "time": "2026-10-23T23:52:00+08:00",
-   "url": "https://www.cls.cn/detail/2514055",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "财联社10月24日电，截至10月20日当周，洲际交易所布伦特原油投机者将净多头头寸增加8852手合约至241881手。",
+   "source": "财联社电报",
+   "time": "2026-10-24T04:16:15+08:00",
+   "url": "https://www.cls.cn/detail/2514074",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688011"
-     ]
-    }
-   ],
+   "direct_bull": [],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "688586"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002707"
+      "900945"
      ]
     }
    ],
@@ -270,15 +208,87 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-23",
-    "event_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "WTI 12月原油期货收涨3.80美元，涨幅3.92%，报103.27美元/桶，本周累计上涨超过4.29%。\n\n布伦特12月原油期货收涨3.55美元，涨幅超过3.13%，报116.",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T03:52:30+08:00",
+   "url": "https://wallstreetcn.com/livenews/3184988",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "WTI 12月原油期货收涨3.80美元，涨幅3.92%，报103.27美元/桶，本周累计上涨超过4.29%。\n\n布伦特1",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T03:01:18+08:00",
+   "url": "https://wallstreetcn.com/live/3184992",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
     "matched_codes": []
    }
   },
   {
    "title": "布伦特原油日内涨幅达3.0%，报116.63美元/桶。",
-   "source": "华尔街见闻",
-   "time": "2026-10-23T23:51:01+08:00",
-   "url": "https://wallstreetcn.com/livenews/3184927",
+   "source": "wallstreetcn",
+   "time": "2026-10-23T23:18:41+08:00",
+   "url": "https://wallstreetcn.com/live/3184927",
    "transmission_id": "oil_up",
    "label": "油价上涨",
    "direct_bear": [],
