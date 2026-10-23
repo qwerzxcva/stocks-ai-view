@@ -51,13 +51,25 @@ def load(name):
 def names_from_master():
     """code -> name, from the cloud warehouse master table if present."""
     p = os.path.join(DATA_DIR, "universe.json")
-    if not os.path.exists(p):
-        return {}
     try:
-        return {c: v.get("name", "") for c, v in
-                json.load(open(p, encoding="utf-8"))["stocks"].items()}
+        out = {c: v.get("name", "") for c, v in
+               json.load(open(p, encoding="utf-8"))["stocks"].items()}
     except Exception:
-        return {}
+        out = {}
+    if not out:
+        # fallback: stock_names.json {"sz000001": "sz000001 平安银行"}
+        p2 = os.path.join(DATA_DIR, "stock_names.json")
+        try:
+            for k, v in json.load(open(p2, encoding="utf-8")).items():
+                code = k[2:] if len(k) > 6 else k
+                nm = v.split(" ", 1)[1] if " " in v else v
+                out[code] = nm
+        except Exception:
+            pass
+    return out
+
+
+MAINBOARD = lambda c: c.startswith(("60", "00"))  # 主板 only: sh60x / sz00x (排除 688/300/301)
 
 
 def bare(code):
@@ -145,8 +157,10 @@ def main():
     calibration = empirical_edge.load_edge_table()
     signals = []
     avoid = []
-    for x in (v5.get("top") or [])[:30]:
+    for x in (v5.get("top") or [])[:60]:
         code = bare(x.get("code"))
+        if not MAINBOARD(code):
+            continue  # 主板 only: 排除 688/300/301 (用户不可买)
         cal = empirical_edge.calibrate(x.get("votes"), calibration) \
             if calibration else {"edge_pp": None, "dir_weight": None}
         aligned, bear_w = empirical_edge.bear_aligned(x.get("votes"), calibration) \
@@ -284,7 +298,7 @@ def main():
         },
         "overseas": overseas,
         "picks": {
-            "signals": signals,
+            "signals": signals[:30],
             "values": values,
             "limit_up": zt,
             "avoid": avoid,
