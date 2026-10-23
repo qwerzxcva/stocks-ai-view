@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-23T14:06:35+08:00",
+ "ts": "2026-10-23T18:40:36+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 473,
- "n_transmissions": 3,
+ "n_transmissions": 2,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "原来手机也有这么多病毒",
-   "source": "贴吧热议",
-   "time": "2026-10-23T13:49:53+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367942&amp;topic_name=%E5%8E%9F%E6%9D%A5%E6%89%8B%E6%9C%BA%E4%B9%9F%E6%9C%89%E8%BF%99%E4%B9%88%E5%A4%9A%E7%97%85%E6%AF%92",
+   "title": "全球对冲基金遭遇疫情来最广泛跌势之一 三大股票策略在同一天跌逾1%",
+   "source": "wallstreetcn",
+   "time": "2026-10-23T14:47:37+08:00",
+   "url": "https://wallstreetcn.com/live/3184260",
    "transmission_id": "epidemic",
    "label": "疫情",
    "direct_bear": [],
@@ -129,7 +129,7 @@
     {
      "sector": "旅游",
      "stocks": [
-      "000888"
+      "002707"
      ]
     },
     {
@@ -144,7 +144,7 @@
       "603885",
       "600115",
       "002928",
-      "302132"
+      "688586"
      ]
     },
     {
@@ -154,7 +154,7 @@
       "002186",
       "605108",
       "002306",
-      "600258"
+      "301073"
      ]
     }
    ],
@@ -170,7 +170,7 @@
   {
    "title": "显卡断供,DIY玩家输麻了",
    "source": "贴吧热议",
-   "time": "2026-10-23T13:49:53+08:00",
+   "time": "2026-10-23T18:17:12+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367880&amp;topic_name=%E6%98%BE%E5%8D%A1%E6%96%AD%E4%BE%9B%2CDIY%E7%8E%A9%E5%AE%B6%E8%BE%93%E9%BA%BB%E4%BA%86",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -181,12 +181,6 @@
      "sector": "半导体设备",
      "stocks": [
       "301660"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "301269"
      ]
     }
    ],
@@ -200,55 +194,6 @@
     "matched_codes": []
    },
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "美国总统特朗普再度威胁对伊朗采取军事行动：已经狠狠打击了他们，可能还会进一步升级",
-   "source": "wallstreetcn",
-   "time": "2026-10-23T05:19:14+08:00",
-   "url": "https://wallstreetcn.com/live/3183984",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301707"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "302132"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000888"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-23",
-    "event_date": "2026-10-23",
-    "matched_codes": []
-   }
   }
  ]
 }
