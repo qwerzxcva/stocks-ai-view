@@ -1,7 +1,7 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-23T09:28:02+08:00",
+    "ts": "2026-10-23T13:59:19+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
     "n_days": 8575,
@@ -11,21 +11,21 @@
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-23T09:28:02+08:00"
+    "rebuilt_at": "2026-10-23T13:59:19+08:00"
   },
   "status": {
     "date": "2026-10-23",
-    "close": 3623.57,
-    "ma5": 3692.18,
-    "ma20": 3800.54,
-    "ma60": 3870.45,
+    "close": 3652.09,
+    "ma5": 3697.89,
+    "ma20": 3801.96,
+    "ma60": 3870.93,
     "ma_bull": false,
-    "macd_hist": -30.52,
+    "macd_hist": -26.88,
     "macd_bull": false,
-    "rsi": 17.1,
-    "momentum_20d_pct": -7.37,
+    "rsi": 18.9,
+    "momentum_20d_pct": -6.64,
     "phase": "downtrend",
-    "volume_ratio": 0.02
+    "volume_ratio": 1.03
   },
   "yearly_kline": {
     "1991": {
@@ -661,18 +661,18 @@
     "2026": {
       "n_days": 193,
       "open": 3986.97,
-      "close": 3623.57,
+      "close": 3652.09,
       "high": 4258.86,
-      "low": 3623.57,
-      "chg_pct": -8.7,
-      "amplitude_pct": 17.53,
-      "turnover_yi": 1170.3,
+      "low": 3574.27,
+      "chg_pct": -7.98,
+      "amplitude_pct": 19.15,
+      "turnover_yi": 1174.5,
       "candles": {
-        "yang": 110,
+        "yang": 111,
         "yin": 82,
-        "cross": 1
+        "cross": 0
       },
-      "max_drawdown_pct": -14.92,
+      "max_drawdown_pct": -16.07,
       "first_date": "2026-01-05",
       "last_date": "2026-10-23"
     }
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -5.69
+        "Q4": -4.95
       },
       "months_covered": 9
     }
@@ -1345,17 +1345,17 @@
         "2023",
         "1998",
         "2013",
-        "2005",
-        "2026"
+        "2026",
+        "2005"
       ],
-      "avg_chg": -0.75,
+      "avg_chg": -0.68,
       "best": [
         "2015",
         9.41
       ],
       "worst": [
-        "2026",
-        -8.7
+        "2005",
+        -8.33
       ]
     },
     "bear_lt-10": {
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 12.1,
+      "chg_pct": 12.98,
       "position": "库存周期中性",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1449,411 +1449,336 @@
   "demand_shift": {
     "industry_top": [
       {
-        "name": "肉鸡养殖",
-        "chg_pct": 0.87,
+        "name": "其他数字媒体",
+        "chg_pct": 15.02,
         "up_n": 2,
-        "down_n": 6,
-        "leader": "湘佳股份",
-        "main_net_inflow_yi": 0.0
+        "down_n": 0,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 1.56
       },
       {
-        "name": "玻璃制造",
-        "chg_pct": 0.49,
+        "name": "机器人",
+        "chg_pct": 5.44,
+        "up_n": 21,
+        "down_n": 1,
+        "leader": "派斯林",
+        "main_net_inflow_yi": 3.38
+      },
+      {
+        "name": "医美服务",
+        "chg_pct": 4.35,
         "up_n": 1,
+        "down_n": 1,
+        "leader": "朗姿股份",
+        "main_net_inflow_yi": 0.22
+      },
+      {
+        "name": "纺织鞋类制造",
+        "chg_pct": 3.86,
+        "up_n": 1,
+        "down_n": 0,
+        "leader": "华利集团",
+        "main_net_inflow_yi": 0.01
+      },
+      {
+        "name": "电机Ⅲ",
+        "chg_pct": 3.09,
+        "up_n": 21,
+        "down_n": 6,
+        "leader": "华阳智能",
+        "main_net_inflow_yi": -0.15
+      },
+      {
+        "name": "电机Ⅱ",
+        "chg_pct": 3.09,
+        "up_n": 21,
+        "down_n": 6,
+        "leader": "华阳智能",
+        "main_net_inflow_yi": -0.15
+      },
+      {
+        "name": "集成电路制造",
+        "chg_pct": 2.91,
+        "up_n": 5,
+        "down_n": 3,
+        "leader": "粤芯半导-U",
+        "main_net_inflow_yi": 10.12
+      },
+      {
+        "name": "工程机械整机",
+        "chg_pct": 2.4,
+        "up_n": 19,
+        "down_n": 3,
+        "leader": "南方路机",
+        "main_net_inflow_yi": 2.29
+      },
+      {
+        "name": "快递",
+        "chg_pct": 2.18,
+        "up_n": 4,
+        "down_n": 0,
+        "leader": "顺丰控股",
+        "main_net_inflow_yi": 0.09
+      },
+      {
+        "name": "锂电专用设备",
+        "chg_pct": 2.18,
+        "up_n": 15,
         "down_n": 4,
-        "leader": "三峡新材",
-        "main_net_inflow_yi": 0.0
+        "leader": "利元亨",
+        "main_net_inflow_yi": 0.4
+      },
+      {
+        "name": "自动化设备",
+        "chg_pct": 2.17,
+        "up_n": 64,
+        "down_n": 31,
+        "leader": "派斯林",
+        "main_net_inflow_yi": -2.37
+      },
+      {
+        "name": "工控设备",
+        "chg_pct": 2.09,
+        "up_n": 24,
+        "down_n": 8,
+        "leader": "嘉晨智能",
+        "main_net_inflow_yi": 0.07
       },
       {
         "name": "农用机械",
-        "chg_pct": 0.37,
-        "up_n": 1,
-        "down_n": 7,
-        "leader": "威马农机",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "房地产综合服务",
-        "chg_pct": 0.31,
-        "up_n": 1,
-        "down_n": 0,
-        "leader": "珠江股份",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "仓储物流",
-        "chg_pct": 0.23,
-        "up_n": 2,
-        "down_n": 4,
-        "leader": "密尔克卫",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "油气开采Ⅲ",
-        "chg_pct": 0.16,
-        "up_n": 2,
-        "down_n": 2,
-        "leader": "新潮能源",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "油气开采Ⅱ",
-        "chg_pct": 0.16,
-        "up_n": 2,
-        "down_n": 2,
-        "leader": "新潮能源",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "油气及炼化工程",
-        "chg_pct": 0.03,
-        "up_n": 2,
-        "down_n": 2,
-        "leader": "通源石油",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "油服工程",
-        "chg_pct": 0.02,
+        "chg_pct": 1.98,
         "up_n": 5,
-        "down_n": 6,
-        "leader": "科力股份",
-        "main_net_inflow_yi": 0.0
+        "down_n": 5,
+        "leader": "威马农机",
+        "main_net_inflow_yi": 0.01
       },
       {
-        "name": "国有大型银行Ⅲ",
-        "chg_pct": 0.02,
-        "up_n": 4,
+        "name": "其他黑色家电",
+        "chg_pct": 1.95,
+        "up_n": 3,
         "down_n": 2,
-        "leader": "交通银行",
-        "main_net_inflow_yi": 0.0
+        "leader": "创维数字",
+        "main_net_inflow_yi": 0.39
       },
       {
-        "name": "油田服务",
-        "chg_pct": 0.01,
-        "up_n": 3,
-        "down_n": 4,
-        "leader": "科力股份",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "农商行Ⅲ",
-        "chg_pct": -0.02,
-        "up_n": 3,
-        "down_n": 3,
-        "leader": "苏农银行",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "股份制银行Ⅲ",
-        "chg_pct": -0.03,
-        "up_n": 2,
-        "down_n": 4,
-        "leader": "浦发银行",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "银行",
-        "chg_pct": -0.07,
-        "up_n": 12,
-        "down_n": 18,
-        "leader": "交通银行",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "银行Ⅱ",
-        "chg_pct": -0.07,
-        "up_n": 12,
-        "down_n": 18,
-        "leader": "交通银行",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "自然景区",
-        "chg_pct": -0.07,
-        "up_n": 2,
-        "down_n": 10,
-        "leader": "张家界",
-        "main_net_inflow_yi": 0.0
+        "name": "国际工程",
+        "chg_pct": 1.94,
+        "up_n": 4,
+        "down_n": 0,
+        "leader": "中材国际",
+        "main_net_inflow_yi": 0.05
       },
       {
         "name": "白酒Ⅲ",
-        "chg_pct": -0.09,
-        "up_n": 6,
-        "down_n": 10,
-        "leader": "迎驾贡酒",
-        "main_net_inflow_yi": 0.0
+        "chg_pct": 1.89,
+        "up_n": 19,
+        "down_n": 1,
+        "leader": "金徽酒",
+        "main_net_inflow_yi": 5.37
       },
       {
         "name": "白酒Ⅱ",
-        "chg_pct": -0.09,
+        "chg_pct": 1.89,
+        "up_n": 19,
+        "down_n": 1,
+        "leader": "金徽酒",
+        "main_net_inflow_yi": 5.37
+      },
+      {
+        "name": "模拟芯片设计",
+        "chg_pct": 1.87,
+        "up_n": 23,
+        "down_n": 12,
+        "leader": "汇顶科技",
+        "main_net_inflow_yi": 2.58
+      },
+      {
+        "name": "垂直应用软件",
+        "chg_pct": 1.84,
+        "up_n": 70,
+        "down_n": 28,
+        "leader": "理工能科",
+        "main_net_inflow_yi": 8.55
+      },
+      {
+        "name": "印刷包装机械",
+        "chg_pct": 1.8,
         "up_n": 6,
-        "down_n": 10,
-        "leader": "迎驾贡酒",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "多业态零售",
-        "chg_pct": -0.1,
-        "up_n": 2,
-        "down_n": 11,
-        "leader": "上海九百",
-        "main_net_inflow_yi": 0.0
-      },
-      {
-        "name": "文化用品",
-        "chg_pct": -0.1,
-        "up_n": 1,
-        "down_n": 3,
-        "leader": "明月镜片",
-        "main_net_inflow_yi": 0.0
+        "down_n": 6,
+        "leader": "永创智能",
+        "main_net_inflow_yi": 0.31
       }
     ],
     "industry_n": 20,
     "concept_top": [
       {
+        "name": "反转股",
+        "chg_pct": 7.02,
+        "up_n": 7,
+        "down_n": 2,
+        "leader": "兆威机电"
+      },
+      {
+        "name": "2026三季报首亏",
+        "chg_pct": 4.83,
+        "up_n": 6,
+        "down_n": 1,
+        "leader": "大鹏工业"
+      },
+      {
         "name": "昨日首板",
-        "chg_pct": 1.35,
-        "up_n": 9,
-        "down_n": 10,
-        "leader": "南矿集团"
-      },
-      {
-        "name": "昨日打二板以上表现",
-        "chg_pct": 0.82,
-        "up_n": 2,
-        "down_n": 3,
-        "leader": "三峡新材"
-      },
-      {
-        "name": "昨日涨停_含一字",
-        "chg_pct": 0.29,
-        "up_n": 12,
-        "down_n": 18,
-        "leader": "南矿集团"
-      },
-      {
-        "name": "B股",
-        "chg_pct": -0.12,
-        "up_n": 2,
-        "down_n": 10,
-        "leader": "黄山Ｂ股"
-      },
-      {
-        "name": "鸡肉概念",
-        "chg_pct": -0.19,
-        "up_n": 4,
-        "down_n": 15,
-        "leader": "湘佳股份"
-      },
-      {
-        "name": "红利破净股",
-        "chg_pct": -0.25,
-        "up_n": 11,
-        "down_n": 27,
-        "leader": "交通银行"
-      },
-      {
-        "name": "酿酒概念",
-        "chg_pct": -0.26,
-        "up_n": 12,
-        "down_n": 18,
-        "leader": "迎驾贡酒"
-      },
-      {
-        "name": "证金持股",
-        "chg_pct": -0.26,
-        "up_n": 11,
-        "down_n": 19,
-        "leader": "中海油服"
-      },
-      {
-        "name": "科创板做市商",
-        "chg_pct": -0.3,
-        "up_n": 1,
-        "down_n": 11,
-        "leader": "国泰海通"
+        "chg_pct": 4.42,
+        "up_n": 16,
+        "down_n": 6,
+        "leader": "睿能科技"
       },
       {
         "name": "昨日涨停",
-        "chg_pct": -0.34,
-        "up_n": 10,
-        "down_n": 18,
+        "chg_pct": 3.5,
+        "up_n": 20,
+        "down_n": 11,
         "leader": "上海九百"
       },
       {
-        "name": "白酒",
-        "chg_pct": -0.35,
-        "up_n": 9,
-        "down_n": 28,
-        "leader": "迎驾贡酒"
-      },
-      {
-        "name": "超级品牌",
-        "chg_pct": -0.4,
+        "name": "PLC概念",
+        "chg_pct": 3.47,
         "up_n": 8,
-        "down_n": 22,
-        "leader": "登康口腔"
+        "down_n": 3,
+        "leader": "睿能科技"
       },
       {
-        "name": "金融地产风格",
-        "chg_pct": -0.4,
-        "up_n": 14,
-        "down_n": 72,
-        "leader": "国泰海通"
+        "name": "机器人执行器",
+        "chg_pct": 3.28,
+        "up_n": 32,
+        "down_n": 5,
+        "leader": "洛轴股份"
       },
       {
-        "name": "保险重仓",
-        "chg_pct": -0.4,
-        "up_n": 11,
-        "down_n": 39,
-        "leader": "浦发银行"
+        "name": "昨日涨停_含一字",
+        "chg_pct": 3.06,
+        "up_n": 20,
+        "down_n": 12,
+        "leader": "上海九百"
       },
       {
-        "name": "资源开采概念",
-        "chg_pct": -0.41,
-        "up_n": 8,
-        "down_n": 15,
-        "leader": "科力股份"
+        "name": "虚拟机器人",
+        "chg_pct": 3.0,
+        "up_n": 12,
+        "down_n": 4,
+        "leader": "多伦科技"
       },
       {
-        "name": "历史新高",
-        "chg_pct": -0.44,
-        "up_n": 2,
+        "name": "昨日打二板以上表现",
+        "chg_pct": 2.93,
+        "up_n": 3,
+        "down_n": 1,
+        "leader": "大业股份"
+      },
+      {
+        "name": "减速器",
+        "chg_pct": 2.61,
+        "up_n": 68,
+        "down_n": 21,
+        "leader": "襄阳轴承"
+      },
+      {
+        "name": "混合现实",
+        "chg_pct": 2.33,
+        "up_n": 21,
+        "down_n": 13,
+        "leader": "天娱数科"
+      },
+      {
+        "name": "ChatGPT概念",
+        "chg_pct": 2.17,
+        "up_n": 49,
+        "down_n": 12,
+        "leader": "天娱数科"
+      },
+      {
+        "name": "人形机器人",
+        "chg_pct": 2.12,
+        "up_n": 227,
+        "down_n": 83,
+        "leader": "睿能科技"
+      },
+      {
+        "name": "3D摄像头",
+        "chg_pct": 2.1,
+        "up_n": 7,
         "down_n": 2,
-        "leader": "工商银行"
+        "leader": "奥比中光-W"
       },
       {
-        "name": "草甘膦",
-        "chg_pct": -0.45,
-        "up_n": 2,
-        "down_n": 10,
-        "leader": "江山股份"
+        "name": "茅指数",
+        "chg_pct": 2.08,
+        "up_n": 36,
+        "down_n": 5,
+        "leader": "宁德时代"
       },
       {
-        "name": "调味品概念",
-        "chg_pct": -0.45,
-        "up_n": 6,
-        "down_n": 23,
-        "leader": "ST加加"
+        "name": "宁组合",
+        "chg_pct": 1.97,
+        "up_n": 19,
+        "down_n": 4,
+        "leader": "宁德时代"
       },
       {
-        "name": "旅游酒店",
-        "chg_pct": -0.51,
-        "up_n": 2,
-        "down_n": 34,
-        "leader": "张家界"
+        "name": "机器视觉",
+        "chg_pct": 1.89,
+        "up_n": 66,
+        "down_n": 33,
+        "leader": "大鹏工业"
       },
       {
-        "name": "红利股",
-        "chg_pct": -0.51,
-        "up_n": 17,
-        "down_n": 70,
-        "leader": "永新股份"
+        "name": "同步磁阻电机",
+        "chg_pct": 1.71,
+        "up_n": 3,
+        "down_n": 4,
+        "leader": "伟创电气"
+      },
+      {
+        "name": "AI手机",
+        "chg_pct": 1.71,
+        "up_n": 21,
+        "down_n": 9,
+        "leader": "福莱新材"
+      },
+      {
+        "name": "创业成份",
+        "chg_pct": 1.71,
+        "up_n": 70,
+        "down_n": 30,
+        "leader": "长盈精密"
       }
     ],
     "concept_n": 20,
     "concentration": {
-      "top5_avg_chg": 0.45,
-      "sample_avg_chg": 0.1,
-      "spread": 0.35,
-      "interpretation": "普涨/轮动分散"
+      "top5_avg_chg": 6.35,
+      "sample_avg_chg": 3.2,
+      "spread": 3.15,
+      "interpretation": "主题集中行情 (头部板块显著强于平均)"
     }
   },
   "stocks": [
     {
-      "code": "601328",
-      "name": "交通银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": 0.73,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
+      "code": "300979",
+      "name": "华利集团",
+      "industry": "纺织鞋类制造",
+      "chg_pct": 3.86,
+      "leader": "华利集团",
+      "main_net_inflow_yi": 0.01,
       "reason": "当前周期需求迁移行业成分股",
-      "price": 8.27,
-      "turnover": 0.02,
-      "pe": 7.5,
-      "mktcap_yi": 2156.19,
-      "pb": 0.63,
-      "quote_time": "20261023092741"
-    },
-    {
-      "code": "601398",
-      "name": "工商银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": 0.12,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
-      "reason": "当前周期需求迁移行业成分股",
-      "price": 8.6,
-      "turnover": 0.0,
-      "pe": 8.19,
-      "mktcap_yi": 23186.65,
-      "pb": 0.78,
-      "quote_time": "20261023092758"
-    },
-    {
-      "code": "601288",
-      "name": "农业银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": -0.95,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
-      "reason": "当前周期需求迁移行业成分股",
-      "price": 7.33,
-      "turnover": 0.0,
-      "pe": 8.61,
-      "mktcap_yi": 23400.6,
-      "pb": 0.91,
-      "quote_time": "20261023092746"
-    },
-    {
-      "code": "601988",
-      "name": "中国银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": -0.42,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
-      "reason": "当前周期需求迁移行业成分股",
-      "price": 7.19,
-      "turnover": 0.0,
-      "pe": 9.3,
-      "mktcap_yi": 15154.04,
-      "pb": 0.84,
-      "quote_time": "20261023092735"
-    },
-    {
-      "code": "601939",
-      "name": "建设银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": 0.09,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
-      "reason": "当前周期需求迁移行业成分股",
-      "price": 11.67,
-      "turnover": 0.01,
-      "pe": 8.81,
-      "mktcap_yi": 1119.58,
-      "pb": 0.85,
-      "quote_time": "20261023092731"
-    },
-    {
-      "code": "601658",
-      "name": "邮储银行",
-      "industry": "国有大型银行Ⅲ",
-      "chg_pct": 0.54,
-      "leader": "交通银行",
-      "main_net_inflow_yi": 0.0,
-      "reason": "当前周期需求迁移行业成分股",
-      "price": 5.59,
-      "turnover": 0.0,
-      "pe": 7.49,
-      "mktcap_yi": 4054.3,
-      "pb": 0.64,
-      "quote_time": "20261023092737"
+      "price": 34.98,
+      "turnover": 0.44,
+      "pe": 16.4,
+      "mktcap_yi": 408.22,
+      "pb": 2.86,
+      "quote_time": "20261023135915"
     }
   ],
   "stocks_meta": {
-    "n": 6,
-    "enriched": 6
+    "n": 1,
+    "enriched": 1
   }
 }
