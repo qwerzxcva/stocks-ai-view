@@ -57,15 +57,18 @@ def names_from_master():
     except Exception:
         out = {}
     if not out:
-        # fallback: stock_names.json {"sz000001": "sz000001 平安银行"}
-        p2 = os.path.join(DATA_DIR, "stock_names.json")
-        try:
-            for k, v in json.load(open(p2, encoding="utf-8")).items():
-                code = k[2:] if len(k) > 6 else k
-                nm = v.split(" ", 1)[1] if " " in v else v
-                out[code] = nm
-        except Exception:
-            pass
+        # fallback: stock_names.json {"sz000001": "sz000001 平安银行"} — try both layouts
+        for p2 in (os.path.join(DATA_DIR, "stock_names.json"),
+                   os.path.join(DATA_DIR, "data", "stock_names.json")):
+            try:
+                for k, v in json.load(open(p2, encoding="utf-8")).items():
+                    code = k[2:] if len(k) > 6 else k
+                    nm = v.split(" ", 1)[1] if " " in v else v
+                    out[code] = nm
+                if out:
+                    break
+            except Exception:
+                continue
     return out
 
 
