@@ -1,28 +1,28 @@
 {
- "ts": "2026-10-24T04:16:27+08:00",
+ "ts": "2026-10-24T04:25:50+08:00",
  "engine": "news_impact v1 (三层映射 + 规则式情感)",
  "n_input": 466,
- "n_mapped": 55,
- "n_unmapped": 352,
+ "n_mapped": 43,
+ "n_unmapped": 365,
  "match_stat": {
   "stock": 1,
-  "concept": 3,
-  "industry": 50,
+  "concept": 5,
+  "industry": 37,
   "annotated": 0,
-  "theme": 1,
-  "unmapped": 352
+  "theme": 0,
+  "unmapped": 365
  },
  "direction_stat": {
-  "bull": 28,
+  "bull": 22,
   "bear": 8,
-  "neutral": 370,
+  "neutral": 377,
   "mixed": 1
  },
  "impacts": [
   {
    "title": "财联社10月24日电，芝加哥期权交易所旗下Cboe Clear U.S.获美国证券交易委员会（SEC）批准，扩大其清算业务范围。",
    "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
+   "time": "2026-10-24T04:12:30+08:00",
    "url": "https://www.cls.cn/detail/2514067",
    "channel": "",
    "themes": [],
@@ -77,7 +77,7 @@
   {
    "title": "花旗证券获批设立，是何信号？",
    "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
+   "time": "2026-10-24T04:25:38+08:00",
    "url": "https://www.cls.cn/detail/2513665",
    "channel": "",
    "themes": [],
@@ -130,9 +130,87 @@
    ]
   },
   {
+   "title": "诺和诺德Awiqli®获美国食品药品管理局（FDA）批准，成为首个且唯一用于10岁及以上2型糖尿病儿童的每周一次胰岛素。",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T02:27:24+08:00",
+   "url": "https://wallstreetcn.com/live/3184985",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "美国食品药品管理局（FDA）批准首个每周一次胰岛素用于治疗儿科患者2型糖尿病。\n\nAwiqli 通过皮下注射给药，每周一",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T02:25:56+08:00",
+   "url": "https://wallstreetcn.com/live/3184983",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "bull",
+   "confidence": 0.6,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
    "title": "OpenAI：与众多云伙伴合作。",
    "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
+   "time": "2026-10-24T04:25:39+08:00",
    "url": "https://wallstreetcn.com/livenews/3184998",
    "channel": "",
    "themes": [],
@@ -140,59 +218,8 @@
    "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 7,
+   "n_stocks": 5,
    "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "OpenAI在其博客中表示，预计后续模型能够识别并利用目前尚未被察觉的安全漏洞。\n\n公司于10月1日恢复了前沿模型强化学习训练及内部推理工作。\n\n已将高算力环境下的红队测试(网络攻防测试）纳入安全评估范畴，以此判定其前沿模型训练及评估工作能否安全开展。\n\n开展前沿模型训练时应断开互联网连接，这是负责任的做法。\n\n已实施前沿模型训练无互联网访问政策，该政策将持续有效，直到安全保障措施的进步证明可以扩大互联网访问权限。",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
-   "url": "https://wallstreetcn.com/livenews/3184997",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
     {
      "code": "920096",
      "name": "嘉晨智能"
@@ -226,16 +253,8 @@
    "confidence": 0.6,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 7,
+   "n_stocks": 5,
    "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
     {
      "code": "920096",
      "name": "嘉晨智能"
@@ -259,243 +278,9 @@
    ]
   },
   {
-   "title": "诺和诺德Awiqli®获美国食品药品管理局（FDA）批准，成为首个且唯一用于10岁及以上2型糖尿病儿童的每周一次胰岛素。",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T02:27:24+08:00",
-   "url": "https://wallstreetcn.com/live/3184985",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 6,
-   "stocks": [
-    {
-     "code": "603696",
-     "name": "安记食品"
-    },
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "美国食品药品管理局（FDA）批准首个每周一次胰岛素用于治疗儿科患者2型糖尿病。\n\nAwiqli 通过皮下注射给药，每周一",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T02:25:56+08:00",
-   "url": "https://wallstreetcn.com/live/3184983",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 6,
-   "stocks": [
-    {
-     "code": "603696",
-     "name": "安记食品"
-    },
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "财联社10月24日电，花旗表示，铝价承压，聚焦2027年可能出现100万至200万吨的显著供应过剩，主要源于印尼主导的强劲供应增长以及需求前景疲软。",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514080",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.7,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "花旗：在能源市场与关税形势进一步明朗之前，我们对铜维持中性立场，并将相关避险行情视为良好的长期买入机会。\n\n铝空头关注2027年可能出现100万至200万吨的大幅供应过剩，主要原因是印度尼西亚主导的供应增长强劲，而需求前景低迷。",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
-   "url": "https://wallstreetcn.com/livenews/3184986",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.7,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "寒武纪：随着市场的持续拓展与收入规模的不断扩大，公司业绩有望保持增长",
-   "source": "wallstreetcn",
-   "time": "2026-10-23T20:44:42+08:00",
-   "url": "https://wallstreetcn.com/live/3184837",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "半导体概念股",
-    "股市重要公告提醒"
-   ],
-   "direction": "bull",
-   "confidence": 0.7,
-   "matched_by": "theme",
-   "match_detail": "题材「半导体概念股」→概念「半导体」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "301660",
-     "name": "粤芯半导-U"
-    }
-   ]
-  },
-  {
-   "title": "财联社10月24日电，据美国商品期货交易委员会（CFTC），截至10月20日当周，COMEX黄金投机者净多头头寸减少2,392手至108,685手。COMEX白银投机者净多头头寸减少1,988手至3,746手。",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514089",
-   "channel": "",
-   "themes": [],
-   "direction": "bear",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "美国商品期货交易委员会（CFTC）：10月20日当周，投机者所持COMEX黄金净多头头寸减少2,394手合约，至108,",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T03:41:13+08:00",
-   "url": "https://wallstreetcn.com/live/3185008",
-   "channel": "a-stock-channel",
-   "themes": [],
-   "direction": "bear",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "美国商品期货交易委员会（CFTC）：10月20日当周，投机者所持COMEX黄金净多头头寸减少2,394手合约，至108,",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T03:41:13+08:00",
-   "url": "https://wallstreetcn.com/live/3185008",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "bear",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "美国商品期货交易委员会（CFTC）：10月20日当周，投机者所持COMEX黄金净多头头寸减少2,394手合约，至108,",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T03:41:13+08:00",
-   "url": "https://wallstreetcn.com/live/3185008",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "bear",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "美国商品期货交易委员会（CFTC）：10月20日当周，投机者所持COMEX黄金净多头头寸减少2,394手合约，至108,685手合约，创最近19周新低。\n\n所持COMEX白银净多头头寸降低至3,746手合约，创逾两年新低。\n\n所持COMEX铜净多头头寸减少至48,009手合约，创逾六周新低。\n\n所持NYMEX铂金净多头头寸减少至6,615手合约，创最近12周新低。\n\n所持NYMEX钯金净多头头寸增加至12,143手合约，创逾17个月新高。",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
-   "url": "https://wallstreetcn.com/livenews/3185008",
-   "channel": "",
-   "themes": [],
-   "direction": "mixed",
-   "confidence": 0.4,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
    "title": "证监会：核准设立花旗证券（中国）有限公司",
    "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
+   "time": "2026-10-24T04:25:38+08:00",
    "url": "https://www.cls.cn/detail/2513545",
    "channel": "",
    "themes": [],
@@ -550,8 +335,63 @@
   {
    "title": "当前A股如何形成新合力？六大券商首席发声",
    "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
+   "time": "2026-10-24T04:25:38+08:00",
    "url": "https://www.cls.cn/detail/2513856",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:金融",
+   "n_stocks": 10,
+   "stocks": [
+    {
+     "code": "000001",
+     "name": "平安银行"
+    },
+    {
+     "code": "159931",
+     "name": "金融地产ETF汇添富"
+    },
+    {
+     "code": "159933",
+     "name": "金融地产ETF国投瑞银"
+    },
+    {
+     "code": "159940",
+     "name": "金融地产ETF广发"
+    },
+    {
+     "code": "510650",
+     "name": "金融地产ETF华夏"
+    },
+    {
+     "code": "512640",
+     "name": "金融地产ETF嘉实"
+    },
+    {
+     "code": "512900",
+     "name": "证券ETF南方"
+    },
+    {
+     "code": "512880",
+     "name": "证券ETF国泰"
+    },
+    {
+     "code": "512820",
+     "name": "银行ETF汇添富"
+    },
+    {
+     "code": "512800",
+     "name": "银行ETF华宝"
+    }
+   ]
+  },
+  {
+   "title": "美国CFTC：对冲基金将欧元空头押注升至2020年以来最高",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185003",
    "channel": "",
    "themes": [],
    "direction": "neutral",
@@ -605,7 +445,7 @@
   {
    "title": "美国商品期货交易委员会（CFTC）：10月20日当周，股票基金投机者将标普500指数芝加哥商业交易所（CME）净空头头寸削减42,221手合约，至348,674手合约。\n\n股票基金经理将标普500指数CME净多头头寸削减18,079手合约，至894,464手合约。",
    "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
+   "time": "2026-10-24T04:25:39+08:00",
    "url": "https://wallstreetcn.com/livenews/3185001",
    "channel": "",
    "themes": [],
@@ -660,7 +500,7 @@
   {
    "title": "继母介绍 12 岁女童进黑作坊务工致六级伤残，厂方仅支付 1 万元跑路，各方该承担什么责任？这对孩子影响多大？",
    "source": "知乎热榜",
-   "time": "2026-10-24T04:16:17+08:00",
+   "time": "2026-10-24T04:08:43+08:00",
    "url": "https://www.zhihu.com/question/2095942778563970468",
    "channel": "",
    "themes": [],
@@ -823,393 +663,6 @@
    ]
   },
   {
-   "title": "机器人概念领涨两市 VIP栏目策划专题解读",
-   "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
-   "url": "https://www.cls.cn/detail/2513677",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "国办印发《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》 拓展新兴领域人工智能就业新空间",
-   "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
-   "url": "https://www.cls.cn/detail/2513630",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "OpenAI将在完全断网环境下训练前沿模型",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514088",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "财联社10月24日电，美国得克萨斯州总检察长以“对消费者造成负面影响”为由起诉OpenAI。",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514078",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "西部数据CFO驳斥AI需求放缓担忧",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
-   "url": "https://wallstreetcn.com/livenews/3185014",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "Anthropic推出Claude Duet智能体研究预览版。",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T03:52:30+08:00",
-   "url": "https://wallstreetcn.com/livenews/3185007",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "DeepSeek 拟新融资 1000 亿元，腾讯、宁德时代出资最多，这会不会改写国内大模型的竞争格局？",
-   "source": "知乎热榜",
-   "time": "2026-10-24T04:16:17+08:00",
-   "url": "https://www.zhihu.com/question/2096713518582179306",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "图灵奖得主希发基思：警惕AI“要挟式”示强，AI闯祸必须对开发者追责",
-   "source": "澎湃新闻",
-   "time": "2026-10-24T04:16:21+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34301129",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
-   "title": "AI算力市场需求持续旺盛：寒武纪三季度营收翻倍，净利14亿元增近1.5倍",
-   "source": "澎湃新闻",
-   "time": "2026-10-24T04:16:21+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34320341",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:人工智能",
-   "n_stocks": 7,
-   "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
-    {
-     "code": "920096",
-     "name": "嘉晨智能"
-    },
-    {
-     "code": "002421",
-     "name": "达实智能"
-    },
-    {
-     "code": "603448",
-     "name": "天博智能"
-    },
-    {
-     "code": "301513",
-     "name": "尚水智能"
-    },
-    {
-     "code": "301083",
-     "name": "百胜智能"
-    }
-   ]
-  },
-  {
    "title": "诺华制药Remibrutinib在第三阶段研究中实现多个主要终点。\n\n相比竞品，该药物将复发缓解型多发性硬化症中的复发率",
    "source": "wallstreetcn",
    "time": "2026-10-23T23:48:33+08:00",
@@ -1253,6 +706,625 @@
    ]
   },
   {
+   "title": "UP主花1000万反对滥用食品添加剂",
+   "source": "B站热搜",
+   "time": "2026-10-24T04:25:42+08:00",
+   "url": "https://search.bilibili.com/all?keyword=UP%E4%B8%BB%E8%8A%B11000%E4%B8%87%E5%8F%8D%E5%AF%B9%E6%BB%A5%E7%94%A8%E9%A3%9F%E5%93%81%E6%B7%BB%E5%8A%A0%E5%89%82",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "星巴克国内施行消费入座",
+   "source": "贴吧热议",
+   "time": "2026-10-24T04:25:44+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367946&amp;topic_name=%E6%98%9F%E5%B7%B4%E5%85%8B%E5%9B%BD%E5%86%85%E6%96%BD%E8%A1%8C%E6%B6%88%E8%B4%B9%E5%85%A5%E5%BA%A7",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "大家买手机还是在官方店买吧，给大家看看教训，机御旗舰店！！！避雷吧，大家可以看看。给大家讲一下，我以37xx的价格在前几天拍了winrt2，结果商品到了以后，快递员激活不了，然后就是因为数字有缺失无法激活，于是，商家跟我说要我退货退款，重新拍，于是，我跟商家协商，能不能按照原有的价格重新买，我就换个货就行了，结果商家不同意，非要以现在所拍下的价格来确定。就是意思是商家自己的问题，导致多出来的价格需要消费者自己去承担，大家自己再看看。希望不要出现这种问题，烧心得很。 #荣耀WIN2# #荣耀# #红米k100#",
+   "source": "酷安话题",
+   "time": "2026-10-24T03:58:32+08:00",
+   "url": "https://www.coolapk.com/feed/74566316",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "周五（10月23日），美股行业ETF多数下跌，全球航空业ETF收跌2.5%，可选消费ETF、金融业ETF、工业指数ETF",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T04:18:01+08:00",
+   "url": "https://wallstreetcn.com/live/3185024",
+   "channel": "a-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "周五（10月23日），美股行业ETF多数下跌，全球航空业ETF收跌2.5%，可选消费ETF、金融业ETF、工业指数ETF",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T04:18:01+08:00",
+   "url": "https://wallstreetcn.com/live/3185024",
+   "channel": "us-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "周五（10月23日），美股行业ETF多数下跌，全球航空业ETF收跌2.5%，可选消费ETF、金融业ETF、工业指数ETF",
+   "source": "wallstreetcn",
+   "time": "2026-10-24T04:18:01+08:00",
+   "url": "https://wallstreetcn.com/live/3185024",
+   "channel": "hk-stock-channel",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:消费",
+   "n_stocks": 6,
+   "stocks": [
+    {
+     "code": "159928",
+     "name": "消费ETF汇添富"
+    },
+    {
+     "code": "159936",
+     "name": "可选消费ETF广发"
+    },
+    {
+     "code": "510630",
+     "name": "消费ETF华夏"
+    },
+    {
+     "code": "512600",
+     "name": "消费ETF嘉实"
+    },
+    {
+     "code": "515650",
+     "name": "消费50ETF富国"
+    },
+    {
+     "code": "603696",
+     "name": "安记食品"
+    }
+   ]
+  },
+  {
+   "title": "机器人概念领涨两市 VIP栏目策划专题解读",
+   "source": "财联社热门",
+   "time": "2026-10-24T04:25:38+08:00",
+   "url": "https://www.cls.cn/detail/2513677",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "国办印发《关于适应人工智能技术发展助力构建就业友好型发展方式的意见》 拓展新兴领域人工智能就业新空间",
+   "source": "财联社热门",
+   "time": "2026-10-24T04:25:38+08:00",
+   "url": "https://www.cls.cn/detail/2513630",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "OpenAI将在完全断网环境下训练前沿模型",
+   "source": "财联社电报",
+   "time": "2026-10-24T04:12:30+08:00",
+   "url": "https://www.cls.cn/detail/2514088",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "财联社10月24日电，美国得克萨斯州总检察长以“对消费者造成负面影响”为由起诉OpenAI。",
+   "source": "财联社电报",
+   "time": "2026-10-24T04:12:30+08:00",
+   "url": "https://www.cls.cn/detail/2514078",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "西部数据CFO驳斥AI需求放缓担忧",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185014",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "Anthropic推出Claude Duet智能体研究预览版。",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185007",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "OpenAI宣布最先进AI模型训练期间禁止直接访问互联网",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3184997",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "DeepSeek 拟新融资 1000 亿元，腾讯、宁德时代出资最多，这会不会改写国内大模型的竞争格局？",
+   "source": "知乎热榜",
+   "time": "2026-10-24T04:08:43+08:00",
+   "url": "https://www.zhihu.com/question/2096713518582179306",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "图灵奖得主希发基思：警惕AI“要挟式”示强，AI闯祸必须对开发者追责",
+   "source": "澎湃新闻",
+   "time": "2026-10-24T04:25:45+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34301129",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "AI算力市场需求持续旺盛：寒武纪三季度营收翻倍，净利14亿元增近1.5倍",
+   "source": "澎湃新闻",
+   "time": "2026-10-24T04:25:45+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34320341",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:人工智能",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "920096",
+     "name": "嘉晨智能"
+    },
+    {
+     "code": "002421",
+     "name": "达实智能"
+    },
+    {
+     "code": "603448",
+     "name": "天博智能"
+    },
+    {
+     "code": "301513",
+     "name": "尚水智能"
+    },
+    {
+     "code": "301083",
+     "name": "百胜智能"
+    }
+   ]
+  },
+  {
+   "title": "美国防部公布所谓科研安全审查结果，商务部回应",
+   "source": "凤凰网",
+   "time": "2026-10-24T04:12:06+08:00",
+   "url": "https://news.ifeng.com/c/8xSRFzZ7poU",
+   "channel": "",
+   "themes": [],
+   "direction": "neutral",
+   "confidence": 0.2,
+   "matched_by": "industry",
+   "match_detail": "industry:军工",
+   "n_stocks": 5,
+   "stocks": [
+    {
+     "code": "512810",
+     "name": "军工ETF华宝"
+    },
+    {
+     "code": "512680",
+     "name": "军工ETF广发"
+    },
+    {
+     "code": "512660",
+     "name": "军工ETF国泰"
+    },
+    {
+     "code": "512560",
+     "name": "军工ETF易方达"
+    },
+    {
+     "code": "512670",
+     "name": "国防ETF鹏华"
+    }
+   ]
+  },
+  {
    "title": "西部数据CFO驳斥AI需求放缓担忧",
    "source": "wallstreetcn",
    "time": "2026-10-24T03:51:52+08:00",
@@ -1263,16 +1335,8 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 7,
+   "n_stocks": 5,
    "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
     {
      "code": "920096",
      "name": "嘉晨智能"
@@ -1306,16 +1370,8 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 7,
+   "n_stocks": 5,
    "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
     {
      "code": "920096",
      "name": "嘉晨智能"
@@ -1349,16 +1405,8 @@
    "confidence": 0.2,
    "matched_by": "industry",
    "match_detail": "industry:人工智能",
-   "n_stocks": 7,
+   "n_stocks": 5,
    "stocks": [
-    {
-     "code": "160223",
-     "name": "GUOTAI ASSET MANAGEMENT CO"
-    },
-    {
-     "code": "501202",
-     "name": "HUATAI SECURITIES (SHANGHAI) AM HTZJ SCI-TECH INV 3Y CL MX-C"
-    },
     {
      "code": "920096",
      "name": "嘉晨智能"
@@ -1382,161 +1430,9 @@
    ]
   },
   {
-   "title": "UP主花1000万反对滥用食品添加剂",
-   "source": "B站热搜",
-   "time": "2026-10-24T03:50:12+08:00",
-   "url": "https://search.bilibili.com/all?keyword=UP%E4%B8%BB%E8%8A%B11000%E4%B8%87%E5%8F%8D%E5%AF%B9%E6%BB%A5%E7%94%A8%E9%A3%9F%E5%93%81%E6%B7%BB%E5%8A%A0%E5%89%82",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 6,
-   "stocks": [
-    {
-     "code": "603696",
-     "name": "安记食品"
-    },
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "星巴克国内施行消费入座",
-   "source": "贴吧热议",
-   "time": "2026-10-24T03:48:30+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367946&amp;topic_name=%E6%98%9F%E5%B7%B4%E5%85%8B%E5%9B%BD%E5%86%85%E6%96%BD%E8%A1%8C%E6%B6%88%E8%B4%B9%E5%85%A5%E5%BA%A7",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 6,
-   "stocks": [
-    {
-     "code": "603696",
-     "name": "安记食品"
-    },
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "大家买手机还是在官方店买吧，给大家看看教训，机御旗舰店！！！避雷吧，大家可以看看。给大家讲一下，我以37xx的价格在前几天拍了winrt2，结果商品到了以后，快递员激活不了，然后就是因为数字有缺失无法激活，于是，商家跟我说要我退货退款，重新拍，于是，我跟商家协商，能不能按照原有的价格重新买，我就换个货就行了，结果商家不同意，非要以现在所拍下的价格来确定。就是意思是商家自己的问题，导致多出来的价格需要消费者自己去承担，大家自己再看看。希望不要出现这种问题，烧心得很。 #荣耀WIN2# #荣耀# #红米k100#",
-   "source": "酷安话题",
-   "time": "2026-10-24T03:58:32+08:00",
-   "url": "https://www.coolapk.com/feed/74566316",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:消费",
-   "n_stocks": 6,
-   "stocks": [
-    {
-     "code": "603696",
-     "name": "安记食品"
-    },
-    {
-     "code": "159928",
-     "name": "消费ETF汇添富"
-    },
-    {
-     "code": "159936",
-     "name": "可选消费ETF广发"
-    },
-    {
-     "code": "510630",
-     "name": "消费ETF华夏"
-    },
-    {
-     "code": "512600",
-     "name": "消费ETF嘉实"
-    },
-    {
-     "code": "515650",
-     "name": "消费50ETF富国"
-    }
-   ]
-  },
-  {
-   "title": "美国防部公布所谓科研安全审查结果，商务部回应",
-   "source": "凤凰网",
-   "time": "2026-10-24T04:16:22+08:00",
-   "url": "https://news.ifeng.com/c/8xSRFzZ7poU",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:军工",
-   "n_stocks": 5,
-   "stocks": [
-    {
-     "code": "512810",
-     "name": "军工ETF华宝"
-    },
-    {
-     "code": "512680",
-     "name": "军工ETF广发"
-    },
-    {
-     "code": "512660",
-     "name": "军工ETF国泰"
-    },
-    {
-     "code": "512560",
-     "name": "军工ETF易方达"
-    },
-    {
-     "code": "512670",
-     "name": "国防ETF鹏华"
-    }
-   ]
-  },
-  {
    "title": "【每日收评】A股午后绝地反攻，创业板指放量涨超4%，全市场超4500股收红",
    "source": "财联社热门",
-   "time": "2026-10-24T03:48:08+08:00",
+   "time": "2026-10-24T04:25:38+08:00",
    "url": "https://www.cls.cn/detail/2513562",
    "channel": "",
    "themes": [],
@@ -1553,66 +1449,47 @@
    ]
   },
   {
-   "title": "财联社10月24日电，花旗表示，在能源市场和关税政策更加明朗之前，对铜维持中性立场，并将任何相关的避险行情视为良好的长期买入机会。",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514079",
+   "title": "周五（10月23日），美股行业ETF多数下跌，全球航空业ETF收跌2.5%，可选消费ETF、金融业ETF、工业指数ETF、医疗业ETF至多跌1.66%，科技行业ETF涨0.49%，半导体ETF涨0.74%，能源业ETF涨2.6%。\n\n2026年迄今，能源业ETF累涨58.14%，半导体ETF涨46.39%，全球科技股指数ETF涨30.60%，科技行业ETF、生物科技指数ETF至多涨27.73%，可选消费ETF则跌4.7%，航空业ETF跌7.02%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185024",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
+   "matched_by": "concept",
+   "match_detail": "概念「半导体」",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "512400",
-     "name": "有色金属ETF南方"
+     "code": "301660",
+     "name": "粤芯半导-U"
     }
    ]
   },
   {
-   "title": "财联社10月24日电，据国际铜研究组织（ICSG），2026年8月全球精炼铜市场供应过剩13.2万吨。",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514071",
+   "title": "本周，标普累跌约0.4%，道指涨超0.4%，纳指跌0.7%。费城半导体指数累跌3.3%，存储芯片指数跌3.4%，半导体设备指数跌2.1%，AI赢家指数跌3.2%、AI软件先驱指数涨4.7%。费城银行指数涨1.1%。科技股七巨头指数跌1.6%，超大市值科技股指数跌1.6%。\n\n周五当天，标普500指数初步收跌0.5%，日用消费品板块跌1.8%，电信、可选消费、金融、工业、保健板块跌超1%，能源板块涨2.5%。\n\n纳斯达克100指数初步大致收平，成分股中，T-Mobile初步收跌7.8%，罗斯百货跌3.1%，西部数据跌3%，CoreWeave跌2.4%，SpaceX涨1.8%，美光涨2.3%，Datadog涨4.7%，派拓网络PANW涨7.3%，CrowdStrike涨8.3%。",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T04:25:39+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185015",
    "channel": "",
    "themes": [],
    "direction": "neutral",
    "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
+   "matched_by": "concept",
+   "match_detail": "概念「半导体」",
    "n_stocks": 1,
    "stocks": [
     {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "LME金属普遍收涨",
-   "source": "财联社电报",
-   "time": "2026-10-24T04:16:15+08:00",
-   "url": "https://www.cls.cn/detail/2514069",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
+     "code": "301660",
+     "name": "粤芯半导-U"
     }
    ]
   },
   {
    "title": "GEN战胜IG数据雷达图",
    "source": "B站热搜",
-   "time": "2026-10-24T03:50:12+08:00",
+   "time": "2026-10-24T04:25:42+08:00",
    "url": "https://search.bilibili.com/all?keyword=GEN%E6%88%98%E8%83%9CIG%E6%95%B0%E6%8D%AE%E9%9B%B7%E8%BE%BE%E5%9B%BE",
    "channel": "",
    "themes": [],
@@ -1629,28 +1506,9 @@
    ]
   },
   {
-   "title": "国内黄金克价跌破860元",
-   "source": "抖音热点",
-   "time": "2026-10-24T04:16:19+08:00",
-   "url": "https://www.douyin.com/hot/2710444",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
    "title": "网友拍到绝美火箭云",
    "source": "抖音热点",
-   "time": "2026-10-24T04:16:19+08:00",
+   "time": "2026-10-24T04:13:02+08:00",
    "url": "https://www.douyin.com/hot/2710326",
    "channel": "",
    "themes": [],
@@ -1663,82 +1521,6 @@
     {
      "code": "603138",
      "name": "海量数据"
-    }
-   ]
-  },
-  {
-   "title": "美国稀土大项目，黄了",
-   "source": "凤凰网",
-   "time": "2026-10-24T04:16:22+08:00",
-   "url": "https://news.ifeng.com/c/8xSpuURnzK6",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "国际铜夜盘收涨1.34%，沪铜收涨0.99%，沪铝收涨1.62%，沪锌收涨1.34%，沪铅收涨0.09%，沪镍收跌0.5",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T01:00:51+08:00",
-   "url": "https://wallstreetcn.com/live/3184958",
-   "channel": "a-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "LME期铜收涨244美元，报14322美元/吨。\n\nLME期铝收涨34美元，报3044美元/吨。\n\nLME期锌收涨72美",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T00:53:14+08:00",
-   "url": "https://wallstreetcn.com/live/3184954",
-   "channel": "a-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
-   "title": "第一量子准备就最高53亿美元的铜矿项目申请阿根廷税收优惠",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T00:10:07+08:00",
-   "url": "https://wallstreetcn.com/live/3184944",
-   "channel": "a-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
     }
    ]
   },
@@ -1803,25 +1585,6 @@
    ]
   },
   {
-   "title": "花旗：在能源市场与关税形势进一步明朗之前，我们对铜维持中性立场，并将相关避险行情视为良好的长期买入机会。\n\n铝空头关注2",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T02:29:16+08:00",
-   "url": "https://wallstreetcn.com/live/3184986",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
-    }
-   ]
-  },
-  {
    "title": "本周，标普累跌约0.4%，道指涨超0.4%，纳指跌0.7%。费城半导体指数累跌3.3%，存储芯片指数跌3.4%，半导体设",
    "source": "wallstreetcn",
    "time": "2026-10-24T04:00:17+08:00",
@@ -1837,25 +1600,6 @@
     {
      "code": "301660",
      "name": "粤芯半导-U"
-    }
-   ]
-  },
-  {
-   "title": "LME期铜收涨244美元，报14322美元/吨。\n\nLME期铝收涨34美元，报3044美元/吨。\n\nLME期锌收涨72美",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T00:52:15+08:00",
-   "url": "https://wallstreetcn.com/live/3184953",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:有色",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "512400",
-     "name": "有色金属ETF南方"
     }
    ]
   }
