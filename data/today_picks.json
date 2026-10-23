@@ -1,5 +1,5 @@
 {
- "ts": "2026-10-23T20:01:40+08:00",
+ "ts": "2026-10-23T21:20:40+08:00",
  "date": "2026-10-23",
  "session": "盘后",
  "generated_by": "build_today_picks.py",
@@ -1212,9 +1212,9 @@
   ]
  },
  "entry_plans": {
-  "n_candidates": 52,
-  "n_tradable": 48,
-  "n_rejected": 4,
+  "n_candidates": 54,
+  "n_tradable": 46,
+  "n_rejected": 8,
   "method": "entry zone = min(prev_close, vwap) - 0.5*ATR .. max(prev_close, vwap) + 0.3*ATR; stop = entry - 1.2*ATR; target = entry + 2.4*ATR",
   "rejected": [
    {
@@ -1232,6 +1232,13 @@
     "chg_pct": 10.01
    },
    {
+    "code": "000156",
+    "name": "华数传媒",
+    "group": "signals",
+    "reason": "at limit-up",
+    "chg_pct": 9.99
+   },
+   {
     "code": "002535",
     "name": "林州重机",
     "group": "signals",
@@ -1239,11 +1246,26 @@
     "chg_pct": 10.18
    },
    {
-    "code": "000156",
-    "name": "华数传媒",
-    "group": "signals",
+    "code": "002343",
+    "name": "慈文传媒",
+    "group": "limit_up",
     "reason": "at limit-up",
-    "chg_pct": 9.99
+    "chg_pct": 10.0
+   },
+   {
+    "code": "001216",
+    "name": "华瓷股份",
+    "group": "limit_up",
+    "reason": "at limit-up",
+    "chg_pct": 10.02
+   },
+   {
+    "code": "920091",
+    "reason": "no quote"
+   },
+   {
+    "code": "920207",
+    "reason": "no quote"
    }
   ],
   "plans": [
@@ -2536,39 +2558,6 @@
    },
    {
     "entry_zone": [
-     9.4,
-     9.72
-    ],
-    "entry_ref": 9.56,
-    "stop_loss": 9.34,
-    "target": 10.0,
-    "risk_pct": 2.3,
-    "reward_pct": 4.6,
-    "rr_ratio": 2.0,
-    "atr": 0.182,
-    "atr_pct": 1.91,
-    "code": "000530",
-    "name": "冰山冷热",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 9.53,
-    "prev_close": 9.49,
-    "chg_pct": 0.42,
-    "turnover": 38.59,
-    "pe": 245.94,
-    "amplitude": 9.69,
-    "time": "20261023161451",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
-   },
-   {
-    "entry_zone": [
      9.36,
      10.04
     ],
@@ -2650,9 +2639,7 @@
     "name": "三峡新材",
     "group": "signals",
     "score": 63.7,
-    "also_in": [
-     "limit_up"
-    ],
+    "also_in": null,
     "price": 4.91,
     "prev_close": 5.23,
     "chg_pct": -6.12,
@@ -2799,47 +2786,14 @@
     "overseas_bias": null,
     "vetoes": [],
     "actionable": true
-   },
-   {
-    "entry_zone": [
-     5.24,
-     5.63
-    ],
-    "entry_ref": 5.44,
-    "stop_loss": 4.78,
-    "target": 6.76,
-    "risk_pct": 12.13,
-    "reward_pct": 24.26,
-    "rr_ratio": 2.0,
-    "atr": 0.55,
-    "atr_pct": 9.96,
-    "code": "600202",
-    "name": "哈空调",
-    "group": "limit_up",
-    "score": null,
-    "also_in": null,
-    "price": 5.52,
-    "prev_close": 6.13,
-    "chg_pct": -9.95,
-    "turnover": 9.31,
-    "pe": -56.3,
-    "amplitude": 8.97,
-    "time": "20261023161500",
-    "engine_v5_score": null,
-    "engine_v5_bull_bear": null,
-    "ban_pick_verdict": null,
-    "pos240_pct": null,
-    "overseas_bias": null,
-    "vetoes": [],
-    "actionable": true
    }
   ]
  },
  "engines": {
-  "engine_v5": "2026-10-23T19:35:13+08:00",
-  "ai_pick_v4": "2026-10-23T19:35:25+08:00",
-  "ban_pick": "2026-10-23T19:45:03+08:00",
-  "reflect_latest": "2026-10-23T19:46:15+08:00",
+  "engine_v5": "2026-10-23T20:51:55+08:00",
+  "ai_pick_v4": "2026-10-23T20:52:05+08:00",
+  "ban_pick": "2026-10-23T21:01:53+08:00",
+  "reflect_latest": "2026-10-23T21:02:52+08:00",
   "overseas_impact": "2026-10-16T18:23:35+08:00"
  },
  "disclaimer": "Rule engines on public data. Research reference only, not investment advice. Win rates are historical, not predictive."
