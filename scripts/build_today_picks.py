@@ -192,6 +192,35 @@ def main():
         else:
             signals.append(row)
 
+    # ── gold-cell scanner picks: positive_signal_scan (2026-10-25) ──
+    # G5_52w_lowvol 次日+2.93~3.17% (27个月次日全正), S1 52W突破次日+0.66%;
+    # 负警报 A1/A2 命中的票强制进 avoid
+    try:
+        sys.path.insert(0, "/home/agentuser/stockdb/t1/alphas")
+        from positive_signal_scan import scan_today
+        _scan = scan_today()
+        _in_sig = {r["code"] for r in signals}
+        for code in [c[2:] for c in _scan.get("G5_52w_lowvol", [])]:
+            if MAINBOARD(code) and code not in _in_sig:
+                signals.insert(0, {
+                    "code": code, "name": master.get(code) or "",
+                    "score": 0.95, "resonance": ["gold_cell_G5"],
+                    "engine": "gold_scan",
+                    "edge_pp": 2.9, "p_up": 93.0,
+                    "buyable": True, "buyability_reason": "gold cell G5: 52W breakout + low vol",
+                    "why": ["52W真突破+低波动 (G5金格子, 次日+2.93%/5日+7.43%, 27个月全正)"],
+                })
+                _in_sig.add(code)
+        _alert = set(c[2:] for c in _scan.get("A1_unlock", []) + _scan.get("A2_zt_big_red", []))
+        for r in list(signals):
+            if r["code"] in _alert and r.get("engine") != "gold_scan":
+                signals.remove(r)
+                r["bear_aligned"] = True
+                r["bear_weight"] = 1.0
+                avoid.append(r)
+    except Exception as _e:
+        print(f"  gold_scan skipped: {_e}", file=sys.stderr)
+
     # ── value picks: ai_pick_v4 with valuation + position filters ──
     values = []
     for x in (v4.get("picks") or [])[:20]:
