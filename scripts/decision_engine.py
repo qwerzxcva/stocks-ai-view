@@ -36,6 +36,13 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
+
+# 主板红线：推荐输出只留 600/601/603/605/000/001/002（排除 300/301/688/北交所）
+MAIN_BOARD_PREFIX = ("600", "601", "603", "605", "000", "001", "002")
+
+
+def _main_board(code) -> bool:
+    return str(code or "")[-6:][:3] in MAIN_BOARD_PREFIX
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
@@ -160,6 +167,7 @@ def main():
     n1 = (ov.get("1") or {}).get("n") or 0
 
     universe = (md or {}).get("table") or (md or {}).get("top") or []
+    universe = [r for r in universe if _main_board(r.get("code"))]
     cards, avoid = [], []
     for r in universe:
         action, conf, reasons, risk = decide_stock(r, regime, win1d)
