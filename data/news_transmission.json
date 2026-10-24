@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-24T13:37:46+08:00",
+ "ts": "2026-10-24T13:49:19+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 323,
- "n_transmissions": 4,
+ "n_input": 471,
+ "n_transmissions": 8,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,187 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "四价流感疫苗消失了？真相来了",
+   "source": "今日头条",
+   "time": "2026-10-24T13:35:21+08:00",
+   "url": "https://www.toutiao.com/trending/7700018293196963883/",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "301580"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002707"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688586"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "301073"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "吧友中病毒写检讨,吧主严肃批阅",
+   "source": "贴吧热议",
+   "time": "2026-10-24T13:35:21+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367997&amp;topic_name=%E5%90%A7%E5%8F%8B%E4%B8%AD%E7%97%85%E6%AF%92%E5%86%99%E6%A3%80%E8%AE%A8%2C%E5%90%A7%E4%B8%BB%E4%B8%A5%E8%82%83%E6%89%B9%E9%98%85",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "301580"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002707"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688586"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "301073"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "以总理称要在约旦河西岸开展“大规模军事行动”",
    "source": "财联社电报",
-   "time": "2026-10-24T13:37:11+08:00",
+   "time": "2026-10-24T13:49:07+08:00",
    "url": "https://www.cls.cn/detail/2514158",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -130,7 +308,7 @@
   {
    "title": "杜兰特福克斯爆发冲突",
    "source": "微博热搜",
-   "time": "2026-10-24T13:37:13+08:00",
+   "time": "2026-10-24T13:35:22+08:00",
    "url": "https://s.weibo.com/weibo?q=%23%E6%9D%9C%E5%85%B0%E7%89%B9%E7%A6%8F%E5%85%8B%E6%96%AF%E7%88%86%E5%8F%91%E5%86%B2%E7%AA%81%23&t=31&band_rank=9&Refer=top",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -179,7 +357,7 @@
   {
    "title": "勇士灰熊爆发冲突",
    "source": "微博热搜",
-   "time": "2026-10-24T13:37:13+08:00",
+   "time": "2026-10-24T13:35:22+08:00",
    "url": "https://s.weibo.com/weibo?q=%23%E5%8B%87%E5%A3%AB%E7%81%B0%E7%86%8A%E7%88%86%E5%8F%91%E5%86%B2%E7%AA%81%23&t=31&band_rank=30&Refer=top",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -224,6 +402,83 @@
     "event_date": "2026-10-24",
     "matched_codes": []
    }
+  },
+  {
+   "title": "泽连斯基含泪谈俄乌冲突：我夜不能寐",
+   "source": "今日头条",
+   "time": "2026-10-24T13:35:21+08:00",
+   "url": "https://www.toutiao.com/trending/7699472218053066815/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688011"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688586"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002707"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "武契奇选前承诺：不制裁俄罗斯，不承认科索沃",
+   "source": "凤凰网",
+   "time": "2026-10-24T13:30:31+08:00",
+   "url": "https://news.ifeng.com/c/8xSAftzwZlJ",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "301660"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
    "title": "以色列总理有关应对国际制裁言论引发国内担忧",
