@@ -42,19 +42,11 @@ jobs:
           STOCKS_KLINE_BULK: ${{ github.workspace }}/bulk
         run: |
           mkdir -p bulk
-          # t1 的部分分片是空占位(14B)，只保留真实有数据的分片并做体积校验；
-          # 00(深主板)+60(沪主板) 覆盖全部主板标的，题材挖掘只服务主板红线
-          for sh in 00 60 30 68; do
-            curl -sL -o bulk/day_qfq_${sh}.csv \
-              https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_${sh}.csv
-            sz=$(wc -c < bulk/day_qfq_${sh}.csv)
-            if [ "$sz" -lt 100000 ]; then
-              echo "drop empty shard ${sh} (${sz}B)"
-              rm -f bulk/day_qfq_${sh}.csv
-            else
-              echo "keep ${sh} (${sz}B)"
-            fi
-          done
+          curl -sL -o bulk/day_qfq_00.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_00.csv
+          curl -sL -o bulk/day_qfq_30.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_30.csv
+          curl -sL -o bulk/day_qfq_60.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_60.csv
+          curl -sL -o bulk/day_qfq_68.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_68.csv
+          curl -sL -o bulk/day_qfq_20.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_20.csv
           ls -la bulk/
 
       - uses: actions/setup-python@v5

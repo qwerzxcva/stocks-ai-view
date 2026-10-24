@@ -18,7 +18,6 @@
 CLI: --theme <板块名> | --auto（取 tier1 最热） | --all（全部 tier1 板块）
 """
 import argparse
-import base64
 import json
 import os
 import sys
@@ -40,35 +39,6 @@ def load(name, default=None):
         return json.load(open(p, encoding="utf-8"))
     except Exception:
         return default
-
-
-def holo_closes(code6: str, days: int = 65):
-    """stocks-holo per-stock kline.json：{symbol, bars, from, to, data:[...]}。
-    远端 t1 的 60/30/68 分片是 14B 占位（超 GitHub 100MB 限制推不上），故 K 线以 holo 为主源。"""
-    pref = "sh" if code6[0] in ("6", "5", "9") else "sz"
-    d = fetch_json(f"https://api.github.com/repos/jiegengxiangjianxue1/stocks-holo/"
-                   f"contents/{pref}{code6}/kline.json")
-    if not d or "content" not in d:
-        return []
-    try:
-        j = json.loads(base64.b64decode(d["content"]).decode("utf-8", "replace"))
-    except Exception:
-        return []
-    rows = j.get("data") or []
-    out = []
-    for r in rows:
-        if isinstance(r, dict):
-            dt, cl = r.get("date") or r.get("d"), r.get("close") or r.get("c")
-        elif isinstance(r, (list, tuple)) and len(r) >= 2:
-            dt, cl = r[0], r[1]
-        else:
-            continue
-        try:
-            out.append((str(dt), float(cl)))
-        except (TypeError, ValueError):
-            continue
-    out.sort()
-    return [c for _, c in out[-days:]]
 
 
 def bulk_closes(code6: str, shard: str, days: int = 65):
@@ -100,11 +70,6 @@ def bulk_closes(code6: str, shard: str, days: int = 65):
 def shard_of(code6: str) -> str:
     p = code6[:2]
     return p if p in ("00", "30", "60", "68", "20") else "00"
-
-
-def closes_of(code6: str, days: int = 65):
-    """K 线收盘序列：holo 主源（远端可用、个股级），bulk 兜底（本地全）"""
-    return holo_closes(code6, days) or bulk_closes(code6, shard_of(code6), days)
 
 
 def pct(a, b):
@@ -194,7 +159,7 @@ def mine_theme(theme: str, pool: dict, la: dict, imap: dict, heat: dict, days: i
     for it in zt:
         code = str(it.get("code") or "")
         c6 = code[-6:] if len(code) >= 6 else code
-        closes = closes_of(c6)
+        closes = bulk_closes(c6, shard_of(c6))
         last = closes[-1] if closes else it.get("price")
         chg20 = pct(last, closes[-21]) if len(closes) > 21 else None
         lo, hi = (min(closes), max(closes)) if closes else (None, None)
@@ -230,7 +195,7 @@ def mine_theme(theme: str, pool: dict, la: dict, imap: dict, heat: dict, days: i
             continue
         if c6[:3] not in MAIN:   # 主板红线：补涨候选同样过滤
             continue
-        closes = closes_of(c6)
+        closes = bulk_closes(c6, shard_of(c6))
         if len(closes) < 21:
             continue
         last = closes[-1]
