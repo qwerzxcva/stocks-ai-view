@@ -49,7 +49,7 @@ def curl_json(url: str) -> dict:
             return json.loads(r.stdout.decode("utf-8", "replace"))
         except Exception as e:
             last = e
-            time.sleep(2 + attempt * 2)
+            time.sleep(8 + attempt * 8)  # 东财限流是短窗型，长退避同轮内多能恢复
     raise last
 
 
