@@ -1,0 +1,84 @@
+# theme-mining — 题材深度挖掘报告（炒作路径/分支拆解/正宗度/补涨候选）
+#
+# 方法来源：公众号概念挖掘方法论（用户指定借鉴 2026-10-24）：
+#   题材拆分支（不是标签）+ 在炒/补涨分层 + 补涨星级 + 炒作路径时间线
+# 数据源：sector_pool（tier分层+龙头）/ limitup_attribution（连板梯队）
+#         db-market 板块成分股 / bulk 日K（20日涨幅与位置）
+# 产出 data/theme_report.json（软件端读同一文件）
+name: theme-mining
+on:
+  schedule:
+    # CST 17:00 工作日（收盘后，涨停梯队与板块数据已定）
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'auto=最热题材 / all=全部 tier1'
+        default: 'auto'
+        type: choice
+        options: [auto, all]
+permissions:
+  contents: write
+
+jobs:
+  mine:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Sync remote main
+        run: |
+          git fetch origin main
+          git merge --ff-only origin/main || echo "already up to date"
+
+      - name: Setup bulk data
+        env:
+          STOCKS_KLINE_BULK: ${{ github.workspace }}/bulk
+        run: |
+          mkdir -p bulk
+          curl -sL -o bulk/day_qfq_00.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_00.csv
+          curl -sL -o bulk/day_qfq_30.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_30.csv
+          curl -sL -o bulk/day_qfq_60.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_60.csv
+          curl -sL -o bulk/day_qfq_68.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_68.csv
+          curl -sL -o bulk/day_qfq_20.csv https://raw.githubusercontent.com/qwerzxcva/t1/main/data/bulk/day_qfq_20.csv
+          ls -la bulk/
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Mine themes
+        run: |
+          if [ "${{ github.event.inputs.scope }}" = "all" ]; then
+            python3 scripts/theme_mining.py --all
+          else
+            python3 scripts/theme_mining.py --auto
+          fi
+
+      - name: Commit & push
+        run: |
+          git config user.name "theme-mining-bot"
+          git config user.email "741059079@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add data/theme_report.json
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+            git commit -m "data: theme mining $ts"
+            git -c http.version=HTTP/1.1 push origin main || {
+              echo "push raced, retrying"
+              git fetch origin main
+              git reset --soft origin/main
+              git add data/theme_report.json
+              git commit -m "data: theme mining $ts" 2>/dev/null || true
+              git push origin main
+            }
+          fi
