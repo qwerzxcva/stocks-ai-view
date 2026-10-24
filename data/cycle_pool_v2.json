@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-10-22T09:28:53+08:00",
+    "ts": "2026-10-24T09:32:27+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8574,
+    "n_days": 8575,
     "span": [
       "1990-12-19",
-      "2026-10-22"
+      "2026-10-23"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-10-22T09:28:53+08:00"
+    "rebuilt_at": "2026-10-24T09:32:27+08:00"
   },
   "status": {
-    "date": "2026-10-22",
-    "close": 3714.48,
-    "ma5": 3722.02,
-    "ma20": 3815.96,
-    "ma60": 3875.61,
+    "date": "2026-10-23",
+    "close": 3690.48,
+    "ma5": 3705.57,
+    "ma20": 3803.88,
+    "ma60": 3871.57,
     "ma_bull": false,
-    "macd_hist": -18.68,
+    "macd_hist": -21.98,
     "macd_bull": false,
-    "rsi": 19.0,
-    "momentum_20d_pct": -4.16,
+    "rsi": 28.0,
+    "momentum_20d_pct": -5.66,
     "phase": "downtrend",
-    "volume_ratio": 0.01
+    "volume_ratio": 1.26
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 192,
+      "n_days": 193,
       "open": 3986.97,
-      "close": 3714.48,
+      "close": 3690.48,
       "high": 4258.86,
-      "low": 3674.82,
-      "chg_pct": -6.41,
-      "amplitude_pct": 15.89,
-      "turnover_yi": 1165.9,
+      "low": 3574.27,
+      "chg_pct": -7.01,
+      "amplitude_pct": 19.15,
+      "turnover_yi": 1175.7,
       "candles": {
-        "yang": 110,
-        "yin": 81,
-        "cross": 1
+        "yang": 111,
+        "yin": 82,
+        "cross": 0
       },
-      "max_drawdown_pct": -13.71,
+      "max_drawdown_pct": -16.07,
       "first_date": "2026-01-05",
-      "last_date": "2026-10-22"
+      "last_date": "2026-10-23"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -3.32
+        "Q4": -3.95
       },
       "months_covered": 9
     }
@@ -1344,11 +1344,11 @@
         "1991",
         "2023",
         "1998",
-        "2026",
         "2013",
+        "2026",
         "2005"
       ],
-      "avg_chg": -0.52,
+      "avg_chg": -0.58,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 15.0,
+      "chg_pct": 14.17,
       "position": "库存周期中性",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1446,10 +1446,339 @@
     },
     "sample_span_years": 36
   },
-  "demand_shift": {},
-  "stocks": [],
+  "demand_shift": {
+    "industry_top": [
+      {
+        "name": "其他数字媒体",
+        "chg_pct": 15.02,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 2.06
+      },
+      {
+        "name": "机器人",
+        "chg_pct": 7.98,
+        "up_n": 22,
+        "down_n": 0,
+        "leader": "派斯林",
+        "main_net_inflow_yi": 10.88
+      },
+      {
+        "name": "视频媒体",
+        "chg_pct": 6.56,
+        "up_n": 1,
+        "down_n": 0,
+        "leader": "芒果超媒",
+        "main_net_inflow_yi": -0.43
+      },
+      {
+        "name": "横向通用软件",
+        "chg_pct": 5.72,
+        "up_n": 32,
+        "down_n": 2,
+        "leader": "绿盟科技",
+        "main_net_inflow_yi": 6.92
+      },
+      {
+        "name": "医美服务",
+        "chg_pct": 5.49,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "朗姿股份",
+        "main_net_inflow_yi": 0.27
+      },
+      {
+        "name": "品牌消费电子",
+        "chg_pct": 5.39,
+        "up_n": 11,
+        "down_n": 0,
+        "leader": "安克创新",
+        "main_net_inflow_yi": -1.06
+      },
+      {
+        "name": "数字芯片设计",
+        "chg_pct": 5.27,
+        "up_n": 56,
+        "down_n": 0,
+        "leader": "峰岹科技",
+        "main_net_inflow_yi": 62.46
+      },
+      {
+        "name": "锂电专用设备",
+        "chg_pct": 5.25,
+        "up_n": 19,
+        "down_n": 0,
+        "leader": "利元亨",
+        "main_net_inflow_yi": 1.06
+      },
+      {
+        "name": "电机Ⅲ",
+        "chg_pct": 5.18,
+        "up_n": 27,
+        "down_n": 0,
+        "leader": "华阳智能",
+        "main_net_inflow_yi": 2.17
+      },
+      {
+        "name": "电机Ⅱ",
+        "chg_pct": 5.18,
+        "up_n": 27,
+        "down_n": 0,
+        "leader": "华阳智能",
+        "main_net_inflow_yi": 2.17
+      },
+      {
+        "name": "集成电路制造",
+        "chg_pct": 5.15,
+        "up_n": 8,
+        "down_n": 0,
+        "leader": "粤芯半导-U",
+        "main_net_inflow_yi": 13.87
+      },
+      {
+        "name": "软件开发",
+        "chg_pct": 5.02,
+        "up_n": 123,
+        "down_n": 10,
+        "leader": "理工能科",
+        "main_net_inflow_yi": 22.64
+      },
+      {
+        "name": "模拟芯片设计",
+        "chg_pct": 5.01,
+        "up_n": 34,
+        "down_n": 2,
+        "leader": "汇顶科技",
+        "main_net_inflow_yi": 4.83
+      },
+      {
+        "name": "其他黑色家电",
+        "chg_pct": 4.99,
+        "up_n": 5,
+        "down_n": 0,
+        "leader": "创维数字",
+        "main_net_inflow_yi": 1.43
+      },
+      {
+        "name": "自动化设备",
+        "chg_pct": 4.97,
+        "up_n": 89,
+        "down_n": 6,
+        "leader": "派斯林",
+        "main_net_inflow_yi": 6.12
+      },
+      {
+        "name": "垂直应用软件",
+        "chg_pct": 4.78,
+        "up_n": 91,
+        "down_n": 8,
+        "leader": "理工能科",
+        "main_net_inflow_yi": 15.72
+      },
+      {
+        "name": "工控设备",
+        "chg_pct": 4.76,
+        "up_n": 30,
+        "down_n": 2,
+        "leader": "伟创电气",
+        "main_net_inflow_yi": 0.19
+      },
+      {
+        "name": "影视动漫制作",
+        "chg_pct": 4.61,
+        "up_n": 13,
+        "down_n": 1,
+        "leader": "中广天择",
+        "main_net_inflow_yi": 2.84
+      },
+      {
+        "name": "文字媒体",
+        "chg_pct": 4.58,
+        "up_n": 2,
+        "down_n": 0,
+        "leader": "中文在线",
+        "main_net_inflow_yi": 0.26
+      },
+      {
+        "name": "影视院线",
+        "chg_pct": 4.4,
+        "up_n": 17,
+        "down_n": 1,
+        "leader": "中广天择",
+        "main_net_inflow_yi": 2.86
+      }
+    ],
+    "industry_n": 20,
+    "concept_top": [
+      {
+        "name": "反转股",
+        "chg_pct": 8.1,
+        "up_n": 7,
+        "down_n": 2,
+        "leader": "兆威机电"
+      },
+      {
+        "name": "2026三季报首亏",
+        "chg_pct": 6.58,
+        "up_n": 7,
+        "down_n": 0,
+        "leader": "大鹏工业"
+      },
+      {
+        "name": "PLC概念",
+        "chg_pct": 6.14,
+        "up_n": 10,
+        "down_n": 1,
+        "leader": "睿能科技"
+      },
+      {
+        "name": "机器人执行器",
+        "chg_pct": 5.92,
+        "up_n": 35,
+        "down_n": 1,
+        "leader": "洛轴股份"
+      },
+      {
+        "name": "3D摄像头",
+        "chg_pct": 5.85,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "奥比中光-W"
+      },
+      {
+        "name": "MLOps概念",
+        "chg_pct": 5.45,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "绿盟科技"
+      },
+      {
+        "name": "虚拟机器人",
+        "chg_pct": 5.34,
+        "up_n": 15,
+        "down_n": 1,
+        "leader": "多伦科技"
+      },
+      {
+        "name": "昨日首板",
+        "chg_pct": 5.34,
+        "up_n": 17,
+        "down_n": 5,
+        "leader": "睿能科技"
+      },
+      {
+        "name": "混合现实",
+        "chg_pct": 5.33,
+        "up_n": 32,
+        "down_n": 2,
+        "leader": "天娱数科"
+      },
+      {
+        "name": "ChatGPT概念",
+        "chg_pct": 5.2,
+        "up_n": 59,
+        "down_n": 3,
+        "leader": "天娱数科"
+      },
+      {
+        "name": "减速器",
+        "chg_pct": 5.13,
+        "up_n": 86,
+        "down_n": 4,
+        "leader": "襄阳轴承"
+      },
+      {
+        "name": "人形机器人",
+        "chg_pct": 4.92,
+        "up_n": 291,
+        "down_n": 20,
+        "leader": "睿能科技"
+      },
+      {
+        "name": "机器视觉",
+        "chg_pct": 4.89,
+        "up_n": 98,
+        "down_n": 2,
+        "leader": "大鹏工业"
+      },
+      {
+        "name": "Web3.0",
+        "chg_pct": 4.86,
+        "up_n": 47,
+        "down_n": 1,
+        "leader": "天娱数科"
+      },
+      {
+        "name": "Kimi概念",
+        "chg_pct": 4.85,
+        "up_n": 17,
+        "down_n": 0,
+        "leader": "亚信安全"
+      },
+      {
+        "name": "AI芯片",
+        "chg_pct": 4.81,
+        "up_n": 36,
+        "down_n": 3,
+        "leader": "沐曦股份-U"
+      },
+      {
+        "name": "同步磁阻电机",
+        "chg_pct": 4.79,
+        "up_n": 7,
+        "down_n": 0,
+        "leader": "伟创电气"
+      },
+      {
+        "name": "数字水印",
+        "chg_pct": 4.77,
+        "up_n": 28,
+        "down_n": 4,
+        "leader": "海天瑞声"
+      },
+      {
+        "name": "华为欧拉",
+        "chg_pct": 4.7,
+        "up_n": 20,
+        "down_n": 0,
+        "leader": "赛意信息"
+      },
+      {
+        "name": "虚拟数字人",
+        "chg_pct": 4.69,
+        "up_n": 82,
+        "down_n": 4,
+        "leader": "天娱数科"
+      }
+    ],
+    "concept_n": 20,
+    "concentration": {
+      "top5_avg_chg": 8.15,
+      "sample_avg_chg": 5.77,
+      "spread": 2.39,
+      "interpretation": "主题集中行情 (头部板块显著强于平均)"
+    }
+  },
+  "stocks": [
+    {
+      "code": "300413",
+      "name": "芒果超媒",
+      "industry": "视频媒体",
+      "chg_pct": 6.56,
+      "leader": "芒果超媒",
+      "main_net_inflow_yi": -0.43,
+      "reason": "当前周期需求迁移行业成分股",
+      "price": 23.23,
+      "turnover": 8.81,
+      "pe": 65.31,
+      "mktcap_yi": 237.34,
+      "pb": 1.88,
+      "quote_time": "20261023161442"
+    }
+  ],
   "stocks_meta": {
-    "n": 0,
-    "enriched": 0
+    "n": 1,
+    "enriched": 1
   }
 }

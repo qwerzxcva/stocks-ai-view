@@ -1,9 +1,9 @@
 {
- "ts": "2026-10-22T04:47:23+08:00",
+ "ts": "2026-10-24T09:47:15+08:00",
  "engine": "overseas_linkage v1 (相关/贝塔/滞后/隔夜)",
  "n_targets": 5,
- "n_drivers": 10,
- "n_pairs": 50,
+ "n_drivers": 9,
+ "n_pairs": 45,
  "window": "共同交易日对齐; 最少 20 个样本",
  "method": {
   "corr": "皮尔逊相关系数 (日收益)",
@@ -22,19 +22,19 @@
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
    "n": 485,
-   "corr": 0.55,
-   "beta": 0.28,
-   "r2": 0.303,
+   "corr": 0.543,
+   "beta": 0.276,
+   "r2": 0.295,
    "best_lag": 0,
-   "lag_corr": 0.55,
+   "lag_corr": 0.543,
    "lag_rows": {
-    "lag-2": -0.032,
-    "lag-1": -0.147,
-    "lag1": 0.159,
-    "lag2": -0.001
+    "lag-2": -0.064,
+    "lag-1": -0.177,
+    "lag1": 0.152,
+    "lag2": -0.02
    },
-   "overnight_corr": 0.159,
-   "overnight_beta": 0.08
+   "overnight_corr": 0.152,
+   "overnight_beta": 0.076
   },
   {
    "target": "sh000300",
@@ -44,19 +44,19 @@
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
    "n": 485,
-   "corr": 0.548,
-   "beta": 0.322,
-   "r2": 0.3,
+   "corr": 0.542,
+   "beta": 0.318,
+   "r2": 0.293,
    "best_lag": 0,
-   "lag_corr": 0.548,
+   "lag_corr": 0.542,
    "lag_rows": {
-    "lag-2": -0.031,
-    "lag-1": -0.151,
-    "lag1": 0.159,
-    "lag2": 0.011
+    "lag-2": -0.061,
+    "lag-1": -0.181,
+    "lag1": 0.149,
+    "lag2": -0.008
    },
-   "overnight_corr": 0.159,
-   "overnight_beta": 0.092
+   "overnight_corr": 0.149,
+   "overnight_beta": 0.085
   },
   {
    "target": "sh000001",
@@ -66,19 +66,19 @@
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
    "n": 485,
-   "corr": 0.525,
-   "beta": 0.39,
-   "r2": 0.275,
+   "corr": 0.518,
+   "beta": 0.383,
+   "r2": 0.268,
    "best_lag": 0,
-   "lag_corr": 0.525,
+   "lag_corr": 0.518,
    "lag_rows": {
-    "lag-2": -0.027,
-    "lag-1": -0.168,
-    "lag1": 0.13,
-    "lag2": 0.004
+    "lag-2": -0.046,
+    "lag-1": -0.193,
+    "lag1": 0.121,
+    "lag2": -0.016
    },
-   "overnight_corr": 0.13,
-   "overnight_beta": 0.095
+   "overnight_corr": 0.121,
+   "overnight_beta": 0.088
   },
   {
    "target": "sz399001",
@@ -88,19 +88,19 @@
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
    "n": 485,
-   "corr": 0.515,
+   "corr": 0.512,
    "beta": 0.416,
-   "r2": 0.265,
+   "r2": 0.262,
    "best_lag": 0,
-   "lag_corr": 0.515,
+   "lag_corr": 0.512,
    "lag_rows": {
-    "lag-2": -0.039,
-    "lag-1": -0.154,
-    "lag1": 0.167,
-    "lag2": 0.061
+    "lag-2": -0.061,
+    "lag-1": -0.177,
+    "lag1": 0.157,
+    "lag2": 0.048
    },
-   "overnight_corr": 0.167,
-   "overnight_beta": 0.133
+   "overnight_corr": 0.157,
+   "overnight_beta": 0.125
   },
   {
    "target": "sh000001",
@@ -110,41 +110,41 @@
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
    "n": 485,
-   "corr": 0.512,
-   "beta": 0.356,
-   "r2": 0.262,
+   "corr": 0.505,
+   "beta": 0.35,
+   "r2": 0.255,
    "best_lag": 0,
-   "lag_corr": 0.512,
+   "lag_corr": 0.505,
    "lag_rows": {
-    "lag-2": -0.033,
-    "lag-1": -0.181,
-    "lag1": 0.124,
-    "lag2": 0.009
+    "lag-2": -0.052,
+    "lag-1": -0.204,
+    "lag1": 0.115,
+    "lag2": -0.014
    },
-   "overnight_corr": 0.124,
-   "overnight_beta": 0.085
+   "overnight_corr": 0.115,
+   "overnight_beta": 0.078
   },
   {
    "target": "sh000300",
    "target_name": "沪深300",
    "driver": "hkHSI",
    "driver_name": "恒生指数",
-   "level": "强",
-   "note": "明显联动: 用对方做择时信号有效",
+   "level": "中",
+   "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.505,
-   "beta": 0.434,
-   "r2": 0.255,
+   "corr": 0.498,
+   "beta": 0.426,
+   "r2": 0.248,
    "best_lag": 0,
-   "lag_corr": 0.505,
+   "lag_corr": 0.498,
    "lag_rows": {
-    "lag-2": -0.034,
-    "lag-1": -0.183,
-    "lag1": 0.131,
-    "lag2": 0.022
+    "lag-2": -0.051,
+    "lag-1": -0.208,
+    "lag1": 0.119,
+    "lag2": 0.0
    },
-   "overnight_corr": 0.131,
-   "overnight_beta": 0.111
+   "overnight_corr": 0.119,
+   "overnight_beta": 0.1
   },
   {
    "target": "sh000300",
@@ -154,19 +154,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.486,
-   "beta": 0.391,
-   "r2": 0.236,
+   "corr": 0.479,
+   "beta": 0.384,
+   "r2": 0.229,
    "best_lag": 0,
-   "lag_corr": 0.486,
+   "lag_corr": 0.479,
    "lag_rows": {
-    "lag-2": -0.038,
-    "lag-1": -0.193,
-    "lag1": 0.128,
-    "lag2": 0.023
+    "lag-2": -0.056,
+    "lag-1": -0.216,
+    "lag1": 0.116,
+    "lag2": -0.003
    },
-   "overnight_corr": 0.128,
-   "overnight_beta": 0.101
+   "overnight_corr": 0.116,
+   "overnight_beta": 0.091
   },
   {
    "target": "sz399006",
@@ -176,19 +176,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.453,
-   "beta": 0.512,
-   "r2": 0.205,
+   "corr": 0.454,
+   "beta": 0.518,
+   "r2": 0.206,
    "best_lag": 0,
-   "lag_corr": 0.453,
+   "lag_corr": 0.454,
    "lag_rows": {
-    "lag-2": -0.035,
-    "lag-1": -0.157,
-    "lag1": 0.151,
-    "lag2": 0.091
+    "lag-2": -0.052,
+    "lag-1": -0.173,
+    "lag1": 0.141,
+    "lag2": 0.083
    },
-   "overnight_corr": 0.151,
-   "overnight_beta": 0.169
+   "overnight_corr": 0.141,
+   "overnight_beta": 0.158
   },
   {
    "target": "sz399001",
@@ -198,19 +198,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.431,
-   "beta": 0.509,
-   "r2": 0.186,
+   "corr": 0.427,
+   "beta": 0.505,
+   "r2": 0.182,
    "best_lag": 0,
-   "lag_corr": 0.431,
+   "lag_corr": 0.427,
    "lag_rows": {
-    "lag-2": -0.03,
-    "lag-1": -0.173,
-    "lag1": 0.134,
-    "lag2": 0.062
+    "lag-2": -0.043,
+    "lag-1": -0.192,
+    "lag1": 0.124,
+    "lag2": 0.046
    },
-   "overnight_corr": 0.134,
-   "overnight_beta": 0.156
+   "overnight_corr": 0.124,
+   "overnight_beta": 0.144
   },
   {
    "target": "sh000001",
@@ -220,19 +220,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.424,
-   "beta": 0.151,
-   "r2": 0.18,
+   "corr": 0.419,
+   "beta": 0.148,
+   "r2": 0.176,
    "best_lag": 0,
-   "lag_corr": 0.424,
+   "lag_corr": 0.419,
    "lag_rows": {
-    "lag-2": -0.0,
-    "lag-1": -0.07,
-    "lag1": 0.074,
-    "lag2": -0.048
+    "lag-2": -0.022,
+    "lag-1": -0.084,
+    "lag1": 0.07,
+    "lag2": -0.058
    },
-   "overnight_corr": 0.074,
-   "overnight_beta": 0.026
+   "overnight_corr": 0.07,
+   "overnight_beta": 0.025
   },
   {
    "target": "sh000300",
@@ -242,19 +242,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.422,
-   "beta": 0.174,
-   "r2": 0.178,
+   "corr": 0.418,
+   "beta": 0.171,
+   "r2": 0.175,
    "best_lag": 0,
-   "lag_corr": 0.422,
+   "lag_corr": 0.418,
    "lag_rows": {
-    "lag-2": 0.014,
-    "lag-1": -0.086,
-    "lag1": 0.088,
-    "lag2": -0.027
+    "lag-2": -0.006,
+    "lag-1": -0.101,
+    "lag1": 0.082,
+    "lag2": -0.037
    },
-   "overnight_corr": 0.088,
-   "overnight_beta": 0.036
+   "overnight_corr": 0.082,
+   "overnight_beta": 0.033
   },
   {
    "target": "sz399001",
@@ -264,19 +264,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.401,
-   "beta": 0.443,
-   "r2": 0.161,
+   "corr": 0.396,
+   "beta": 0.439,
+   "r2": 0.157,
    "best_lag": 0,
-   "lag_corr": 0.401,
+   "lag_corr": 0.396,
    "lag_rows": {
-    "lag-2": -0.037,
-    "lag-1": -0.182,
-    "lag1": 0.132,
-    "lag2": 0.06
+    "lag-2": -0.05,
+    "lag-1": -0.199,
+    "lag1": 0.122,
+    "lag2": 0.041
    },
-   "overnight_corr": 0.132,
-   "overnight_beta": 0.143
+   "overnight_corr": 0.122,
+   "overnight_beta": 0.133
   },
   {
    "target": "sz399001",
@@ -286,19 +286,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.399,
-   "beta": 0.226,
-   "r2": 0.159,
+   "corr": 0.396,
+   "beta": 0.224,
+   "r2": 0.157,
    "best_lag": 0,
-   "lag_corr": 0.399,
+   "lag_corr": 0.396,
    "lag_rows": {
-    "lag-2": 0.018,
-    "lag-1": -0.083,
-    "lag1": 0.093,
-    "lag2": 0.011
+    "lag-2": 0.003,
+    "lag-1": -0.094,
+    "lag1": 0.086,
+    "lag2": 0.006
    },
-   "overnight_corr": 0.093,
-   "overnight_beta": 0.052
+   "overnight_corr": 0.086,
+   "overnight_beta": 0.048
   },
   {
    "target": "sh000688",
@@ -308,19 +308,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.387,
-   "beta": 0.478,
+   "corr": 0.386,
+   "beta": 0.48,
    "r2": 0.149,
    "best_lag": 0,
-   "lag_corr": 0.387,
+   "lag_corr": 0.386,
    "lag_rows": {
-    "lag-2": 0.002,
-    "lag-1": -0.147,
-    "lag1": 0.12,
-    "lag2": 0.052
+    "lag-2": -0.009,
+    "lag-1": -0.159,
+    "lag1": 0.116,
+    "lag2": 0.044
    },
-   "overnight_corr": 0.12,
-   "overnight_beta": 0.146
+   "overnight_corr": 0.116,
+   "overnight_beta": 0.142
   },
   {
    "target": "sh000300",
@@ -330,41 +330,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.377,
-   "beta": 0.224,
-   "r2": 0.142,
+   "corr": 0.367,
+   "beta": 0.218,
+   "r2": 0.135,
    "best_lag": 0,
-   "lag_corr": 0.377,
+   "lag_corr": 0.367,
    "lag_rows": {
-    "lag-2": -0.023,
-    "lag-1": -0.149,
-    "lag1": 0.084,
-    "lag2": 0.009
+    "lag-2": -0.03,
+    "lag-1": -0.163,
+    "lag1": 0.08,
+    "lag2": -0.009
    },
-   "overnight_corr": 0.084,
-   "overnight_beta": 0.05
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "hk00700",
-   "driver_name": "腾讯",
-   "level": "中",
-   "note": "有联动但自有逻辑更强",
-   "n": 485,
-   "corr": 0.366,
-   "beta": 0.188,
-   "r2": 0.134,
-   "best_lag": 0,
-   "lag_corr": 0.366,
-   "lag_rows": {
-    "lag-2": -0.015,
-    "lag-1": -0.119,
-    "lag1": 0.077,
-    "lag2": 0.014
-   },
-   "overnight_corr": 0.077,
-   "overnight_beta": 0.039
+   "overnight_corr": 0.08,
+   "overnight_beta": 0.047
   },
   {
    "target": "sz399006",
@@ -380,13 +358,35 @@
    "best_lag": 0,
    "lag_corr": 0.359,
    "lag_rows": {
-    "lag-2": 0.03,
-    "lag-1": -0.085,
-    "lag1": 0.09,
-    "lag2": 0.045
+    "lag-2": 0.019,
+    "lag-1": -0.092,
+    "lag1": 0.082,
+    "lag2": 0.044
    },
-   "overnight_corr": 0.09,
-   "overnight_beta": 0.07
+   "overnight_corr": 0.082,
+   "overnight_beta": 0.065
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "hk00700",
+   "driver_name": "腾讯",
+   "level": "中",
+   "note": "有联动但自有逻辑更强",
+   "n": 485,
+   "corr": 0.356,
+   "beta": 0.183,
+   "r2": 0.127,
+   "best_lag": 0,
+   "lag_corr": 0.356,
+   "lag_rows": {
+    "lag-2": -0.023,
+    "lag-1": -0.133,
+    "lag1": 0.074,
+    "lag2": -0.001
+   },
+   "overnight_corr": 0.074,
+   "overnight_beta": 0.038
   },
   {
    "target": "sz399006",
@@ -396,19 +396,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.357,
-   "beta": 0.59,
-   "r2": 0.128,
+   "corr": 0.356,
+   "beta": 0.592,
+   "r2": 0.127,
    "best_lag": 0,
-   "lag_corr": 0.357,
+   "lag_corr": 0.356,
    "lag_rows": {
-    "lag-2": -0.021,
-    "lag-1": -0.186,
-    "lag1": 0.12,
-    "lag2": 0.095
+    "lag-2": -0.031,
+    "lag-1": -0.199,
+    "lag1": 0.11,
+    "lag2": 0.084
    },
-   "overnight_corr": 0.12,
-   "overnight_beta": 0.195
+   "overnight_corr": 0.11,
+   "overnight_beta": 0.18
   },
   {
    "target": "sz399006",
@@ -418,19 +418,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.329,
-   "beta": 0.508,
-   "r2": 0.108,
+   "corr": 0.328,
+   "beta": 0.51,
+   "r2": 0.107,
    "best_lag": 0,
-   "lag_corr": 0.329,
+   "lag_corr": 0.328,
    "lag_rows": {
-    "lag-2": -0.031,
-    "lag-1": -0.193,
-    "lag1": 0.12,
-    "lag2": 0.088
+    "lag-2": -0.04,
+    "lag-1": -0.205,
+    "lag1": 0.11,
+    "lag2": 0.075
    },
-   "overnight_corr": 0.12,
-   "overnight_beta": 0.182
+   "overnight_corr": 0.11,
+   "overnight_beta": 0.169
   },
   {
    "target": "sz399001",
@@ -440,19 +440,19 @@
    "level": "中",
    "note": "有联动但自有逻辑更强",
    "n": 485,
-   "corr": 0.327,
-   "beta": 0.266,
-   "r2": 0.107,
+   "corr": 0.32,
+   "beta": 0.262,
+   "r2": 0.102,
    "best_lag": 0,
-   "lag_corr": 0.327,
+   "lag_corr": 0.32,
    "lag_rows": {
-    "lag-2": -0.011,
-    "lag-1": -0.157,
-    "lag1": 0.09,
-    "lag2": 0.033
+    "lag-2": -0.017,
+    "lag-1": -0.167,
+    "lag1": 0.088,
+    "lag2": 0.018
    },
-   "overnight_corr": 0.09,
-   "overnight_beta": 0.073
+   "overnight_corr": 0.088,
+   "overnight_beta": 0.071
   },
   {
    "target": "sz399006",
@@ -462,19 +462,19 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 485,
-   "corr": 0.29,
+   "corr": 0.286,
    "beta": 0.33,
-   "r2": 0.084,
+   "r2": 0.082,
    "best_lag": 0,
-   "lag_corr": 0.29,
+   "lag_corr": 0.286,
    "lag_rows": {
-    "lag-2": -0.013,
-    "lag-1": -0.157,
-    "lag1": 0.08,
-    "lag2": 0.05
+    "lag-2": -0.017,
+    "lag-1": -0.165,
+    "lag1": 0.079,
+    "lag2": 0.038
    },
-   "overnight_corr": 0.08,
-   "overnight_beta": 0.091
+   "overnight_corr": 0.079,
+   "overnight_beta": 0.09
   },
   {
    "target": "sh000688",
@@ -484,19 +484,19 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 485,
-   "corr": 0.281,
-   "beta": 0.243,
-   "r2": 0.079,
+   "corr": 0.279,
+   "beta": 0.242,
+   "r2": 0.078,
    "best_lag": 0,
-   "lag_corr": 0.281,
+   "lag_corr": 0.279,
    "lag_rows": {
-    "lag-2": 0.057,
-    "lag-1": -0.092,
-    "lag1": 0.082,
-    "lag2": -0.005
+    "lag-2": 0.049,
+    "lag-1": -0.097,
+    "lag1": 0.08,
+    "lag2": -0.007
    },
-   "overnight_corr": 0.082,
-   "overnight_beta": 0.071
+   "overnight_corr": 0.08,
+   "overnight_beta": 0.068
   },
   {
    "target": "sh000688",
@@ -506,19 +506,19 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 485,
-   "corr": 0.251,
-   "beta": 0.453,
-   "r2": 0.063,
+   "corr": 0.249,
+   "beta": 0.452,
+   "r2": 0.062,
    "best_lag": 0,
-   "lag_corr": 0.251,
+   "lag_corr": 0.249,
    "lag_rows": {
-    "lag-2": -0.004,
-    "lag-1": -0.167,
-    "lag1": 0.082,
-    "lag2": 0.042
+    "lag-2": -0.01,
+    "lag-1": -0.176,
+    "lag1": 0.078,
+    "lag2": 0.033
    },
-   "overnight_corr": 0.082,
-   "overnight_beta": 0.146
+   "overnight_corr": 0.078,
+   "overnight_beta": 0.139
   },
   {
    "target": "sh000688",
@@ -528,19 +528,19 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 485,
-   "corr": 0.228,
-   "beta": 0.385,
-   "r2": 0.052,
+   "corr": 0.226,
+   "beta": 0.384,
+   "r2": 0.051,
    "best_lag": 0,
-   "lag_corr": 0.228,
+   "lag_corr": 0.226,
    "lag_rows": {
-    "lag-2": -0.008,
-    "lag-1": -0.176,
-    "lag1": 0.086,
-    "lag2": 0.038
+    "lag-2": -0.014,
+    "lag-1": -0.184,
+    "lag1": 0.083,
+    "lag2": 0.027
    },
-   "overnight_corr": 0.086,
-   "overnight_beta": 0.144
+   "overnight_corr": 0.083,
+   "overnight_beta": 0.139
   },
   {
    "target": "sh000688",
@@ -550,16 +550,16 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 485,
-   "corr": 0.208,
-   "beta": 0.26,
-   "r2": 0.043,
+   "corr": 0.206,
+   "beta": 0.258,
+   "r2": 0.042,
    "best_lag": 0,
-   "lag_corr": 0.208,
+   "lag_corr": 0.206,
    "lag_rows": {
-    "lag-2": -0.037,
-    "lag-1": -0.184,
+    "lag-2": -0.04,
+    "lag-1": -0.188,
     "lag1": 0.075,
-    "lag2": 0.018
+    "lag2": 0.008
    },
    "overnight_corr": 0.075,
    "overnight_beta": 0.093
@@ -572,19 +572,19 @@
    "level": "弱",
    "note": "基本独立, 偶发共振",
    "n": 482,
-   "corr": 0.151,
-   "beta": 0.146,
+   "corr": 0.153,
+   "beta": 0.148,
    "r2": 0.023,
    "best_lag": 0,
-   "lag_corr": 0.151,
+   "lag_corr": 0.153,
    "lag_rows": {
-    "lag-2": -0.019,
-    "lag-1": 0.055,
-    "lag1": 0.044,
-    "lag2": 0.009
+    "lag-2": -0.02,
+    "lag-1": 0.059,
+    "lag1": 0.036,
+    "lag2": 0.004
    },
-   "overnight_corr": 0.044,
-   "overnight_beta": 0.042
+   "overnight_corr": 0.036,
+   "overnight_beta": 0.035
   },
   {
    "target": "sh000688",
@@ -594,63 +594,63 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.133,
-   "beta": 0.094,
+   "corr": 0.135,
+   "beta": 0.096,
    "r2": 0.018,
    "best_lag": 0,
-   "lag_corr": 0.133,
+   "lag_corr": 0.135,
    "lag_rows": {
-    "lag-2": -0.091,
-    "lag-1": 0.006,
-    "lag1": 0.035,
-    "lag2": 0.028
+    "lag-2": -0.092,
+    "lag-1": 0.005,
+    "lag1": 0.03,
+    "lag2": 0.027
    },
-   "overnight_corr": 0.035,
-   "overnight_beta": 0.025
+   "overnight_corr": 0.03,
+   "overnight_beta": 0.021
   },
   {
    "target": "sz399001",
    "target_name": "深证成指",
+   "driver": "usNVDA",
+   "driver_name": "英伟达",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.128,
+   "beta": 0.081,
+   "r2": 0.016,
+   "best_lag": 0,
+   "lag_corr": 0.128,
+   "lag_rows": {
+    "lag-2": -0.035,
+    "lag-1": 0.036,
+    "lag1": 0.124,
+    "lag2": -0.01
+   },
+   "overnight_corr": 0.124,
+   "overnight_beta": 0.078
+  },
+  {
+   "target": "sz399006",
+   "target_name": "创业板指",
    "driver": "usNVDA",
    "driver_name": "英伟达",
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
    "corr": 0.125,
-   "beta": 0.079,
+   "beta": 0.11,
    "r2": 0.016,
    "best_lag": 1,
-   "lag_corr": 0.138,
+   "lag_corr": 0.128,
    "lag_rows": {
-    "lag-2": -0.037,
-    "lag-1": 0.029,
-    "lag1": 0.138,
-    "lag2": 0.0
+    "lag-2": -0.042,
+    "lag-1": 0.053,
+    "lag1": 0.128,
+    "lag2": -0.018
    },
-   "overnight_corr": 0.138,
-   "overnight_beta": 0.087
-  },
-  {
-   "target": "sz399006",
-   "target_name": "创业板指",
-   "driver": "usNVDA",
-   "driver_name": "英伟达",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.121,
-   "beta": 0.107,
-   "r2": 0.015,
-   "best_lag": 1,
-   "lag_corr": 0.142,
-   "lag_rows": {
-    "lag-2": -0.044,
-    "lag-1": 0.047,
-    "lag1": 0.142,
-    "lag2": -0.01
-   },
-   "overnight_corr": 0.142,
-   "overnight_beta": 0.125
+   "overnight_corr": 0.128,
+   "overnight_beta": 0.113
   },
   {
    "target": "sh000300",
@@ -660,19 +660,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.117,
+   "corr": 0.119,
    "beta": 0.054,
    "r2": 0.014,
    "best_lag": 1,
-   "lag_corr": 0.14,
+   "lag_corr": 0.125,
    "lag_rows": {
-    "lag-2": -0.053,
-    "lag-1": 0.059,
-    "lag1": 0.14,
-    "lag2": -0.008
+    "lag-2": -0.049,
+    "lag-1": 0.069,
+    "lag1": 0.125,
+    "lag2": -0.021
    },
-   "overnight_corr": 0.14,
-   "overnight_beta": 0.064
+   "overnight_corr": 0.125,
+   "overnight_beta": 0.057
   },
   {
    "target": "sh000001",
@@ -682,217 +682,151 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.102,
-   "beta": 0.04,
-   "r2": 0.01,
+   "corr": 0.104,
+   "beta": 0.041,
+   "r2": 0.011,
    "best_lag": 1,
-   "lag_corr": 0.134,
+   "lag_corr": 0.122,
    "lag_rows": {
-    "lag-2": -0.076,
-    "lag-1": 0.06,
-    "lag1": 0.134,
-    "lag2": 0.005
+    "lag-2": -0.075,
+    "lag-1": 0.068,
+    "lag1": 0.122,
+    "lag2": -0.007
    },
-   "overnight_corr": 0.134,
-   "overnight_beta": 0.053
+   "overnight_corr": 0.122,
+   "overnight_beta": 0.048
   },
   {
    "target": "sz399001",
    "target_name": "深证成指",
+   "driver": "usTSLA",
+   "driver_name": "特斯拉",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.098,
+   "beta": 0.045,
+   "r2": 0.01,
+   "best_lag": 1,
+   "lag_corr": 0.126,
+   "lag_rows": {
+    "lag-2": -0.069,
+    "lag-1": -0.001,
+    "lag1": 0.126,
+    "lag2": 0.024
+   },
+   "overnight_corr": 0.126,
+   "overnight_beta": 0.058
+  },
+  {
+   "target": "sh000300",
+   "target_name": "沪深300",
+   "driver": "usTSLA",
+   "driver_name": "特斯拉",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.097,
+   "beta": 0.032,
+   "r2": 0.009,
+   "best_lag": 1,
+   "lag_corr": 0.115,
+   "lag_rows": {
+    "lag-2": -0.056,
+    "lag-1": 0.013,
+    "lag1": 0.115,
+    "lag2": 0.014
+   },
+   "overnight_corr": 0.115,
+   "overnight_beta": 0.039
+  },
+  {
+   "target": "sz399006",
+   "target_name": "创业板指",
+   "driver": "usTSLA",
+   "driver_name": "特斯拉",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.095,
+   "beta": 0.062,
+   "r2": 0.009,
+   "best_lag": 1,
+   "lag_corr": 0.124,
+   "lag_rows": {
+    "lag-2": -0.077,
+    "lag-1": 0.021,
+    "lag1": 0.124,
+    "lag2": 0.029
+   },
+   "overnight_corr": 0.124,
+   "overnight_beta": 0.08
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
    "driver": "usTSLA",
    "driver_name": "特斯拉",
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
    "corr": 0.094,
-   "beta": 0.044,
+   "beta": 0.027,
    "r2": 0.009,
-   "best_lag": 1,
-   "lag_corr": 0.134,
-   "lag_rows": {
-    "lag-2": -0.067,
-    "lag-1": -0.001,
-    "lag1": 0.134,
-    "lag2": 0.026
-   },
-   "overnight_corr": 0.134,
-   "overnight_beta": 0.062
-  },
-  {
-   "target": "sh000300",
-   "target_name": "沪深300",
-   "driver": "usTSLA",
-   "driver_name": "特斯拉",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.093,
-   "beta": 0.031,
-   "r2": 0.009,
-   "best_lag": 1,
-   "lag_corr": 0.122,
-   "lag_rows": {
-    "lag-2": -0.054,
-    "lag-1": 0.014,
-    "lag1": 0.122,
-    "lag2": 0.017
-   },
-   "overnight_corr": 0.122,
-   "overnight_beta": 0.041
-  },
-  {
-   "target": "sz399006",
-   "target_name": "创业板指",
-   "driver": "usTSLA",
-   "driver_name": "特斯拉",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.092,
-   "beta": 0.059,
-   "r2": 0.008,
-   "best_lag": 1,
-   "lag_corr": 0.132,
-   "lag_rows": {
-    "lag-2": -0.077,
-    "lag-1": 0.021,
-    "lag1": 0.132,
-    "lag2": 0.03
-   },
-   "overnight_corr": 0.132,
-   "overnight_beta": 0.085
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "usTSLA",
-   "driver_name": "特斯拉",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.089,
-   "beta": 0.026,
-   "r2": 0.008,
-   "best_lag": 1,
-   "lag_corr": 0.12,
-   "lag_rows": {
-    "lag-2": -0.063,
-    "lag-1": 0.021,
-    "lag1": 0.12,
-    "lag2": 0.016
-   },
-   "overnight_corr": 0.12,
-   "overnight_beta": 0.035
-  },
-  {
-   "target": "sh000688",
-   "target_name": "科创50",
-   "driver": "usDJI",
-   "driver_name": "道琼斯",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.086,
-   "beta": 0.248,
-   "r2": 0.007,
-   "best_lag": 1,
-   "lag_corr": 0.105,
-   "lag_rows": {
-    "lag-2": -0.08,
-    "lag-1": 0.056,
-    "lag1": 0.105,
-    "lag2": 0.045
-   },
-   "overnight_corr": 0.105,
-   "overnight_beta": 0.305
-  },
-  {
-   "target": "sh000688",
-   "target_name": "科创50",
-   "driver": "usMSFT",
-   "driver_name": "微软",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": -0.062,
-   "beta": -0.093,
-   "r2": 0.004,
-   "best_lag": -2,
-   "lag_corr": -0.087,
-   "lag_rows": {
-    "lag-2": -0.087,
-    "lag-1": 0.07,
-    "lag1": 0.025,
-    "lag2": 0.003
-   },
-   "overnight_corr": 0.025,
-   "overnight_beta": 0.037
-  },
-  {
-   "target": "sz399001",
-   "target_name": "深证成指",
-   "driver": "usDJI",
-   "driver_name": "道琼斯",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.051,
-   "beta": 0.095,
-   "r2": 0.003,
-   "best_lag": 1,
-   "lag_corr": 0.2,
-   "lag_rows": {
-    "lag-2": -0.1,
-    "lag-1": 0.078,
-    "lag1": 0.2,
-    "lag2": 0.045
-   },
-   "overnight_corr": 0.2,
-   "overnight_beta": 0.377
-  },
-  {
-   "target": "sh000300",
-   "target_name": "沪深300",
-   "driver": "usMSFT",
-   "driver_name": "微软",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": -0.05,
-   "beta": -0.035,
-   "r2": 0.002,
-   "best_lag": -2,
-   "lag_corr": -0.124,
-   "lag_rows": {
-    "lag-2": -0.124,
-    "lag-1": 0.118,
-    "lag1": 0.103,
-    "lag2": 0.024
-   },
-   "overnight_corr": 0.103,
-   "overnight_beta": 0.073
-  },
-  {
-   "target": "sz399001",
-   "target_name": "深证成指",
-   "driver": "usMSFT",
-   "driver_name": "微软",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": -0.047,
-   "beta": -0.046,
-   "r2": 0.002,
    "best_lag": 1,
    "lag_corr": 0.115,
    "lag_rows": {
-    "lag-2": -0.114,
-    "lag-1": 0.104,
+    "lag-2": -0.066,
+    "lag-1": 0.02,
     "lag1": 0.115,
-    "lag2": 0.022
+    "lag2": 0.012
    },
    "overnight_corr": 0.115,
-   "overnight_beta": 0.113
+   "overnight_beta": 0.033
+  },
+  {
+   "target": "sh000688",
+   "target_name": "科创50",
+   "driver": "usMSFT",
+   "driver_name": "微软",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": -0.058,
+   "beta": -0.086,
+   "r2": 0.003,
+   "best_lag": -2,
+   "lag_corr": -0.088,
+   "lag_rows": {
+    "lag-2": -0.088,
+    "lag-1": 0.07,
+    "lag1": 0.02,
+    "lag2": 0.003
+   },
+   "overnight_corr": 0.02,
+   "overnight_beta": 0.031
+  },
+  {
+   "target": "sh000300",
+   "target_name": "沪深300",
+   "driver": "usMSFT",
+   "driver_name": "微软",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": -0.045,
+   "beta": -0.032,
+   "r2": 0.002,
+   "best_lag": -2,
+   "lag_corr": -0.125,
+   "lag_rows": {
+    "lag-2": -0.125,
+    "lag-1": 0.124,
+    "lag1": 0.099,
+    "lag2": 0.027
+   },
+   "overnight_corr": 0.099,
+   "overnight_beta": 0.07
   },
   {
    "target": "sh000688",
@@ -902,63 +836,41 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.046,
-   "beta": 0.069,
+   "corr": 0.043,
+   "beta": 0.066,
    "r2": 0.002,
    "best_lag": -1,
    "lag_corr": 0.123,
    "lag_rows": {
-    "lag-2": -0.034,
+    "lag-2": -0.037,
     "lag-1": 0.123,
-    "lag1": 0.027,
-    "lag2": -0.024
+    "lag1": 0.028,
+    "lag2": -0.019
    },
-   "overnight_corr": 0.027,
-   "overnight_beta": 0.041
+   "overnight_corr": 0.028,
+   "overnight_beta": 0.042
   },
   {
-   "target": "sz399006",
-   "target_name": "创业板指",
-   "driver": "usDJI",
-   "driver_name": "道琼斯",
+   "target": "sz399001",
+   "target_name": "深证成指",
+   "driver": "usMSFT",
+   "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.04,
-   "beta": 0.106,
+   "corr": -0.041,
+   "beta": -0.04,
    "r2": 0.002,
-   "best_lag": 1,
-   "lag_corr": 0.18,
+   "best_lag": -2,
+   "lag_corr": -0.115,
    "lag_rows": {
-    "lag-2": -0.096,
-    "lag-1": 0.1,
-    "lag1": 0.18,
-    "lag2": 0.038
+    "lag-2": -0.115,
+    "lag-1": 0.107,
+    "lag1": 0.11,
+    "lag2": 0.024
    },
-   "overnight_corr": 0.18,
-   "overnight_beta": 0.475
-  },
-  {
-   "target": "sh000300",
-   "target_name": "沪深300",
-   "driver": "usDJI",
-   "driver_name": "道琼斯",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.039,
-   "beta": 0.054,
-   "r2": 0.002,
-   "best_lag": 1,
-   "lag_corr": 0.187,
-   "lag_rows": {
-    "lag-2": -0.091,
-    "lag-1": 0.085,
-    "lag1": 0.187,
-    "lag2": 0.042
-   },
-   "overnight_corr": 0.187,
-   "overnight_beta": 0.258
+   "overnight_corr": 0.11,
+   "overnight_beta": 0.107
   },
   {
    "target": "sz399006",
@@ -968,41 +880,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.038,
-   "beta": 0.053,
+   "corr": 0.035,
+   "beta": 0.048,
    "r2": 0.001,
    "best_lag": -1,
-   "lag_corr": 0.169,
+   "lag_corr": 0.168,
    "lag_rows": {
-    "lag-2": -0.057,
-    "lag-1": 0.169,
+    "lag-2": -0.061,
+    "lag-1": 0.168,
     "lag1": 0.082,
-    "lag2": -0.034
+    "lag2": -0.027
    },
    "overnight_corr": 0.082,
-   "overnight_beta": 0.112
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "usDJI",
-   "driver_name": "道琼斯",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 482,
-   "corr": 0.036,
-   "beta": 0.043,
-   "r2": 0.001,
-   "best_lag": 1,
-   "lag_corr": 0.198,
-   "lag_rows": {
-    "lag-2": -0.125,
-    "lag-1": 0.088,
-    "lag1": 0.198,
-    "lag2": 0.041
-   },
-   "overnight_corr": 0.198,
-   "overnight_beta": 0.236
+   "overnight_beta": 0.113
   },
   {
    "target": "sz399006",
@@ -1012,19 +902,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": -0.034,
-   "beta": -0.046,
+   "corr": -0.028,
+   "beta": -0.038,
    "r2": 0.001,
    "best_lag": -2,
-   "lag_corr": -0.11,
+   "lag_corr": -0.111,
    "lag_rows": {
-    "lag-2": -0.11,
-    "lag-1": 0.102,
-    "lag1": 0.093,
-    "lag2": 0.008
+    "lag-2": -0.111,
+    "lag-1": 0.104,
+    "lag1": 0.087,
+    "lag2": 0.009
    },
-   "overnight_corr": 0.093,
-   "overnight_beta": 0.127
+   "overnight_corr": 0.087,
+   "overnight_beta": 0.12
   },
   {
    "target": "sh000001",
@@ -1034,19 +924,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.026,
-   "beta": 0.016,
+   "corr": 0.023,
+   "beta": 0.014,
    "r2": 0.001,
    "best_lag": -1,
-   "lag_corr": 0.161,
+   "lag_corr": 0.162,
    "lag_rows": {
-    "lag-2": -0.098,
-    "lag-1": 0.161,
-    "lag1": 0.113,
-    "lag2": -0.032
+    "lag-2": -0.107,
+    "lag-1": 0.162,
+    "lag1": 0.115,
+    "lag2": -0.029
    },
-   "overnight_corr": 0.113,
-   "overnight_beta": 0.07
+   "overnight_corr": 0.115,
+   "overnight_beta": 0.071
   },
   {
    "target": "sh000300",
@@ -1056,19 +946,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.026,
-   "beta": 0.019,
+   "corr": 0.023,
+   "beta": 0.016,
    "r2": 0.001,
    "best_lag": -1,
    "lag_corr": 0.16,
    "lag_rows": {
-    "lag-2": -0.058,
+    "lag-2": -0.068,
     "lag-1": 0.16,
-    "lag1": 0.094,
-    "lag2": -0.025
+    "lag1": 0.096,
+    "lag2": -0.02
    },
-   "overnight_corr": 0.094,
-   "overnight_beta": 0.068
+   "overnight_corr": 0.096,
+   "overnight_beta": 0.069
   },
   {
    "target": "sz399001",
@@ -1078,19 +968,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": 0.024,
-   "beta": 0.024,
-   "r2": 0.001,
+   "corr": 0.02,
+   "beta": 0.02,
+   "r2": 0.0,
    "best_lag": -1,
    "lag_corr": 0.152,
    "lag_rows": {
-    "lag-2": -0.064,
+    "lag-2": -0.071,
     "lag-1": 0.152,
-    "lag1": 0.104,
-    "lag2": -0.025
+    "lag1": 0.105,
+    "lag2": -0.019
    },
-   "overnight_corr": 0.104,
-   "overnight_beta": 0.102
+   "overnight_corr": 0.105,
+   "overnight_beta": 0.103
   },
   {
    "target": "sh000001",
@@ -1100,19 +990,19 @@
    "level": "极弱",
    "note": "几乎无关",
    "n": 482,
-   "corr": -0.012,
-   "beta": -0.008,
+   "corr": -0.008,
+   "beta": -0.005,
    "r2": 0.0,
    "best_lag": -2,
-   "lag_corr": -0.14,
+   "lag_corr": -0.143,
    "lag_rows": {
-    "lag-2": -0.14,
-    "lag-1": 0.115,
-    "lag1": 0.119,
-    "lag2": 0.036
+    "lag-2": -0.143,
+    "lag-1": 0.12,
+    "lag1": 0.116,
+    "lag2": 0.039
    },
-   "overnight_corr": 0.119,
-   "overnight_beta": 0.073
+   "overnight_corr": 0.116,
+   "overnight_beta": 0.071
   }
  ]
 }
