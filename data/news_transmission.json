@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-24T04:25:50+08:00",
+ "ts": "2026-10-24T09:36:02+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 466,
- "n_transmissions": 4,
+ "n_input": 469,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "美国总统特朗普：伊朗伊斯兰共和国会告诉你，我们拥有最好的军事装备。",
-   "source": "华尔街见闻",
-   "time": "2026-10-24T04:25:39+08:00",
-   "url": "https://wallstreetcn.com/livenews/3185005",
+   "title": "独行侠步行者爆发冲突",
+   "source": "微博热搜",
+   "time": "2026-10-24T09:33:23+08:00",
+   "url": "https://s.weibo.com/weibo?q=%23%E7%8B%AC%E8%A1%8C%E4%BE%A0%E6%AD%A5%E8%A1%8C%E8%80%85%E7%88%86%E5%8F%91%E5%86%B2%E7%AA%81%23&t=31&band_rank=30&Refer=top",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -128,10 +128,59 @@
    }
   },
   {
-   "title": "财联社10月24日电，截至10月20日当周，洲际交易所布伦特原油投机者将净多头头寸增加8852手合约至241881手。",
+   "title": "特朗普称可能对伊发动小规模军事行动",
+   "source": "今日头条",
+   "time": "2026-10-24T09:18:35+08:00",
+   "url": "https://www.toutiao.com/trending/7700007804479753778/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688011"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688586"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002707"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "周六你需要知道的隔夜全球要闻：特朗普称可能对伊发动一次小规模“史诗怒火”行动；中东局势紧张推动布伦特原油价格创7个月来新高；美股三大指数集体收跌",
    "source": "财联社电报",
-   "time": "2026-10-24T04:12:30+08:00",
-   "url": "https://www.cls.cn/detail/2514074",
+   "time": "2026-10-24T09:18:37+08:00",
+   "url": "https://www.cls.cn/detail/2514114",
    "transmission_id": "oil_up",
    "label": "油价上涨",
    "direct_bear": [],
@@ -162,6 +211,62 @@
     "event_date": "2026-10-24",
     "matched_codes": []
    }
+  },
+  {
+   "title": "以色列总理有关应对国际制裁言论引发国内担忧",
+   "source": "华尔街见闻",
+   "time": "2026-10-24T09:23:45+08:00",
+   "url": "https://wallstreetcn.com/livenews/3185052",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "301660"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "武契奇选前承诺：不制裁俄罗斯，不承认科索沃",
+   "source": "凤凰网",
+   "time": "2026-10-24T09:18:37+08:00",
+   "url": "https://news.ifeng.com/c/8xSAftzwZlJ",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "301660"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-24",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
    "title": "WTI 12月原油期货收涨3.80美元，涨幅3.92%，报103.27美元/桶，本周累计上涨超过4.29%。\n\n布伦特1",
@@ -196,42 +301,6 @@
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-23",
     "event_date": "2026-10-24",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "布伦特原油日内涨幅达3.0%，报116.63美元/桶。",
-   "source": "wallstreetcn",
-   "time": "2026-10-23T23:18:41+08:00",
-   "url": "https://wallstreetcn.com/live/3184927",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-23",
-    "event_date": "2026-10-23",
     "matched_codes": []
    }
   }
