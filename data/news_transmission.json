@@ -1,7 +1,7 @@
 {
- "ts": "2026-10-25T03:16:35+08:00",
+ "ts": "2026-10-25T03:32:00+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 472,
+ "n_input": 471,
  "n_transmissions": 10,
  "n_rules": 16,
  "rules": [
@@ -81,7 +81,7 @@
   {
    "title": "刚果（金）埃博拉疫情已致4727人死亡",
    "source": "华尔街见闻",
-   "time": "2026-10-25T02:56:38+08:00",
+   "time": "2026-10-25T03:26:41+08:00",
    "url": "https://wallstreetcn.com/livenews/3185126",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -170,7 +170,7 @@
   {
    "title": "流感疫苗全是三价并非减配",
    "source": "抖音热点",
-   "time": "2026-10-25T03:16:28+08:00",
+   "time": "2026-10-25T03:09:14+08:00",
    "url": "https://www.douyin.com/hot/2711839",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -259,7 +259,7 @@
   {
    "title": "四价流感疫苗消失了？真相来了",
    "source": "今日头条",
-   "time": "2026-10-25T02:50:46+08:00",
+   "time": "2026-10-25T03:20:48+08:00",
    "url": "https://www.toutiao.com/trending/7700018293196963883/",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -348,7 +348,7 @@
   {
    "title": "吧友中病毒写检讨,吧主严肃批阅",
    "source": "贴吧热议",
-   "time": "2026-10-25T03:16:29+08:00",
+   "time": "2026-10-25T03:13:34+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367997&amp;topic_name=%E5%90%A7%E5%8F%8B%E4%B8%AD%E7%97%85%E6%AF%92%E5%86%99%E6%A3%80%E8%AE%A8%2C%E5%90%A7%E4%B8%BB%E4%B8%A5%E8%82%83%E6%89%B9%E9%98%85",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -486,7 +486,7 @@
   {
    "title": "菲防长叫嚣“战争行为”恐吓中国",
    "source": "今日头条",
-   "time": "2026-10-25T02:50:46+08:00",
+   "time": "2026-10-25T03:20:48+08:00",
    "url": "https://www.toutiao.com/trending/7699081979290976299/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -533,10 +533,59 @@
    }
   },
   {
-   "title": "小泉进次郎宣扬军事野心有何意图",
+   "title": "俄乌冲突正大规模转向地下",
    "source": "今日头条",
-   "time": "2026-10-25T02:50:46+08:00",
-   "url": "https://www.toutiao.com/trending/7700200069101784619/",
+   "time": "2026-10-25T03:20:48+08:00",
+   "url": "https://www.toutiao.com/trending/7699774580223623731/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688011"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688586"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002707"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-23",
+    "event_date": "2026-10-25",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "八国外长“史无前例”齐聚土耳其，反对对伊朗采取军事行动",
+   "source": "澎湃新闻",
+   "time": "2026-10-25T03:31:54+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34325583",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -635,34 +684,6 @@
    "source": "财联社电报",
    "time": "2026-10-25T03:07:50+08:00",
    "url": "https://www.cls.cn/detail/2514243",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "301660"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-23",
-    "event_date": "2026-10-25",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "博主：美国一边制裁一边买俄油",
-   "source": "今日头条",
-   "time": "2026-10-25T02:50:46+08:00",
-   "url": "https://www.toutiao.com/trending/7700241452860706367/",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
    "direct_bear": [],
