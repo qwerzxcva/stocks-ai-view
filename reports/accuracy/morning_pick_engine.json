@@ -1,0 +1,373 @@
+{
+ "engine": "morning_pick_engine",
+ "metric": "主板 topk 候选 T+1/T+5 收益 vs 同 asof 全体主板等权基准",
+ "degraded_mode": "日线级降级实现: gap_env(隔夜外围)与 moneyflow(资金快照) 维度无历史序列 → 缺席; 仅 4 维(breakout/pullback/momentum/vol_energy)",
+ "asof_sampling": "每月第1/15交易日(共46期)",
+ "asof_range": [
+  "2023-08-01",
+  "2026-10-15"
+ ],
+ "results": {
+  "default": {
+   "weights": {
+    "breakout": 1.0,
+    "pullback": 1.0,
+    "momentum": 1.0,
+    "vol_energy": 1.0
+   },
+   "topk": 5,
+   "horizons": {
+    "T+1": {
+     "n": 222,
+     "win_rate": 0.4009,
+     "wilson95": [
+      0.3386,
+      0.4665
+     ],
+     "avg_ret_pct": -0.509,
+     "sharpe": -0.101,
+     "maxdd_pct": -79.2,
+     "bench_avg_pct": -0.218,
+     "excess_pp": -0.291,
+     "by_regime": {
+      "bull": {
+       "n": 112,
+       "win_rate": 0.4018,
+       "wilson95": [
+        0.3157,
+        0.4944
+       ],
+       "avg_ret_pct": -0.284,
+       "sharpe": -0.051,
+       "maxdd_pct": -62.13,
+       "bench_avg_pct": -0.093,
+       "excess_pp": -0.191
+      },
+      "bear": {
+       "n": 48,
+       "win_rate": 0.3542,
+       "wilson95": [
+        0.2343,
+        0.4956
+       ],
+       "avg_ret_pct": -1.593,
+       "sharpe": -0.373,
+       "maxdd_pct": -55.73,
+       "bench_avg_pct": -0.594,
+       "excess_pp": -0.999
+      },
+      "range": {
+       "n": 47,
+       "win_rate": 0.383,
+       "wilson95": [
+        0.2579,
+        0.5257
+       ],
+       "avg_ret_pct": -0.397,
+       "sharpe": -0.09,
+       "maxdd_pct": -37.54,
+       "bench_avg_pct": -0.288,
+       "excess_pp": -0.109
+      }
+     }
+    },
+    "T+5": {
+     "n": 222,
+     "win_rate": 0.4144,
+     "wilson95": [
+      0.3516,
+      0.4801
+     ],
+     "avg_ret_pct": -1.065,
+     "sharpe": -0.088,
+     "maxdd_pct": -98.34,
+     "bench_avg_pct": -0.462,
+     "excess_pp": -0.603,
+     "by_regime": {
+      "bull": {
+       "n": 112,
+       "win_rate": 0.4821,
+       "wilson95": [
+        0.3917,
+        0.5737
+       ],
+       "avg_ret_pct": 1.049,
+       "sharpe": 0.078,
+       "maxdd_pct": -65.09,
+       "bench_avg_pct": 0.403,
+       "excess_pp": 0.646
+      },
+      "bear": {
+       "n": 48,
+       "win_rate": 0.2292,
+       "wilson95": [
+        0.1331,
+        0.3654
+       ],
+       "avg_ret_pct": -5.27,
+       "sharpe": -0.491,
+       "maxdd_pct": -96.23,
+       "bench_avg_pct": -2.325,
+       "excess_pp": -2.945
+      },
+      "range": {
+       "n": 47,
+       "win_rate": 0.4468,
+       "wilson95": [
+        0.3141,
+        0.5875
+       ],
+       "avg_ret_pct": -1.493,
+       "sharpe": -0.15,
+       "maxdd_pct": -69.67,
+       "bench_avg_pct": -0.448,
+       "excess_pp": -1.045
+      }
+     }
+    }
+   }
+  },
+  "conservative": {
+   "weights": {
+    "breakout": 0.8,
+    "pullback": 1.5,
+    "momentum": 0.8,
+    "vol_energy": 1.2
+   },
+   "topk": 3,
+   "horizons": {
+    "T+1": {
+     "n": 133,
+     "win_rate": 0.391,
+     "wilson95": [
+      0.3122,
+      0.4759
+     ],
+     "avg_ret_pct": -0.38,
+     "sharpe": -0.076,
+     "maxdd_pct": -56.65,
+     "bench_avg_pct": -0.246,
+     "excess_pp": -0.134,
+     "by_regime": {
+      "bull": {
+       "n": 69,
+       "win_rate": 0.3623,
+       "wilson95": [
+        0.259,
+        0.4802
+       ],
+       "avg_ret_pct": -0.375,
+       "sharpe": -0.065,
+       "maxdd_pct": -49.16,
+       "bench_avg_pct": -0.104,
+       "excess_pp": -0.271
+      },
+      "bear": {
+       "n": 28,
+       "win_rate": 0.4643,
+       "wilson95": [
+        0.2953,
+        0.6419
+       ],
+       "avg_ret_pct": -0.738,
+       "sharpe": -0.224,
+       "maxdd_pct": -19.96,
+       "bench_avg_pct": -0.728,
+       "excess_pp": -0.01
+      },
+      "range": {
+       "n": 27,
+       "win_rate": 0.2963,
+       "wilson95": [
+        0.1585,
+        0.4848
+       ],
+       "avg_ret_pct": -0.461,
+       "sharpe": -0.096,
+       "maxdd_pct": -31.22,
+       "bench_avg_pct": -0.283,
+       "excess_pp": -0.178
+      }
+     }
+    },
+    "T+5": {
+     "n": 133,
+     "win_rate": 0.391,
+     "wilson95": [
+      0.3122,
+      0.4759
+     ],
+     "avg_ret_pct": -0.75,
+     "sharpe": -0.066,
+     "maxdd_pct": -87.32,
+     "bench_avg_pct": -0.431,
+     "excess_pp": -0.319,
+     "by_regime": {
+      "bull": {
+       "n": 69,
+       "win_rate": 0.4493,
+       "wilson95": [
+        0.3377,
+        0.5662
+       ],
+       "avg_ret_pct": 1.086,
+       "sharpe": 0.086,
+       "maxdd_pct": -52.25,
+       "bench_avg_pct": 0.39,
+       "excess_pp": 0.696
+      },
+      "bear": {
+       "n": 28,
+       "win_rate": 0.2857,
+       "wilson95": [
+        0.1525,
+        0.4706
+       ],
+       "avg_ret_pct": -2.904,
+       "sharpe": -0.316,
+       "maxdd_pct": -72.13,
+       "bench_avg_pct": -2.475,
+       "excess_pp": -0.429
+      },
+      "range": {
+       "n": 27,
+       "win_rate": 0.3333,
+       "wilson95": [
+        0.1864,
+        0.5218
+       ],
+       "avg_ret_pct": -2.815,
+       "sharpe": -0.253,
+       "maxdd_pct": -67.26,
+       "bench_avg_pct": -0.219,
+       "excess_pp": -2.596
+      }
+     }
+    }
+   }
+  },
+  "aggressive": {
+   "weights": {
+    "breakout": 1.5,
+    "pullback": 0.8,
+    "momentum": 1.5,
+    "vol_energy": 0.8
+   },
+   "topk": 5,
+   "horizons": {
+    "T+1": {
+     "n": 225,
+     "win_rate": 0.4,
+     "wilson95": [
+      0.3382,
+      0.4652
+     ],
+     "avg_ret_pct": -0.482,
+     "sharpe": -0.091,
+     "maxdd_pct": -81.78,
+     "bench_avg_pct": -0.216,
+     "excess_pp": -0.266,
+     "by_regime": {
+      "bull": {
+       "n": 115,
+       "win_rate": 0.3913,
+       "wilson95": [
+        0.307,
+        0.4826
+       ],
+       "avg_ret_pct": -0.536,
+       "sharpe": -0.092,
+       "maxdd_pct": -74.81,
+       "bench_avg_pct": -0.104,
+       "excess_pp": -0.432
+      },
+      "bear": {
+       "n": 49,
+       "win_rate": 0.4082,
+       "wilson95": [
+        0.2822,
+        0.5475
+       ],
+       "avg_ret_pct": -0.68,
+       "sharpe": -0.143,
+       "maxdd_pct": -38.07,
+       "bench_avg_pct": -0.56,
+       "excess_pp": -0.12
+      },
+      "range": {
+       "n": 46,
+       "win_rate": 0.3478,
+       "wilson95": [
+        0.2268,
+        0.4923
+       ],
+       "avg_ret_pct": -0.668,
+       "sharpe": -0.143,
+       "maxdd_pct": -46.09,
+       "bench_avg_pct": -0.285,
+       "excess_pp": -0.383
+      }
+     }
+    },
+    "T+5": {
+     "n": 225,
+     "win_rate": 0.4133,
+     "wilson95": [
+      0.351,
+      0.4786
+     ],
+     "avg_ret_pct": -1.307,
+     "sharpe": -0.113,
+     "maxdd_pct": -99.18,
+     "bench_avg_pct": -0.413,
+     "excess_pp": -0.894,
+     "by_regime": {
+      "bull": {
+       "n": 115,
+       "win_rate": 0.4696,
+       "wilson95": [
+        0.3808,
+        0.5603
+       ],
+       "avg_ret_pct": 0.421,
+       "sharpe": 0.034,
+       "maxdd_pct": -71.12,
+       "bench_avg_pct": 0.39,
+       "excess_pp": 0.031
+      },
+      "bear": {
+       "n": 49,
+       "win_rate": 0.3265,
+       "wilson95": [
+        0.2121,
+        0.4662
+       ],
+       "avg_ret_pct": -4.01,
+       "sharpe": -0.369,
+       "maxdd_pct": -94.36,
+       "bench_avg_pct": -2.191,
+       "excess_pp": -1.819
+      },
+      "range": {
+       "n": 46,
+       "win_rate": 0.3913,
+       "wilson95": [
+        0.2639,
+        0.5354
+       ],
+       "avg_ret_pct": -2.457,
+       "sharpe": -0.23,
+       "maxdd_pct": -79.83,
+       "bench_avg_pct": -0.336,
+       "excess_pp": -2.121
+      }
+     }
+    }
+   }
+  }
+ },
+ "caveats": [
+  "无分钟线/竞价数据, 降级为前一交易日收盘打分, 与生产早盘口径不同",
+  "6 个分片滞后到 2026-10-16"
+ ]
+}

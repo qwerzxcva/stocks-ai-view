@@ -1,0 +1,23 @@
+{
+  "engine": "cycle_grid_tester",
+  "status": "对照记录 — 不重跑",
+  "conclusion": "已证 100 点网格无效（R2 phase3_cycle_grid_raw.json）",
+  "evidence": {
+    "grid50_band20_window3": {
+      "n_pivots": 146, "hit_rate": 0.8288, "random_rate": 0.8,
+      "binom_p": 0.2246, "mc_p": 0.2917,
+      "note": "hit_rate 与随机基线 0.8 无显著差异"
+    },
+    "grid50_band20_window5": {
+      "n_pivots": 87, "hit_rate": 0.8161, "random_rate": 0.8,
+      "binom_p": 0.4147, "mc_p": 0.5045
+    },
+    "focus3500_band": {
+      "band": [3470.0, 3530.0], "n_events": 4,
+      "up_rate_T20": 0.25, "wilson95_ci": [0.0456, 0.6994],
+      "note": "样本极小(n=4), 无统计功效"
+    }
+  },
+  "reason_skipped": "网格位命中=必然事件(价格连续穿越), 检验口径本身有缺陷; 100 点粒度对 3000+ 指数过宽",
+  "action": "本任务不重跑, 标记为已知无效引擎, 路由降权参考"
+}

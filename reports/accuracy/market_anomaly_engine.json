@@ -1,0 +1,111 @@
+{
+ "engine": "market_anomaly_engine",
+ "metric": "异动事件后 T+1/T+5 指数(sh000001)方向条件胜率 vs 无条件基准; 评估期=指数历史 2023-01 起",
+ "note": "zt/dt_flood 事件识别用全历史 bulk(含 2023 前), 方向验证仅 2023-01 后; sector_surge/leader_crash 因行业映射仅 1050 只且历史板块成分变化, 不重跑历史(全历史口径下 leader_crash 前视已标注)",
+ "unconditional_baseline": {
+  "T+1": {
+   "up": 0.5296,
+   "down": 0.4704,
+   "flat": 0.0,
+   "n": 810
+  },
+  "T+5": {
+   "up": 0.5174,
+   "down": 0.4826,
+   "flat": 0.0,
+   "n": 806
+  }
+ },
+ "results": {
+  "zt_flood": {
+   "n_events_in_window": 331,
+   "T+1": {
+    "n": 330,
+    "win_rate": 0.5394,
+    "wilson95": [
+     0.4855,
+     0.5924
+    ],
+    "avg_fwd_pct": 0.055
+   },
+   "T+5": {
+    "n": 328,
+    "win_rate": 0.5518,
+    "wilson95": [
+     0.4977,
+     0.6047
+    ],
+    "avg_fwd_pct": 0.2
+   }
+  },
+  "dt_flood": {
+   "n_events_in_window": 171,
+   "T+1": {
+    "n": 171,
+    "win_rate": 0.4561,
+    "wilson95": [
+     0.3833,
+     0.5309
+    ],
+    "avg_fwd_pct": 0.034
+   },
+   "T+5": {
+    "n": 169,
+    "win_rate": 0.432,
+    "wilson95": [
+     0.3596,
+     0.5073
+    ],
+    "avg_fwd_pct": 0.43
+   }
+  },
+  "index_gap_up": {
+   "n_events_in_window": 16,
+   "T+1": {
+    "n": 16,
+    "win_rate": 0.5,
+    "wilson95": [
+     0.28,
+     0.72
+    ],
+    "avg_fwd_pct": 0.449
+   },
+   "T+5": {
+    "n": 16,
+    "win_rate": 0.5625,
+    "wilson95": [
+     0.3318,
+     0.769
+    ],
+    "avg_fwd_pct": 1.626
+   }
+  },
+  "index_gap_down": {
+   "n_events_in_window": 19,
+   "T+1": {
+    "n": 19,
+    "win_rate": 0.2105,
+    "wilson95": [
+     0.0851,
+     0.4333
+    ],
+    "avg_fwd_pct": 0.62
+   },
+   "T+5": {
+    "n": 19,
+    "win_rate": 0.3158,
+    "wilson95": [
+     0.1536,
+     0.5399
+    ],
+    "avg_fwd_pct": 0.865
+   }
+  }
+ },
+ "caveats": [
+  "zt/dt_flood 阈值 ±9.8% 主板口径, ST/20cm 未区分",
+  "2023 前事件用于训练 hist_winrate(引擎内), 本评估仅样本外(2023-01 后)",
+  "sector_surge 与 dual_mainline 需行业映射历史, industry_map_em 仅当前快照 → 无法无前视历史重跑, 跳过",
+  "leader_crash 引擎内已标注全期成交额排序轻微前视, 本评估不重跑"
+ ]
+}

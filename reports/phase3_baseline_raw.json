@@ -1,0 +1,471 @@
+{
+ "ts": "2026-10-23T22:08:34",
+ "engine": "phase3_baseline_final.py (reflect_engine 口径复现 + 修正基准)",
+ "windows": {
+  "pred_dates": [
+   "2023-11-20",
+   "2026-10-19"
+  ],
+  "n_pred_files": 656,
+  "n_records": 64447,
+  "kline_max_date": "2026-10-16",
+  "index_max_date": "2026-10-09"
+ },
+ "method": {
+  "return": "T 收盘 → T+N 收盘 (reflect_engine.verify_prediction:176-191)",
+  "hit": "看多(bull>bear)且上涨 / 看空(bear>bull)且下跌; 平盘不命中; overall=全样本上涨占比 (reflect raw_win_rate 口径)",
+  "ci": "Wilson 95% (reflect_engine.wilson_ci:33)",
+  "dedup": "(code,date) 多片重复 → 主分片(00-09/20/30/60/68)优先, 辅助片(expand/extra/recent/stockdb)仅补主片缺失; 修正 reflect 原实现的文件序 first-wins 混基准缺陷",
+  "benchmark": "同期全体主分片股票同窗口(T收盘→T+N收盘)上涨比例, 按样本 exit_date 加权",
+  "ma250_regime": "上证综指收盘 vs MA250 (sh000001.txt, 至 2026-10-09); >=MA250=bull 否则 bear",
+  "phase_snapshot": "latest.json/market_now.json 相位快照 (1 条, 来源 ['latest.json', 'market_now.json']); 仅 1 条快照, 全部样本被代理为同一标签, 无分段价值"
+ },
+ "data_quality": {
+  "main_shard_codes": 4019,
+  "aux_rows_merged": 842904,
+  "aux_conflict_rows_skipped": 94718,
+  "dup_within_main_shards": 2186596,
+  "cross_shard_basis_conflict_example": "sh600519 2024-06-11 close: 主片(01/07) 1434.661 vs expand 1569.000 (差 9.1%); sz000021 同日 主片(00) 14.960 vs stockdb 15.500; 1日收益差 0.9pp"
+ },
+ "dropped": {
+  "no_bars_at_pred": 153,
+  "no_forward_10d": 598,
+  "no_forward_5d": 348,
+  "no_forward_1d": 50,
+  "no_forward_3d": 50
+ },
+ "horizons": {
+  "1": {
+   "overall_raw": {
+    "n": 64397,
+    "win_rate": 45.78,
+    "wilson_ci": [
+     45.39,
+     46.16
+    ],
+    "benchmark_pct": 47.68,
+    "excess_pp": -1.9
+   },
+   "dir_bull": {
+    "n": 62059,
+    "win_rate": 45.92,
+    "wilson_ci": [
+     45.53,
+     46.31
+    ],
+    "benchmark_pct": 47.84,
+    "excess_pp": -1.92
+   },
+   "dir_bear": {
+    "n": 2110,
+    "win_rate": 57.44,
+    "wilson_ci": [
+     55.32,
+     59.54
+    ],
+    "benchmark_pct": 44.36,
+    "excess_pp": 13.08
+   },
+   "ma250": {
+    "bear": {
+     "n": 8198,
+     "win_rate": 45.01,
+     "wilson_ci": [
+      43.94,
+      46.09
+     ],
+     "benchmark_pct": 47.19,
+     "excess_pp": -2.18
+    },
+    "bull": {
+     "n": 41599,
+     "win_rate": 46.98,
+     "wilson_ci": [
+      46.5,
+      47.46
+     ],
+     "benchmark_pct": 48.76,
+     "excess_pp": -1.78
+    }
+   },
+   "phase_snapshot": {
+    "range": {
+     "n": 64397,
+     "win_rate": 46.27,
+     "wilson_ci": [
+      45.88,
+      46.65
+     ],
+     "benchmark_pct": 47.68,
+     "excess_pp": -1.41
+    }
+   },
+   "by_year": {
+    "2023": {
+     "n": 3000,
+     "win_rate": 43.77,
+     "wilson_ci": [
+      42.0,
+      45.55
+     ],
+     "benchmark_pct": 43.11,
+     "excess_pp": 0.66
+    },
+    "2024": {
+     "n": 24200,
+     "win_rate": 45.73,
+     "wilson_ci": [
+      45.1,
+      46.36
+     ],
+     "benchmark_pct": 47.6,
+     "excess_pp": -1.87
+    },
+    "2025": {
+     "n": 24300,
+     "win_rate": 45.91,
+     "wilson_ci": [
+      45.28,
+      46.54
+     ],
+     "benchmark_pct": 49.1,
+     "excess_pp": -3.19
+    },
+    "2026": {
+     "n": 12897,
+     "win_rate": 48.53,
+     "wilson_ci": [
+      47.67,
+      49.39
+     ],
+     "benchmark_pct": 46.37,
+     "excess_pp": 2.16
+    }
+   }
+  },
+  "3": {
+   "overall_raw": {
+    "n": 64397,
+    "win_rate": 44.95,
+    "wilson_ci": [
+     44.57,
+     45.34
+    ],
+    "benchmark_pct": 47.46,
+    "excess_pp": -2.51
+   },
+   "dir_bull": {
+    "n": 62059,
+    "win_rate": 44.97,
+    "wilson_ci": [
+     44.58,
+     45.37
+    ],
+    "benchmark_pct": 47.55,
+    "excess_pp": -2.58
+   },
+   "dir_bear": {
+    "n": 2110,
+    "win_rate": 54.41,
+    "wilson_ci": [
+     52.28,
+     56.52
+    ],
+    "benchmark_pct": 46.63,
+    "excess_pp": 7.78
+   },
+   "ma250": {
+    "bear": {
+     "n": 8198,
+     "win_rate": 43.0,
+     "wilson_ci": [
+      41.93,
+      44.07
+     ],
+     "benchmark_pct": 47.65,
+     "excess_pp": -4.65
+    },
+    "bull": {
+     "n": 41599,
+     "win_rate": 46.8,
+     "wilson_ci": [
+      46.32,
+      47.28
+     ],
+     "benchmark_pct": 49.39,
+     "excess_pp": -2.59
+    }
+   },
+   "phase_snapshot": {
+    "range": {
+     "n": 64397,
+     "win_rate": 45.24,
+     "wilson_ci": [
+      44.86,
+      45.63
+     ],
+     "benchmark_pct": 47.46,
+     "excess_pp": -2.22
+    }
+   },
+   "by_year": {
+    "2023": {
+     "n": 3000,
+     "win_rate": 39.73,
+     "wilson_ci": [
+      38.0,
+      41.5
+     ],
+     "benchmark_pct": 38.75,
+     "excess_pp": 0.98
+    },
+    "2024": {
+     "n": 24200,
+     "win_rate": 43.57,
+     "wilson_ci": [
+      42.95,
+      44.2
+     ],
+     "benchmark_pct": 46.37,
+     "excess_pp": -2.8
+    },
+    "2025": {
+     "n": 24300,
+     "win_rate": 46.61,
+     "wilson_ci": [
+      45.99,
+      47.24
+     ],
+     "benchmark_pct": 50.87,
+     "excess_pp": -4.26
+    },
+    "2026": {
+     "n": 12897,
+     "win_rate": 47.08,
+     "wilson_ci": [
+      46.22,
+      47.94
+     ],
+     "benchmark_pct": 45.45,
+     "excess_pp": 1.63
+    }
+   }
+  },
+  "5": {
+   "overall_raw": {
+    "n": 64099,
+    "win_rate": 44.07,
+    "wilson_ci": [
+     43.69,
+     44.45
+    ],
+    "benchmark_pct": 47.6,
+    "excess_pp": -3.53
+   },
+   "dir_bull": {
+    "n": 61770,
+    "win_rate": 44.04,
+    "wilson_ci": [
+     43.65,
+     44.44
+    ],
+    "benchmark_pct": 47.69,
+    "excess_pp": -3.65
+   },
+   "dir_bear": {
+    "n": 2103,
+    "win_rate": 53.97,
+    "wilson_ci": [
+     51.83,
+     56.09
+    ],
+    "benchmark_pct": 46.6,
+    "excess_pp": 7.37
+   },
+   "ma250": {
+    "bear": {
+     "n": 7900,
+     "win_rate": 41.68,
+     "wilson_ci": [
+      40.6,
+      42.77
+     ],
+     "benchmark_pct": 49.52,
+     "excess_pp": -7.84
+    },
+    "bull": {
+     "n": 41599,
+     "win_rate": 46.03,
+     "wilson_ci": [
+      45.55,
+      46.51
+     ],
+     "benchmark_pct": 49.71,
+     "excess_pp": -3.68
+    }
+   },
+   "phase_snapshot": {
+    "range": {
+     "n": 64099,
+     "win_rate": 44.33,
+     "wilson_ci": [
+      43.95,
+      44.71
+     ],
+     "benchmark_pct": 47.6,
+     "excess_pp": -3.27
+    }
+   },
+   "by_year": {
+    "2023": {
+     "n": 3000,
+     "win_rate": 36.83,
+     "wilson_ci": [
+      35.13,
+      38.58
+     ],
+     "benchmark_pct": 36.47,
+     "excess_pp": 0.36
+    },
+    "2024": {
+     "n": 24200,
+     "win_rate": 42.59,
+     "wilson_ci": [
+      41.97,
+      43.22
+     ],
+     "benchmark_pct": 45.74,
+     "excess_pp": -3.15
+    },
+    "2025": {
+     "n": 24300,
+     "win_rate": 46.65,
+     "wilson_ci": [
+      46.03,
+      47.28
+     ],
+     "benchmark_pct": 52.43,
+     "excess_pp": -5.78
+    },
+    "2026": {
+     "n": 12599,
+     "win_rate": 44.97,
+     "wilson_ci": [
+      44.1,
+      45.84
+     ],
+     "benchmark_pct": 44.81,
+     "excess_pp": 0.16
+    }
+   }
+  },
+  "10": {
+   "overall_raw": {
+    "n": 63849,
+    "win_rate": 43.64,
+    "wilson_ci": [
+     43.25,
+     44.02
+    ],
+    "benchmark_pct": 47.91,
+    "excess_pp": -4.27
+   },
+   "dir_bull": {
+    "n": 61522,
+    "win_rate": 43.68,
+    "wilson_ci": [
+     43.28,
+     44.07
+    ],
+    "benchmark_pct": 48.14,
+    "excess_pp": -4.46
+   },
+   "dir_bear": {
+    "n": 2102,
+    "win_rate": 56.71,
+    "wilson_ci": [
+     54.58,
+     58.81
+    ],
+    "benchmark_pct": 43.16,
+    "excess_pp": 13.55
+   },
+   "ma250": {
+    "bear": {
+     "n": 7650,
+     "win_rate": 41.62,
+     "wilson_ci": [
+      40.52,
+      42.73
+     ],
+     "benchmark_pct": 52.27,
+     "excess_pp": -10.65
+    },
+    "bull": {
+     "n": 41599,
+     "win_rate": 46.22,
+     "wilson_ci": [
+      45.74,
+      46.7
+     ],
+     "benchmark_pct": 51.0,
+     "excess_pp": -4.78
+    }
+   },
+   "phase_snapshot": {
+    "range": {
+     "n": 63849,
+     "win_rate": 44.08,
+     "wilson_ci": [
+      43.69,
+      44.46
+     ],
+     "benchmark_pct": 47.91,
+     "excess_pp": -3.83
+    }
+   },
+   "by_year": {
+    "2023": {
+     "n": 3000,
+     "win_rate": 33.53,
+     "wilson_ci": [
+      31.87,
+      35.24
+     ],
+     "benchmark_pct": 31.32,
+     "excess_pp": 2.21
+    },
+    "2024": {
+     "n": 24200,
+     "win_rate": 41.48,
+     "wilson_ci": [
+      40.86,
+      42.11
+     ],
+     "benchmark_pct": 45.52,
+     "excess_pp": -4.04
+    },
+    "2025": {
+     "n": 24300,
+     "win_rate": 47.88,
+     "wilson_ci": [
+      47.25,
+      48.51
+     ],
+     "benchmark_pct": 55.28,
+     "excess_pp": -7.4
+    },
+    "2026": {
+     "n": 12349,
+     "win_rate": 44.24,
+     "wilson_ci": [
+      43.36,
+      45.12
+     ],
+     "benchmark_pct": 41.89,
+     "excess_pp": 2.35
+    }
+   }
+  }
+ }
+}

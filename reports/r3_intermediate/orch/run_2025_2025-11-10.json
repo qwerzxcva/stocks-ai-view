@@ -1,0 +1,479 @@
+{
+ "engine": "central_orchestrator v1",
+ "ts": "2026-10-24T02:13:46+08:00",
+ "elapsed_s": 153.296082,
+ "asof": "2025-11-10",
+ "regime": {
+  "regime": "bull",
+  "regime_score": 5.5,
+  "confidence": 1.0,
+  "phase": "repair",
+  "phase_cn": "修复",
+  "gate": 1.0,
+  "routing": {
+   "A": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "大盘趋势确认, 与 B 并联",
+    "weight": 0.6
+   },
+   "B": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "个股引擎主输出",
+    "weight": 1.0
+   },
+   "C": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "异动追共振",
+    "weight": 0.6
+   },
+   "D": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "消息作二次过滤",
+    "weight": 0.3
+   },
+   "E": {
+    "mode": "serial_before_all",
+    "tier": "中",
+    "note": "数据质检前置门禁",
+    "weight": 0.6
+   },
+   "F": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "资金流确认进攻",
+    "weight": 0.6
+   },
+   "G": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "行业主线共振加分",
+    "weight": 1.0
+   },
+   "H": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "另类信号仅参考",
+    "weight": 0.02
+   }
+  },
+  "evidence": {
+   "close_vs_ma20": {
+    "value": 1.77,
+    "points": 1.0
+   },
+   "close_vs_ma60": {
+    "value": 4.1,
+    "points": 1.0
+   },
+   "close_vs_ma250": {
+    "value": 15.19,
+    "points": 1.0
+   },
+   "ma20_slope_5d_pct": {
+    "value": 0.621,
+    "points": 0.5
+   },
+   "ma60_slope_5d_pct": {
+    "value": 0.802,
+    "points": 0.5
+   },
+   "ma250_slope_5d_pct": {
+    "value": 0.403,
+    "points": 0.5
+   },
+   "drawdown_from_250d_high_pct": {
+    "value": 0.0,
+    "points": 1.0
+   },
+   "vol60_percentile": {
+    "value": 0.476,
+    "note": "60日已实现波动率的全历史分位"
+   }
+  }
+ },
+ "routing": {
+  "source": "cli_override",
+  "groups_planned": [
+   "B",
+   "E"
+  ],
+  "runs": {
+   "E": {
+    "status": "ok",
+    "mode": "serial_before_all",
+    "elapsed_s": 0.007283,
+    "engines": [
+     "shard_check"
+    ]
+   },
+   "B": {
+    "status": "ok",
+    "mode": "parallel",
+    "engine_errors": null,
+    "engines": [
+     "engine_v5",
+     "tomorrow_candidate",
+     "morning_pick",
+     "price_level"
+    ]
+   }
+  }
+ },
+ "groups": {
+  "B": {
+   "engines": [
+    "engine_v5",
+    "tomorrow_candidate",
+    "morning_pick",
+    "price_level"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "engine_picks"
+   ]
+  },
+  "E": {
+   "engines": [
+    "shard_check"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "shard_check"
+   ]
+  }
+ },
+ "market_context": {
+  "anomalies": null,
+  "index_levels": null,
+  "cycle": null,
+  "shard_check": {
+   "n_shards": 18,
+   "bulk_latest": "2026-10-23",
+   "stale_vs_asof": false
+  }
+ },
+ "rounds": {
+  "engine_level": {
+   "cold_start": true,
+   "ensemble_weights": {
+    "tomorrow_candidate": 0.5,
+    "morning_pick": 0.5
+   },
+   "alpha": 1.0,
+   "review_winrate_excess": {
+    "tomorrow_candidate": 0.0,
+    "morning_pick": 0.0
+   }
+  },
+  "dim_level": {
+   "rule": "对口引擎权重 0.5, 辅助引擎均分余量 0.5; H 组 ≤0.02 写死",
+   "dims_observed": {
+    "ma": 30,
+    "rsi": 30,
+    "macd": 30,
+    "volume": 30,
+    "rel_strength": 30,
+    "gap_env": 5,
+    "breakout": 5,
+    "pullback": 5,
+    "momentum": 5,
+    "vol_energy": 5,
+    "sector": 6
+   }
+  },
+  "final": {
+   "formula": "S = 100 × regime_gate × Σ v_j·D_j (百分制, 与 LLM adjust ±10 同量纲)",
+   "regime_gate": 1.0,
+   "llm_detail": null,
+   "group_weights_v": {
+    "E": 0.375,
+    "B": 0.625
+   },
+   "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+   "llm_adjust_applied": 0,
+   "scored_universe": 32,
+   "output_filter": "main_board_only"
+  }
+ },
+ "top": [
+  {
+   "code": "sh603551",
+   "S_raw": 0.4162,
+   "S": 41.62,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.423,
+    "rsi": 0.206,
+    "macd": 0.9,
+    "volume": 0.925,
+    "sector": 1.0,
+    "rel_strength": 0.542
+   },
+   "group_contrib": {
+    "B": 0.6659999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 83.3,
+     "name": "奥普科技"
+    }
+   }
+  },
+  {
+   "code": "sh600493",
+   "S_raw": 0.4025,
+   "S": 40.25,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.644,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 82.2,
+     "name": "凤竹纺织"
+    }
+   }
+  },
+  {
+   "code": "sh600228",
+   "S_raw": 0.3687,
+   "S": 36.88,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.684,
+    "macd": 0.5,
+    "volume": 0.0,
+    "sector": 0.609,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.59,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 79.5,
+     "name": "返利科技"
+    }
+   }
+  },
+  {
+   "code": "sh603088",
+   "S_raw": 0.3633,
+   "S": 36.33,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.979,
+    "rsi": 0.68,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.5812,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 79.06,
+     "name": "宁波精达"
+    }
+   }
+  },
+  {
+   "code": "sz000955",
+   "S_raw": 0.3564,
+   "S": 35.64,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.893,
+    "rsi": 0.706,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.5702000000000002,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 78.51,
+     "name": "欣龙控股"
+    }
+   }
+  },
+  {
+   "code": "sh601996",
+   "S_raw": 0.342,
+   "S": 34.2,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.47,
+    "rsi": 0.8,
+    "macd": 0.9,
+    "volume": 1.0,
+    "rel_strength": 0.486,
+    "gap_env": 0.0,
+    "breakout": 1.0,
+    "pullback": 0.0,
+    "momentum": 0.397,
+    "vol_energy": 0.764
+   },
+   "group_contrib": {
+    "B": 0.5472,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 86.56,
+     "name": "丰林集团"
+    },
+    "morning_pick": {
+     "score": 68.16,
+     "name": "丰林集团"
+    }
+   }
+  },
+  {
+   "code": "sz000707",
+   "S_raw": 0.3394,
+   "S": 33.94,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.0,
+    "rsi": 0.837,
+    "macd": 0.5,
+    "volume": 0.87,
+    "rel_strength": 0.744
+   },
+   "group_contrib": {
+    "B": 0.5430000000000001,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 77.15,
+     "name": "双环科技"
+    }
+   }
+  },
+  {
+   "code": "sh600727",
+   "S_raw": 0.3366,
+   "S": 33.66,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.0,
+    "rsi": 0.824,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 0.603
+   },
+   "group_contrib": {
+    "B": 0.5386000000000002,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 76.93,
+     "name": "鲁北化工"
+    }
+   }
+  },
+  {
+   "code": "sz000686",
+   "S_raw": 0.3316,
+   "S": 33.16,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 1.0,
+    "sector": 0.505,
+    "rel_strength": 1.0,
+    "gap_env": 0.0,
+    "breakout": 1.0,
+    "pullback": 0.0,
+    "momentum": 0.906,
+    "vol_energy": 0.741
+   },
+   "group_contrib": {
+    "B": 0.5306000000000001,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 81.15,
+     "name": "东北证券"
+    },
+    "morning_pick": {
+     "score": 71.9,
+     "name": "东北证券"
+    }
+   }
+  },
+  {
+   "code": "sh600835",
+   "S_raw": 0.3275,
+   "S": 32.75,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.736,
+    "rsi": 0.718,
+    "macd": 0.5,
+    "volume": 0.794,
+    "rel_strength": 0.832,
+    "gap_env": 0.0,
+    "breakout": 1.0,
+    "pullback": 0.0,
+    "momentum": 0.643,
+    "vol_energy": 0.315
+   },
+   "group_contrib": {
+    "B": 0.524,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 85.8,
+     "name": "上海机电"
+    },
+    "morning_pick": {
+     "score": 66.6,
+     "name": "上海机电"
+    }
+   }
+  }
+ ],
+ "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+ "feedback_updater": "skipped (--no-feedback)",
+ "data_asof": {
+  "regime_router": {
+   "index": "2025-11-10",
+   "note": "本地数据滞后于当前日期 2026-10-23, 为已知限制"
+  },
+  "engines": {
+   "tomorrow_candidate": "2025-11-10",
+   "morning_pick": "2025-11-10"
+  }
+ },
+ "degraded": [
+  "无复盘权重文件 (/root/workspace/stocks-ai-view/reports/r3_intermediate/weights/fold_2025.json), 引擎级 ensembling 等权 (cold_start=true)"
+ ]
+}

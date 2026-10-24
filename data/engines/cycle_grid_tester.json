@@ -1,0 +1,338 @@
+{
+ "ts": "2026-10-23T22:07:13",
+ "engine": "cycle_grid_tester v1 (新增引擎, 不改既有文件)",
+ "asof": "2026-10-09",
+ "data_asof": {
+  "index": "2026-10-09",
+  "n_bars": 801,
+  "note": "样本 2023-06 起仅约 3.3 年, 检验功效有限; 本地数据滞后于 2026-10-23 为已知限制"
+ },
+ "params": {
+  "grid": 100.0,
+  "band": 30.0,
+  "window": 5,
+  "sims": 200,
+  "focus": 3500.0
+ },
+ "pivot_counts": {
+  "tops": 46,
+  "bottoms": 41,
+  "total": 87
+ },
+ "grid_hypothesis_test": {
+  "H0": "顶/谷落在 100 点网格 ±30 带内的比例不高于随机",
+  "hits": 52,
+  "n": 87,
+  "hit_rate": 0.5977,
+  "random_expectation_rate": 0.6,
+  "binom_pvalue_upper_tail": 0.5636,
+  "monte_carlo_shift_pvalue": 0.607,
+  "reading": "p<0.05 时网格聚集显著高于随机; 否则统计上不能拒绝「与随机无异」。本引擎只报统计量, 不据此确认或否定任何主观判断。"
+ },
+ "window_sensitivity": [
+  {
+   "window": 3,
+   "n_pivots": 146,
+   "hits": 88,
+   "hit_rate": 0.6027,
+   "random_expectation": 0.6
+  },
+  {
+   "window": 5,
+   "n_pivots": 87,
+   "hits": 52,
+   "hit_rate": 0.5977,
+   "random_expectation": 0.6
+  },
+  {
+   "window": 8,
+   "n_pivots": 59,
+   "hits": 40,
+   "hit_rate": 0.678,
+   "random_expectation": 0.6
+  },
+  {
+   "window": 10,
+   "n_pivots": 47,
+   "hits": 32,
+   "hit_rate": 0.6809,
+   "random_expectation": 0.6
+  }
+ ],
+ "round_level_support_resistance": [
+  {
+   "level": 2600,
+   "resistance_hits": 0,
+   "support_hits": 0,
+   "resistance_dates": [],
+   "support_dates": []
+  },
+  {
+   "level": 2700,
+   "resistance_hits": 0,
+   "support_hits": 2,
+   "resistance_dates": [],
+   "support_dates": [
+    "2024-01-23",
+    "2024-09-18"
+   ]
+  },
+  {
+   "level": 2800,
+   "resistance_hits": 0,
+   "support_hits": 0,
+   "resistance_dates": [],
+   "support_dates": []
+  },
+  {
+   "level": 2900,
+   "resistance_hits": 2,
+   "support_hits": 3,
+   "resistance_dates": [
+    "2024-01-26",
+    "2024-08-19"
+   ],
+   "support_dates": [
+    "2023-10-23",
+    "2023-12-21",
+    "2024-07-09"
+   ]
+  },
+  {
+   "level": 3000,
+   "resistance_hits": 3,
+   "support_hits": 2,
+   "resistance_dates": [
+    "2024-01-02",
+    "2024-07-02",
+    "2024-07-19"
+   ],
+   "support_dates": [
+    "2024-03-28",
+    "2024-04-15"
+   ]
+  },
+  {
+   "level": 3100,
+   "resistance_hits": 5,
+   "support_hits": 1,
+   "resistance_dates": [
+    "2023-11-21",
+    "2024-03-19",
+    "2024-03-21",
+    "2024-04-02",
+    "2024-04-18"
+   ],
+   "support_dates": [
+    "2023-09-08"
+   ]
+  },
+  {
+   "level": 3200,
+   "resistance_hits": 2,
+   "support_hits": 2,
+   "resistance_dates": [
+    "2023-08-28",
+    "2024-05-20"
+   ],
+   "support_dates": [
+    "2024-11-27",
+    "2025-01-22"
+   ]
+  },
+  {
+   "level": 3300,
+   "resistance_hits": 1,
+   "support_hits": 2,
+   "resistance_dates": [
+    "2023-07-31"
+   ],
+   "support_dates": [
+    "2025-03-04",
+    "2025-04-30"
+   ]
+  },
+  {
+   "level": 3400,
+   "resistance_hits": 4,
+   "support_hits": 0,
+   "resistance_dates": [
+    "2024-12-27",
+    "2025-02-27",
+    "2025-05-14",
+    "2025-06-11"
+   ],
+   "support_dates": []
+  },
+  {
+   "level": 3500,
+   "resistance_hits": 2,
+   "support_hits": 0,
+   "resistance_dates": [
+    "2024-11-08",
+    "2024-12-10"
+   ],
+   "support_dates": []
+  },
+  {
+   "level": 3600,
+   "resistance_hits": 0,
+   "support_hits": 0,
+   "resistance_dates": [],
+   "support_dates": []
+  },
+  {
+   "level": 3700,
+   "resistance_hits": 1,
+   "support_hits": 0,
+   "resistance_dates": [
+    "2024-10-08"
+   ],
+   "support_dates": []
+  },
+  {
+   "level": 3800,
+   "resistance_hits": 0,
+   "support_hits": 5,
+   "resistance_dates": [],
+   "support_dates": [
+    "2025-09-23",
+    "2025-10-13",
+    "2025-11-24",
+    "2025-12-16",
+    "2026-03-23"
+   ]
+  },
+  {
+   "level": 3900,
+   "resistance_hits": 2,
+   "support_hits": 2,
+   "resistance_dates": [
+    "2025-08-26",
+    "2025-09-18"
+   ],
+   "support_dates": [
+    "2025-11-05",
+    "2026-06-08"
+   ]
+  },
+  {
+   "level": 4000,
+   "resistance_hits": 3,
+   "support_hits": 2,
+   "resistance_dates": [
+    "2025-10-30",
+    "2026-08-18",
+    "2026-09-01"
+   ],
+   "support_dates": [
+    "2026-02-03",
+    "2026-06-29"
+   ]
+  },
+  {
+   "level": 4100,
+   "resistance_hits": 1,
+   "support_hits": 1,
+   "resistance_dates": [
+    "2026-07-10"
+   ],
+   "support_dates": [
+    "2026-01-20"
+   ]
+  },
+  {
+   "level": 4200,
+   "resistance_hits": 4,
+   "support_hits": 0,
+   "resistance_dates": [
+    "2026-01-14",
+    "2026-01-29",
+    "2026-03-03",
+    "2026-06-23"
+   ],
+   "support_dates": []
+  },
+  {
+   "level": 4300,
+   "resistance_hits": 0,
+   "support_hits": 0,
+   "resistance_dates": [],
+   "support_dates": []
+  }
+ ],
+ "focus_level_stats": {
+  "level": 3500,
+  "resistance_hits": 2,
+  "support_hits": 0,
+  "resistance_dates": [
+   "2024-11-08",
+   "2024-12-10"
+  ],
+  "support_dates": []
+ },
+ "focus_reading": "3500±30 区间历史命中见 focus_level_stats; 「是否构成支撑」仅为历史频率描述, 不含对未来点位的预判。",
+ "recent_top_bottom_alternation": [
+  {
+   "from": {
+    "type": "top",
+    "date": "2026-08-18",
+    "price": 3994.18
+   },
+   "to": {
+    "type": "bottom",
+    "date": "2026-08-25",
+    "price": 3850.86
+   },
+   "amplitude": -143.32
+  },
+  {
+   "from": {
+    "type": "bottom",
+    "date": "2026-08-25",
+    "price": 3850.86
+   },
+   "to": {
+    "type": "top",
+    "date": "2026-09-01",
+    "price": 3995.18
+   },
+   "amplitude": 144.32
+  },
+  {
+   "from": {
+    "type": "top",
+    "date": "2026-09-01",
+    "price": 3995.18
+   },
+   "to": {
+    "type": "bottom",
+    "date": "2026-09-16",
+    "price": 3842.72
+   },
+   "amplitude": -152.46
+  },
+  {
+   "from": {
+    "type": "bottom",
+    "date": "2026-09-16",
+    "price": 3842.72
+   },
+   "to": {
+    "type": "top",
+    "date": "2026-09-22",
+    "price": 3967.68
+   },
+   "amplitude": 124.96
+  }
+ ],
+ "swing_amplitude_stats": {
+  "n_swings": 70,
+  "mean": 192.5,
+  "median": 151.6,
+  "min": 65.8,
+  "max": 984.7,
+  "pct_amplitude_near_grid_multiple": 0.6
+ },
+ "wording_discipline": "本报告只陈述统计结果; 不确认、不否定、不预测用户关于网格/点位的判断。"
+}

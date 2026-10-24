@@ -1,0 +1,451 @@
+{
+ "engine": "central_orchestrator v1",
+ "ts": "2026-10-24T01:20:58+08:00",
+ "elapsed_s": 106.054864,
+ "asof": "2024-09-27",
+ "regime": {
+  "regime": "bull",
+  "regime_score": 3.5,
+  "confidence": 0.936,
+  "phase": "rally",
+  "phase_cn": "主升",
+  "gate": 1.0,
+  "routing": {
+   "A": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "大盘趋势确认, 与 B 并联",
+    "weight": 0.6
+   },
+   "B": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "个股引擎主输出",
+    "weight": 1.0
+   },
+   "C": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "异动追共振",
+    "weight": 0.6
+   },
+   "D": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "消息作二次过滤",
+    "weight": 0.3
+   },
+   "E": {
+    "mode": "serial_before_all",
+    "tier": "中",
+    "note": "数据质检前置门禁",
+    "weight": 0.6
+   },
+   "F": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "资金流确认进攻",
+    "weight": 0.6
+   },
+   "G": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "行业主线共振加分",
+    "weight": 1.0
+   },
+   "H": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "另类信号仅参考",
+    "weight": 0.02
+   }
+  },
+  "evidence": {
+   "close_vs_ma20": {
+    "value": 10.21,
+    "points": 1.0
+   },
+   "close_vs_ma60": {
+    "value": 7.58,
+    "points": 1.0
+   },
+   "close_vs_ma250": {
+    "value": 3.66,
+    "points": 1.0
+   },
+   "ma20_slope_5d_pct": {
+    "value": 0.632,
+    "points": 0.5
+   },
+   "ma60_slope_5d_pct": {
+    "value": -0.168,
+    "points": -0.5
+   },
+   "ma250_slope_5d_pct": {
+    "value": -0.141,
+    "points": -0.5
+   },
+   "drawdown_from_250d_high_pct": {
+    "value": -2.64,
+    "points": 1.0
+   },
+   "vol60_percentile": {
+    "value": 0.806,
+    "note": "60日已实现波动率的全历史分位"
+   }
+  }
+ },
+ "routing": {
+  "source": "cli_override",
+  "groups_planned": [
+   "B",
+   "E"
+  ],
+  "runs": {
+   "E": {
+    "status": "ok",
+    "mode": "serial_before_all",
+    "elapsed_s": 0.006572,
+    "engines": [
+     "shard_check"
+    ]
+   },
+   "B": {
+    "status": "ok",
+    "mode": "parallel",
+    "engine_errors": null,
+    "engines": [
+     "engine_v5",
+     "tomorrow_candidate",
+     "morning_pick",
+     "price_level"
+    ]
+   }
+  }
+ },
+ "groups": {
+  "B": {
+   "engines": [
+    "engine_v5",
+    "tomorrow_candidate",
+    "morning_pick",
+    "price_level"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "engine_picks"
+   ]
+  },
+  "E": {
+   "engines": [
+    "shard_check"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "shard_check"
+   ]
+  }
+ },
+ "market_context": {
+  "anomalies": null,
+  "index_levels": null,
+  "cycle": null,
+  "shard_check": {
+   "n_shards": 18,
+   "bulk_latest": "2026-10-23",
+   "stale_vs_asof": false
+  }
+ },
+ "rounds": {
+  "engine_level": {
+   "cold_start": false,
+   "ensemble_weights": {
+    "tomorrow_candidate": 0.5,
+    "morning_pick": 0.5
+   },
+   "alpha": 1.0,
+   "review_winrate_excess": {
+    "tomorrow_candidate": 0.0,
+    "morning_pick": 0.0
+   }
+  },
+  "dim_level": {
+   "rule": "对口引擎权重 0.5, 辅助引擎均分余量 0.5; H 组 ≤0.02 写死",
+   "dims_observed": {
+    "ma": 30,
+    "rsi": 30,
+    "macd": 30,
+    "volume": 30,
+    "rel_strength": 30,
+    "sector": 14,
+    "gap_env": 5,
+    "breakout": 5,
+    "pullback": 5,
+    "momentum": 5,
+    "vol_energy": 5
+   }
+  },
+  "final": {
+   "formula": "S = 100 × regime_gate × Σ v_j·D_j (百分制, 与 LLM adjust ±10 同量纲)",
+   "regime_gate": 1.0,
+   "llm_detail": null,
+   "group_weights_v": {
+    "E": 0.375,
+    "B": 0.625
+   },
+   "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+   "llm_adjust_applied": 0,
+   "scored_universe": 32,
+   "output_filter": "main_board_only"
+  }
+ },
+ "top": [
+  {
+   "code": "sz002406",
+   "S_raw": 0.5509,
+   "S": 55.09,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.907,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8813999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 94.07,
+     "name": "远东传动"
+    }
+   }
+  },
+  {
+   "code": "sz002513",
+   "S_raw": 0.5506,
+   "S": 55.06,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.905,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8809999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 94.05,
+     "name": "蓝丰生化"
+    }
+   }
+  },
+  {
+   "code": "sz002159",
+   "S_raw": 0.5246,
+   "S": 52.46,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.86,
+    "macd": 0.5,
+    "volume": 1.0,
+    "sector": 0.676,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8393999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 91.97,
+     "name": "三特索道"
+    }
+   }
+  },
+  {
+   "code": "sz002103",
+   "S_raw": 0.5242,
+   "S": 52.42,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.864,
+    "rsi": 0.878,
+    "macd": 0.5,
+    "volume": 0.813,
+    "sector": 0.978,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8388,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 91.94,
+     "name": "广博股份"
+    }
+   }
+  },
+  {
+   "code": "sz002692",
+   "S_raw": 0.52,
+   "S": 52.0,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.813,
+    "rsi": 0.929,
+    "macd": 0.5,
+    "volume": 0.918,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8319999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 91.6,
+     "name": "远程股份"
+    }
+   }
+  },
+  {
+   "code": "sz002075",
+   "S_raw": 0.5015,
+   "S": 50.15,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.617,
+    "macd": 0.5,
+    "volume": 0.895,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.8024000000000001,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 90.12,
+     "name": "沙钢股份"
+    }
+   }
+  },
+  {
+   "code": "sh600073",
+   "S_raw": 0.4959,
+   "S": 49.59,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.734,
+    "rsi": 0.943,
+    "macd": 0.5,
+    "volume": 0.786,
+    "sector": 0.797,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.7934,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 89.67,
+     "name": "光明肉业"
+    }
+   }
+  },
+  {
+   "code": "sz000593",
+   "S_raw": 0.4889,
+   "S": 48.89,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.801,
+    "rsi": 0.809,
+    "macd": 0.5,
+    "volume": 0.835,
+    "rel_strength": 0.966
+   },
+   "group_contrib": {
+    "B": 0.7822,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 89.11,
+     "name": "德龙汇能"
+    }
+   }
+  },
+  {
+   "code": "sh603580",
+   "S_raw": 0.4394,
+   "S": 43.94,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.407,
+    "rsi": 0.798,
+    "macd": 0.9,
+    "volume": 0.758,
+    "rel_strength": 0.652
+   },
+   "group_contrib": {
+    "B": 0.7030000000000001,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 85.15,
+     "name": "艾艾精工"
+    }
+   }
+  },
+  {
+   "code": "sz002186",
+   "S_raw": 0.4375,
+   "S": 43.75,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 1.0,
+    "sector": 1.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.7,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 85.0,
+     "name": "全 聚 德"
+    }
+   }
+  }
+ ],
+ "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+ "feedback_updater": "skipped (--no-feedback)",
+ "data_asof": {
+  "regime_router": {
+   "index": "2024-09-27",
+   "note": "本地数据滞后于当前日期 2026-10-23, 为已知限制"
+  },
+  "engines": {
+   "tomorrow_candidate": "2024-09-27",
+   "morning_pick": "2024-09-27"
+  }
+ },
+ "degraded": null
+}

@@ -1,0 +1,63 @@
+{
+ "engine": "strategy_router T2 soft weights",
+ "version": 1,
+ "ts": "2026-10-24T06:00:00+08:00",
+ "asof": "2026-10-20",
+ "manual": true,
+ "manual_reason": "T2 权重降级：由硬编码 TIER_MAP 分档剔除降级为 10 策略软加权；权重由 T1 参数网格（Bonferroni 校正）+ T3 全市场 bear 段 3200 只稳健性 + regime×策略交叉表证据人工定版",
+ "rollback": "router 未接线时本文件纯声明性，不影响线上行为；接线后回滚 = 删除本文件并恢复 strategy_router.py 硬编码 TIER_MAP（bear→s01/s02/s05/s09, range→s06/s08/s10, bull→s03/s04/s07）",
+ "schema": "strategy_weights[regime][strategy_module] = weight; 每 regime 行 10 策略权重总和 = 1.0; 策略名为 strategies/ 下模块名（与 TIER_MAP 一致）",
+ "constraints": "全部权重 ∈ [0.03, 0.25]，无零权、无硬剔除；S4 全 regime 地板 0.05（全市场 n=0 失效）；S7 全局最低 0.03-0.05；S2 bear 段无效压至 0.06",
+ "strategy_weights": {
+  "bear": {
+   "s09_boll_band": 0.22,
+   "s05_drawdown_cushion": 0.21,
+   "s01_ema_strict": 0.19,
+   "s03_turnover_relay": 0.09,
+   "s02_conservative_risk": 0.06,
+   "s06_strong_pullback": 0.06,
+   "s04_intraday_breakout": 0.05,
+   "s08_multifactor_resonance": 0.05,
+   "s10_main_capital": 0.04,
+   "s07_emotion_limitup": 0.03
+  },
+  "range": {
+   "s06_strong_pullback": 0.15,
+   "s08_multifactor_resonance": 0.14,
+   "s10_main_capital": 0.12,
+   "s01_ema_strict": 0.11,
+   "s05_drawdown_cushion": 0.11,
+   "s09_boll_band": 0.11,
+   "s03_turnover_relay": 0.1,
+   "s02_conservative_risk": 0.06,
+   "s04_intraday_breakout": 0.05,
+   "s07_emotion_limitup": 0.05
+  },
+  "bull": {
+   "s03_turnover_relay": 0.19,
+   "s01_ema_strict": 0.15,
+   "s09_boll_band": 0.11,
+   "s10_main_capital": 0.11,
+   "s06_strong_pullback": 0.1,
+   "s08_multifactor_resonance": 0.1,
+   "s05_drawdown_cushion": 0.09,
+   "s02_conservative_risk": 0.05,
+   "s04_intraday_breakout": 0.05,
+   "s07_emotion_limitup": 0.05
+  }
+ },
+ "evidence_refs": {
+  "bear_defense": "T3 全市场 bear 段 3200 只稳健性确认：S9/S5/S1 为 bear 段正超额主力，故 bear 档三策略合计 0.62",
+  "s2_bear": "T3 regime×策略交叉表：S2 bear 段超额无效 → bear 档压至 0.06",
+  "s4_invalid": "S4 盘中突破全市场扩样验证 n=0（信号失效）→ 全 regime 地板 0.05 而非剔除",
+  "s7_lowest": "S7 情绪连板各 regime 超额均最低 → 全局 0.03-0.05",
+  "t1_grid": "T1 参数网格搜索（Bonferroni 多重检验校正）确认 bear 段头部排序稳健",
+  "range_bull": "range/bull 段无显著头部 → 近等权微调：range 微升 s06/s08，bull 微升 s03/s01"
+ },
+ "caveats": [
+  "生效前提：strategy_router.py 需改为读本文件替代硬编码 TIER_MAP；未接线前本文件纯声明性，不改变任何线上行为",
+  "权重基于历史 bear/range/bull 段回测超额，不保证未来 regime 下有效；regime 误判会直接传导到权重错配",
+  "evidence 均为自基准相对超额（同 lookback 全市场等权为基准），非绝对收益承诺",
+  "S4 地板 0.05 仅为保留恢复通道，其信号当前无统计效力"
+ ]
+}

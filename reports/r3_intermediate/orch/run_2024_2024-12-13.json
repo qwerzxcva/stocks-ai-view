@@ -1,0 +1,459 @@
+{
+ "engine": "central_orchestrator v1",
+ "ts": "2026-10-24T01:37:54+08:00",
+ "elapsed_s": 96.662205,
+ "asof": "2024-12-13",
+ "regime": {
+  "regime": "bull",
+  "regime_score": 5.5,
+  "confidence": 1.0,
+  "phase": "rally",
+  "phase_cn": "主升",
+  "gate": 1.0,
+  "routing": {
+   "A": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "大盘趋势确认, 与 B 并联",
+    "weight": 0.6
+   },
+   "B": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "个股引擎主输出",
+    "weight": 1.0
+   },
+   "C": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "异动追共振",
+    "weight": 0.6
+   },
+   "D": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "消息作二次过滤",
+    "weight": 0.3
+   },
+   "E": {
+    "mode": "serial_before_all",
+    "tier": "中",
+    "note": "数据质检前置门禁",
+    "weight": 0.6
+   },
+   "F": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "资金流确认进攻",
+    "weight": 0.6
+   },
+   "G": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "行业主线共振加分",
+    "weight": 1.0
+   },
+   "H": {
+    "mode": "serial_after_B",
+    "tier": "轻",
+    "note": "另类信号仅参考",
+    "weight": 0.02
+   }
+  },
+  "evidence": {
+   "close_vs_ma20": {
+    "value": 1.07,
+    "points": 1.0
+   },
+   "close_vs_ma60": {
+    "value": 4.38,
+    "points": 1.0
+   },
+   "close_vs_ma250": {
+    "value": 11.78,
+    "points": 1.0
+   },
+   "ma20_slope_5d_pct": {
+    "value": 0.103,
+    "points": 0.5
+   },
+   "ma60_slope_5d_pct": {
+    "value": 1.751,
+    "points": 0.5
+   },
+   "ma250_slope_5d_pct": {
+    "value": 0.259,
+    "points": 0.5
+   },
+   "drawdown_from_250d_high_pct": {
+    "value": -2.81,
+    "points": 1.0
+   },
+   "vol60_percentile": {
+    "value": 0.983,
+    "note": "60日已实现波动率的全历史分位"
+   }
+  }
+ },
+ "routing": {
+  "source": "cli_override",
+  "groups_planned": [
+   "B",
+   "E"
+  ],
+  "runs": {
+   "E": {
+    "status": "ok",
+    "mode": "serial_before_all",
+    "elapsed_s": 0.004998,
+    "engines": [
+     "shard_check"
+    ]
+   },
+   "B": {
+    "status": "ok",
+    "mode": "parallel",
+    "engine_errors": null,
+    "engines": [
+     "engine_v5",
+     "tomorrow_candidate",
+     "morning_pick",
+     "price_level"
+    ]
+   }
+  }
+ },
+ "groups": {
+  "B": {
+   "engines": [
+    "engine_v5",
+    "tomorrow_candidate",
+    "morning_pick",
+    "price_level"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "engine_picks"
+   ]
+  },
+  "E": {
+   "engines": [
+    "shard_check"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "shard_check"
+   ]
+  }
+ },
+ "market_context": {
+  "anomalies": null,
+  "index_levels": null,
+  "cycle": null,
+  "shard_check": {
+   "n_shards": 18,
+   "bulk_latest": "2026-10-23",
+   "stale_vs_asof": false
+  }
+ },
+ "rounds": {
+  "engine_level": {
+   "cold_start": false,
+   "ensemble_weights": {
+    "tomorrow_candidate": 0.5,
+    "morning_pick": 0.5
+   },
+   "alpha": 1.0,
+   "review_winrate_excess": {
+    "tomorrow_candidate": 0.0,
+    "morning_pick": 0.0
+   }
+  },
+  "dim_level": {
+   "rule": "对口引擎权重 0.5, 辅助引擎均分余量 0.5; H 组 ≤0.02 写死",
+   "dims_observed": {
+    "ma": 30,
+    "rsi": 30,
+    "macd": 30,
+    "volume": 30,
+    "rel_strength": 30,
+    "gap_env": 5,
+    "breakout": 5,
+    "pullback": 5,
+    "momentum": 5,
+    "vol_energy": 5,
+    "sector": 6
+   }
+  },
+  "final": {
+   "formula": "S = 100 × regime_gate × Σ v_j·D_j (百分制, 与 LLM adjust ±10 同量纲)",
+   "regime_gate": 1.0,
+   "llm_detail": null,
+   "group_weights_v": {
+    "E": 0.375,
+    "B": 0.625
+   },
+   "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+   "llm_adjust_applied": 0,
+   "scored_universe": 33,
+   "output_filter": "main_board_only"
+  }
+ },
+ "top": [
+  {
+   "code": "sz002438",
+   "S_raw": 0.4967,
+   "S": 49.67,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.744,
+    "rsi": 0.976,
+    "macd": 0.5,
+    "volume": 0.754,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.7948,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 89.74,
+     "name": "江苏神通"
+    }
+   }
+  },
+  {
+   "code": "sh600769",
+   "S_raw": 0.473,
+   "S": 47.3,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.855,
+    "rsi": 0.662,
+    "macd": 0.5,
+    "volume": 0.767,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.7568,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 87.84,
+     "name": "祥龙电业"
+    }
+   }
+  },
+  {
+   "code": "sh603551",
+   "S_raw": 0.4162,
+   "S": 41.62,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.423,
+    "rsi": 0.206,
+    "macd": 0.9,
+    "volume": 0.925,
+    "sector": 1.0,
+    "rel_strength": 0.542
+   },
+   "group_contrib": {
+    "B": 0.6659999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 83.3,
+     "name": "奥普科技"
+    }
+   }
+  },
+  {
+   "code": "sz001380",
+   "S_raw": 0.3919,
+   "S": 39.19,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.99,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 0.918,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.6269999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 81.35,
+     "name": "华纬科技"
+    }
+   }
+  },
+  {
+   "code": "sh600866",
+   "S_raw": 0.3761,
+   "S": 37.61,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.866,
+    "rsi": 0.905,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.6018000000000001,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 80.09,
+     "name": "星湖科技"
+    }
+   }
+  },
+  {
+   "code": "sz002395",
+   "S_raw": 0.36,
+   "S": 36.0,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.873,
+    "rsi": 0.843,
+    "macd": 0.5,
+    "volume": 0.0,
+    "sector": 0.487,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.576,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 78.8,
+     "name": "双象股份"
+    }
+   }
+  },
+  {
+   "code": "sz000929",
+   "S_raw": 0.3565,
+   "S": 35.65,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.973,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 0.775,
+    "sector": 0.419,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.5703999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 78.52,
+     "name": "兰州黄河"
+    }
+   }
+  },
+  {
+   "code": "sz002241",
+   "S_raw": 0.3293,
+   "S": 32.93,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 1.0,
+    "rsi": 0.0,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 1.0,
+    "gap_env": 0.0,
+    "breakout": 1.0,
+    "pullback": 0.0,
+    "momentum": 0.909,
+    "vol_energy": 0.553
+   },
+   "group_contrib": {
+    "B": 0.5268,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 82.2,
+     "name": "歌尔股份"
+    },
+    "morning_pick": {
+     "score": 70.48,
+     "name": "歌尔股份"
+    }
+   }
+  },
+  {
+   "code": "sh601599",
+   "S_raw": 0.3262,
+   "S": 32.62,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.627,
+    "rsi": 0.71,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.5219999999999999,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 76.1,
+     "name": "浙文影业"
+    }
+   }
+  },
+  {
+   "code": "sh600159",
+   "S_raw": 0.3159,
+   "S": 31.59,
+   "gate": 1.0,
+   "dim_votes": {
+    "ma": 0.594,
+    "rsi": 0.907,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 0.746
+   },
+   "group_contrib": {
+    "B": 0.5054,
+    "E": 0.0
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 75.27,
+     "name": "大龙地产"
+    }
+   }
+  }
+ ],
+ "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+ "feedback_updater": "skipped (--no-feedback)",
+ "data_asof": {
+  "regime_router": {
+   "index": "2024-12-13",
+   "note": "本地数据滞后于当前日期 2026-10-23, 为已知限制"
+  },
+  "engines": {
+   "tomorrow_candidate": "2024-12-13",
+   "morning_pick": "2024-12-13"
+  }
+ },
+ "degraded": null
+}

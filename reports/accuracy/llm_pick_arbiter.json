@@ -1,0 +1,81 @@
+{
+ "engine": "llm_pick_arbiter",
+ "metric": "rule 降级调分有效性: 中枢 top10 按 dim_votes 离散度+regime 规则调分后, 上调组 vs 下调组 T+1/T+5 胜率差",
+ "note": "R3 中 llm 100% JSONDecodeError → 本评估为重放 rule 降级路径(生产同函数, 键名 dim_votes 适配)",
+ "adjust_rule": "dim_votes 均值≥0.7且sd≤0.15→+2; sd≥0.4→-2; bear&S≥80→-2; bull&S≥75→+1; 封顶±10",
+ "results": {
+  "T+1": {
+   "adjust_up": {
+    "n": 12,
+    "wins": 5,
+    "win_rate": 0.4167,
+    "wilson95": [
+     0.1933,
+     0.6805
+    ],
+    "avg_ret_pct": 0.51
+   },
+   "adjust_down": {
+    "n": 50,
+    "wins": 20,
+    "win_rate": 0.4,
+    "wilson95": [
+     0.2761,
+     0.5382
+    ],
+    "avg_ret_pct": -0.621
+   },
+   "no_adjust": {
+    "n": 401,
+    "wins": 185,
+    "win_rate": 0.4613,
+    "wilson95": [
+     0.4132,
+     0.5103
+    ],
+    "avg_ret_pct": 0.153
+   },
+   "up_minus_down_pp": 1.67,
+   "avg_ret_diff_pp": 1.131
+  },
+  "T+5": {
+   "adjust_up": {
+    "n": 12,
+    "wins": 5,
+    "win_rate": 0.4167,
+    "wilson95": [
+     0.1933,
+     0.6805
+    ],
+    "avg_ret_pct": -2.278
+   },
+   "adjust_down": {
+    "n": 50,
+    "wins": 20,
+    "win_rate": 0.4,
+    "wilson95": [
+     0.2761,
+     0.5382
+    ],
+    "avg_ret_pct": -1.104
+   },
+   "no_adjust": {
+    "n": 401,
+    "wins": 183,
+    "win_rate": 0.4564,
+    "wilson95": [
+     0.4083,
+     0.5053
+    ],
+    "avg_ret_pct": 0.342
+   },
+   "up_minus_down_pp": 1.67,
+   "avg_ret_diff_pp": -1.174
+  }
+ },
+ "caveats": [
+  "中枢 dim_votes 键为 ma/rsi/macd/volume/rel_strength, 非生产 DIM_KEYS 中文维度 → 规则实际为 dim_votes 离散度版",
+  "LLM 真实路径(heavy/light)无法回测(无历史 API 响应)",
+  "样本 470 条, 规则触发率有限"
+ ]
+}

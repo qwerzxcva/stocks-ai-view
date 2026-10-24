@@ -1,0 +1,466 @@
+{
+ "meta": {
+  "title": "T3续 S5/S9 bear段全市场验证（无前视+全市场等权基准）",
+  "pool": 100,
+  "bear_days": 174,
+  "subscene_days": {
+   "grind": 153,
+   "panic": 6,
+   "bottom": 15
+  },
+  "index_range": [
+   "2023-06-16",
+   "2026-10-23"
+  ],
+  "horizons": [
+   5,
+   10
+  ],
+  "bench": "全市场主板等权",
+  "prescreen": "精确必要条件预筛（因果指标 full[i]==slice[i]），命中日调官方evaluate核实"
+ },
+ "strategies": {
+  "s05_drawdown_cushion": {
+   "n_signals": 1195,
+   "horizons": {
+    "T+5": {
+     "n": 1195,
+     "win_rate": 0.5113,
+     "wilson95": [
+      0.483,
+      0.5396
+     ],
+     "avg_ret_pct": 1.776,
+     "bench_avg_pct": 1.482,
+     "excess_pp": 0.294,
+     "bench_win_rate": 0.5375,
+     "win_excess_pp": -2.62,
+     "by_scene": {
+      "grind": {
+       "n": 1087,
+       "win_rate": 0.4977,
+       "wilson95": [
+        0.468,
+        0.5274
+       ],
+       "avg_ret_pct": 0.664,
+       "bench_avg_pct": 0.762,
+       "excess_pp": -0.098,
+       "bench_win_rate": 0.5214,
+       "win_excess_pp": -2.37
+      },
+      "panic": {
+       "n": 100,
+       "win_rate": 0.63,
+       "wilson95": [
+        0.5322,
+        0.7182
+       ],
+       "avg_ret_pct": 13.777,
+       "bench_avg_pct": 9.197,
+       "excess_pp": 4.58,
+       "bench_win_rate": 0.6932,
+       "win_excess_pp": -6.32
+      },
+      "bottom": {
+       "n": 8,
+       "win_rate": 0.875,
+       "wilson95": [
+        0.5291,
+        0.9776
+       ],
+       "avg_ret_pct": 2.815,
+       "bench_avg_pct": 2.855,
+       "excess_pp": -0.04,
+       "bench_win_rate": 0.7857,
+       "win_excess_pp": 8.93
+      }
+     },
+     "by_year": {
+      "2023": {
+       "n": 442,
+       "win_rate": 0.4457,
+       "wilson95": [
+        0.4,
+        0.4923
+       ],
+       "avg_ret_pct": 0.019,
+       "bench_avg_pct": -0.054,
+       "excess_pp": 0.073,
+       "bench_win_rate": 0.465,
+       "win_excess_pp": -1.93
+      },
+      "2024": {
+       "n": 606,
+       "win_rate": 0.495,
+       "wilson95": [
+        0.4554,
+        0.5348
+       ],
+       "avg_ret_pct": 2.537,
+       "bench_avg_pct": 2.264,
+       "excess_pp": 0.273,
+       "bench_win_rate": 0.5397,
+       "win_excess_pp": -4.47
+      },
+      "2025": {
+       "n": 70,
+       "win_rate": 1.0,
+       "wilson95": [
+        0.948,
+        1.0
+       ],
+       "avg_ret_pct": 6.549,
+       "bench_avg_pct": 4.795,
+       "excess_pp": 1.755,
+       "bench_win_rate": 0.9228,
+       "win_excess_pp": 7.72
+      },
+      "2026": {
+       "n": 77,
+       "win_rate": 0.5714,
+       "wilson95": [
+        0.4601,
+        0.676
+       ],
+       "avg_ret_pct": 1.524,
+       "bench_avg_pct": 1.131,
+       "excess_pp": 0.393,
+       "bench_win_rate": 0.586,
+       "win_excess_pp": -1.45
+      }
+     }
+    },
+    "T+10": {
+     "n": 1195,
+     "win_rate": 0.5172,
+     "wilson95": [
+      0.4888,
+      0.5454
+     ],
+     "avg_ret_pct": 4.419,
+     "bench_avg_pct": 2.353,
+     "excess_pp": 2.066,
+     "bench_win_rate": 0.5228,
+     "win_excess_pp": -0.56,
+     "by_scene": {
+      "grind": {
+       "n": 1087,
+       "win_rate": 0.4913,
+       "wilson95": [
+        0.4616,
+        0.521
+       ],
+       "avg_ret_pct": 0.872,
+       "bench_avg_pct": 1.032,
+       "excess_pp": -0.159,
+       "bench_win_rate": 0.4978,
+       "win_excess_pp": -0.65
+      },
+      "panic": {
+       "n": 100,
+       "win_rate": 0.81,
+       "wilson95": [
+        0.7222,
+        0.8749
+       ],
+       "avg_ret_pct": 43.48,
+       "bench_avg_pct": 17.075,
+       "excess_pp": 26.405,
+       "bench_win_rate": 0.8085,
+       "win_excess_pp": 0.15
+      },
+      "bottom": {
+       "n": 8,
+       "win_rate": 0.375,
+       "wilson95": [
+        0.1368,
+        0.6943
+       ],
+       "avg_ret_pct": -1.89,
+       "bench_avg_pct": -2.079,
+       "excess_pp": 0.189,
+       "bench_win_rate": 0.3482,
+       "win_excess_pp": 2.68
+      }
+     },
+     "by_year": {
+      "2023": {
+       "n": 442,
+       "win_rate": 0.4661,
+       "wilson95": [
+        0.42,
+        0.5127
+       ],
+       "avg_ret_pct": 0.152,
+       "bench_avg_pct": -0.026,
+       "excess_pp": 0.178,
+       "bench_win_rate": 0.4516,
+       "win_excess_pp": 1.45
+      },
+      "2024": {
+       "n": 606,
+       "win_rate": 0.4934,
+       "wilson95": [
+        0.4538,
+        0.5331
+       ],
+       "avg_ret_pct": 7.472,
+       "bench_avg_pct": 3.952,
+       "excess_pp": 3.521,
+       "bench_win_rate": 0.5241,
+       "win_excess_pp": -3.07
+      },
+      "2025": {
+       "n": 70,
+       "win_rate": 0.9714,
+       "wilson95": [
+        0.9017,
+        0.9921
+       ],
+       "avg_ret_pct": 6.52,
+       "bench_avg_pct": 4.796,
+       "excess_pp": 1.724,
+       "bench_win_rate": 0.9152,
+       "win_excess_pp": 5.62
+      },
+      "2026": {
+       "n": 77,
+       "win_rate": 0.5844,
+       "wilson95": [
+        0.4729,
+        0.6879
+       ],
+       "avg_ret_pct": 2.976,
+       "bench_avg_pct": 1.213,
+       "excess_pp": 1.763,
+       "bench_win_rate": 0.5643,
+       "win_excess_pp": 2.01
+      }
+     }
+    }
+   }
+  },
+  "s09_boll_band": {
+   "n_signals": 338,
+   "horizons": {
+    "T+5": {
+     "n": 338,
+     "win_rate": 0.5799,
+     "wilson95": [
+      0.5267,
+      0.6313
+     ],
+     "avg_ret_pct": 6.428,
+     "bench_avg_pct": 3.761,
+     "excess_pp": 2.667,
+     "bench_win_rate": 0.6157,
+     "win_excess_pp": -3.58,
+     "by_scene": {
+      "grind": {
+       "n": 270,
+       "win_rate": 0.5481,
+       "wilson95": [
+        0.4885,
+        0.6064
+       ],
+       "avg_ret_pct": 1.298,
+       "bench_avg_pct": 1.32,
+       "excess_pp": -0.022,
+       "bench_win_rate": 0.5782,
+       "win_excess_pp": -3.0
+      },
+      "panic": {
+       "n": 67,
+       "win_rate": 0.7015,
+       "wilson95": [
+        0.5834,
+        0.7977
+       ],
+       "avg_ret_pct": 27.169,
+       "bench_avg_pct": 13.609,
+       "excess_pp": 13.559,
+       "bench_win_rate": 0.7644,
+       "win_excess_pp": -6.29
+      },
+      "bottom": {
+       "n": 1,
+       "win_rate": 1.0,
+       "wilson95": [
+        0.2065,
+        1.0
+       ],
+       "avg_ret_pct": 1.92,
+       "bench_avg_pct": 3.01,
+       "excess_pp": -1.091,
+       "bench_win_rate": 0.7857,
+       "win_excess_pp": 21.43
+      }
+     },
+     "by_year": {
+      "2023": {
+       "n": 74,
+       "win_rate": 0.527,
+       "wilson95": [
+        0.4148,
+        0.6366
+       ],
+       "avg_ret_pct": 0.875,
+       "bench_avg_pct": 0.415,
+       "excess_pp": 0.46,
+       "bench_win_rate": 0.5252,
+       "win_excess_pp": 0.18
+      },
+      "2024": {
+       "n": 215,
+       "win_rate": 0.5209,
+       "wilson95": [
+        0.4544,
+        0.5868
+       ],
+       "avg_ret_pct": 8.643,
+       "bench_avg_pct": 5.002,
+       "excess_pp": 3.641,
+       "bench_win_rate": 0.6007,
+       "win_excess_pp": -7.98
+      },
+      "2025": {
+       "n": 35,
+       "win_rate": 1.0,
+       "wilson95": [
+        0.9011,
+        1.0
+       ],
+       "avg_ret_pct": 6.137,
+       "bench_avg_pct": 4.313,
+       "excess_pp": 1.825,
+       "bench_win_rate": 0.8962,
+       "win_excess_pp": 10.38
+      },
+      "2026": {
+       "n": 14,
+       "win_rate": 0.7143,
+       "wilson95": [
+        0.4535,
+        0.8828
+       ],
+       "avg_ret_pct": 2.5,
+       "bench_avg_pct": 1.02,
+       "excess_pp": 1.48,
+       "bench_win_rate": 0.6224,
+       "win_excess_pp": 9.18
+      }
+     }
+    },
+    "T+10": {
+     "n": 338,
+     "win_rate": 0.6361,
+     "wilson95": [
+      0.5835,
+      0.6856
+     ],
+     "avg_ret_pct": 9.843,
+     "bench_avg_pct": 5.638,
+     "excess_pp": 4.205,
+     "bench_win_rate": 0.6358,
+     "win_excess_pp": 0.03,
+     "by_scene": {
+      "grind": {
+       "n": 270,
+       "win_rate": 0.5889,
+       "wilson95": [
+        0.5294,
+        0.6459
+       ],
+       "avg_ret_pct": 2.429,
+       "bench_avg_pct": 2.503,
+       "excess_pp": -0.074,
+       "bench_win_rate": 0.5853,
+       "win_excess_pp": 0.36
+      },
+      "panic": {
+       "n": 67,
+       "win_rate": 0.8209,
+       "wilson95": [
+        0.7125,
+        0.8945
+       ],
+       "avg_ret_pct": 39.815,
+       "bench_avg_pct": 18.387,
+       "excess_pp": 21.428,
+       "bench_win_rate": 0.8433,
+       "win_excess_pp": -2.24
+      },
+      "bottom": {
+       "n": 1,
+       "win_rate": 1.0,
+       "wilson95": [
+        0.2065,
+        1.0
+       ],
+       "avg_ret_pct": 3.665,
+       "bench_avg_pct": -2.053,
+       "excess_pp": 5.718,
+       "bench_win_rate": 0.3571,
+       "win_excess_pp": 64.29
+      }
+     },
+     "by_year": {
+      "2023": {
+       "n": 74,
+       "win_rate": 0.5541,
+       "wilson95": [
+        0.4409,
+        0.6618
+       ],
+       "avg_ret_pct": 0.822,
+       "bench_avg_pct": 1.039,
+       "excess_pp": -0.217,
+       "bench_win_rate": 0.5421,
+       "win_excess_pp": 1.2
+      },
+      "2024": {
+       "n": 215,
+       "win_rate": 0.6047,
+       "wilson95": [
+        0.538,
+        0.6676
+       ],
+       "avg_ret_pct": 13.671,
+       "bench_avg_pct": 7.601,
+       "excess_pp": 6.07,
+       "bench_win_rate": 0.6245,
+       "win_excess_pp": -1.98
+      },
+      "2025": {
+       "n": 35,
+       "win_rate": 0.9714,
+       "wilson95": [
+        0.8547,
+        0.9949
+       ],
+       "avg_ret_pct": 6.971,
+       "bench_avg_pct": 4.482,
+       "excess_pp": 2.489,
+       "bench_win_rate": 0.881,
+       "win_excess_pp": 9.04
+      },
+      "2026": {
+       "n": 14,
+       "win_rate": 0.7143,
+       "wilson95": [
+        0.4535,
+        0.8828
+       ],
+       "avg_ret_pct": 5.932,
+       "bench_avg_pct": 2.696,
+       "excess_pp": 3.236,
+       "bench_win_rate": 0.6922,
+       "win_excess_pp": 2.21
+      }
+     }
+    }
+   }
+  }
+ }
+}

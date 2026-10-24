@@ -1,0 +1,211 @@
+{
+ "engine": "feedback_updater v1",
+ "ts": "2026-10-24T04:34:53+08:00",
+ "asof": "2026-10-23",
+ "train_end": "2026-10-23",
+ "lookback": 60,
+ "updated": true,
+ "dry_run": false,
+ "cold_start": false,
+ "settled_records": 581,
+ "update_rule": "w_i ← w_i·exp(0.1×(r_i−r̄)), L1 归一, 截断[0.05,0.4], h:* ≤0.02; r_i = T+1 胜率超额 (口径见 sources)",
+ "r_bar": -0.1261,
+ "engine_r": {
+  "engine_v5": 0.0764,
+  "tomorrow_candidate": -0.2089,
+  "morning_pick": -0.2459
+ },
+ "engine_win_rates_t1": {
+  "engine_v5": 0.5184,
+  "tomorrow_candidate": 0.2188,
+  "morning_pick": 0.1818
+ },
+ "single_engine_no_relative_update": false,
+ "weights_before": {
+  "engine_v5": 0.4,
+  "morning_pick": 0.299445,
+  "tomorrow_candidate": 0.300555
+ },
+ "weights_after": {
+  "engine_v5": 0.4,
+  "morning_pick": 0.29889,
+  "tomorrow_candidate": 0.30111
+ },
+ "delta": {
+  "engine_v5": 0.0,
+  "morning_pick": -0.000555,
+  "tomorrow_candidate": 0.000555
+ },
+ "converged": false,
+ "converge_note": "only 5 versions (<11)",
+ "evidence": {
+  "engine_v5": {
+   "source": "predictions_snapshots",
+   "days": 59,
+   "date_from": "2026-05-12",
+   "date_to": "2026-10-22",
+   "top_pct": 0.1,
+   "t1": {
+    "group": {
+     "n": 490,
+     "mean": 17.3398,
+     "win_rate": 0.5184
+    },
+    "bench": {
+     "n": 191860,
+     "mean": -0.1812,
+     "win_rate": 0.442
+    },
+    "excess": 17.521
+   },
+   "t5": {
+    "group": {
+     "n": 470,
+     "mean": 13.5475,
+     "win_rate": 0.4787
+    },
+    "bench": {
+     "n": 172770,
+     "mean": -0.6905,
+     "win_rate": 0.391
+    },
+    "excess": 14.238
+   },
+   "t10": {
+    "group": {
+     "n": 328,
+     "mean": 21.7362,
+     "win_rate": 0.5091
+    },
+    "bench": {
+     "n": 151938,
+     "mean": -1.1126,
+     "win_rate": 0.3743
+    },
+    "excess": 22.8488
+   }
+  },
+  "tomorrow_candidate": {
+   "source": "predictions_snapshots",
+   "days": 22,
+   "date_from": "2026-09-11",
+   "date_to": "2026-10-20",
+   "top_pct": 0.1,
+   "t1": {
+    "group": {
+     "n": 64,
+     "mean": -12.415,
+     "win_rate": 0.2188
+    },
+    "bench": {
+     "n": 78765,
+     "mean": -0.2611,
+     "win_rate": 0.4277
+    },
+    "excess": -12.1539
+   },
+   "t5": {
+    "group": {
+     "n": 61,
+     "mean": -14.9439,
+     "win_rate": 0.2131
+    },
+    "bench": {
+     "n": 70244,
+     "mean": -1.2532,
+     "win_rate": 0.3736
+    },
+    "excess": -13.6907
+   },
+   "t10": {
+    "group": {
+     "n": 36,
+     "mean": -12.7008,
+     "win_rate": 0.1944
+    },
+    "bench": {
+     "n": 49412,
+     "mean": -2.9563,
+     "win_rate": 0.3402
+    },
+    "excess": -9.7445
+   }
+  },
+  "morning_pick": {
+   "source": "predictions_snapshots",
+   "days": 22,
+   "date_from": "2026-09-11",
+   "date_to": "2026-10-20",
+   "top_pct": 0.1,
+   "t1": {
+    "group": {
+     "n": 22,
+     "mean": -9.188,
+     "win_rate": 0.1818
+    },
+    "bench": {
+     "n": 78765,
+     "mean": -0.2611,
+     "win_rate": 0.4277
+    },
+    "excess": -8.9269
+   },
+   "t5": {
+    "group": {
+     "n": 20,
+     "mean": -12.6603,
+     "win_rate": 0.05
+    },
+    "bench": {
+     "n": 70244,
+     "mean": -1.2532,
+     "win_rate": 0.3736
+    },
+    "excess": -11.4071
+   },
+   "t10": {
+    "group": {
+     "n": 16,
+     "mean": -12.8843,
+     "win_rate": 0.125
+    },
+    "bench": {
+     "n": 49412,
+     "mean": -2.9563,
+     "win_rate": 0.3402
+    },
+    "excess": -9.928
+   }
+  }
+ },
+ "sources": {
+  "pick_log": {
+   "status": "ok (0 settled rows <= 2026-10-23)",
+   "db": "/root/stockdb/picks.duckdb",
+   "convention": "T+1 = 次日开盘买入→收盘 (ret_open_close, 表内既有口径); 表内远期口径仅 ret_t2, T+5/T+10 不可得, 如实缺席",
+   "excess_benchmark": "同一 lookback 内全部 settled 记录平均 ret_open_close 胜率为基准 (自基准, 仅作分组相对比较)"
+  },
+  "engine_v5_predictions": {
+   "dir": "/root/workspace/stocks-ai-view/data/predictions",
+   "convention": "T 日收盘买入 → T+1/5/10 收盘卖出; 高分组 = 快照 score 前 10%; 基准 = 同期全市场等权收益(分片日线自算, 无既有基线文件)",
+   "status": "ok (59 settled snapshot days)"
+  },
+  "tomorrow_candidate_snapshots": {
+   "dir": "/root/workspace/stocks-ai-view/data/predictions",
+   "convention": "同 engine_v5 (predictions/tomorrow_candidate_*.json)",
+   "status": "ok (22 settled snapshot days)"
+  },
+  "morning_pick_snapshots": {
+   "dir": "/root/workspace/stocks-ai-view/data/predictions",
+   "convention": "同 engine_v5 (predictions/morning_pick_*.json)",
+   "status": "ok (22 settled snapshot days)"
+  }
+ },
+ "degraded": null,
+ "version": 6,
+ "weights": {
+  "engine_v5": 0.4,
+  "morning_pick": 0.29889,
+  "tomorrow_candidate": 0.30111
+ }
+}

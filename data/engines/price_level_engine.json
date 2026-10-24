@@ -1,0 +1,158 @@
+{
+ "engine": "price_level_engine v1",
+ "ts": "2026-10-24T01:59:24+08:00",
+ "code": "sh600519",
+ "is_index": false,
+ "data_asof": "2026-10-23",
+ "source": "workspace/stocks-data-kline/data/bulk/day_qfq_60.csv",
+ "bars_used": 250,
+ "levels": {
+  "current": 1335.0,
+  "support": [
+   {
+    "price": 1322.01,
+    "touches": 1,
+    "last_touch_idx": 76
+   },
+   {
+    "price": 1286.483,
+    "touches": 4,
+    "last_touch_idx": 218
+   },
+   {
+    "price": 1258.412,
+    "touches": 4,
+    "last_touch_idx": 227
+   }
+  ],
+  "resistance": [
+   {
+    "price": 1337.52,
+    "touches": 3,
+    "last_touch_idx": 222
+   },
+   {
+    "price": 1362.995,
+    "touches": 4,
+    "last_touch_idx": 206
+   },
+   {
+    "price": 1431.657,
+    "touches": 7,
+    "last_touch_idx": 99
+   },
+   {
+    "price": 1406.416,
+    "touches": "poc",
+    "src": "volume_profile"
+   }
+  ],
+  "pressure": [
+   {
+    "price": 1338.656,
+    "poc": 1343.868,
+    "vol_share": 0.0652
+   },
+   {
+    "price": 1401.204,
+    "poc": 1406.416,
+    "vol_share": 0.0982
+   }
+  ],
+  "suppressed": [
+   {
+    "price": 1431.657,
+    "failed_breaks": 20
+   },
+   {
+    "price": 1475.716,
+    "failed_breaks": 17
+   },
+   {
+    "price": 1337.52,
+    "failed_breaks": 7
+   }
+  ],
+  "swing_fib": {
+   "wave": "down",
+   "wave_hi": 1568.0,
+   "wave_lo": 1151.01,
+   "rebound_382": 1310.3,
+   "rebound_500": 1359.505,
+   "rebound_618": 1408.71,
+   "ma20": 1274.381,
+   "ma60": 1298.153
+  },
+  "pivot": {
+   "P": 1329.627,
+   "R1": 1349.253,
+   "S1": 1315.373,
+   "R2": 1363.507,
+   "S2": 1295.747,
+   "based_on": "2026-10-23"
+  },
+  "round_number": {
+   "grid": 10,
+   "below": 1330.0,
+   "above": 1340.0
+  },
+  "chip": {
+   "levels": [
+    {
+     "price": 1296.957,
+     "weight": 0.166
+    },
+    {
+     "price": 1310.856,
+     "weight": 0.1395
+    },
+    {
+     "price": 1255.257,
+     "weight": 0.1281
+    }
+   ],
+   "degraded": true,
+   "confidence": "low",
+   "note": "真实筹码分布数据缺失(已知缺口), 降级为换手率衰减成交量加权价格分布近似"
+  },
+  "fund": {
+   "chain": [
+    {
+     "date": "2026-07-30",
+     "vwap": 1348.587,
+     "vol_ratio": 2.73
+    },
+    {
+     "date": "2026-07-31",
+     "vwap": 1344.03,
+     "vol_ratio": 2.09
+    },
+    {
+     "date": "2026-08-10",
+     "vwap": 1342.303,
+     "vol_ratio": 2.38
+    },
+    {
+     "date": "2026-08-17",
+     "vwap": 1291.477,
+     "vol_ratio": 2.98
+    },
+    {
+     "date": "2026-10-15",
+     "vwap": 1304.243,
+     "vol_ratio": 2.19
+    }
+   ],
+   "degraded": true,
+   "note": "资金流历史序列缺失(已知缺口), 降级为放量日(量≥2×MA20) VWAP 链"
+  },
+  "bottom_fishing": {
+   "price": 1296.783,
+   "support": 1322.01,
+   "atr14": 25.227,
+   "rsi14": 71.01,
+   "rsi_oversold": false,
+   "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+  }
+ }
+}

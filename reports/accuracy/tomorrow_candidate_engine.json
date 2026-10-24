@@ -1,0 +1,379 @@
+{
+ "engine": "tomorrow_candidate_engine",
+ "metric": "主板 topk 候选 T+1/T+5 收益 vs 同 asof 全体主板等权基准",
+ "asof_sampling": "每月第1/15交易日(共46期)",
+ "asof_range": [
+  "2023-08-01",
+  "2026-10-15"
+ ],
+ "results": {
+  "default": {
+   "weights": {
+    "ma": 1.0,
+    "rsi": 1.0,
+    "macd": 1.0,
+    "volume": 1.0,
+    "sector": 1.0,
+    "rel_strength": 1.0
+   },
+   "topk": 30,
+   "horizons": {
+    "T+1": {
+     "n": 1308,
+     "win_rate": 0.4151,
+     "wilson95": [
+      0.3887,
+      0.4421
+     ],
+     "avg_ret_pct": -0.149,
+     "sharpe": -0.037,
+     "maxdd_pct": -98.55,
+     "bench_avg_pct": -0.241,
+     "excess_pp": 0.092,
+     "by_regime": {
+      "bull": {
+       "n": 659,
+       "win_rate": 0.4173,
+       "wilson95": [
+        0.3802,
+        0.4553
+       ],
+       "avg_ret_pct": -0.252,
+       "sharpe": -0.061,
+       "maxdd_pct": -94.92,
+       "bench_avg_pct": -0.106,
+       "excess_pp": -0.146
+      },
+      "bear": {
+       "n": 285,
+       "win_rate": 0.4211,
+       "wilson95": [
+        0.3652,
+        0.4791
+       ],
+       "avg_ret_pct": -0.191,
+       "sharpe": -0.048,
+       "maxdd_pct": -72.01,
+       "bench_avg_pct": -0.654,
+       "excess_pp": 0.463
+      },
+      "range": {
+       "n": 278,
+       "win_rate": 0.3957,
+       "wilson95": [
+        0.34,
+        0.4542
+       ],
+       "avg_ret_pct": -0.021,
+       "sharpe": -0.005,
+       "maxdd_pct": -55.22,
+       "bench_avg_pct": -0.295,
+       "excess_pp": 0.274
+      }
+     }
+    },
+    "T+5": {
+     "n": 1308,
+     "win_rate": 0.4128,
+     "wilson95": [
+      0.3865,
+      0.4397
+     ],
+     "avg_ret_pct": -0.957,
+     "sharpe": -0.095,
+     "maxdd_pct": -100.0,
+     "bench_avg_pct": -0.518,
+     "excess_pp": -0.439,
+     "by_regime": {
+      "bull": {
+       "n": 659,
+       "win_rate": 0.475,
+       "wilson95": [
+        0.4371,
+        0.5131
+       ],
+       "avg_ret_pct": 0.157,
+       "sharpe": 0.015,
+       "maxdd_pct": -99.67,
+       "bench_avg_pct": 0.41,
+       "excess_pp": -0.253
+      },
+      "bear": {
+       "n": 285,
+       "win_rate": 0.3474,
+       "wilson95": [
+        0.2945,
+        0.4043
+       ],
+       "avg_ret_pct": -3.242,
+       "sharpe": -0.316,
+       "maxdd_pct": -100.0,
+       "bench_avg_pct": -2.34,
+       "excess_pp": -0.902
+      },
+      "range": {
+       "n": 278,
+       "win_rate": 0.4065,
+       "wilson95": [
+        0.3504,
+        0.4651
+       ],
+       "avg_ret_pct": -0.377,
+       "sharpe": -0.038,
+       "maxdd_pct": -94.61,
+       "bench_avg_pct": -0.7,
+       "excess_pp": 0.323
+      }
+     }
+    }
+   }
+  },
+  "conservative": {
+   "weights": {
+    "ma": 1.0,
+    "rsi": 1.5,
+    "macd": 0.8,
+    "volume": 1.2,
+    "sector": 1.0,
+    "rel_strength": 1.0
+   },
+   "topk": 20,
+   "horizons": {
+    "T+1": {
+     "n": 858,
+     "win_rate": 0.4091,
+     "wilson95": [
+      0.3767,
+      0.4423
+     ],
+     "avg_ret_pct": -0.124,
+     "sharpe": -0.031,
+     "maxdd_pct": -93.39,
+     "bench_avg_pct": -0.241,
+     "excess_pp": 0.117,
+     "by_regime": {
+      "bull": {
+       "n": 431,
+       "win_rate": 0.42,
+       "wilson95": [
+        0.3743,
+        0.4671
+       ],
+       "avg_ret_pct": -0.238,
+       "sharpe": -0.057,
+       "maxdd_pct": -82.66,
+       "bench_avg_pct": -0.107,
+       "excess_pp": -0.131
+      },
+      "bear": {
+       "n": 187,
+       "win_rate": 0.4011,
+       "wilson95": [
+        0.3335,
+        0.4726
+       ],
+       "avg_ret_pct": -0.18,
+       "sharpe": -0.047,
+       "maxdd_pct": -56.9,
+       "bench_avg_pct": -0.651,
+       "excess_pp": 0.471
+      },
+      "range": {
+       "n": 183,
+       "win_rate": 0.3825,
+       "wilson95": [
+        0.3152,
+        0.4547
+       ],
+       "avg_ret_pct": -0.095,
+       "sharpe": -0.025,
+       "maxdd_pct": -43.11,
+       "bench_avg_pct": -0.297,
+       "excess_pp": 0.202
+      }
+     }
+    },
+    "T+5": {
+     "n": 858,
+     "win_rate": 0.3986,
+     "wilson95": [
+      0.3664,
+      0.4317
+     ],
+     "avg_ret_pct": -0.922,
+     "sharpe": -0.093,
+     "maxdd_pct": -100.0,
+     "bench_avg_pct": -0.523,
+     "excess_pp": -0.399,
+     "by_regime": {
+      "bull": {
+       "n": 431,
+       "win_rate": 0.4571,
+       "wilson95": [
+        0.4106,
+        0.5043
+       ],
+       "avg_ret_pct": 0.025,
+       "sharpe": 0.003,
+       "maxdd_pct": -98.45,
+       "bench_avg_pct": 0.408,
+       "excess_pp": -0.383
+      },
+      "bear": {
+       "n": 187,
+       "win_rate": 0.3422,
+       "wilson95": [
+        0.278,
+        0.4128
+       ],
+       "avg_ret_pct": -2.84,
+       "sharpe": -0.267,
+       "maxdd_pct": -99.95,
+       "bench_avg_pct": -2.33,
+       "excess_pp": -0.51
+      },
+      "range": {
+       "n": 183,
+       "win_rate": 0.388,
+       "wilson95": [
+        0.3204,
+        0.4602
+       ],
+       "avg_ret_pct": -0.377,
+       "sharpe": -0.038,
+       "maxdd_pct": -79.9,
+       "bench_avg_pct": -0.718,
+       "excess_pp": 0.341
+      }
+     }
+    }
+   }
+  },
+  "aggressive": {
+   "weights": {
+    "ma": 1.0,
+    "rsi": 1.0,
+    "macd": 1.0,
+    "volume": 1.0,
+    "sector": 1.3,
+    "rel_strength": 1.5
+   },
+   "topk": 40,
+   "horizons": {
+    "T+1": {
+     "n": 1760,
+     "win_rate": 0.4193,
+     "wilson95": [
+      0.3965,
+      0.4425
+     ],
+     "avg_ret_pct": -0.119,
+     "sharpe": -0.029,
+     "maxdd_pct": -99.32,
+     "bench_avg_pct": -0.239,
+     "excess_pp": 0.12,
+     "by_regime": {
+      "bull": {
+       "n": 885,
+       "win_rate": 0.4226,
+       "wilson95": [
+        0.3905,
+        0.4554
+       ],
+       "avg_ret_pct": -0.202,
+       "sharpe": -0.048,
+       "maxdd_pct": -97.43,
+       "bench_avg_pct": -0.104,
+       "excess_pp": -0.098
+      },
+      "bear": {
+       "n": 384,
+       "win_rate": 0.3932,
+       "wilson95": [
+        0.3457,
+        0.4429
+       ],
+       "avg_ret_pct": -0.367,
+       "sharpe": -0.096,
+       "maxdd_pct": -83.76,
+       "bench_avg_pct": -0.651,
+       "excess_pp": 0.284
+      },
+      "range": {
+       "n": 375,
+       "win_rate": 0.416,
+       "wilson95": [
+        0.3672,
+        0.4665
+       ],
+       "avg_ret_pct": 0.133,
+       "sharpe": 0.034,
+       "maxdd_pct": -61.63,
+       "bench_avg_pct": -0.293,
+       "excess_pp": 0.426
+      }
+     }
+    },
+    "T+5": {
+     "n": 1760,
+     "win_rate": 0.4068,
+     "wilson95": [
+      0.3841,
+      0.4299
+     ],
+     "avg_ret_pct": -1.045,
+     "sharpe": -0.104,
+     "maxdd_pct": -100.0,
+     "bench_avg_pct": -0.512,
+     "excess_pp": -0.533,
+     "by_regime": {
+      "bull": {
+       "n": 885,
+       "win_rate": 0.4678,
+       "wilson95": [
+        0.4351,
+        0.5007
+       ],
+       "avg_ret_pct": 0.252,
+       "sharpe": 0.024,
+       "maxdd_pct": -99.76,
+       "bench_avg_pct": 0.411,
+       "excess_pp": -0.159
+      },
+      "bear": {
+       "n": 384,
+       "win_rate": 0.3464,
+       "wilson95": [
+        0.3005,
+        0.3953
+       ],
+       "avg_ret_pct": -3.522,
+       "sharpe": -0.351,
+       "maxdd_pct": -100.0,
+       "bench_avg_pct": -2.327,
+       "excess_pp": -1.195
+      },
+      "range": {
+       "n": 375,
+       "win_rate": 0.3867,
+       "wilson95": [
+        0.3388,
+        0.4369
+       ],
+       "avg_ret_pct": -0.801,
+       "sharpe": -0.083,
+       "maxdd_pct": -99.09,
+       "bench_avg_pct": -0.678,
+       "excess_pp": -0.123
+      }
+     }
+    }
+   }
+  }
+ },
+ "caveats": [
+  "asof 采样为月度 2 期, 非逐日全历史, 信号间相关性较低但仍存在",
+  "6 个分片滞后到 2026-10-16, 2026-10-17 后 asof 部分股票缺数据",
+  "行业映射 industry_map_em 为当前快照(1050只), 历史 asof 的 sector 维有轻微前视(行业归属漂移)"
+ ]
+}

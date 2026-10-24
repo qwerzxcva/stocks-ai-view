@@ -1,0 +1,92 @@
+{
+ "engine": "feedback_updater v1",
+ "ts": "2026-10-23T22:20:22+08:00",
+ "asof": "2025-06-30",
+ "train_end": "2025-06-30",
+ "lookback": 60,
+ "updated": false,
+ "dry_run": true,
+ "cold_start": false,
+ "settled_records": 585,
+ "update_rule": "w_i ← w_i·exp(0.1×(r_i−r̄)), L1 归一, 截断[0.05,0.4], h:* ≤0.02; r_i = T+1 胜率超额 (口径见 sources)",
+ "r_bar": 0.1467,
+ "engine_r": {
+  "engine_v5": 0.1467
+ },
+ "single_engine_no_relative_update": true,
+ "weights_before": {
+  "engine_v5": 1.0
+ },
+ "weights_after": {
+  "engine_v5": 1.0
+ },
+ "delta": {
+  "engine_v5": 0.0
+ },
+ "converged": false,
+ "converge_note": "only 4 versions (<11)",
+ "evidence": {
+  "engine_v5": {
+   "source": "predictions_snapshots",
+   "days": 60,
+   "date_from": "2025-04-01",
+   "date_to": "2025-06-30",
+   "top_pct": 0.1,
+   "t1": {
+    "group": {
+     "n": 585,
+     "mean": 46.8492,
+     "win_rate": 0.6581
+    },
+    "bench": {
+     "n": 166901,
+     "mean": 0.1359,
+     "win_rate": 0.5114
+    },
+    "excess": 46.7133
+   },
+   "t5": {
+    "group": {
+     "n": 585,
+     "mean": 40.546,
+     "win_rate": 0.6256
+    },
+    "bench": {
+     "n": 166901,
+     "mean": 0.6393,
+     "win_rate": 0.5405
+    },
+    "excess": 39.9067
+   },
+   "t10": {
+    "group": {
+     "n": 117,
+     "mean": 30.6997,
+     "win_rate": 0.4957
+    },
+    "bench": {
+     "n": 166900,
+     "mean": 1.4753,
+     "win_rate": 0.5784
+    },
+    "excess": 29.2244
+   }
+  }
+ },
+ "sources": {
+  "pick_log": {
+   "status": "ok (0 settled rows <= 2025-06-30)",
+   "db": "/root/stockdb/picks.duckdb",
+   "convention": "T+1 = 次日开盘买入→收盘 (ret_open_close, 表内既有口径); 表内远期口径仅 ret_t2, T+5/T+10 不可得, 如实缺席",
+   "excess_benchmark": "同一 lookback 内全部 settled 记录平均 ret_open_close 胜率为基准 (自基准, 仅作分组相对比较)"
+  },
+  "engine_v5_predictions": {
+   "dir": "/root/workspace/stocks-ai-view/data/predictions",
+   "convention": "T 日收盘买入 → T+1/5/10 收盘卖出; 高分组 = 快照 score 前 10%; 基准 = 同期全市场等权收益(分片日线自算, 无既有基线文件)",
+   "status": "ok (60 settled snapshot days)"
+  }
+ },
+ "degraded": [
+  "单引擎阶段: r̄=r_i, 乘性因子=1, 权重数值不变, 版本仅作链起点落盘 (single_engine_no_relative_update)"
+ ]
+}

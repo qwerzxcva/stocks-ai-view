@@ -1,0 +1,414 @@
+{
+ "engine": "r3_summarize.py — Phase3 R3 集成回测汇总",
+ "convention": {
+  "return": "T(asof)收盘→T+N收盘, %",
+  "benchmark": "同日全体主分片股票等权(均值/上涨占比); 主分片优先, 辅助片仅补主片缺失(code,date)",
+  "dedup": "主片内 (code,date) first-wins; 跨片冲突弃辅助片",
+  "ci": "Wilson 95%"
+ },
+ "data_quality": {
+  "aux_rows_merged": 49709,
+  "aux_conflict_skipped": 3330,
+  "main_shard_codes": 5324
+ },
+ "dropped": {
+  "no_bar_at_asof": 7
+ },
+ "folds": {
+  "2023": {
+   "year_days": 133,
+   "train_end": "2023-11-03",
+   "test_start": "2023-11-20",
+   "test_end": "2023-12-29",
+   "asofs_planned": [
+    "2023-11-20",
+    "2023-11-27",
+    "2023-12-04",
+    "2023-12-11",
+    "2023-12-18",
+    "2023-12-25"
+   ],
+   "train_snap_days": 0,
+   "train_window": [
+    "2022-01-01",
+    "2023-11-03"
+   ],
+   "weights_file": "/root/workspace/stocks-ai-view/reports/r3_intermediate/weights/fold_2023.json",
+   "weights_note": null,
+   "fb_done": true
+  },
+  "2024": {
+   "year_days": 242,
+   "train_end": "2024-09-10",
+   "test_start": "2024-09-11",
+   "test_end": "2024-12-31",
+   "asofs_planned": [
+    "2024-09-11",
+    "2024-09-20",
+    "2024-09-27",
+    "2024-10-11",
+    "2024-10-18",
+    "2024-10-25",
+    "2024-11-01",
+    "2024-11-08",
+    "2024-11-15",
+    "2024-11-22",
+    "2024-11-29",
+    "2024-12-06",
+    "2024-12-13",
+    "2024-12-20",
+    "2024-12-27"
+   ],
+   "train_snap_days": 199,
+   "train_window": [
+    "2023-01-01",
+    "2024-09-10"
+   ],
+   "weights_file": "/root/workspace/stocks-ai-view/reports/r3_intermediate/weights/fold_2024.json",
+   "weights_note": null,
+   "fb_done": true,
+   "fb": {
+    "updated_would": false,
+    "settled": 1986,
+    "engine_r": {
+     "engine_v5": 0.1011
+    },
+    "single_engine": true,
+    "degraded": [
+     "单引擎阶段: r̄=r_i, 乘性因子=1, 权重数值不变, 版本仅作链起点落盘 (single_engine_no_relative_update)"
+    ]
+   }
+  },
+  "2025": {
+   "year_days": 243,
+   "train_end": "2025-09-11",
+   "test_start": "2025-09-12",
+   "test_end": "2025-12-31",
+   "asofs_planned": [
+    "2025-09-12",
+    "2025-09-19",
+    "2025-09-26",
+    "2025-10-13",
+    "2025-10-20",
+    "2025-10-27",
+    "2025-11-03",
+    "2025-11-10",
+    "2025-11-17",
+    "2025-11-24",
+    "2025-12-01",
+    "2025-12-08",
+    "2025-12-15",
+    "2025-12-22",
+    "2025-12-29"
+   ],
+   "train_snap_days": 412,
+   "train_window": [
+    "2024-01-01",
+    "2025-09-11"
+   ],
+   "weights_file": "/root/workspace/stocks-ai-view/reports/r3_intermediate/weights/fold_2025.json",
+   "weights_note": null,
+   "fb_done": true,
+   "fb": {
+    "updated_would": false,
+    "settled": 2464,
+    "engine_r": {
+     "engine_v5": 0.131
+    },
+    "single_engine": true,
+    "degraded": [
+     "单引擎阶段: r̄=r_i, 乘性因子=1, 权重数值不变, 版本仅作链起点落盘 (single_engine_no_relative_update)"
+    ]
+   }
+  },
+  "2026": {
+   "year_days": 193,
+   "train_end": "2026-07-27",
+   "test_start": "2026-07-28",
+   "test_end": "2026-10-16",
+   "asofs_planned": [
+    "2026-07-28",
+    "2026-08-04",
+    "2026-08-11",
+    "2026-08-18",
+    "2026-08-25",
+    "2026-09-01",
+    "2026-09-08",
+    "2026-09-15",
+    "2026-09-22",
+    "2026-09-30",
+    "2026-10-14"
+   ],
+   "train_snap_days": 355,
+   "train_window": [
+    "2025-01-01",
+    "2026-07-27"
+   ],
+   "weights_file": "/root/workspace/stocks-ai-view/scripts/engines/weights/latest.json",
+   "weights_note": "feedback 仅 engine_v5 单信号源, r̄=r_i 乘性因子=1, fold 权重与 latest.json 等价; 权重文件引用主仓只读",
+   "fb_done": true,
+   "fb": {
+    "updated_would": false,
+    "settled": 2436,
+    "engine_r": {
+     "engine_v5": 0.1984
+    },
+    "single_engine": true,
+    "degraded": [
+     "单引擎阶段: r̄=r_i, 乘性因子=1, 权重数值不变, 版本仅作链起点落盘 (single_engine_no_relative_update)"
+    ]
+   }
+  }
+ },
+ "llm_mode": {
+  "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)": 470
+ },
+ "overall": {
+  "t1": {
+   "n": 463,
+   "win_rate": 45.36,
+   "wilson_ci": [
+    40.88,
+    49.91
+   ],
+   "bench_win_rate": 46.86,
+   "excess_pp": -1.5,
+   "mean_ret": 0.079,
+   "bench_mean_ret": 0.232,
+   "mean_excess_pp": -0.153
+  },
+  "t5": {
+   "n": 463,
+   "win_rate": 44.92,
+   "wilson_ci": [
+    40.45,
+    49.48
+   ],
+   "bench_win_rate": 49.19,
+   "excess_pp": -4.27,
+   "mean_ret": 0.118,
+   "bench_mean_ret": 0.838,
+   "mean_excess_pp": -0.72
+  }
+ },
+ "by_fold": {
+  "2023": {
+   "t1": {
+    "n": 60,
+    "win_rate": 31.67,
+    "wilson_ci": [
+     21.31,
+     44.23
+    ],
+    "bench_win_rate": 38.77,
+    "excess_pp": -7.11,
+    "mean_ret": -0.785,
+    "bench_mean_ret": -0.351,
+    "mean_excess_pp": -0.434
+   },
+   "t5": {
+    "n": 60,
+    "win_rate": 38.33,
+    "wilson_ci": [
+     27.09,
+     50.98
+    ],
+    "bench_win_rate": 36.37,
+    "excess_pp": 1.97,
+    "mean_ret": -1.153,
+    "bench_mean_ret": 0.275,
+    "mean_excess_pp": -1.429
+   }
+  },
+  "2024": {
+   "t1": {
+    "n": 150,
+    "win_rate": 56.67,
+    "wilson_ci": [
+     48.67,
+     64.33
+    ],
+    "bench_win_rate": 58.45,
+    "excess_pp": -1.79,
+    "mean_ret": 1.253,
+    "bench_mean_ret": 1.297,
+    "mean_excess_pp": -0.044
+   },
+   "t5": {
+    "n": 150,
+    "win_rate": 47.33,
+    "wilson_ci": [
+     39.51,
+     55.29
+    ],
+    "bench_win_rate": 54.34,
+    "excess_pp": -7.01,
+    "mean_ret": 0.97,
+    "bench_mean_ret": 1.805,
+    "mean_excess_pp": -0.835
+   }
+  },
+  "2025": {
+   "t1": {
+    "n": 147,
+    "win_rate": 40.14,
+    "wilson_ci": [
+     32.56,
+     48.21
+    ],
+    "bench_win_rate": 41.35,
+    "excess_pp": -1.22,
+    "mean_ret": -0.633,
+    "bench_mean_ret": -0.147,
+    "mean_excess_pp": -0.485
+   },
+   "t5": {
+    "n": 147,
+    "win_rate": 46.26,
+    "wilson_ci": [
+     38.4,
+     54.31
+    ],
+    "bench_win_rate": 49.46,
+    "excess_pp": -3.2,
+    "mean_ret": 0.172,
+    "bench_mean_ret": 0.419,
+    "mean_excess_pp": -0.248
+   }
+  },
+  "2026": {
+   "t1": {
+    "n": 106,
+    "win_rate": 44.34,
+    "wilson_ci": [
+     35.24,
+     53.83
+    ],
+    "bench_win_rate": 42.66,
+    "excess_pp": 1.68,
+    "mean_ret": -0.106,
+    "bench_mean_ret": -0.418,
+    "mean_excess_pp": 0.312
+   },
+   "t5": {
+    "n": 106,
+    "win_rate": 43.4,
+    "wilson_ci": [
+     34.36,
+     52.9
+    ],
+    "bench_win_rate": 48.79,
+    "excess_pp": -5.4,
+    "mean_ret": -0.442,
+    "bench_mean_ret": 0.369,
+    "mean_excess_pp": -0.811
+   }
+  }
+ },
+ "by_regime": {
+  "bear": {
+   "t1": {
+    "n": 118,
+    "win_rate": 43.22,
+    "wilson_ci": [
+     34.64,
+     52.23
+    ],
+    "bench_win_rate": 42.72,
+    "excess_pp": 0.5,
+    "mean_ret": 0.153,
+    "bench_mean_ret": -0.19,
+    "mean_excess_pp": 0.343
+   },
+   "t5": {
+    "n": 118,
+    "win_rate": 56.78,
+    "wilson_ci": [
+     47.77,
+     65.36
+    ],
+    "bench_win_rate": 53.6,
+    "excess_pp": 3.18,
+    "mean_ret": 2.141,
+    "bench_mean_ret": 2.377,
+    "mean_excess_pp": -0.236
+   }
+  },
+  "bull": {
+   "t1": {
+    "n": 287,
+    "win_rate": 45.64,
+    "wilson_ci": [
+     39.98,
+     51.43
+    ],
+    "bench_win_rate": 47.85,
+    "excess_pp": -2.2,
+    "mean_ret": 0.114,
+    "bench_mean_ret": 0.429,
+    "mean_excess_pp": -0.314
+   },
+   "t5": {
+    "n": 287,
+    "win_rate": 42.16,
+    "wilson_ci": [
+     36.59,
+     47.94
+    ],
+    "bench_win_rate": 47.46,
+    "excess_pp": -5.3,
+    "mean_ret": -0.332,
+    "bench_mean_ret": 0.318,
+    "mean_excess_pp": -0.65
+   }
+  },
+  "range": {
+   "t1": {
+    "n": 58,
+    "win_rate": 48.28,
+    "wilson_ci": [
+     35.93,
+     60.84
+    ],
+    "bench_win_rate": 50.37,
+    "excess_pp": -2.1,
+    "mean_ret": -0.246,
+    "bench_mean_ret": 0.12,
+    "mean_excess_pp": -0.366
+   },
+   "t5": {
+    "n": 58,
+    "win_rate": 34.48,
+    "wilson_ci": [
+     23.56,
+     47.33
+    ],
+    "bench_win_rate": 48.83,
+    "excess_pp": -14.35,
+    "mean_ret": -1.772,
+    "bench_mean_ret": 0.28,
+    "mean_excess_pp": -2.052
+   }
+  }
+ },
+ "portfolio": {
+  "t1": {
+   "n_periods": 47,
+   "cum_ret_pct": 2.54,
+   "bench_cum_ret_pct": 10.15,
+   "max_drawdown_pct": -17.27,
+   "bench_max_drawdown_pct": -11.7,
+   "sharpe": 0.55,
+   "bench_sharpe": 1.56
+  },
+  "t5": {
+   "n_periods": 47,
+   "cum_ret_pct": -0.69,
+   "bench_cum_ret_pct": 42.46,
+   "max_drawdown_pct": -24.5,
+   "bench_max_drawdown_pct": -15.61,
+   "sharpe": 0.13,
+   "bench_sharpe": 1.43
+  }
+ }
+}

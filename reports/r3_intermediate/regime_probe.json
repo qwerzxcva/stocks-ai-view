@@ -1,0 +1,77 @@
+{
+ "ts": "2026-10-23T22:24:01",
+ "engine": "regime_router v1 (新增引擎, 不改既有文件)",
+ "asof": "2026-10-15",
+ "data_asof": {
+  "index": "2026-10-09",
+  "note": "本地数据滞后于当前日期 2026-10-23, 为已知限制"
+ },
+ "regime": "bear",
+ "regime_score": -4.5,
+ "confidence": 1.0,
+ "phase": "repair",
+ "phase_cn": "修复",
+ "phase_since": "2026-10-15",
+ "phase_source": "bulk shards self-computed limit-up ladder + emotion overlay",
+ "regime_gate": {
+  "bull": 1.0,
+  "range": 0.8,
+  "bear": 0.5
+ },
+ "gate_applied": 0.5,
+ "routing": {
+  "A": {
+   "mode": "serial_before_all",
+   "tier": "重",
+   "note": "大盘风控一票否决前置",
+   "weight": 0.5
+  },
+  "B": {
+   "mode": "serial_after_A",
+   "tier": "轻",
+   "note": "个股引擎降级为观察名单",
+   "weight": 0.15
+  },
+  "C": {
+   "mode": "parallel",
+   "tier": "中",
+   "note": "只报风险型异动(跌停潮/龙头大跌)",
+   "weight": 0.3
+  },
+  "D": {
+   "mode": "parallel",
+   "tier": "中",
+   "note": "利空消息权重上调",
+   "weight": 0.3
+  },
+  "E": {
+   "mode": "serial_before_all",
+   "tier": "重",
+   "note": "弱市数据质量更需严防",
+   "weight": 0.5
+  },
+  "F": {
+   "mode": "parallel",
+   "tier": "重",
+   "note": "资金流是 bear 撤离核心信号",
+   "weight": 0.5
+  },
+  "G": {
+   "mode": "parallel",
+   "tier": "轻",
+   "note": "行业仅保留防御性观察",
+   "weight": 0.15
+  },
+  "H": {
+   "mode": "serial_after_A",
+   "tier": "轻",
+   "note": "另类信号仅参考",
+   "weight": 0.02
+  }
+ },
+ "h_group_hard_cap": 0.02,
+ "degraded": [
+  "seal 无炸板历史, 日线口径恒 None (emotion 快照覆盖期除外)",
+  "涨停口径统一按 10% 主板近似, ST/科创/创业 20cm 未区分"
+ ]
+}

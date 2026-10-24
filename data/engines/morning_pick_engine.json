@@ -1,0 +1,220 @@
+{
+ "engine": "morning_pick_engine v1 (daily-degraded)",
+ "ts": "2026-10-23T22:08:35+08:00",
+ "data_asof": "2026-10-16",
+ "trade_date": "2026-10-16",
+ "weights": {
+  "gap_env": 0.8,
+  "breakout": 1.2,
+  "pullback": 1.2,
+  "momentum": 1.0,
+  "vol_energy": 1.0,
+  "moneyflow": 0.6
+ },
+ "scanned": 300,
+ "sampling": "systematic step-sample limit=300",
+ "output_filter": "main_board_only(600/601/603/605/000/001/002)",
+ "degraded": {
+  "intraday_source": null,
+  "note": "分钟线/竞价数据为已知缺口, 当前为日线级降级实现; detect_intraday_source() 返回 None, 数据源适配层已预留(TODO)",
+  "gap_env": "ok ts=2026-10-22T09:31:53+08:00",
+  "moneyflow": "ok (snapshot, no history)"
+ },
+ "picks": [
+  {
+   "code": "sz002421",
+   "name": "达实智能",
+   "score": 61.38,
+   "close": 3.12,
+   "date": "2026-10-16",
+   "votes": [
+    {
+     "indicator": "gap_env",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "隔夜外围 +0.15% 平稳"
+    },
+    {
+     "indicator": "breakout",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "未突破"
+    },
+    {
+     "indicator": "pullback",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "无回踩结构"
+    },
+    {
+     "indicator": "momentum",
+     "vote": 1,
+     "strength": 0.925,
+     "why": "5日动量 +13.9% 温和走强"
+    },
+    {
+     "indicator": "vol_energy",
+     "vote": 1,
+     "strength": 0.766,
+     "why": "量能温和放大(5日/20日 1.81)"
+    }
+   ]
+  },
+  {
+   "code": "sz002025",
+   "name": "航天电器",
+   "score": 59.49,
+   "close": 53.96,
+   "date": "2026-10-16",
+   "votes": [
+    {
+     "indicator": "gap_env",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "隔夜外围 +0.15% 平稳"
+    },
+    {
+     "indicator": "breakout",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "未突破"
+    },
+    {
+     "indicator": "pullback",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "无回踩结构"
+    },
+    {
+     "indicator": "momentum",
+     "vote": 1,
+     "strength": 0.825,
+     "why": "5日动量 +12.4% 温和走强"
+    },
+    {
+     "indicator": "vol_energy",
+     "vote": 1,
+     "strength": 0.585,
+     "why": "量能温和放大(5日/20日 1.55)"
+    }
+   ]
+  },
+  {
+   "code": "sh603669",
+   "name": "灵康药业",
+   "score": 58.99,
+   "close": 6.73,
+   "date": "2026-10-12",
+   "votes": [
+    {
+     "indicator": "gap_env",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "隔夜外围 +0.15% 平稳"
+    },
+    {
+     "indicator": "breakout",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "未突破"
+    },
+    {
+     "indicator": "pullback",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "无回踩结构"
+    },
+    {
+     "indicator": "momentum",
+     "vote": 1,
+     "strength": 0.938,
+     "why": "5日动量 +14.1% 温和走强"
+    },
+    {
+     "indicator": "vol_energy",
+     "vote": 1,
+     "strength": 0.398,
+     "why": "量能温和放大(5日/20日 1.28)"
+    }
+   ]
+  },
+  {
+   "code": "sz002515",
+   "name": "金字火腿",
+   "score": 58.8,
+   "close": 6.2,
+   "date": "2026-10-16",
+   "votes": [
+    {
+     "indicator": "gap_env",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "隔夜外围 +0.15% 平稳"
+    },
+    {
+     "indicator": "breakout",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "未突破"
+    },
+    {
+     "indicator": "pullback",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "无回踩结构"
+    },
+    {
+     "indicator": "momentum",
+     "vote": 1,
+     "strength": 0.662,
+     "why": "5日动量 +9.9% 温和走强"
+    },
+    {
+     "indicator": "vol_energy",
+     "vote": 1,
+     "strength": 0.645,
+     "why": "量能温和放大(5日/20日 1.64)"
+    }
+   ]
+  },
+  {
+   "code": "sh600075",
+   "name": "新疆天业",
+   "score": 58.69,
+   "close": 4.35,
+   "date": "2026-10-16",
+   "votes": [
+    {
+     "indicator": "gap_env",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "隔夜外围 +0.15% 平稳"
+    },
+    {
+     "indicator": "breakout",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "未突破"
+    },
+    {
+     "indicator": "pullback",
+     "vote": 0,
+     "strength": 0.2,
+     "why": "无回踩结构"
+    },
+    {
+     "indicator": "momentum",
+     "vote": 1,
+     "strength": 0.675,
+     "why": "5日动量 +10.1% 温和走强"
+    },
+    {
+     "indicator": "vol_energy",
+     "vote": 1,
+     "strength": 0.616,
+     "why": "量能温和放大(5日/20日 1.59)"
+    }
+   ]
+  }
+ ]
+}

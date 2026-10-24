@@ -1,0 +1,123 @@
+{
+ "engine": "central_orchestrator",
+ "metric": "终审 top10 个股 T+1/T+5 收益 vs 同日全体主板等权基准",
+ "source": "R3 集成评分 walk-forward (47 asofs × top10, 2023-11~2026-10)",
+ "n_picks": 470,
+ "n_asofs": 47,
+ "llm_adjust_status": {
+  "applied": 0,
+  "failed": 470,
+  "note": "全部 47 期 llm JSONDecodeError, 中枢 S 未调分 → 本结果为纯引擎集成评分"
+ },
+ "results": {
+  "T+1": {
+   "n": 463,
+   "win_rate": 0.4536,
+   "wilson95": [
+    0.4088,
+    0.4991
+   ],
+   "avg_ret_pct": 0.079,
+   "sharpe": 0.021,
+   "maxdd_pct": -86.62,
+   "bench_win_rate_avg": 0.4686,
+   "excess_pp": -0.153,
+   "excess_win_rate_pp": -1.5,
+   "by_regime": {
+    "bull": {
+     "n": 287,
+     "win_rate": 0.4564,
+     "wilson95": [
+      0.3998,
+      0.5143
+     ],
+     "avg_ret_pct": 0.114,
+     "sharpe": 0.029,
+     "maxdd_pct": -89.27,
+     "excess_pp": -0.314
+    },
+    "bear": {
+     "n": 118,
+     "win_rate": 0.4322,
+     "wilson95": [
+      0.3464,
+      0.5223
+     ],
+     "avg_ret_pct": 0.153,
+     "sharpe": 0.048,
+     "maxdd_pct": -32.24,
+     "excess_pp": 0.343
+    },
+    "range": {
+     "n": 58,
+     "win_rate": 0.4828,
+     "wilson95": [
+      0.3593,
+      0.6084
+     ],
+     "avg_ret_pct": -0.246,
+     "sharpe": -0.066,
+     "maxdd_pct": -31.91,
+     "excess_pp": -0.366
+    }
+   }
+  },
+  "T+5": {
+   "n": 463,
+   "win_rate": 0.4492,
+   "wilson95": [
+    0.4045,
+    0.4948
+   ],
+   "avg_ret_pct": 0.118,
+   "sharpe": 0.014,
+   "maxdd_pct": -95.99,
+   "bench_win_rate_avg": 0.4919,
+   "excess_pp": -0.72,
+   "excess_win_rate_pp": -4.27,
+   "by_regime": {
+    "bull": {
+     "n": 287,
+     "win_rate": 0.4216,
+     "wilson95": [
+      0.3659,
+      0.4794
+     ],
+     "avg_ret_pct": -0.332,
+     "sharpe": -0.038,
+     "maxdd_pct": -97.4,
+     "excess_pp": -0.65
+    },
+    "bear": {
+     "n": 118,
+     "win_rate": 0.5678,
+     "wilson95": [
+      0.4777,
+      0.6536
+     ],
+     "avg_ret_pct": 2.141,
+     "sharpe": 0.251,
+     "maxdd_pct": -65.34,
+     "excess_pp": -0.236
+    },
+    "range": {
+     "n": 58,
+     "win_rate": 0.3448,
+     "wilson95": [
+      0.2356,
+      0.4733
+     ],
+     "avg_ret_pct": -1.772,
+     "sharpe": -0.334,
+     "maxdd_pct": -68.49,
+     "excess_pp": -2.052
+    }
+   }
+  }
+ },
+ "caveats": [
+  "基准为同日全体主板(含非主板)股票等权均值(R3 eval.json 口径)",
+  "R3 为周频抽样(每周一), 非逐日",
+  "llm_pick_arbiter 在 R3 中 100% 失败, 本结果不含 LLM 调分贡献"
+ ]
+}

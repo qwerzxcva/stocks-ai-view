@@ -1,0 +1,313 @@
+{
+ "engine": "price_level_engine",
+ "metric": "触位后T+N方向命中率 vs 无条件基准(支撑: 最近分形低点聚类, tol=0.5*ATR14, 次日触及支撑带)",
+ "pool_size": 50,
+ "pool": "主板蓝筹50只(同 bt_driver POOL)",
+ "history": "全历史(各股数据起点~2026-10-23, 主分片优先)",
+ "param_grid": {
+  "fractal_lb": [
+   5,
+   10,
+   20
+  ],
+  "horizon": [
+   5,
+   10
+  ]
+ },
+ "results": {
+  "lb5_h5": {
+   "touch_events": 61468,
+   "win_rate": 0.4976,
+   "wilson95": [
+    0.4936,
+    0.5015
+   ],
+   "baseline_win_rate": 0.4983,
+   "edge_pp": -0.07,
+   "avg_ret_pct": 0.155,
+   "sharpe": 0.026,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 4101,
+     "win_rate": 0.477,
+     "wilson95": [
+      0.4617,
+      0.4923
+     ]
+    },
+    "bear": {
+     "n": 2200,
+     "win_rate": 0.5059,
+     "wilson95": [
+      0.485,
+      0.5268
+     ]
+    },
+    "range": {
+     "n": 2043,
+     "win_rate": 0.4552,
+     "wilson95": [
+      0.4337,
+      0.4769
+     ]
+    },
+    "unknown": {
+     "n": 53124,
+     "win_rate": 0.5005,
+     "wilson95": [
+      0.4962,
+      0.5047
+     ]
+    }
+   },
+   "n_stocks": 50
+  },
+  "lb5_h10": {
+   "touch_events": 61390,
+   "win_rate": 0.503,
+   "wilson95": [
+    0.4991,
+    0.507
+   ],
+   "baseline_win_rate": 0.5032,
+   "edge_pp": -0.02,
+   "avg_ret_pct": 0.347,
+   "sharpe": 0.041,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 4101,
+     "win_rate": 0.4884,
+     "wilson95": [
+      0.4731,
+      0.5037
+     ]
+    },
+    "bear": {
+     "n": 2138,
+     "win_rate": 0.5136,
+     "wilson95": [
+      0.4924,
+      0.5347
+     ]
+    },
+    "range": {
+     "n": 2036,
+     "win_rate": 0.4381,
+     "wilson95": [
+      0.4167,
+      0.4598
+     ]
+    },
+    "unknown": {
+     "n": 53115,
+     "win_rate": 0.5062,
+     "wilson95": [
+      0.502,
+      0.5105
+     ]
+    }
+   },
+   "n_stocks": 50
+  },
+  "lb10_h5": {
+   "touch_events": 36796,
+   "win_rate": 0.4947,
+   "wilson95": [
+    0.4896,
+    0.4998
+   ],
+   "baseline_win_rate": 0.4983,
+   "edge_pp": -0.35,
+   "avg_ret_pct": 0.07,
+   "sharpe": 0.012,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 2438,
+     "win_rate": 0.4787,
+     "wilson95": [
+      0.4589,
+      0.4985
+     ]
+    },
+    "bear": {
+     "n": 1438,
+     "win_rate": 0.4868,
+     "wilson95": [
+      0.461,
+      0.5126
+     ]
+    },
+    "range": {
+     "n": 1318,
+     "win_rate": 0.4476,
+     "wilson95": [
+      0.421,
+      0.4746
+     ]
+    },
+    "unknown": {
+     "n": 31602,
+     "win_rate": 0.4983,
+     "wilson95": [
+      0.4928,
+      0.5038
+     ]
+    }
+   },
+   "n_stocks": 50
+  },
+  "lb10_h10": {
+   "touch_events": 36740,
+   "win_rate": 0.4984,
+   "wilson95": [
+    0.4933,
+    0.5035
+   ],
+   "baseline_win_rate": 0.5032,
+   "edge_pp": -0.48,
+   "avg_ret_pct": 0.222,
+   "sharpe": 0.027,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 2438,
+     "win_rate": 0.5025,
+     "wilson95": [
+      0.4826,
+      0.5223
+     ]
+    },
+    "bear": {
+     "n": 1390,
+     "win_rate": 0.5036,
+     "wilson95": [
+      0.4773,
+      0.5298
+     ]
+    },
+    "range": {
+     "n": 1313,
+     "win_rate": 0.4158,
+     "wilson95": [
+      0.3895,
+      0.4427
+     ]
+    },
+    "unknown": {
+     "n": 31599,
+     "win_rate": 0.5013,
+     "wilson95": [
+      0.4957,
+      0.5068
+     ]
+    }
+   },
+   "n_stocks": 50
+  },
+  "lb20_h5": {
+   "touch_events": 18170,
+   "win_rate": 0.4877,
+   "wilson95": [
+    0.4805,
+    0.495
+   ],
+   "baseline_win_rate": 0.4983,
+   "edge_pp": -1.05,
+   "avg_ret_pct": -0.008,
+   "sharpe": -0.001,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 1215,
+     "win_rate": 0.4691,
+     "wilson95": [
+      0.4412,
+      0.4973
+     ]
+    },
+    "bear": {
+     "n": 730,
+     "win_rate": 0.5027,
+     "wilson95": [
+      0.4665,
+      0.5389
+     ]
+    },
+    "range": {
+     "n": 702,
+     "win_rate": 0.4416,
+     "wilson95": [
+      0.4053,
+      0.4785
+     ]
+    },
+    "unknown": {
+     "n": 15523,
+     "win_rate": 0.4906,
+     "wilson95": [
+      0.4827,
+      0.4984
+     ]
+    }
+   },
+   "n_stocks": 50
+  },
+  "lb20_h10": {
+   "touch_events": 18142,
+   "win_rate": 0.4921,
+   "wilson95": [
+    0.4848,
+    0.4994
+   ],
+   "baseline_win_rate": 0.5032,
+   "edge_pp": -1.11,
+   "avg_ret_pct": 0.116,
+   "sharpe": 0.014,
+   "maxdd_pct": -100.0,
+   "by_regime": {
+    "bull": {
+     "n": 1215,
+     "win_rate": 0.5251,
+     "wilson95": [
+      0.497,
+      0.5531
+     ]
+    },
+    "bear": {
+     "n": 713,
+     "win_rate": 0.5077,
+     "wilson95": [
+      0.4711,
+      0.5443
+     ]
+    },
+    "range": {
+     "n": 698,
+     "win_rate": 0.4169,
+     "wilson95": [
+      0.3809,
+      0.4538
+     ]
+    },
+    "unknown": {
+     "n": 15516,
+     "win_rate": 0.4922,
+     "wilson95": [
+      0.4843,
+      0.5001
+     ]
+    }
+   },
+   "n_stocks": 50
+  }
+ },
+ "caveats": [
+  "validate 仅评估支撑位(与引擎 --validate 同口径), 未含阻力/压力/枢轴等其余 9 类价位",
+  "每股票独立检验, 跨股票事件池化统计; 重叠窗口事件非独立, CI 偏窄",
+  "6 个分片(02/04/06/07/08/09)数据滞后到 2026-10-16, 对应 2026-10-17 至 10-23 股票缺 T+10 评估"
+ ]
+}

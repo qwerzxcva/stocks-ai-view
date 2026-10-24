@@ -1,0 +1,97 @@
+{
+ "engine": "feedback_updater v1",
+ "ts": "2026-10-23T19:26:10+08:00",
+ "asof": "2026-10-16",
+ "train_end": "2026-10-16",
+ "lookback": 60,
+ "updated": true,
+ "dry_run": false,
+ "cold_start": true,
+ "settled_records": 511,
+ "update_rule": "w_i ← w_i·exp(0.1×(r_i−r̄)), L1 归一, 截断[0.05,0.4], h:* ≤0.02; r_i = T+1 胜率超额 (口径见 sources)",
+ "r_bar": 0.1143,
+ "engine_r": {
+  "engine_v5": 0.1143
+ },
+ "single_engine_no_relative_update": true,
+ "weights_before": {
+  "engine_v5": 1.0
+ },
+ "weights_after": {
+  "engine_v5": 1.0
+ },
+ "delta": {
+  "engine_v5": 0.0
+ },
+ "converged": false,
+ "converge_note": "only 0 versions (<11)",
+ "evidence": {
+  "engine_v5": {
+   "source": "predictions_snapshots",
+   "days": 59,
+   "date_from": "2026-04-30",
+   "date_to": "2026-10-15",
+   "top_pct": 0.1,
+   "t1": {
+    "group": {
+     "n": 511,
+     "mean": 25.9701,
+     "win_rate": 0.5479
+    },
+    "bench": {
+     "n": 104216,
+     "mean": -0.1873,
+     "win_rate": 0.4336
+    },
+    "excess": 26.1574
+   },
+   "t5": {
+    "group": {
+     "n": 360,
+     "mean": 30.9457,
+     "win_rate": 0.575
+    },
+    "bench": {
+     "n": 90872,
+     "mean": -0.448,
+     "win_rate": 0.4089
+    },
+    "excess": 31.3937
+   },
+   "t10": {
+    "group": {
+     "n": 188,
+     "mean": 2.6885,
+     "win_rate": 0.3777
+    },
+    "bench": {
+     "n": 87497,
+     "mean": -0.8762,
+     "win_rate": 0.3752
+    },
+    "excess": 3.5647
+   }
+  }
+ },
+ "sources": {
+  "pick_log": {
+   "status": "ok (0 settled rows <= 2026-10-16)",
+   "db": "/root/stockdb/picks.duckdb",
+   "convention": "T+1 = 次日开盘买入→收盘 (ret_open_close, 表内既有口径); 表内远期口径仅 ret_t2, T+5/T+10 不可得, 如实缺席",
+   "excess_benchmark": "同一 lookback 内全部 settled 记录平均 ret_open_close 胜率为基准 (自基准, 仅作分组相对比较)"
+  },
+  "engine_v5_predictions": {
+   "dir": "/root/workspace/stocks-ai-view/data/predictions",
+   "convention": "T 日收盘买入 → T+1/5/10 收盘卖出; 高分组 = 快照 score 前 10%; 基准 = 同期全市场等权收益(分片日线自算, 无既有基线文件)",
+   "status": "ok (59 settled snapshot days)"
+  }
+ },
+ "degraded": [
+  "无历史权重, 等权初始化 (cold_start=true)",
+  "单引擎阶段: r̄=r_i, 乘性因子=1, 权重数值不变, 版本仅作链起点落盘 (single_engine_no_relative_update)"
+ ],
+ "version": 1,
+ "weights": {
+  "engine_v5": 1.0
+ }
+}

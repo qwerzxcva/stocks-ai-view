@@ -1,0 +1,1119 @@
+{
+ "engine": "central_orchestrator v1",
+ "ts": "2026-10-23T22:08:52+08:00",
+ "elapsed_s": 196.54933,
+ "asof": "2026-10-23",
+ "regime": {
+  "regime": "bear",
+  "regime_score": -4.5,
+  "confidence": 1.0,
+  "phase": "repair",
+  "phase_cn": "修复",
+  "gate": 0.5,
+  "routing": {
+   "A": {
+    "mode": "serial_before_all",
+    "tier": "重",
+    "note": "大盘风控一票否决前置",
+    "weight": 0.5
+   },
+   "B": {
+    "mode": "serial_after_A",
+    "tier": "轻",
+    "note": "个股引擎降级为观察名单",
+    "weight": 0.15
+   },
+   "C": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "只报风险型异动(跌停潮/龙头大跌)",
+    "weight": 0.3
+   },
+   "D": {
+    "mode": "parallel",
+    "tier": "中",
+    "note": "利空消息权重上调",
+    "weight": 0.3
+   },
+   "E": {
+    "mode": "serial_before_all",
+    "tier": "重",
+    "note": "弱市数据质量更需严防",
+    "weight": 0.5
+   },
+   "F": {
+    "mode": "parallel",
+    "tier": "重",
+    "note": "资金流是 bear 撤离核心信号",
+    "weight": 0.5
+   },
+   "G": {
+    "mode": "parallel",
+    "tier": "轻",
+    "note": "行业仅保留防御性观察",
+    "weight": 0.15
+   },
+   "H": {
+    "mode": "serial_after_A",
+    "tier": "轻",
+    "note": "另类信号仅参考",
+    "weight": 0.02
+   }
+  },
+  "evidence": {
+   "close_vs_ma20": {
+    "value": -3.2,
+    "points": -1.0
+   },
+   "close_vs_ma60": {
+    "value": -3.37,
+    "points": -1.0
+   },
+   "close_vs_ma250": {
+    "value": -5.64,
+    "points": -1.0
+   },
+   "ma20_slope_5d_pct": {
+    "value": -0.927,
+    "points": -0.5
+   },
+   "ma60_slope_5d_pct": {
+    "value": -0.43,
+    "points": -0.5
+   },
+   "ma250_slope_5d_pct": {
+    "value": -0.018,
+    "points": -0.5
+   },
+   "drawdown_from_250d_high_pct": {
+    "value": -11.24,
+    "points": 0.0
+   },
+   "vol60_percentile": {
+    "value": 0.602,
+    "note": "60日已实现波动率的全历史分位"
+   }
+  }
+ },
+ "routing": {
+  "source": "regime_router.routing",
+  "groups_planned": [
+   "A",
+   "B",
+   "C",
+   "E"
+  ],
+  "runs": {
+   "A": {
+    "status": "ok",
+    "mode": "serial_before_all",
+    "elapsed_s": 0.334566,
+    "engines": [
+     "cycle_grid_tester",
+     "price_level_index"
+    ]
+   },
+   "E": {
+    "status": "ok",
+    "mode": "serial_before_all",
+    "elapsed_s": 0.0055,
+    "engines": [
+     "shard_check"
+    ]
+   },
+   "C": {
+    "status": "ok",
+    "mode": "parallel",
+    "engine_errors": null,
+    "engines": [
+     "market_anomaly"
+    ]
+   },
+   "B": {
+    "status": "ok",
+    "mode": "serial_after_A",
+    "engines": [
+     "engine_v5",
+     "tomorrow_candidate",
+     "morning_pick",
+     "price_level"
+    ]
+   }
+  }
+ },
+ "groups": {
+  "A": {
+   "engines": [
+    "cycle_grid_tester",
+    "price_level_index"
+   ],
+   "output_keys": [
+    "cycle",
+    "dim_signals",
+    "index_levels"
+   ]
+  },
+  "B": {
+   "engines": [
+    "engine_v5",
+    "tomorrow_candidate",
+    "morning_pick",
+    "price_level"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "engine_picks"
+   ]
+  },
+  "C": {
+   "engines": [
+    "market_anomaly"
+   ],
+   "output_keys": [
+    "anomalies",
+    "data_asof",
+    "dim_signals"
+   ]
+  },
+  "E": {
+   "engines": [
+    "shard_check"
+   ],
+   "output_keys": [
+    "dim_signals",
+    "shard_check"
+   ]
+  }
+ },
+ "market_context": {
+  "anomalies": [
+   {
+    "type": "leader_crash",
+    "severity": "medium",
+    "evidence": [
+     {
+      "code": "sh603386",
+      "industry": "印制电路板",
+      "ret": -7.85
+     },
+     {
+      "code": "sh605258",
+      "industry": "印制电路板",
+      "ret": -8.06
+     },
+     {
+      "code": "sz000626",
+      "industry": "原材料供应链服务",
+      "ret": -9.95
+     }
+    ],
+    "hist_winrate": {
+     "T+1": {
+      "n": 164,
+      "p": 0.5732,
+      "ci95": [
+       0.4966,
+       0.6463
+      ]
+     },
+     "T+5": {
+      "n": 160,
+      "p": 0.5437,
+      "ci95": [
+       0.4664,
+       0.619
+      ]
+     }
+    },
+    "direction": "历史同类异动后 T+1/T+5 大盘收阳条件频率见 hist_winrate; 为频率描述非点预测, 仅用 T 日前数据"
+   }
+  ],
+  "index_levels": {
+   "current": 3765.71,
+   "support": [
+    {
+     "price": 3741.11,
+     "touches": 1,
+     "src": "window_low_fallback"
+    }
+   ],
+   "resistance": [
+    {
+     "price": 3947.367,
+     "touches": 16,
+     "last_touch_idx": 242
+    },
+    {
+     "price": 4101.81,
+     "touches": 10,
+     "last_touch_idx": 190
+    },
+    {
+     "price": 4183.505,
+     "touches": 6,
+     "last_touch_idx": 177
+    }
+   ],
+   "data_asof": "2026-10-09"
+  },
+  "cycle": {
+   "p_binom": 0.5636,
+   "p_mc": 0.6337,
+   "hit_rate": 0.5977,
+   "data_asof": "2026-10-09"
+  },
+  "shard_check": {
+   "n_shards": 18,
+   "bulk_latest": "2026-10-16",
+   "stale_vs_asof": true
+  }
+ },
+ "rounds": {
+  "engine_level": {
+   "cold_start": false,
+   "ensemble_weights": {
+    "tomorrow_candidate": 0.5,
+    "morning_pick": 0.5
+   },
+   "alpha": 1.0,
+   "review_winrate_excess": {
+    "tomorrow_candidate": 0.0,
+    "morning_pick": 0.0
+   }
+  },
+  "dim_level": {
+   "rule": "对口引擎权重 0.5, 辅助引擎均分余量 0.5; H 组 ≤0.02 写死",
+   "dims_observed": {
+    "ma": 30,
+    "rsi": 30,
+    "macd": 30,
+    "volume": 30,
+    "rel_strength": 30,
+    "sector": 9,
+    "gap_env": 5,
+    "breakout": 5,
+    "pullback": 5,
+    "momentum": 5,
+    "vol_energy": 5
+   }
+  },
+  "final": {
+   "formula": "S = 100 × regime_gate × Σ v_j·D_j (百分制, 与 LLM adjust ±10 同量纲)",
+   "regime_gate": 0.5,
+   "llm_detail": null,
+   "group_weights_v": {
+    "A": 0.3448,
+    "E": 0.3448,
+    "C": 0.2069,
+    "B": 0.1034
+   },
+   "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+   "llm_adjust_applied": 0,
+   "scored_universe": 32,
+   "output_filter": "main_board_only"
+  }
+ },
+ "top": [
+  {
+   "code": "sz002467",
+   "S_raw": -0.2007,
+   "S": -10.03,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.641,
+    "rsi": 0.822,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 0.899
+   },
+   "group_contrib": {
+    "B": 0.5266,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 76.33,
+     "name": "二六三"
+    }
+   },
+   "price_levels": {
+    "current": 4.61,
+    "support": [
+     {
+      "price": 4.45,
+      "touches": 1,
+      "last_touch_idx": 100
+     },
+     {
+      "price": 4.35,
+      "touches": 1,
+      "last_touch_idx": 44
+     },
+     {
+      "price": 4.22,
+      "touches": 2,
+      "last_touch_idx": 57
+     }
+    ],
+    "resistance": [
+     {
+      "price": 4.7,
+      "touches": 4,
+      "last_touch_idx": 93
+     },
+     {
+      "price": 4.84,
+      "touches": 1,
+      "last_touch_idx": 2
+     },
+     {
+      "price": 4.97,
+      "touches": 1,
+      "last_touch_idx": 58
+     },
+     {
+      "price": 5.916,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "pivot": {
+     "P": 4.667,
+     "R1": 4.783,
+     "S1": 4.493,
+     "R2": 4.957,
+     "S2": 4.377,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 4.267,
+     "support": 4.45,
+     "atr14": 0.183,
+     "rsi14": 26.95,
+     "rsi_oversold": true,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sh605117",
+   "S_raw": -0.2039,
+   "S": -10.2,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.313,
+    "rsi": 0.88,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.49560000000000004,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 74.78,
+     "name": "德业股份"
+    }
+   },
+   "price_levels": {
+    "current": 71.54,
+    "support": [
+     {
+      "price": 66.61,
+      "touches": 2,
+      "last_touch_idx": 204
+     },
+     {
+      "price": 59.5,
+      "touches": 1,
+      "last_touch_idx": 227
+     },
+     {
+      "price": 55.51,
+      "touches": 1,
+      "last_touch_idx": 232
+     }
+    ],
+    "resistance": [
+     {
+      "price": 73.36,
+      "touches": 1,
+      "last_touch_idx": 199
+     },
+     {
+      "price": 74.9,
+      "touches": 1,
+      "last_touch_idx": 194
+     },
+     {
+      "price": 76.977,
+      "touches": 3,
+      "last_touch_idx": 212
+     },
+     {
+      "price": 74.478,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "pivot": {
+     "P": 72.083,
+     "R1": 73.337,
+     "S1": 70.287,
+     "R2": 75.133,
+     "S2": 69.033,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 61.319,
+     "support": 66.61,
+     "atr14": 5.291,
+     "rsi14": 67.0,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sz000823",
+   "S_raw": -0.2099,
+   "S": -10.49,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.656,
+    "rsi": 0.376,
+    "macd": 0.0,
+    "volume": 0.0,
+    "sector": 1.0,
+    "rel_strength": 1.0
+   },
+   "group_contrib": {
+    "B": 0.4380000000000001,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 71.9,
+     "name": "超声电子"
+    }
+   },
+   "price_levels": {
+    "current": 20.29,
+    "support": [
+     {
+      "price": 16.81,
+      "touches": 1,
+      "last_touch_idx": 169
+     },
+     {
+      "price": 16.28,
+      "touches": 1,
+      "last_touch_idx": 166
+     },
+     {
+      "price": 15.69,
+      "touches": 2,
+      "last_touch_idx": 161
+     },
+     {
+      "price": 14.869,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 24.6,
+      "touches": 1,
+      "last_touch_idx": 246
+     },
+     {
+      "price": 25.5,
+      "touches": 1,
+      "last_touch_idx": 237
+     },
+     {
+      "price": 27.74,
+      "touches": 1,
+      "last_touch_idx": 242
+     }
+    ],
+    "pivot": {
+     "P": 20.533,
+     "R1": 21.067,
+     "S1": 19.757,
+     "R2": 21.843,
+     "S2": 19.223,
+     "based_on": "2026-10-12"
+    },
+    "bottom_fishing": {
+     "price": 14.604,
+     "support": 16.81,
+     "atr14": 2.206,
+     "rsi14": 43.97,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sz002039",
+   "S_raw": -0.2135,
+   "S": -10.68,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.0,
+    "rsi": 0.726,
+    "macd": 0.5,
+    "volume": 0.0,
+    "sector": 1.0,
+    "rel_strength": 0.56
+   },
+   "group_contrib": {
+    "B": 0.4024000000000001,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 70.12,
+     "name": "黔源电力"
+    }
+   },
+   "price_levels": {
+    "current": 20.58,
+    "support": [
+     {
+      "price": 15.7,
+      "touches": 2,
+      "last_touch_idx": 22
+     },
+     {
+      "price": 14.95,
+      "touches": 3,
+      "last_touch_idx": 191
+     },
+     {
+      "price": 14.614,
+      "touches": 9,
+      "last_touch_idx": 203
+     },
+     {
+      "price": 14.54,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 21.32,
+      "touches": 1,
+      "src": "window_high_fallback"
+     }
+    ],
+    "pivot": {
+     "P": 20.65,
+     "R1": 20.9,
+     "S1": 20.33,
+     "R2": 21.22,
+     "S2": 20.08,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 14.835,
+     "support": 15.7,
+     "atr14": 0.865,
+     "rsi14": 84.22,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sh603538",
+   "S_raw": -0.2139,
+   "S": -10.7,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.0,
+    "rsi": 0.874,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 0.0
+   },
+   "group_contrib": {
+    "B": 0.39879999999999993,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 69.94,
+     "name": "美诺华"
+    }
+   },
+   "price_levels": {
+    "current": 23.85,
+    "support": [
+     {
+      "price": 22.2,
+      "touches": 1,
+      "last_touch_idx": 77
+     },
+     {
+      "price": 20.012,
+      "touches": 4,
+      "last_touch_idx": 221
+     },
+     {
+      "price": 19.53,
+      "touches": 2,
+      "last_touch_idx": 214
+     },
+     {
+      "price": 20.498,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 24.68,
+      "touches": 1,
+      "last_touch_idx": 70
+     },
+     {
+      "price": 25.3,
+      "touches": 1,
+      "last_touch_idx": 66
+     },
+     {
+      "price": 25.755,
+      "touches": 2,
+      "last_touch_idx": 62
+     }
+    ],
+    "pivot": {
+     "P": 24.067,
+     "R1": 24.663,
+     "S1": 23.253,
+     "R2": 25.477,
+     "S2": 22.657,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 20.654,
+     "support": 22.2,
+     "atr14": 1.546,
+     "rsi14": 66.84,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sz001323",
+   "S_raw": -0.2148,
+   "S": -10.74,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.273,
+    "rsi": 0.92,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 0.427
+   },
+   "group_contrib": {
+    "B": 0.39,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 69.5,
+     "name": "慕思股份"
+    }
+   },
+   "price_levels": {
+    "current": 18.37,
+    "support": [
+     {
+      "price": 17.62,
+      "touches": 1,
+      "src": "window_low_fallback"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 34.317,
+      "touches": 4,
+      "last_touch_idx": 232
+     },
+     {
+      "price": 35.135,
+      "touches": 4,
+      "last_touch_idx": 215
+     },
+     {
+      "price": 36.39,
+      "touches": 4,
+      "last_touch_idx": 136
+     },
+     {
+      "price": 33.588,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "pivot": {
+     "P": 18.467,
+     "R1": 18.833,
+     "S1": 18.003,
+     "R2": 19.297,
+     "S2": 17.637,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 14.901,
+     "support": 17.62,
+     "atr14": 2.719,
+     "rsi14": 27.97,
+     "rsi_oversold": true,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sh605069",
+   "S_raw": -0.2149,
+   "S": -10.74,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.0,
+    "rsi": 0.818,
+    "macd": 0.5,
+    "volume": 1.0,
+    "rel_strength": 0.0
+   },
+   "group_contrib": {
+    "B": 0.38939999999999997,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 69.47,
+     "name": "正和生态"
+    }
+   },
+   "price_levels": {
+    "current": 10.45,
+    "support": [
+     {
+      "price": 10.32,
+      "touches": 2,
+      "last_touch_idx": 56
+     },
+     {
+      "price": 10.0,
+      "touches": 2,
+      "last_touch_idx": 116
+     },
+     {
+      "price": 9.831,
+      "touches": 7,
+      "last_touch_idx": 185
+     }
+    ],
+    "resistance": [
+     {
+      "price": 10.6,
+      "touches": 2,
+      "last_touch_idx": 105
+     },
+     {
+      "price": 10.85,
+      "touches": 1,
+      "last_touch_idx": 54
+     },
+     {
+      "price": 11.04,
+      "touches": 1,
+      "last_touch_idx": 50
+     }
+    ],
+    "pivot": {
+     "P": 10.4,
+     "R1": 10.65,
+     "S1": 10.2,
+     "R2": 10.85,
+     "S2": 9.95,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 9.834,
+     "support": 10.32,
+     "atr14": 0.486,
+     "rsi14": 65.44,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sh600783",
+   "S_raw": -0.2169,
+   "S": -10.84,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.94,
+    "rsi": 0.762,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 0.0
+   },
+   "group_contrib": {
+    "B": 0.37,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 68.5,
+     "name": "鲁信创投"
+    }
+   },
+   "price_levels": {
+    "current": 13.35,
+    "support": [
+     {
+      "price": 13.038,
+      "touches": 9,
+      "last_touch_idx": 153
+     },
+     {
+      "price": 12.469,
+      "touches": 11,
+      "last_touch_idx": 180
+     },
+     {
+      "price": 12.09,
+      "touches": 3,
+      "last_touch_idx": 187
+     }
+    ],
+    "resistance": [
+     {
+      "price": 13.548,
+      "touches": 14,
+      "last_touch_idx": 219
+     },
+     {
+      "price": 13.81,
+      "touches": 4,
+      "last_touch_idx": 140
+     },
+     {
+      "price": 14.167,
+      "touches": 3,
+      "last_touch_idx": 245
+     },
+     {
+      "price": 13.461,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "pivot": {
+     "P": 13.453,
+     "R1": 13.657,
+     "S1": 13.147,
+     "R2": 13.963,
+     "S2": 12.943,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 12.512,
+     "support": 13.038,
+     "atr14": 0.526,
+     "rsi14": 64.04,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sz002181",
+   "S_raw": -0.2175,
+   "S": -10.87,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.186,
+    "rsi": 0.355,
+    "macd": 0.5,
+    "volume": 0.3,
+    "sector": 1.0,
+    "rel_strength": 0.0
+   },
+   "group_contrib": {
+    "B": 0.36419999999999986,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 68.21,
+     "name": "粤 传 媒"
+    }
+   },
+   "price_levels": {
+    "current": 9.46,
+    "support": [
+     {
+      "price": 6.2,
+      "touches": 1,
+      "last_touch_idx": 112
+     },
+     {
+      "price": 5.512,
+      "touches": 5,
+      "last_touch_idx": 211
+     },
+     {
+      "price": 5.353,
+      "touches": 6,
+      "last_touch_idx": 240
+     },
+     {
+      "price": 5.477,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 10.75,
+      "touches": 1,
+      "last_touch_idx": 247
+     }
+    ],
+    "pivot": {
+     "P": 9.743,
+     "R1": 10.097,
+     "S1": 9.107,
+     "R2": 10.733,
+     "S2": 8.753,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 5.539,
+     "support": 6.2,
+     "atr14": 0.661,
+     "rsi14": 80.84,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  },
+  {
+   "code": "sh600177",
+   "S_raw": -0.2175,
+   "S": -10.88,
+   "gate": 0.5,
+   "dim_votes": {
+    "ma": 0.915,
+    "rsi": 0.751,
+    "macd": 0.5,
+    "volume": 0.0,
+    "rel_strength": 0.0
+   },
+   "group_contrib": {
+    "B": 0.36379999999999996,
+    "A": 0.0,
+    "E": -0.5,
+    "C": -0.4
+   },
+   "engines": {
+    "tomorrow_candidate": {
+     "score": 68.19,
+     "name": "XD雅戈尔"
+    }
+   },
+   "price_levels": {
+    "current": 8.45,
+    "support": [
+     {
+      "price": 7.76,
+      "touches": 1,
+      "last_touch_idx": 10
+     },
+     {
+      "price": 7.633,
+      "touches": 3,
+      "last_touch_idx": 232
+     },
+     {
+      "price": 7.454,
+      "touches": 12,
+      "last_touch_idx": 236
+     },
+     {
+      "price": 7.501,
+      "touches": "poc",
+      "src": "volume_profile"
+     }
+    ],
+    "resistance": [
+     {
+      "price": 8.7,
+      "touches": 1,
+      "last_touch_idx": 247
+     }
+    ],
+    "pivot": {
+     "P": 8.463,
+     "R1": 8.547,
+     "S1": 8.367,
+     "R2": 8.643,
+     "S2": 8.283,
+     "based_on": "2026-10-16"
+    },
+    "bottom_fishing": {
+     "price": 7.484,
+     "support": 7.76,
+     "atr14": 0.276,
+     "rsi14": 63.79,
+     "rsi_oversold": false,
+     "note": "支撑位−1×ATR(14); RSI<30 时为共振强信号"
+    }
+   }
+  }
+ ],
+ "llm": "error: JSONDecodeError: Expecting value: line 1 column 2 (char 1)",
+ "feedback_updater": "ok",
+ "data_asof": {
+  "regime_router": {
+   "index": "2026-10-09",
+   "note": "本地数据滞后于当前日期 2026-10-23, 为已知限制"
+  },
+  "engines": {
+   "tomorrow_candidate": "2026-10-16",
+   "morning_pick": "2026-10-16"
+  }
+ },
+ "degraded": null
+}
