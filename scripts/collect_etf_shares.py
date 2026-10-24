@@ -72,22 +72,25 @@ def kline_series(secid: str) -> list:
     return out
 
 
-def live_snapshot(code: str, secid: str) -> dict | None:
-    """push2 实时快照：f47 成交量(手) + f8 换手率(真实份额口径)。"""
-    root = curl_json("https://push2.eastmoney.com/api/qt/stock/get"
-                     f"?secid={secid}&fields=f43,f47,f48,f8,f10,f57,f58")
-    d = (root.get("data") or {})
-    if code == "510300":
-        print(f"  [probe] 510300 push2 raw: {d}")  # CI 日志里确认 f8 是否为换手率
-    vol = d.get("f47")
-    turnover = d.get("f8")
-    if vol is None or turnover is None:
-        return None
-    vol, turnover = float(vol), float(turnover)
-    if turnover <= 0:
-        return None
-    return {"date": datetime.now(CST).strftime("%Y-%m-%d"), "vol": vol, "turnover": turnover,
-            "live_shares_yi": round(vol / turnover / 1e4, 2)}
+def live_snapshot_all(codes_secs: dict) -> dict:
+    """ulist 批量快照：一次请求拿全篮子 f12 代码/f5 成交量(手)/f8 换手率(真实份额口径)。
+    逐只 stock/get 会触限流；ulist 单请求一次到位。"""
+    secids = ",".join(codes_secs.values())
+    root = curl_json("https://push2.eastmoney.com/api/qt/ulist.np/get"
+                     f"?secids={secids}&fields=f12,f5,f8&fltt=2&invt=2")
+    out = {}
+    for d in (root.get("data") or {}).get("diff") or []:
+        code, vol, turnover = str(d.get("f12") or ""), d.get("f5"), d.get("f8")
+        if code == "510300":
+            print(f"  [probe] 510300 ulist raw: {d}")  # CI 日志确认 f8 是否为换手率
+        if not vol or not turnover:
+            continue
+        vol, turnover = float(vol), float(turnover)
+        if turnover <= 0:
+            continue
+        out[code] = {"date": datetime.now(CST).strftime("%Y-%m-%d"), "vol": vol,
+                     "turnover": turnover, "live_shares_yi": round(vol / turnover / 1e4, 2)}
+    return out
 
 
 def pct(a, b):
@@ -103,18 +106,21 @@ def main() -> None:
             old = {}
 
     basket = {}
+    live_map = {}
+    try:
+        live_map = live_snapshot_all(BASKET)  # 一次批量请求拿全篮子快照
+    except Exception as e:
+        print(f"[warn] 批量 live 快照失败: {e}", file=sys.stderr)
     for code, (secid, name) in BASKET.items():
         try:
             series = kline_series(secid)
-            time.sleep(1.5)
-            live = live_snapshot(code, secid)
-            time.sleep(1.0)
+            time.sleep(3.0)  # K线单只请求间隔拉长，防限流
         except Exception as e:
             print(f"[warn] {code} 抓取失败: {e}", file=sys.stderr)
             if code not in old:
                 continue
             series = old[code].get("series") or []
-            live = (old[code].get("live_series") or [None])[-1]
+        live = live_map.get(code)
 
         # 合并 live 序列（按日期去重，新值覆盖）
         live_series = {x["date"]: x for x in (old.get(code, {}).get("live_series") or [])}
