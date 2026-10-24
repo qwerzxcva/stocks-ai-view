@@ -75,7 +75,7 @@ def kline_series(secid: str) -> list:
 def live_snapshot_all(codes_secs: dict) -> dict:
     """ulist 批量快照：一次请求拿全篮子 f12 代码/f5 成交量(手)/f8 换手率(真实份额口径)。
     逐只 stock/get 会触限流；ulist 单请求一次到位。"""
-    secids = ",".join(codes_secs.values())
+    secids = ",".join(v[0] for v in codes_secs.values())
     root = curl_json("https://push2.eastmoney.com/api/qt/ulist.np/get"
                      f"?secids={secids}&fields=f12,f5,f8&fltt=2&invt=2")
     out = {}
@@ -114,9 +114,9 @@ def main() -> None:
     for code, (secid, name) in BASKET.items():
         try:
             series = kline_series(secid)
-            time.sleep(3.0)  # K线单只请求间隔拉长，防限流
+            time.sleep(5.0)  # K线单只请求间隔拉长，防 Actions 出口被限流
         except Exception as e:
-            print(f"[warn] {code} 抓取失败: {e}", file=sys.stderr)
+            print(f"[warn] {code} 抓取失败: {e}，回退旧数据", file=sys.stderr)
             if code not in old:
                 continue
             series = old[code].get("series") or []
