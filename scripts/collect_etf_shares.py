@@ -73,23 +73,61 @@ def kline_series(secid: str) -> list:
 
 
 def live_snapshot_all(codes_secs: dict) -> dict:
-    """ulist 批量快照：一次请求拿全篮子 f12 代码/f5 成交量(手)/f8 换手率(真实份额口径)。
-    逐只 stock/get 会触限流；ulist 单请求一次到位。"""
+    """批量快照（真实份额口径）。主：东财 ulist（一次请求全篮子）；备：腾讯 qt 批量（GBK）。
+    东财对出口限流时腾讯兜底；腾讯引引号里 index 6=成交量(手)、38=换手率(%)。"""
+    date = datetime.now(CST).strftime("%Y-%m-%d")
     secids = ",".join(v[0] for v in codes_secs.values())
-    root = curl_json("https://push2.eastmoney.com/api/qt/ulist.np/get"
-                     f"?secids={secids}&fields=f12,f5,f8&fltt=2&invt=2")
+    try:
+        root = curl_json("https://push2.eastmoney.com/api/qt/ulist.np/get"
+                         f"?secids={secids}&fields=f12,f5,f8&fltt=2&invt=2")
+        out = {}
+        for d in (root.get("data") or {}).get("diff") or []:
+            code, vol, turnover = str(d.get("f12") or ""), d.get("f5"), d.get("f8")
+            if not vol or not turnover:
+                continue
+            vol, turnover = float(vol), float(turnover)
+            if turnover <= 0:
+                continue
+            out[code] = {"date": date, "vol": vol, "turnover": turnover,
+                         "live_shares_yi": round(vol / turnover / 1e4, 2)}
+        if out:
+            return out
+        print("[warn] 东财 ulist 无数据，转腾讯", file=sys.stderr)
+    except Exception as e:
+        print(f"[warn] 东财 ulist 失败({e})，转腾讯", file=sys.stderr)
+    # 腾讯 qt 批量（会 GBK 编码）
+    tq = ",".join(("sh" if v[0].startswith("1.") else "sz") + code for code, v in codes_secs.items())
+    last = None
+    for attempt in range(3):
+        try:
+            r = subprocess.run(["curl", "-s", "--max-time", "20", f"https://qt.gtimg.cn/q={tq}"],
+                               capture_output=True, timeout=30)
+            if r.returncode != 0 or not r.stdout:
+                raise RuntimeError(f"curl rc={r.returncode}")
+            text = r.stdout.decode("gbk", "replace")
+            break
+        except Exception as e:
+            last = e
+            time.sleep(2 + attempt)
+    else:
+        raise last
     out = {}
-    for d in (root.get("data") or {}).get("diff") or []:
-        code, vol, turnover = str(d.get("f12") or ""), d.get("f5"), d.get("f8")
-        if code == "510300":
-            print(f"  [probe] 510300 ulist raw: {d}")  # CI 日志确认 f8 是否为换手率
-        if not vol or not turnover:
+    for line in text.split(";"):
+        if "=" not in line:
             continue
-        vol, turnover = float(vol), float(turnover)
-        if turnover <= 0:
+        code = line.split("=")[0].strip().lstrip("v_")[2:]
+        fields = line.split("~")
+        if len(fields) < 39:
             continue
-        out[code] = {"date": datetime.now(CST).strftime("%Y-%m-%d"), "vol": vol,
-                     "turnover": turnover, "live_shares_yi": round(vol / turnover / 1e4, 2)}
+        try:
+            vol = float(fields[6] or 0)
+            turnover = float(fields[38] or 0)
+        except (ValueError, IndexError):
+            continue
+        if vol <= 0 or turnover <= 0:
+            continue
+        out[code] = {"date": date, "vol": vol, "turnover": turnover,
+                     "live_shares_yi": round(vol / turnover / 1e4, 2)}
     return out
 
 
