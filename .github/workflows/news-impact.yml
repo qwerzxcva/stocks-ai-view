@@ -1,0 +1,60 @@
+# news-impact — 前 50 条新闻逐条利好/利空/影响个股分析
+# 结果：写回 t3/news/<date>.md（新闻数据库）+ stocks-ai-view/data/news_impact.json（app读取）
+name: news-impact
+on:
+  schedule:
+    # 工作日 17:10 CST，收盘后
+    - cron: '10 9 * * 1-5'
+  workflow_dispatch: {}
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      TZ: Asia/Shanghai
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Analyze first 50 news items
+        run: |
+          python3 scripts/news_impact_analyze.py --limit 50
+          python3 - <<'PY'
+          import json
+          d = json.load(open("data/news_impact.json", encoding="utf-8"))
+          if d.get("push_status") != "ok":
+              raise SystemExit("news history append is not confirmed: " + str(d.get("push_status")))
+          if d.get("n") != 50 or len(d.get("items") or []) != 50 or len(d.get("impacts") or []) != 50:
+              raise SystemExit("news impact must contain 50 aligned items and impacts")
+          print("validated news impact: 50 aligned items; history append ok")
+          PY
+      - name: Commit app analysis index
+        run: |
+          git config user.name "news-impact-bot"
+          git config user.email "741059079@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add data/news_impact.json data/data/news_impact.json
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+            git commit -m "data: news impact analysis $ts"
+            git -c http.version=HTTP/1.1 push origin main || {
+              git fetch origin main
+              git reset --soft origin/main
+              git add data/news_impact.json data/data/news_impact.json
+              if ! git diff --cached --quiet; then
+                git commit -m "data: news impact analysis $ts"
+              fi
+              git push origin main
+            }
+          fi
