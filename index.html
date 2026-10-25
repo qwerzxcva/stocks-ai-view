@@ -336,9 +336,6 @@ td:nth-child(n+3),th:nth-child(n+3){text-align:right}
         <div style="font-size:11px;font-weight:800;margin-bottom:4px">实时热榜 <span id="hotSideSub" style="font-weight:400;font-size:10px;color:var(--tx3)">Newsnow 15平台</span></div>
         <div id="hotSide" style="font-size:11px;max-height:300px;overflow-y:auto"></div>
       </div>
-      <!-- renderNews 写入: 摘要计数 + 全文列表。容器缺失时整个资讯流不渲染。 -->
-      <div id="newsCount" class="fl" style="padding:4px 12px;font-size:10px"></div>
-      <div id="newsFull" style="padding:0 12px 8px"></div>
     </div>
     <div class="card c-card" data-ci="8">
       <div class="hd">海外关联 <span class="sub" id="olSub">大盘/板块 与 纳指/恒指/日经/KOSPI 的相关·贝塔·滞后·隔夜传导</span></div>
@@ -658,10 +655,8 @@ function renderAiReview(){
   const d=(window._data||{}).ai_review||{};
   if(!d.ok||!d.review) return '';
   const model=(d.model||'').split('/').pop();
-  return '<div style="font-size:11px;margin-bottom:4px"><b>🤖 AI 复盘</b> '
-    +'<span class="fl" style="font-size:9px">'+_esc2(model)+' (GitCode AI 免费额度) · '
-    +_t(d.ts)+' · 上下文 '+_esc2(d.context_len)+' 字</span></div>'
-    +'<div style="font-size:11px;line-height:1.7">'+md2html(d.review)+'</div>';
+  return _details('🤖 AI 复盘 · '+_esc2(model)+' · '+_t(d.ts),
+    '<div style="font-size:11px;line-height:1.7">'+md2html(d.review)+'</div>',false);
 }
 // 极简 Markdown → HTML (只处理 AI 复盘用到的: ## 标题 / **粗体** / 换行)
 function md2html(md){
@@ -865,33 +860,20 @@ function renderFundRank(fr){
     <td class="up" style="font-weight:700">${sign(r.ret_1y)}%</td></tr>`).join('')||'<tr><td colspan="8" class="fl">暂无</td></tr>';
 }
 function renderNews(ns, digest){
-  const n=(ns||[]).length;
-  document.getElementById('newsCount').textContent=n+'条';
-  // 数据年龄: news_digest.json 是 CI 生成的, 停了用户必须看得见
+  const box=document.getElementById('newsFull'), count=document.getElementById('newsCount');
+  if(!box) return;
+  const g=window._data||{}, items=_collectUnifiedNews(g);
+  if(count) count.textContent=items.length+'条 · 已按题材合并';
   let ageHtml='';
   if(digest&&digest.ts){
     try{
-      const t=new Date(digest.ts), ageMin=(Date.now()-t.getTime())/60000;
+      const ageMin=(Date.now()-new Date(digest.ts).getTime())/60000;
       const col=ageMin<90?'var(--dn)':(ageMin<360?'var(--amber)':'var(--up)');
       const ageTxt=ageMin<60?Math.round(ageMin)+'分钟前':(ageMin/60).toFixed(1)+'小时前';
-      ageHtml='<div style="padding:2px 12px 4px;font-size:9px;color:var(--tx3)">更新于 '+
-        '<span style="color:'+col+'">'+ageTxt+'</span>'+
-        (digest.stale?' <span style="color:var(--amber)">· 窗口内无新闻, 显示较早内容</span>':'')+
-        ' · 窗口 '+ (digest.keep_hours||24) +'h</div>';
+      ageHtml='<div class="fl" style="font-size:9px">统一消息入口 · 更新于 <span style="color:'+col+'">'+ageTxt+'</span>'+(digest.stale?' · 窗口内无新闻, 显示较早内容':'')+'</div>';
     }catch(e){}
   }
-  const box=document.getElementById('newsFull');
-  const list=(ns||[]).slice(0,80).map(n=>{
-    // 主题标签: theme 数组 (ai_screener 格式) 或 _cat 分类 (news_digest 格式)
-    const tags=(n.theme&&n.theme.length)?n.theme.slice(0,3).map(t=>'#'+t).join(' '):(n._cat?'#'+n._cat:'');
-    return `<div class="n-item">
-    <span class="dot ${n.sentiment||'neu'}"></span>
-    <div class="n-body">
-      <div class="n-title">${n.title}</div>
-      <div class="n-meta"><span>${(n.ts||'').slice(5,16)}</span><span class="n-th">${tags}</span><span>${n.src||''}</span></div>
-    </div></div>`;
-  }).join('')||'<span class="fl" style="padding:12px;text-align:center">暂无新闻</span>';
-  box.innerHTML=ageHtml+list;
+  box.innerHTML=ageHtml+_renderUnifiedNews(g);
 }
 // 数据已在 render() 里并行取到, 这里只负责渲染 (消除一次串行请求)
 function renderHotImpactData(d){
@@ -1322,8 +1304,70 @@ function renderMoneyFlow(d){
 let dsRendered=false, mlRendered=false, thRendered=false,
     plRendered=false, nfRendered=false, gmRendered=false, olRendered=false;
 
+function resetRenderState(){
+  dsRendered=mlRendered=thRendered=plRendered=nfRendered=gmRendered=olRendered=false;
+  cdRendered=fdRendered=decRendered=scenRendered=false;
+  feRendered=rvRendered=qaRendered=ovRendered=pkRendered=mfRendered=false;
+}
+
 var _esc2 = s => String(s==null?'—':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 var _t = ts => ts ? String(ts).replace('T',' ').slice(5,16) : '';
+function _details(label,body,open){
+  return '<details'+(open?' open':'')+' style="margin:4px 0"><summary style="cursor:pointer;font-weight:700">'+_esc2(label)+'</summary><div style="padding:4px 0 2px">'+body+'</div></details>';
+}
+function _newsThemes(item){
+  const raw=item&&((item.themes&&item.themes.length&&item.themes)||(item.theme&&item.theme.length&&item.theme)||item.affected_sectors||item.sectors||[]);
+  return (Array.isArray(raw)?raw:[raw]).map(x=>typeof x==='string'?x:(x&&((x.name||x.sector||x.theme||x.title)||''))).filter(Boolean).slice(0,5);
+}
+function _newsAffected(item){
+  const stocks=item&&((item.affected_stocks&&item.affected_stocks.length&&item.affected_stocks)||(item.stocks&&item.stocks.length&&item.stocks)||item.codes||[]);
+  return (Array.isArray(stocks)?stocks:[stocks]).filter(x=>x&&x!=='unknown').map(x=>{
+    if(typeof x==='string') return {code:x,name:x};
+    return {code:x.code||'',name:x.name||x.code||'',evidence:x.evidence||x.reason||''};
+  }).filter(x=>x.code||x.name).slice(0,12);
+}
+function _impactRows(items,limit){
+  return (items||[]).slice(0,limit||8).map((it,idx)=>{
+    const verdict=String(it.verdict||'中性'), vc=/利空|风险/.test(verdict)?'var(--dn)':(/利好|看多/.test(verdict)?'var(--up)':'var(--amber)');
+    const sectors=_newsThemes(it), stocks=_newsAffected(it);
+    const positive=it.positive_reason||it.benefit_reason||it.benefit_reasons&&it.benefit_reasons.join('、')||'insufficient_data';
+    const negative=it.negative_reason||it.harm_reason||it.harm_reasons&&it.harm_reasons.join('、')||'insufficient_data';
+    const body='<div class="fl" style="font-size:9px">时间 '+_esc2(it.published_at||it.time||it.ts||'insufficient_data')+' · 来源 '+_esc2(it.source||'insufficient_data')+'</div>'
+      +'<div style="font-size:10px">正向: '+_esc2(String(positive).slice(0,180))+' · 负向: '+_esc2(String(negative).slice(0,180))+'</div>'
+      +'<div style="font-size:10px">影响板块: '+_esc2(sectors.join('、')||'insufficient_data')+'</div>'
+      +'<div style="font-size:10px">影响个股: '+_esc2(stocks.map(x=>x.name||x.code).join('、')||'insufficient_data')+'</div>'
+      +(it.impact_reason||it.digest?'<div class="fl" style="font-size:9px">证据: '+_esc2(String(it.impact_reason||it.digest).slice(0,220))+'</div>':'');
+    return _details((idx+1)+'. '+(it.title||'—')+' · '+verdict,'<span style="color:'+vc+';font-weight:700">'+_esc2(verdict)+'</span>'+body,false);
+  }).join('');
+}
+function _collectUnifiedNews(g){
+  const out=[], seen={};
+  const add=(item,kind)=>{
+    if(!item||!item.title)return;
+    const key=String(item.title).trim();
+    if(seen[key]){Object.assign(seen[key],item);return;}
+    const row=Object.assign({},item,{_kind:kind,_themes:_newsThemes(item)}); seen[key]=row; out.push(row);
+  };
+  ((g.news_extra||{}).items||[]).forEach(x=>add(x,'财经资讯'));
+  ((g.hot_news||{}).items||[]).forEach(x=>add(x,'全平台热点'));
+  ((g.news_impact||{}).items||[]).forEach(x=>add(x,'影响分析'));
+  return out;
+}
+function _renderUnifiedNews(g){
+  const items=_collectUnifiedNews(g), groups={};
+  items.forEach(item=>{const keys=item._themes.length?item._themes:['未知']; keys.forEach(k=>{(groups[k]||(groups[k]=[])).push(item);});});
+  return Object.entries(groups).map(([theme,rows])=>{
+    const body=rows.map(item=>{
+      const verdict=item.verdict?'<span style="color:'+( /利空|风险/.test(String(item.verdict))?'var(--dn)':(/利好|看多/.test(String(item.verdict))?'var(--up)':'var(--amber)'))+';font-weight:700">'+_esc2(item.verdict)+'</span>':'';
+      const meta='<div class="fl" style="font-size:9px">'+_esc2(item._kind||'消息')+' · '+_esc2(item.source||'')+' · '+_esc2(item.time||item.ts||item.published_at||'')+'</div>';
+      const impact=item.verdict?'<div style="font-size:10px">影响板块: '+_esc2(_newsThemes(item).join('、')||'insufficient_data')+' · 个股: '+_esc2(_newsAffected(item).map(x=>x.name||x.code).join('、')||'insufficient_data')+'</div>':'';
+      const summary=item.summary||item.digest||item.impact_reason||'';
+      const bodyHtml=meta+(item.url?'<a href="'+_esc2(item.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--tx)">'+_esc2(item.title)+'</a>':'<b>'+_esc2(item.title)+'</b>')+(verdict?' '+verdict:'')+impact+(summary?'<div style="font-size:10px;line-height:1.55">'+_esc2(String(summary).slice(0,500))+'</div>':'');
+      return _details(item.title,bodyHtml,false);
+    }).join('');
+    return _details(theme+' · '+rows.length+'条',body,false);
+  }).join('')||'<div class="no-data">暂无资讯</div>';
+}
 
 // ─── 1. 统一市场行情 (global_markets.json) ────────────────────
 // A股与全球指数共用一个视图；历史 K 线只消费已采集的 index_kline/global_kline。
@@ -1865,7 +1909,7 @@ function renderPicksCard(){
      '评分 = 多引擎共振36 + 引擎均分30 + 估值±15 + 位置15 + 资金±12 ｜ '+
      '入场区间和盈亏比按每只候选的决策快照价计算；实时价只作对照，不改写决策记录。 ｜ '+
      '<b>Research reference only, not investment advice.</b></div>';
-  return h;
+  return h?_details('早盘 / 午盘推股 · 展开详情',h,false):'';
 }
 
 function renderDailySummary(){
@@ -1974,6 +2018,12 @@ function renderDailySummary(){
       }).join(' · ')+'</div>';
     });
     if(!anyBoard&&spd.note) h+='<div class="fl" style="font-size:10px">异动榜待开盘后相邻两轮差分生成 ('+_esc2(spd.note)+')</div>';
+    const impactItems=Array.isArray(g.news_impact&&g.news_impact.items)?g.news_impact.items:[];
+    if(impactItems.length){
+      const impactBody=_impactRows(impactItems,8);
+      h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">消息异动影响 <span class="sub">复用统一 news_impact · '+impactItems.length+' 条</span></div>';
+      h+=_details('查看新闻 verdict、正负向与影响板块/个股',impactBody,false);
+    }
   })();
 
   // ═══ 0a2. 市场KPI补齐 + 点位提醒 (借鉴 tick-stock-panel 市场看板) ═══
@@ -2083,19 +2133,9 @@ function renderDailySummary(){
     if(gs.sentiment_label) h+='<div class="fl" style="font-size:10px;margin-bottom:8px">全球情绪: <b>'+_esc2(gs.sentiment_label)+'</b> ('+_esc2(gs.avg_chg_pct)+'%) — '+_esc2(gs.interpretation)+'</div>';
   }
 
-  // 1. 盘面解读
+  // 1. 盘面解读：正文统一由独立 commentary 模块渲染，这里只保留单一入口提示。
   h+='<div class="hd" style="padding:6px 0">① 盘面解读</div>';
-  const mn=g.market_now||{};
-  if(mn.market){
-    const m=mn.market;
-    h+='<div class="fl" style="font-size:10px;line-height:1.7">'
-      +'上涨 <b class="up">'+_esc2(m.advance)+'</b> / 下跌 <b class="dn">'+_esc2(m.decline)+'</b>'
-      +' · 涨停 <b class="up">'+_esc2(m.limit_up||m.zt_count)+'</b> / 跌停 <b class="dn">'+_esc2(m.limit_down||m.dt_count)+'</b>'
-      +' · 成交额 '+_esc2(m.turnover?fmtYi(m.turnover):'—')
-      +(m.up_pct!=null?' · 上涨占比 '+_esc2(m.up_pct)+'%':'')
-      +'</div>';
-  }
-  if(brief.market_view||brief.summary) h+='<div style="font-size:11px;line-height:1.6;margin:4px 0">'+_esc2(brief.market_view||brief.summary)+'</div>';
+  h+='<div class="fl" style="font-size:10px;line-height:1.6">统一口径见本页下方「盘面解读」模块，避免重复展示第二份正文。</div>';
 
   // 2. 明日走势预测与策略及原因
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">② 明日走势预测与策略</div>';
@@ -2144,7 +2184,8 @@ function renderDailySummary(){
 
   // 6. 盘前分析 (大A + 美股早盘)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑥ 盘前分析 (大A / 美股早盘)</div>';
-  if(brief.pre_market||brief.premarket) h+='<div style="font-size:11px;line-height:1.6">'+_esc2(brief.pre_market||brief.premarket)+'</div>';
+  const premarketText=brief.pre_market||brief.premarket||'';
+  if(premarketText) h+=_details('展开盘前分析正文','<div style="font-size:11px;line-height:1.6">'+_esc2(premarketText)+'</div>',false);
   else h+='<div class="fl" style="font-size:10px">仅在盘前时段生成 (daily-brief 引擎 UTC 23:30 = CST 07:30)</div>';
 
   // 7. AI 复盘 (GitCode AI 结合算法/引擎产出生成)
@@ -2377,42 +2418,58 @@ function renderThemes(){
   const box=document.getElementById('themeBox');
   if(!box) return;
   const g=window._data||{};
-  // hot_themes.json 顶层是 {ts, themes:[...]}; latest.json 里的 themes 是数组
+  // theme_report 是题材深挖的主契约；旧热点文件仅作降级展示。
+  const report=g.theme_report||{};
   const themeFile=g.hot_themes||{};
   const impactReports=(g.hot_impact||{}).reports||themeFile.hot_reports||[];
   const grouped=((g.hot_news||{}).groups||{});
   const groupThemes=Object.entries(grouped).map(([name,row])=>({name:name,count:(row.items||row.top||[]).length||row.count||0,direction:'neutral',stocks:[]}));
-  const thRaw=[].concat((themeFile.themes||[]),(g.themes||[]),groupThemes).filter((x,i,a)=>x&&x.name&&a.findIndex(y=>y.name===x.name)===i);
-  const th=Array.isArray(thRaw)?thRaw:(thRaw.themes||[]);
+  const reportThemes=Array.isArray(report.themes)?report.themes:[];
+  const legacyThemes=[].concat((themeFile.themes||[]),(g.themes||[]),groupThemes);
+  const thRaw=[].concat(reportThemes,legacyThemes).filter((x,i,a)=>x&&x.name||x&&x.theme).filter((x,i,a)=>a.findIndex(y=>(y.name||y.theme)===(x.name||x.theme))===i);
+  const th=Array.isArray(thRaw)?thRaw:[];
   const ne=g.news_extra||{};
   let h='';
   if(th.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">题材热度 <span class="sub">'+th.length+' 个</span></div>';
-    h+='<table><thead><tr><th>主题</th><th>热度</th><th>方向</th><th>关联个股</th></tr></thead><tbody>';
+    h+='<div class="hd" style="border-top:none;padding:6px 0">题材热度/深挖 <span class="sub">'+th.length+' 个 · '+_t(report.ts||themeFile.ts)+'</span></div>';
+    h+='<table><thead><tr><th>主题</th><th>热度</th><th>方向</th><th>龙头/关联个股</th><th>路径</th></tr></thead><tbody>';
     th.slice(0,30).forEach(t=>{
-      // stocks 可能是 [{code,name}] 或 ["600000",...], 统一成 code 列表
-      const st=(t.stocks||t.codes||[]).map(s=>(s&&typeof s==='object')?(s.code||''):s).filter(Boolean);
-      const dir=t.direction==='bull'?'看多':(t.direction==='bear'?'看空':'中性');
-      h+='<tr><td><b>'+_esc2(t.name||t.theme)+'</b></td>'
-        +'<td>'+_esc2(t.count||t.news_count||t.heat||'')+'</td>'
+      const name=t.name||t.theme||'';
+      const st=(t.stocks||t.codes||[]).map(s=>(s&&typeof s==='object')?(s.code||s.name||''):s).filter(Boolean);
+      const leader=t.leader||'';
+      const dir=t.direction==='bull'?'看多':(t.direction==='bear'?'看空':(t.tier||'中性'));
+      const path=Array.isArray(t.path)?t.path.join(' → '):(t.path||'');
+      h+='<tr><td><b>'+_esc2(name)+'</b></td>'
+        +'<td>'+_esc2(t.count||t.news_count||t.score||t.heat||'')+'</td>'
         +'<td>'+_esc2(dir)+'</td>'
-        +'<td>'+st.slice(0,6).map(c=>'<span class="clk" data-code="'+_esc2(c)+'" style="color:var(--accent)">'+_esc2(c)+'</span>').join(' ')+'</td></tr>';
+        +'<td>'+_esc2(leader||st.slice(0,6).join(' '))+'</td>'
+        +'<td class="fl" title="'+_esc2(path)+'">'+_esc2(path.slice(0,80))+'</td></tr>';
     });
     h+='</tbody></table>';
   } else { h+='<div class="fl">主题聚合样本不足</div>'; }
-  if(impactReports.length){
+  if(reportThemes.length){
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">题材分支与补涨 <span class="sub">'+_t(report.ts)+' · '+_esc2(report.engine||'theme_report')+'</span></div>';
+    reportThemes.slice(0,12).forEach(r=>{
+      const hot=r.hot||[], watch=r.watchlist||[], degraded=r.degraded||[];
+      h+='<div class="hi"><div class="hi-head">'+_esc2(r.theme||'—')+'<span class="sub">'+_esc2(r.tier||'—')+' · 涨停梯队 '+hot.length+' · 补涨 '+watch.length+'</span></div>';
+      if(r.path&&r.path.length) h+='<div class="fl" style="font-size:9px;padding:2px 0">路径: '+_esc2(r.path.join(' → '))+'</div>';
+      if(hot.length) h+='<div class="chips">'+hot.slice(0,8).map(s=>'<span class="chip clk" data-code="'+_esc2(s.code||'')+'">'+_esc2(s.name||s.code)+' <b>'+_esc2(s.lianban_label||s.authentic||'')+'</b></span>').join('')+'</div>';
+      if(watch.length) h+='<div class="fl" style="font-size:9px;padding:2px 0">补涨: '+watch.slice(0,8).map(s=>_esc2((s.code||'')+' '+(s.name||'')+' '+(s.star||0)+'星')).join(' · ')+'</div>';
+      if(degraded.length) h+='<div class="fl" style="font-size:9px;color:var(--amber)">降级: '+_esc2(degraded.join('；'))+'</div>';
+      h+='</div>';
+    });
+  } else if(impactReports.length){
     h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">热点推演主题 <span class="sub">'+_t((g.hot_impact||themeFile).ts)+'</span></div>';
     impactReports.forEach(r=>{
       h+='<div class="hi"><div class="hi-head">'+_esc2(r.theme)+'<span class="sub">热度 '+Math.round((r.heat||0)*100)+'% · '+_esc2(r.news_count||0)+' 条</span></div>';
       h+='<div class="chips">'+(r.stocks||[]).slice(0,8).map(s=>'<span class="chip clk" data-code="'+_esc2(String(s.code||'').replace(/^(sh|sz|bj)/,''))+'">'+_esc2(s.name||s.code)+' <b>'+_esc2(s.signal||'')+'</b></span>').join('')+'</div></div>';
     });
   }
-  // 从实时资讯里提取的题材 (华尔街见闻 related_themes)
   const fromNews={};
   (ne.items||[]).forEach(it=>{ (it.themes||[]).forEach(t=>{ fromNews[t]=(fromNews[t]||0)+1; }); });
   const nn=Object.entries(fromNews).sort((a,b)=>b[1]-a[1]);
   if(nn.length){
-    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">实时资讯题材 <span class="sub">从华尔街见闻 related_themes 提取</span></div>';
+    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">实时资讯题材 <span class="sub">从 related_themes 提取</span></div>';
     h+='<div class="chips">'+nn.slice(0,20).map(([k,v])=>'<span class="chip">'+_esc2(k)+' <b>'+v+'</b></span>').join('')+'</div>';
   }
   box.innerHTML=h;
@@ -2826,108 +2883,35 @@ function renderOverseasLinkage(){
   box.innerHTML=h;
 }
 
+function newsImageMarkup(item, fallbackKey){
+  const raw=(item&&(item.image||item.img||item.cover||item.thumbnail||
+    (Array.isArray(item.images)&&item.images[0])||
+    (Array.isArray(item.image_urls)&&item.image_urls[0])))||'';
+  const src=String(raw||'').trim();
+  if(!/^https?:\/\//i.test(src)) return '';
+  const key=_esc2(fallbackKey||item.title||'news-image');
+  return '<div class="news-media" style="margin:4px 0;max-width:420px">'+
+    '<img src="'+_esc2(src)+'" alt="'+key+'" loading="lazy" referrerpolicy="no-referrer" '
+    +'style="display:block;max-width:100%;max-height:180px;object-fit:cover;border-radius:4px;border:1px solid var(--border)" '
+    +'onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'">'+
+    '<span class="fl" style="display:none;font-size:9px;padding:4px;border:1px dashed var(--border)">图片加载失败，保留文字分析</span></div>';
+}
+function newsMediaFor(title, item, d, hot){
+  const direct=newsImageMarkup(item,title);
+  if(direct) return direct;
+  const all=[].concat((d&&d.items)||[],(hot&&hot.items)||[]);
+  const hit=all.find(x=>String(x.title||'')===String(title||''));
+  return hit?newsImageMarkup(hit,title):'';
+}
 function renderNewsFlow(){
   const box=document.getElementById('newsFlowBox');
   if(!box) return;
   const g=window._data||{};
-  const d=g.news_extra||{};
-  const hot=g.hot_news||{};
+  const unified=_collectUnifiedNews(g);
   const sub=document.getElementById('newsSub');
-  const n1=(d.items||[]).length, n2=(hot.items||[]).length;
-  if(sub) sub.textContent='财经资讯 '+n1+' · 全平台热点 '+n2+' · '+_t(d.ts||hot.ts);
-  const srcName={cls:'财联社',wallstreetcn:'华尔街见闻',zaobao:'联合早报'};
-  const srcCol={cls:'var(--up)',wallstreetcn:'var(--accent)',zaobao:'var(--amber)'};
-  let h='';
+  if(sub) sub.textContent='统一消息/题材入口 · '+unified.length+' 条 · 点击题材展开消息';
+  let h=_renderUnifiedNews(g)+'<div class="fl" style="padding:8px 0 2px;font-size:9px">消息无题材统一归入“未知”；实时异动复用同一 news_impact.items。</div>';
 
-  // ── 第零区: 消息传导 (坏消息利好谁 / 好消息利空谁) ──────
-  // news_impact 只做单向映射 (坏消息→该板块bear), 这里补上第二半:
-  // 一条消息有两个方向的资金流向 — 直接受损方 + 间接受益方 (替代/避险/资金转移)
-  const nt=g.news_transmission||{};
-  const trs=nt.transmissions||[];
-  if(trs.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">🔀 消息传导 <span class="sub">好消息利好谁 · 坏消息利空谁 · 诱多/洗盘只在资金证据相反时标注 · '+_t(nt.ts)+'</span></div>';
-    trs.slice(0,8).forEach(r=>{
-      h+='<div style="padding:5px 0;border-bottom:1px dashed var(--bd)">';
-      h+='<div style="font-size:11px;font-weight:700">['+_esc2(r.label)+'] ';
-      if(r.url) h+='<a href="'+_esc2(r.url)+'" target="_blank" style="color:var(--tx);text-decoration:none">'+_esc2(r.title)+'</a>';
-      else h+=_esc2(r.title);
-      h+='</div>';
-      const sec=(title,arr,col)=>{
-        if(!arr||!arr.length) return '';
-        return '<div style="font-size:10px;margin:2px 0 0 8px">'
-          +'<span style="color:'+col+';font-weight:700">'+title+'</span> '
-          +arr.map(x=>'<span class="clk" data-code="'+_esc2((x.stocks||[])[0]||'')+'" '
-            +'style="color:var(--accent)">'+_esc2(x.sector)+'</span>'
-            +' <span class="fl" style="font-size:9px">('+_esc2((x.stocks||[]).length)+'只)</span>').join(' · ')
-          +'</div>';
-      };
-      h+=sec('↑ 好消息利好谁', r.direct_bull, 'var(--up)');
-      h+=sec('↓ 坏消息利空谁', r.direct_bear, 'var(--dn)');
-      const behavior=[].concat(...(r.direct_bull||[]).map(x=>x.behavior||[]), ...(r.direct_bear||[]).map(x=>x.behavior||[]));
-      if(behavior.length){
-        h+='<div style="font-size:10px;margin:2px 0 0 8px"><b>行为证据</b> '+behavior.slice(0,4).map(x=>'<span class="clk" data-code="'+_esc2(x.code)+'">'+_esc2(x.code)+' '+_esc2(x.label)+'</span> <span class="fl">'+_esc2(x.evidence)+'</span>').join(' · ')+'</div>';
-      }
-      h+=sec('⇄ 反向受益 (资金转移)', r.inverse_bull, 'var(--up)');
-      h+=sec('⇄ 反向受害 (被抽血)', r.inverse_bear, 'var(--dn)');
-      h+=sec('🛡 避险去向', r.hedge, 'var(--amber)');
-      if(r.flow_evidence&&r.flow_evidence.status!=='matched') h+='<div class="fl" style="font-size:9px;margin:2px 0 0 8px">资金证据不足 · 新闻 '+_esc2(r.flow_evidence.event_date||'日期未知')+' / 资金 '+_esc2(r.flow_evidence.trade_date||'日期未知')+'</div>';
-      if(r.note) h+='<div class="fl" style="font-size:9px;margin:2px 0 0 8px">'+_esc2(r.note)+'</div>';
-      h+='</div>';
-    });
-    h+='<div class="fl" style="padding:6px 0 2px;font-size:9px;line-height:1.5">'
-      +_esc2(nt.caveat||'')+'</div>';
-  }
-
-  // ── 第一区: Newsnow 全平台热点 (15源) ──────────────────────
-  if(hot.items&&hot.items.length){
-    h+='<div class="hd" style="border-top:none;padding:6px 0">全平台热点 <span class="sub">'+_esc2(hot.n_sources_ok)+' 个平台 · '+_t(hot.ts)+'</span></div>';
-    // 财经相关分组优先 (TrendRadar 式频率词分组)
-    const grp=hot.groups||{};
-    if(Object.keys(grp).length){
-      h+='<div class="fl" style="font-size:10px;margin:2px 0 4px">财经相关分组 (频率词匹配):</div>';
-      h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">';
-      Object.entries(grp).forEach(([k,st])=>{
-        h+='<span class="bdg" style="background:rgba(102,57,186,.14);color:var(--accent)">'
-          +_esc2(k)+' <b>'+st.count+'</b></span>';
-      });
-      h+='</div>';
-      // 每组列前 3 条
-      Object.entries(grp).forEach(([k,st])=>{
-        h+='<div class="fl" style="font-size:10px;margin:4px 0 2px">'+_esc2(k)+' TOP:</div>';
-        h+='<ul style="font-size:11px;line-height:1.6;margin:0 0 4px 16px;padding:0">';
-        st.top.slice(0,3).forEach(t=>{ h+='<li>'+_esc2(t)+'</li>'; });
-        h+='</ul>';
-      });
-    }
-    // 各平台条数
-    h+='<div class="chips" style="margin:6px 0">';
-    Object.entries(hot.sources_ok||{}).length&&Object.entries((hot.items||[]).reduce((a,x)=>{a[x.source]=(a[x.source]||0)+1;return a},{})).sort((a,b)=>b[1]-a[1]).forEach(([k,v])=>{
-      h+='<span class="chip">'+_esc2(k)+' <b>'+v+'</b></span>';
-    });
-    h+='</div>';
-  }
-
-  // ── 第二区: 财经资讯流 (财联社/见闻/早报) ──────────────────
-  if(d.items&&d.items.length){
-    h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">财经资讯流 <span class="sub">'+n1+' 条</span></div>';
-    h+='<div class="chips" style="margin-bottom:6px">';
-    Object.entries(d.per_source||{}).forEach(([k,v])=>{
-      h+='<span class="chip" style="color:'+(srcCol[k]||'var(--tx2)')+'">'+_esc2(srcName[k]||k)+' <b>'+v+'</b></span>';
-    });
-    h+='</div>';
-    h+='<div style="font-size:11px;line-height:1.6">';
-    d.items.slice(0,60).forEach(it=>{
-      const t=_t(it.time);
-    h+='<div style="padding:4px 0;border-bottom:1px solid var(--border)">'
-      +'<span style="color:'+(srcCol[it.source]||'var(--tx3)')+';font-size:10px">['+_esc2(srcName[it.source]||it.source)+']</span> '
-      +'<span class="fl" style="font-size:9px">'+_esc2(t)+'</span><br>'
-      +(it.url?'<a href="'+_esc2(it.url)+'" target="_blank" style="color:var(--tx)">'+_esc2(it.title)+'</a>':_esc2(it.title))
-      +(it.themes&&it.themes.length?' <span class="fl" style="font-size:9px">#'+it.themes.slice(0,3).map(_esc2).join(' #')+'</span>':'')
-      +(it.summary?'<div class="fl" style="font-size:9px;margin-top:1px">'+_esc2(it.summary.slice(0,120))+'</div>':'')
-      +'</div>';
-  });
-  h+='</div>';
-  }
   const digest=g.news_digest||{};
   const cats=digest.categories||{};
   const catRows=Object.entries(cats).filter(([,v])=>Array.isArray(v)?v.length:(v.items||[]).length);
@@ -3501,6 +3485,9 @@ const SOURCES = [
   'data/sample_balance.json',  // 样本均衡
   'data/global_fx.json',       // 全球汇率
   'data/hot_themes.json',      // 热点主题 (build_mainlines 产出)
+  'data/theme_report.json',     // 题材深挖：路径/涨停梯队/补涨候选
+  'data/news_impact.json',      // 前50条新闻逐条利好利空与影响个股
+  'data/sources_registry.json', // 数据源真实总量与状态分组
   'data/concept_heat.json',      // 概念热力矩阵 (build_concept_heat 产出)
   'data/mainline.json',        // 今日主线 + 明日预测 (保留兼容)
   'data/recent_mainlines.json', // 近30日稳定主线
@@ -3530,6 +3517,19 @@ async function render(){
   const d = g.latest;
   window._lastD = d;
   window._data = g;
+  const registry=g.sources_registry;
+  const sourceTag=document.getElementById('dataSourceTag');
+  if(sourceTag&&registry&&Array.isArray(registry.sources)){
+    const counts=registry.by_status||{};
+    const statusText=Object.entries(counts).map(([k,v])=>k+' '+v).join(' · ');
+    sourceTag.textContent='数据源 '+(registry.total==null?registry.sources.length:registry.total)+' · '+statusText;
+    sourceTag.title='来源注册表 '+(registry.generated||'')+' · '+statusText;
+    sourceTag.style.display='inline-block';
+  }else if(sourceTag){
+    sourceTag.textContent='数据源状态 unavailable';
+    sourceTag.title='sources_registry.json 未加载或格式无效';
+    sourceTag.style.display='inline-block';
+  }
   if(!d){ document.getElementById('updTime').textContent='⚠️ 数据加载失败'; return; }
 
   // ── 实时行情覆盖: market_now 优先于 latest, realtime_minute 最细 ──
@@ -3657,7 +3657,6 @@ async function render(){
   _safe(()=>renderZtAgg(),'ztAgg');
   _safe(()=>renderFundRank((d.fund_rank && d.fund_rank.length) ? d.fund_rank
                  : ((mn && mn.fund_rank) ? mn.fund_rank : [])),'fundRank');
-  _safe(()=>renderNews((newsList && newsList.length) ? newsList : d.news_recent, nd),'news');
   if(g.hot_impact) _safe(()=>renderHotImpactData(g.hot_impact),'hotImpact');
   if(d.commentary) _safe(()=>renderCommentary(d.commentary),'commentary');
   // 强势股/龙虎榜/大宗: enrich.json 是独立文件, 不被 latest.json 的远端
@@ -3690,7 +3689,9 @@ async function render(){
   window._gmData = g.global_markets; if(g.global_markets && gmRendered) renderGlobalMarkets(g.global_markets);
   window._newsData = g.news_extra;
   window._hotData = g.hot_news;
-  if((g.news_extra||g.hot_news) && (nfRendered || document.querySelector('.c-tab.active')?.dataset.c==='7')){
+  window._newsImpact = g.news_impact;
+  window._themeReport = g.theme_report;
+  if((g.news_extra||g.hot_news||g.news_impact) && (nfRendered || document.querySelector('.c-tab.active')?.dataset.c==='7')){
     nfRendered=true; _safe(renderNewsFlow,'newsFlow');
   }
   window._engineV5 = g.engine_v5;
@@ -3852,6 +3853,7 @@ window.__manualRefresh=async function(){
     }
     const reg=await navigator.serviceWorker.getRegistration();
     if(reg&&reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+    resetRenderState();
     window.__forceRefresh=true;
     try{ await render(); } finally { window.__forceRefresh=false; }
     const u=document.getElementById('updTime');

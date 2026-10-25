@@ -25,6 +25,7 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
+MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002")
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
@@ -37,10 +38,11 @@ except Exception:
 
 
 # ─── bulk K线加载 (只取需要的字段, 按 code 分块) ─────────────────
-def load_bulk_klines(codes=None):
+def load_bulk_klines(codes=None, bulk_dir=None):
     """返回 {symbol: [[date,open,close,high,low,vol], ...] 按日期升序}
 
     codes: None=全部; 否则只加载这些 (裸码或带前缀都可)
+    bulk_dir: 可选 bulk 目录覆盖 paths.BULK
     """
     want = None
     if codes:
@@ -51,7 +53,8 @@ def load_bulk_klines(codes=None):
             bare = c[2:] if c[:2] in ("sh", "sz", "bj") else c
             want.add(bare)
     out = {}
-    for p in sorted(glob.glob(os.path.join(BULK, "day_qfq_*.csv"))):
+    source_dir = bulk_dir or BULK
+    for p in sorted(glob.glob(os.path.join(source_dir, "day_qfq_*.csv"))):
         with open(p, encoding="utf-8", errors="replace") as f:
             for line in f:
                 if line.startswith("#") or "|" not in line:
@@ -149,7 +152,7 @@ def main():
 
     bulk = args.bulk or BULK
     print(f"[ai_pick_v4] 加载 bulk K线 ({bulk}) ...", flush=True)
-    klines = load_bulk_klines()
+    klines = load_bulk_klines(bulk_dir=bulk)
     print(f"[ai_pick_v4] {len(klines)} 只股票", flush=True)
 
     feats = []
@@ -163,16 +166,28 @@ def main():
         return 1
     print(f"[ai_pick_v4] 特征计算完成 {len(feats)} 只", flush=True)
 
+    # 先以全体有效 K 线的共同最新交易日为基准，再做筛选；不能从候选子集反推日期。
+    all_dates = [f.get("date") for f in feats if f.get("date")]
+    as_of = max(all_dates) if all_dates else None
+    if as_of:
+        feats = [f for f in feats if f.get("date") == as_of]
+        print(f"[ai_pick_v4] 统一交易日 {as_of}，有效样本 {len(feats)} 只", flush=True)
+
     # 硬过滤: 未涨停 + 涨幅0.5-5% + 位置<60% + 量比1.5-2.5
     cand = [f for f in feats
-            if not f["is_zt_today"]
+            if str(f.get("symbol", "")).replace("sh", "").replace("sz", "").replace("bj", "").startswith(MAIN_BOARD_PREFIXES)
+            and not f["is_zt_today"]
             and 0.005 <= f["ret"] <= 0.05
             and f["pos240"] < 0.6
             and 1.5 <= f["vratio"] <= 2.5]
     print(f"[ai_pick_v4] 硬过滤后 {len(cand)} 只", flush=True)
     if not cand:
-        out = {"ts": datetime.now(CST).isoformat(timespec="seconds"),
+        now_ts = datetime.now(CST).isoformat(timespec="seconds")
+        out = {"ts": now_ts,
                "engine": "ai_pick v4 (移植自 stocks-algo)",
+               "date": as_of, "data_date": as_of,
+               "stale": as_of is None,
+               "provenance": {"source": "bulk day_qfq", "confidence": "high" if as_of else "insufficient", "snapshot_ts": now_ts},
                "n_scanned": len(feats), "n_candidates": 0, "picks": [],
                "note": "无候选 (可能非交易日或市场不满足强市闸门)",
                "meta": {"source": "bulk day_qfq_*.csv"}}
@@ -326,10 +341,15 @@ def main():
             "pattern_bonus": round(pat_bonus.get(c["symbol"], 0), 3),
         })
 
+    data_dates = sorted({p.get("date") for p in picks if p.get("date")})
+    data_date = data_dates[0] if len(data_dates) == 1 else None
     out = {
         "ts": datetime.now(CST).isoformat(timespec="seconds"),
         "engine": "ai_pick v4 (移植自 jiegengxiangjianxue1/stocks-algo)",
-        "date": picks[0]["date"] if picks else None,
+        "date": data_date,
+        "data_date": data_date,
+        "stale": data_date is None,
+        "provenance": {"source": "bulk day_qfq", "confidence": "high" if data_date else "insufficient", "snapshot_ts": datetime.now(CST).isoformat(timespec="seconds")},
         "n_scanned": len(feats),
         "n_candidates": len(cand),
         "global": g,

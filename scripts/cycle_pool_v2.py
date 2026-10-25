@@ -31,6 +31,7 @@ import re
 import sys
 import time
 import urllib.request
+import urllib.parse
 from collections import defaultdict
 from datetime import datetime, timezone, timedelta
 
@@ -187,6 +188,9 @@ def stock_candidates(demand):
 
     def _add(codes, item, reason):
         for code in codes:
+            bare = str(code or "").replace("sh", "").replace("sz", "").replace("bj", "")
+            if not bare.startswith(("600", "601", "603", "605", "000", "001", "002")):
+                continue
             if code in seen:
                 continue
             seen.add(code)
@@ -204,14 +208,14 @@ def stock_candidates(demand):
         if not codes and nm in zt_names:
             codes = [zt_names[nm]]
         if codes:
-            _add(codes[:6], item, "当前周期需求迁移行业成分股")
+            _add([c for c in codes if c not in zt_names.values()][:6], item, "当前周期需求迁移行业成分股")
 
     # 概念榜: 概念不在行业映射 → hot_impact 归因 → 涨停名称兜底
     for item in ((demand or {}).get("concept_top") or [])[:8]:
         nm = item.get("name")
         codes = _concept_stocks_from_reports(nm) or ([] if nm not in zt_names else [zt_names[nm]])
         if codes:
-            _add(codes[:4], item, "当前周期需求迁移概念成分股")
+            _add([c for c in codes if c not in zt_names.values()][:4], item, "当前周期需求迁移概念成分股")
 
     return rows[:60]
 
@@ -662,6 +666,8 @@ def main():
 
     print("[4/4] 需求变化 (板块轮动) ...")
     demand = demand_shift()
+    if not demand:
+        print("[cycle_pool_v2] demand_shift 无有效板块数据，股票池标记为 insufficient_data", file=sys.stderr)
 
     print("[5/5] 股票候选 (行业/概念成分股 + 实时行情补全) ...")
     stocks = stock_candidates(demand)
@@ -702,6 +708,8 @@ def main():
         "stocks_meta": {
             "n": len(stocks),
             "enriched": sum(1 for s in stocks if s.get("price") is not None),
+            "status": "ok" if stocks else "insufficient_data",
+            "reason": None if stocks else ("demand_shift 无有效板块数据" if not demand else "板块成分映射未产生股票候选"),
         },
     }
 

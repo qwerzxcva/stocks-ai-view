@@ -12,7 +12,7 @@ CST = timezone(timedelta(hours=8))
 # field 是页面和产物中实际存在的业务字段；count_field 指定真正的股票/条目池。
 POOLS = {
     "risk": ("decision.json", "avoid", "daily"),
-    "cycle": ("cycle_pool_v2.json", "regimes", "weekly"),
+    "cycle": ("cycle_pool_v2.json", "stocks", "weekly"),
     "recommend": ("ai_pick_v4.json", "picks", "daily"),
     "hot": ("hot_news.json", "items", "daily"),
     "low": ("lowpool.json", "strong", "daily"),
@@ -130,6 +130,10 @@ def audit_pool(name, spec, now):
     parsed = parse_ts(timestamp)
     age = round((now - parsed).total_seconds() / 3600, 2) if parsed else None
     status = status_for(data, value, timestamp, kind, now)
+    if name == "cycle" and isinstance(data, dict):
+        stocks_meta = data.get("stocks_meta") or {}
+        if stocks_meta.get("status") == "insufficient_data" or stocks_meta.get("n") == 0:
+            status = "insufficient_data"
     effective_age = trading_age_hours(parsed, now) if parsed and kind == "intraday" else age
     return {
         "file": filename,
@@ -155,7 +159,7 @@ def main():
     pools = {name: audit_pool(name, spec, now) for name, spec in POOLS.items()}
     stale = [name for name, row in pools.items() if row["status"] == "stale"]
     empty = [name for name, row in pools.items() if row["empty"]]
-    insufficient = [name for name, row in pools.items() if row["status"] in ("missing", "missing_field", "no_timestamp", "future_timestamp")]
+    insufficient = [name for name, row in pools.items() if row["status"] in ("missing", "missing_field", "no_timestamp", "future_timestamp", "insufficient_data")]
     payload = {
         "ts": now.isoformat(timespec="seconds"),
         "engine": "pool_audit.py",
@@ -167,7 +171,7 @@ def main():
         "meta": {
             "purpose": "按实际业务字段审计多池覆盖、空池、时间戳和时效",
             "session_rule": "intraday 仅累计工作日 09:15-11:30、13:00-15:05 的交易时段时间，阈值3小时；daily/weekly按日历年龄",
-            "field_corrections": {"cycle": "cycle_pool_v2.regimes + cycle_pool_v2.meta.ts", "risk": "decision.avoid", "hot": "hot_news.items"},
+            "field_corrections": {"cycle": "cycle_pool_v2.stocks + cycle_pool_v2.stocks_meta.n + cycle_pool_v2.meta.ts", "risk": "decision.avoid", "hot": "hot_news.items"},
         },
     }
     with open(args.out, "w", encoding="utf-8") as handle:
