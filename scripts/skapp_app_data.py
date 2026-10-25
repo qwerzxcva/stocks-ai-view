@@ -16,6 +16,7 @@ Data policy: every value comes from a real upstream file; anything absent stays
 null or {"status": "insufficient"} — never fabricated.
 """
 import json, os, re, subprocess, sys, urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 GH = "https://raw.githubusercontent.com"
 A = f"{GH}/qwerzxcva/stocks-ai-view/main/data"
@@ -389,8 +390,9 @@ def main():
             "skapp-data:data/search/symbols.json",
         ] + [f"shard-bundle:{c}" for c in codes
              if (records[c].get("detail") or {}).get("status") == "ok"])),
-        "registered_sources": 89,
-        "note": "engine outputs are products of the 89+ registered collection sources; news/sectors mirror the site's own engine outputs; AI Q&A via GitCode free AI (only from provided real data)",
+        "registered_sources": 190,
+        "news_sources_registered": 13,
+        "note": "engine outputs are products of the 190 registered collection sources; news/sectors mirror the site's own engine outputs; AI Q&A via GitCode free AI (only from provided real data)",
     }
     decision["sources"] = src
     picks["sources"] = src
@@ -401,8 +403,25 @@ def main():
     dump("data/data/stock_names.json", names)
 
     # ── API: 消息面(移植站点 news_* 四个引擎产出) ──
+    news_items = (hot_news.get("items") or []) if isinstance(hot_news.get("items"), list) else []
+    impact_items = news_impact.get("items") if isinstance(news_impact.get("items"), list) else []
+    n_input = news_impact.get("n_input", news_impact.get("n"))
+    n_mapped = news_impact.get("n_mapped")
+    unmapped_count = news_impact.get("n_unmapped")
+    if unmapped_count is None and isinstance(n_input, int) and isinstance(n_mapped, int):
+        unmapped_count = max(0, n_input - n_mapped)
+    news_source_ts = (hot_news.get("ts") or digest.get("ts") or
+                      news_impact.get("input_ts") or news_impact.get("ts"))
+    news_status = ("ok" if news_items and news_source_ts and unmapped_count is not None
+                   else "insufficient_data")
     news_api = {
-        "ts": digest.get("ts") or (hot_news or {}).get("ts"),
+        "ts": news_source_ts,
+        "source_ts": news_source_ts,
+        "status": news_status,
+        "unmapped_count": unmapped_count if unmapped_count is not None else "insufficient_data",
+        "items": news_items[:100],
+        "impacts": (news_impact.get("impacts") or impact_items)[:50]
+                    if isinstance(news_impact.get("impacts") or impact_items, list) else [],
         "digest": {
             "ts": digest.get("ts"),
             "date": digest.get("date"),
@@ -416,7 +435,9 @@ def main():
             "categories": {
                 k: (v[:10] if isinstance(v, list) else v)
                 for k, v in (digest.get("categories") or {}).items()
-            } if isinstance(digest.get("categories"), dict) else [],
+            } if isinstance(digest.get("categories"), dict) else {},
+            "themes": (hot_themes.get("themes") or [])[:20]
+                      if isinstance(hot_themes.get("themes"), list) else [],
         },
         "hot_news": {
             "ts": hot_news.get("ts"),
@@ -426,11 +447,20 @@ def main():
             "groups": (hot_news.get("groups") or [])[:20] if isinstance(hot_news.get("groups"), list) else (hot_news.get("groups") or {}),
         },
         "impact": {
-            "ts": news_impact.get("ts"),
+            "schema_version": news_impact.get("schema_version", "unknown"),
+            "ts": news_impact.get("ts") or news_impact.get("generated_at"),
             "engine": news_impact.get("engine"),
-            "n_input": news_impact.get("n_input"),
-            "n_mapped": news_impact.get("n_mapped"),
-            "impacts": (news_impact.get("impacts") or [])[:30] if isinstance(news_impact.get("impacts"), list) else [],
+            "source_ts": news_impact.get("input_ts") or news_impact.get("ts") or news_impact.get("generated_at"),
+            "n_input": n_input,
+            "n_mapped": n_mapped,
+            "unmapped_count": unmapped_count if unmapped_count is not None else "insufficient_data",
+            "status": news_impact.get("status") or news_impact.get("coverage_status") or "insufficient_data",
+            "stale": news_impact.get("stale", news_impact.get("source_status") != "live"),
+            "provenance": news_impact.get("provenance") or news_impact.get("meta") or {},
+            "source_registry_count": (news_impact.get("meta") or {}).get("source_registry_count", 190),
+            "news_source_registry_count": (news_impact.get("meta") or {}).get("news_source_registry_count", 13),
+            "items": (news_impact.get("items") or [])[:50] if isinstance(news_impact.get("items"), list) else [],
+            "impacts": (news_impact.get("impacts") or news_impact.get("items") or [])[:50] if isinstance(news_impact.get("impacts") or news_impact.get("items"), list) else [],
         },
         "transmission": {
             "ts": news_trans.get("ts"),
@@ -466,27 +496,45 @@ def main():
             return []
         return [b for b in boards if isinstance(b, dict)][:200]
 
-    # 预生成 Top N 板块成分股(db-market sector/<kind>_constituents/<bk>.json)
+    # Fetch constituent files for every published industry/concept board.
     board_members = {}
     _ind_boards = _board_list(industries)
     _con_boards = _board_list(concepts)
-    for b, kind in ([(x, "industry") for x in _ind_boards[:15]] +
-                    [(x, "concept") for x in _con_boards[:15]]):
+    board_jobs = {}
+    for b, kind in ([(x, "industry") for x in _ind_boards] +
+                    [(x, "concept") for x in _con_boards]):
         bk = b.get("bk")
-        if not bk:
-            continue
-        c = gj(f"{MARKET}/sector/{kind}_constituents/{bk}.json")
-        if isinstance(c, dict) and isinstance(c.get("members"), list):
+        if bk:
+            board_jobs[(bk, kind)] = b
+
+    def _fetch_board(job):
+        (bk, kind), board = job
+        path = f"{MARKET}/sector/{kind}_constituents/{bk}.json"
+        data = gj(path)
+        return bk, kind, board, path, data
+
+    with ThreadPoolExecutor(max_workers=8) as executor:
+        futures = [executor.submit(_fetch_board, job) for job in board_jobs.items()]
+        for future in as_completed(futures):
+            bk, kind, board, path, data = future.result()
+            members = data.get("members") if isinstance(data, dict) else None
+            valid_members = [
+                {"code": str(m["code"]), "name": m["name"]}
+                for m in (members or [])
+                if isinstance(m, dict) and m.get("code") and m.get("name")
+            ] if isinstance(members, list) else []
+            source_ts = ((data or {}).get("generated_at") or (data or {}).get("ts") or
+                         (industries if kind == "industry" else concepts).get("generated_at"))
             board_members[bk] = {
-                "name": b.get("name"),
+                "name": board.get("name"),
                 "kind": kind,
-                "n": c.get("n"),
-                "members": [
-                    {"code": m.get("code"), "name": m.get("name")}
-                    for m in c["members"][:60] if isinstance(m, dict)
-                ],
+                "n": data.get("n") if isinstance(data, dict) else None,
+                "members": valid_members[:200],
+                "source_ts": source_ts,
+                "source": path,
+                "status": "ok" if valid_members else "insufficient_data",
             }
-    print(f"board_members prebuilt: {len(board_members)}", flush=True)
+    print(f"board_members fetched: {len(board_members)} / {len(board_jobs)}", flush=True)
 
     # ── API: 板块(移植站点的行业/概念/板块池) ──
     def _industry_list(raw):
@@ -511,13 +559,48 @@ def main():
         if not isinstance(boards, list):
             return []
         return [b for b in boards if isinstance(b, dict)][:200]
+    industry_source_ts = industries.get("generated_at") or industries.get("ts")
+    concept_source_ts = concepts.get("generated_at") or concepts.get("ts")
+    board_by_name = {}
+    for board in _ind_boards + _con_boards:
+        if board.get("name"):
+            board_by_name.setdefault(board["name"], board)
+    for tier in ("tier1", "tier2", "tier3", "tier_down"):
+        rows = sector_pool.get(tier)
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            board = board_by_name.get(row.get("sector"))
+            member_data = board_members.get(board.get("bk")) if board else None
+            row["members"] = member_data.get("members", []) if member_data else []
+            row["source_ts"] = member_data.get("source_ts") if member_data else None
+            row["source"] = member_data.get("source") if member_data else None
+            row["status"] = member_data.get("status", "insufficient_data") if member_data else "insufficient_data"
+    sector_pool["source_ts"] = (sector_pool.get("ts") or
+                                 (sector_pool.get("meta") or {}).get("ts"))
+    sector_pool["source"] = (sector_pool.get("meta") or {}).get("source")
+    for board in _ind_boards:
+        board.update({"source_ts": industry_source_ts, "source": "db-market:sector/industry.json"})
+        detail = board_members.get(board.get("bk"))
+        board["status"] = detail.get("status", "insufficient_data") if detail else "insufficient_data"
+        board["members"] = detail.get("members", []) if detail else []
+    for board in _con_boards:
+        board.update({"source_ts": concept_source_ts, "source": "db-market:sector/concept.json"})
+        detail = board_members.get(board.get("bk"))
+        board["status"] = detail.get("status", "insufficient_data") if detail else "insufficient_data"
+        board["members"] = detail.get("members", []) if detail else []
     sectors_api = {
-        "ts": sector_pool.get("ts") or picks.get("ts"),
+        "ts": industry_source_ts or concept_source_ts or sector_pool.get("ts") or picks.get("ts"),
+        "source_ts": {"industry": industry_source_ts, "concept": concept_source_ts},
+        "status": "ok" if board_members else "insufficient_data",
         "industries": _ind_boards,
         "concepts": _con_boards,
         "industry_map_em": _industry_list(industry_map)[:80],
         "sector_pool": sector_pool,
         "industry_stocks": industry_stocks if isinstance(industry_stocks, dict) else {},
+        "sector_pool_source_ts": sector_pool.get("ts") or sector_pool.get("generated_at"),
         # 预生成 Top 板块的成分股(全量 200+ 板块逐一拉太大, 按市值/数量取前 30)
         "board_members": board_members,
         "sources": [

@@ -91,12 +91,18 @@ jobs:
         run: |
           python3 scripts/rebuild_pools.py --out-dir data
 
-      # 1b) 周期池 v2 (多池选股真正消费的周期池: 行业/概念成分股+实时估值)
-      # 2026-10-17 修复: cycle_pool_v2.py 之前没有任何 workflow 调度,
-      # 导致多池选股的周期池数据陈旧缺失。现随 rebuild-pools 一起重建。
+
+      # 1b) 行业映射先于周期池准备, 缺失时尝试重建
+      - name: Prepare industry map for cycle pool
+        run: |
+          if [ "$(date +%u)" = "1" ] || [ ! -s data/industry_map_em.json ]; then
+            python3 scripts/build_industry_map_em.py --out data/industry_map_em.json
+          fi
+
+      # 1c) 周期池 v2 (实时需求榜, 失败时使用 sector_pool + 行业映射)
       - name: Rebuild cycle_pool_v2
         run: |
-          python3 scripts/cycle_pool_v2.py --out data/cycle_pool_v2.json || echo "cycle_pool_v2 skipped"
+          python3 scripts/cycle_pool_v2.py --out data/cycle_pool_v2.json
 
       # 2) 低位池 (依赖 bulk K线 + 快照)
       - name: Rebuild lowpool

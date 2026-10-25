@@ -199,7 +199,10 @@ def stock_candidates(demand):
                          "chg_pct": item.get("chg_pct"),
                          "leader": item.get("leader"),
                          "main_net_inflow_yi": item.get("main_net_inflow_yi"),
-                         "reason": reason})
+                         "source": item.get("source", "demand_shift"),
+                         "source_ts": item.get("source_ts"),
+                         "reason": reason,
+                         "algorithm": "cycle_pool_v2_industry_members"})
 
     # 行业榜: 精确 → 去后缀模糊 → 涨停名称兜底
     for item in ((demand or {}).get("industry_top") or [])[:12]:
@@ -217,6 +220,27 @@ def stock_candidates(demand):
         if codes:
             _add([c for c in codes if c not in zt_names.values()][:4], item, "当前周期需求迁移概念成分股")
 
+    if not rows:
+        sector_path = os.path.join(root, "data", "sector_pool.json")
+        try:
+            sector_pool = json.load(open(sector_path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            sector_pool = {}
+        source_ts = sector_pool.get("date") or sector_pool.get("meta", {}).get("ts")
+        for tier in ("tier1", "tier2", "tier3", "tier_down"):
+            for sector in sector_pool.get(tier) or []:
+                name = sector.get("sector") or sector.get("name")
+                codes = by_industry.get(name) or by_base.get(_strip_suffix(name), [])
+                if not codes:
+                    continue
+                item = {"name": name, "chg_pct": sector.get("avg_chg_1d"),
+                        "leader": sector.get("leader"), "source": "sector_pool+industry_map_em",
+                        "source_ts": source_ts}
+                _add(codes[:6], item, "sector_pool 行业成分股回退候选")
+                if len(rows) >= 60:
+                    break
+            if len(rows) >= 60:
+                break
     return rows[:60]
 
 
@@ -526,7 +550,8 @@ def demand_shift():
 
     数据源: push2his clist (绕开 push2 WAF, 2026-10-13 实测 total=496 行业 / 506 概念)
     """
-    out = {}
+    out = {"source_ts": datetime.now(CST).isoformat(timespec="seconds"),
+           "source": "eastmoney_push2his_clist"}
 
     def _clist(fs, fields, fid="f3", pz=20):
         u = (f"https://push2his.eastmoney.com/api/qt/clist/get?pn=1&pz={pz}&po=1&np=1"
@@ -551,6 +576,7 @@ def demand_shift():
                 "up_n": it.get("f104"), "down_n": it.get("f105"),
                 "leader": it.get("f128"),
                 "main_net_inflow_yi": round(f62 / 1e8, 2) if f62 is not None else None,
+                "source": out["source"], "source_ts": out["source_ts"],
             })
         out["industry_top"] = rows
         out["industry_n"] = len(rows)
@@ -565,6 +591,7 @@ def demand_shift():
                 "chg_pct": round((it.get("f3") or 0) / 100, 2),
                 "up_n": it.get("f104"), "down_n": it.get("f105"),
                 "leader": it.get("f128"),
+                "source": out["source"], "source_ts": out["source_ts"],
             })
         out["concept_top"] = rows
         out["concept_n"] = len(rows)
@@ -667,7 +694,7 @@ def main():
     print("[4/4] 需求变化 (板块轮动) ...")
     demand = demand_shift()
     if not demand:
-        print("[cycle_pool_v2] demand_shift 无有效板块数据，股票池标记为 insufficient_data", file=sys.stderr)
+        print("[cycle_pool_v2] demand_shift 无有效板块数据，将尝试本地行业映射回退", file=sys.stderr)
 
     print("[5/5] 股票候选 (行业/概念成分股 + 实时行情补全) ...")
     stocks = stock_candidates(demand)
@@ -682,7 +709,9 @@ def main():
                 if not s["name"]:
                     s["name"] = q.get("name") or s["name"]
                 n_enriched += 1
-        print(f"[stocks] 候选 {len(stocks)} 只, 行情补全 {n_enriched} 只", flush=True)
+        stocks = [s for s in stocks if not s.get("quote_time") or
+                  s.get("chg_pct") is None or s["chg_pct"] < 9.6]
+        print(f"[stocks] 行情补全 {n_enriched} 只，排除涨停后候选 {len(stocks)} 只", flush=True)
 
     print("[+] 五维状态 ...")
     status = five_dim_status(bars)
@@ -714,9 +743,25 @@ def main():
     }
 
     path = args.out or DEFAULT_OUT
+    if not stocks:
+        out["stocks_meta"] = {
+            "n": 0, "enriched": 0, "status": "insufficient_data",
+            "reason": "demand_shift、sector_pool/industry_map_em 均未生成有效候选"}
+        if os.path.exists(path):
+            try:
+                with open(path, encoding="utf-8") as existing_file:
+                    previous = json.load(existing_file)
+                if previous.get("stocks"):
+                    out["stocks"] = previous["stocks"]
+                    out["stocks_meta"]["n"] = len(previous["stocks"])
+                    out["stocks_meta"]["preserved_previous"] = True
+            except (OSError, json.JSONDecodeError):
+                pass
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
-    with open(path, "w", encoding="utf-8") as f:
+    temp_path = path + ".tmp"
+    with open(temp_path, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
+    os.replace(temp_path, path)
     print(f"[done] → {path} ({os.path.getsize(path)}B)")
     # 摘要
     print(f"\n=== 摘要 ===")
