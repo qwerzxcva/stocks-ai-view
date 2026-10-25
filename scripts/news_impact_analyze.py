@@ -466,7 +466,13 @@ def main():
     os.makedirs(os.path.dirname(p), exist_ok=True)
     with open(p, "w", encoding="utf-8") as output:
         json.dump(out, output, ensure_ascii=False, indent=2)
+    # appFile maps base(data)+/data/<file>; duplicate for Android's double-data contract.
+    app_p = os.path.join(DATA_DIR, "data", "news_impact.json")
+    os.makedirs(os.path.dirname(app_p), exist_ok=True)
+    with open(app_p, "w", encoding="utf-8") as output:
+        json.dump(out, output, ensure_ascii=False, indent=2)
     print(f"output_path={p} ({os.path.getsize(p)} B)")
+    print(f"app_output_path={app_p} ({os.path.getsize(app_p)} B)")
     print("判定分布:", dict(Counter(r["verdict"] for r in results)))
     print("识别到个股的条数:", sum(1 for r in results if r["codes"]))
     if publish_error:
