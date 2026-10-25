@@ -134,8 +134,51 @@ def _dedupe_news(rows, limit):
     return out
 
 
-def load_news(limit=50):
-    """Prefer live public news; fallback rows are explicitly marked stale."""
+def _local_news(path, source_kind):
+    """Read collector output and preserve its public source fields."""
+    if not path or not os.path.exists(path):
+        return []
+    try:
+        with open(path, encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, ValueError) as exc:
+        print(f"[warn] local {source_kind} source unavailable: {exc}", file=sys.stderr)
+        return []
+    root_ts = payload.get("ts") if isinstance(payload, dict) else None
+    rows = []
+    freshness = "collector_snapshot"
+    try:
+        if root_ts:
+            stamp = str(root_ts).replace("Z", "+00:00")
+            age_hours = (datetime.now(timezone.utc) - datetime.fromisoformat(stamp).astimezone(timezone.utc)).total_seconds() / 3600
+            if age_hours > 24:
+                freshness = "stale_snapshot"
+    except (TypeError, ValueError):
+        freshness = "unknown"
+    for item in (payload.get("items") or []) if isinstance(payload, dict) else []:
+        if not isinstance(item, dict):
+            continue
+        title = (item.get("title") or "").strip()
+        if not title:
+            continue
+        published = item.get("published_at") or item.get("updated") or item.get("time") or root_ts
+        rows.append({
+            "title": title,
+            "digest": (item.get("digest") or item.get("summary") or item.get("content") or "")[:500],
+            "published_at": published or None,
+            "ts": published or root_ts,
+            "source": item.get("source_name") or item.get("source") or source_kind,
+            "source_url": item.get("url") or item.get("link") or "",
+            "codes": item.get("codes") or [],
+            "themes": item.get("themes") or ([item.get("group")] if item.get("group") else []),
+            "input_freshness": freshness, "stale": freshness == "stale_snapshot",
+        })
+    return rows
+
+
+def load_news(limit=50, hot_news_path=None, news_extra_path=None):
+    """Merge collector outputs and public live news; fallback rows are marked stale."""
+    local = _local_news(hot_news_path, "hot_news") + _local_news(news_extra_path, "news_extra")
     live = []
     try:
         d = fetch_json("https://np-listapi.eastmoney.com/comm/web/getNewsByColumns"
@@ -152,8 +195,10 @@ def load_news(limit=50):
                 for i in items if (i.get("title") or "").strip()]
     except Exception as e:
         print(f"[warn] 7x24 live source failed ({e}), using marked snapshot", file=sys.stderr)
-    if len(_dedupe_news(live, limit)) >= limit:
-        return _dedupe_news(live, limit)
+    # Live public rows take precedence; collector rows only fill missing coverage.
+    live = _dedupe_news(live + local, limit)
+    if len(live) >= limit:
+        return live
 
     try:
         j = fetch_json("https://raw.githubusercontent.com/qwerzxcva/stocks-ai-view/main/data/api/news.json")
@@ -232,16 +277,25 @@ def analyze(title, digest, symbols, board_map=None, item=None):
 
     # 影响个股：代码命中优先，其次名称匹配
     hits = []
-    m = re.search(r"\b(\d{6})\b", title)
-    if m:
-        hits.append(m.group(1))
-    # 名称匹配：全称 + 去空格简称（如 "宁德时代" / "宁德"）
+    hit_by = {}
+    for raw_code in (item or {}).get("codes") or []:
+        code = re.sub(r"^(sh|sz|bj)", "", str(raw_code).lower())
+        if code.isdigit() and code not in hits:
+            hits.append(code.zfill(6))
+            hit_by[code.zfill(6)] = "source_annotation"
+    for code in re.findall(r"(?<!\d)(?:sh|sz|bj)?\s*(\d{6})(?!\d)", title, re.I):
+        if code not in hits:
+            hits.append(code)
+            hit_by[code] = "public_title_code"
+    # 名称匹配只接受完整公开名称，避免把普通词语的前两个字误当成股票简称。
+    compact_title = title.replace(" ", "")
     for code, name in symbols:
         if not name or len(name) < 2:
             continue
         nm = name.replace(" ", "")
-        if (nm in title.replace(" ", "") or (len(nm) >= 3 and nm[:2] in title)) and code not in hits:
+        if nm in compact_title and code not in hits:
             hits.append(code)
+            hit_by[code] = "public_title_name"
         if len(hits) >= 6:
             break
     # 板块影响（无个股时给板块）
@@ -251,7 +305,7 @@ def analyze(title, digest, symbols, board_map=None, item=None):
             if bname and bname in title:
                 boards.append(bname)
     names = {str(code): name for code, name in symbols}
-    stocks = [{"code": code, "name": names.get(code), "evidence": "public_title_code_or_name"}
+    stocks = [{"code": code, "name": names.get(code), "evidence": hit_by.get(code, "public_title_code_or_name")}
               for code in hits[:6]]
     benefit_reasons = ["公开标题/摘要命中利好词：" + "、".join(pos[:8])] if pos else ["unknown: 未命中可核验利好词"]
     harm_reasons = ["公开标题/摘要命中利空词：" + "、".join(neg[:8])] if neg else ["unknown: 未命中可核验利空词"]
@@ -273,7 +327,7 @@ def analyze(title, digest, symbols, board_map=None, item=None):
             "positive_reason": "；".join(benefit_reasons), "negative_reason": "；".join(harm_reasons),
             "reasons": reasons, "pos_words": pos[:8], "neg_words": neg[:8], "codes": hits[:6], "boards": boards[:3],
             "stocks": stocks, "affected_stocks": stocks, "affected_stocks_status": impact_status,
-            "impact_reason": impact_reason, "matched_by": ("title_code" if m else "stock_name" if hits else "board" if boards else "none"),
+            "impact_reason": impact_reason, "matched_by": ("collector_annotation" if any(v == "source_annotation" for v in hit_by.values()) else "title_code" if any(v == "public_title_code" for v in hit_by.values()) else "stock_name" if any(v == "public_title_name" for v in hit_by.values()) else "board" if boards else "none"),
             "evidence": {"title": title, "digest": digest or "", "source": source, "published_at": published_at,
                          "impact": "title_code_or_name_or_board" if hits or boards else "unknown"},
             "confidence": confidence, "confidence_basis": "rule_based_public_text",
@@ -287,13 +341,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=MAX_ITEMS)
     ap.add_argument("--no-push", action="store_true", help="不回写 GitHub")
+    ap.add_argument("--hot-news", default=os.path.join(DATA_DIR, "hot_news.json"))
+    ap.add_argument("--news-extra", default=os.path.join(DATA_DIR, "news_extra.json"))
     args = ap.parse_args()
     limit = max(1, min(args.limit, MAX_ITEMS))
     run_ts = datetime.now(CST).isoformat(timespec="seconds")
     run_id = os.environ.get("GITHUB_RUN_ID") or f"local-{datetime.now(CST).strftime('%Y%m%d%H%M%S')}"
 
     today = datetime.now(CST).strftime("%Y-%m-%d")
-    news = load_news(limit)
+    news = load_news(limit, args.hot_news, args.news_extra)
     symbols = load_symbols()
     board_map = load_boards()
     print(f"取到 {len(news)} 条新闻, 代码表 {len(symbols)} 只")
@@ -357,25 +413,28 @@ def main():
         row["evidence_status"] = "sufficient" if published != "unknown" and row.get("source") not in (None, "unknown") else "insufficient"
         row["status"] = "ok" if row["evidence_status"] == "sufficient" else "insufficient"
         stocks = row.get("affected_stocks") or []
-        if not stocks:
-            stocks = [{"code": "unknown", "name": "unknown", "matched_by": "unknown",
-                       "evidence": "unknown", "confidence": 0.0}]
         for stock in stocks:
             stock.setdefault("matched_by", row.get("matched_by") or "unknown")
             stock.setdefault("evidence", "unknown")
             stock.setdefault("confidence", row.get("confidence", 0.0))
         row["affected_stocks"] = stocks
+        row["matched_by"] = row.get("matched_by") or ("stock" if row.get("codes") else ("board" if row.get("boards") else "unknown"))
         row["positive_reason"] = row.get("positive_reason") or "；".join(row.get("benefit_reasons") or []) or "insufficient"
         row["negative_reason"] = row.get("negative_reason") or "；".join(row.get("harm_reasons") or []) or "insufficient"
+        row["evidence"] = row.get("evidence") or {"status": "insufficient_data"}
+        row["provenance"] = {"source": row.get("source") or "unknown", "published_at": row.get("published_at"),
+                             "input_freshness": row.get("input_freshness") or "unknown", "stale": bool(row.get("stale"))}
 
     impacts = [{"title": r.get("title"), "source": r.get("source") or "unknown", "published_at": r.get("published_at"),
                  "time": r.get("published_at"), "url": r.get("url"), "verdict": r.get("verdict"),
                  "sentiment": r.get("sentiment"), "direction": r.get("direction"),
                  "positive_reason": r.get("positive_reason"), "negative_reason": r.get("negative_reason"),
+                 "matched_by": r.get("matched_by") or "unknown", "evidence": r.get("evidence") or {"status": "insufficient_data"},
+                 "provenance": r.get("provenance") or {"source": r.get("source") or "unknown", "published_at": r.get("published_at")},
                  "evidence_status": r.get("evidence_status"), "affected_stocks": r.get("affected_stocks"),
                  "channel": r.get("source") or "",
-                 "themes": r.get("boards") or [], "direction": r.get("direction"),
-                 "confidence": r.get("confidence"), "matched_by": "stock" if r.get("stocks") else ("board" if r.get("boards") else None),
+                 "themes": r.get("boards") or [],
+                 "confidence": r.get("confidence"), "matched_by": r.get("matched_by") or "unknown",
                  "match_detail": r.get("impact_reason"), "n_stocks": len(r.get("stocks") or []),
                  "stocks": r.get("stocks") or [], "status": r.get("status"),
                  "evidence_status": r.get("evidence_status"), "reasons": r.get("reasons") or [],
@@ -390,7 +449,8 @@ def main():
            "engine": "news_impact_analyze v2", "date": today, "n": len(results),
            "n_input": len(results), "n_mapped": mapped, "n_unmapped": len(results) - mapped,
            "coverage_status": "complete" if len(results) >= limit else "insufficient",
-           "source_status": "live" if results and all(not r.get("stale") for r in results) else ("mixed_or_stale" if results else "unavailable"),
+           "source_status": ("live" if results and all(r.get("input_freshness") == "live" for r in results)
+                            else "mixed_or_stale" if results else "unavailable"),
            "push_status": publish["status"], "publish": publish,
            "output_path": output_path,
            "provenance": {"source": "eastmoney_724_or_github_snapshot", "confidence": "rule_based_public_text",

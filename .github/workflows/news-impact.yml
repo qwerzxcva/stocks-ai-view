@@ -42,7 +42,8 @@ jobs:
           git config user.email "741059079@qq.com"
           git fetch origin main
           git reset --soft origin/main
-          git add data/news_impact.json          if git diff --quiet --cached HEAD; then
+          git add data/news_impact.json data/data/news_impact.json
+          if git diff --quiet --cached HEAD; then
             echo "no changes"
           else
             ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
@@ -50,7 +51,8 @@ jobs:
             git -c http.version=HTTP/1.1 push origin main || {
               git fetch origin main
               git reset --soft origin/main
-              git add data/news_impact.json              if ! git diff --cached --quiet; then
+              git add data/news_impact.json data/data/news_impact.json
+              if ! git diff --cached --quiet; then
                 git commit -m "data: news impact analysis $ts"
               fi
               git push origin main

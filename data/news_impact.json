@@ -1,221 +1,144 @@
 {
- "ts": "2026-10-26T03:39:51+08:00",
- "engine": "news_impact v1 (三层映射 + 规则式情感)",
- "n_input": 474,
- "n_mapped": 10,
- "n_unmapped": 409,
- "match_stat": {
-  "stock": 0,
-  "concept": 2,
-  "industry": 8,
-  "annotated": 0,
-  "theme": 0,
-  "unmapped": 409
- },
- "direction_stat": {
-  "bull": 21,
-  "bear": 12,
-  "neutral": 386,
-  "mixed": 0
- },
- "impacts": [
-  {
-   "title": "英国财政部与加拿大财政部发布联合声明。\n\n两国同意制定合作框架，将在投资和融资方面相互支持。\n\n英国和加拿大重申加强防务融资的承诺。\n\n已达成一致，最好建立两个不同但互补的机构，以伙伴关系开展工作。\n\n将制定合作框架，以维护多边防御机制以及国防、安全和韧性银行的利益。",
-   "source": "华尔街见闻",
-   "time": "2026-10-26T03:31:17+08:00",
-   "url": "https://wallstreetcn.com/livenews/3185244",
-   "channel": "",
-   "themes": [],
-   "direction": "bull",
-   "confidence": 0.6,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
+  "schema_version": "news-impact.v2",
+  "status": "insufficient",
+  "ts": "2026-10-25T12:10:39+08:00",
+  "generated_at": "2026-10-25T12:10:39+08:00",
+  "input_ts": "2026-10-25T12:10:39+08:00",
+  "run_id": "local-20261025121039",
+  "engine": "news_impact_analyze v2",
+  "date": "2026-10-25",
+  "n": 1,
+  "n_input": 1,
+  "n_mapped": 0,
+  "n_unmapped": 1,
+  "coverage_status": "complete",
+  "source_status": "live",
+  "push_status": "failed",
+  "publish": {
+    "status": "failed",
+    "error": "GH_TOKEN is required for non-dry-run history append"
   },
-  {
-   "title": "A股蓄势反弹可期？投资主线有哪些？十大券商策略来了",
-   "source": "财联社热门",
-   "time": "2026-10-26T03:20:07+08:00",
-   "url": "https://www.cls.cn/detail/2514451",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
+  "output_path": "/root/workspace/stocks-ai-view/data/news_impact.json",
+  "provenance": {
+    "source": "eastmoney_724_or_github_snapshot",
+    "confidence": "rule_based_public_text",
+    "snapshot_ts": "2026-10-25T12:10:39+08:00",
+    "stale": false
   },
-  {
-   "title": "攸关半导体生产！美国能源部将氦气认定为关键材料",
-   "source": "财联社热门",
-   "time": "2026-10-26T03:20:07+08:00",
-   "url": "https://www.cls.cn/detail/2514219",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「半导体」",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "301660",
-     "name": ""
-    }
-   ]
+  "direction_stat": {
+    "neutral": 1
   },
-  {
-   "title": "【公告全知道】人形机器人+光模块+模拟芯片+AI眼镜！公司低电压、超低功耗产品已应用到国内头部机器人",
-   "source": "财联社电报",
-   "time": "2026-10-26T03:11:34+08:00",
-   "url": "https://www.cls.cn/detail/2514480",
-   "channel": "",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "concept",
-   "match_detail": "概念「模拟芯片」",
-   "n_stocks": 1,
-   "stocks": [
+  "items": [
     {
-     "code": "688368",
-     "name": ""
+      "title": "测试新闻",
+      "published_at": "2026-10-25T12:00:00+08:00",
+      "ts": "2026-10-25T12:00:00+08:00",
+      "source": "fixture",
+      "source_url": "fixture://x",
+      "digest": "",
+      "stale": false,
+      "input_freshness": "live",
+      "sentiment": "neu",
+      "direction": "neutral",
+      "verdict": "中性",
+      "status": "ok",
+      "evidence_status": "sufficient",
+      "benefit_reasons": [
+        "unknown: 未命中可核验利好词"
+      ],
+      "harm_reasons": [
+        "unknown: 未命中可核验利空词"
+      ],
+      "positive_reason": "unknown: 未命中可核验利好词",
+      "negative_reason": "unknown: 未命中可核验利空词",
+      "reasons": [
+        "未命中预定义方向词，保持中性，不作利好或利空推断"
+      ],
+      "pos_words": [],
+      "neg_words": [],
+      "codes": [],
+      "boards": [],
+      "stocks": [],
+      "affected_stocks": [],
+      "affected_stocks_status": "insufficient_data",
+      "impact_reason": "未找到可核验个股或板块证据",
+      "matched_by": "none",
+      "evidence": {
+        "title": "测试新闻",
+        "digest": "",
+        "source": "fixture",
+        "published_at": "2026-10-25T12:00:00+08:00",
+        "url": "fixture://x"
+      },
+      "confidence": 0.2,
+      "confidence_basis": "rule_based_public_text",
+      "provenance": {
+        "source": "fixture",
+        "published_at": "2026-10-25T12:00:00+08:00",
+        "input_freshness": "live",
+        "stale": false
+      },
+      "analyzed_at": "2026-10-25T12:10:39+08:00",
+      "run_id": "local-20261025121039",
+      "time": "2026-10-25T12:00:00+08:00",
+      "url": "fixture://x"
     }
-   ]
-  },
-  {
-   "title": "高能环境：证券简称10月29日起变更为“高能时代”",
-   "source": "wallstreetcn",
-   "time": "2026-10-25T15:43:37+08:00",
-   "url": "https://wallstreetcn.com/live/3185191",
-   "channel": "a-stock-channel",
-   "themes": [
-    "A股7×24快讯直播",
-    "股市重要公告提醒"
-   ],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
+  ],
+  "impacts": [
     {
-     "code": "000001",
-     "name": "平安银行"
+      "title": "测试新闻",
+      "source": "fixture",
+      "published_at": "2026-10-25T12:00:00+08:00",
+      "time": "2026-10-25T12:00:00+08:00",
+      "url": "fixture://x",
+      "verdict": "中性",
+      "sentiment": "neu",
+      "direction": "neutral",
+      "positive_reason": "unknown: 未命中可核验利好词",
+      "negative_reason": "unknown: 未命中可核验利空词",
+      "matched_by": "none",
+      "evidence": {
+        "title": "测试新闻",
+        "digest": "",
+        "source": "fixture",
+        "published_at": "2026-10-25T12:00:00+08:00",
+        "url": "fixture://x"
+      },
+      "provenance": {
+        "source": "fixture",
+        "published_at": "2026-10-25T12:00:00+08:00",
+        "input_freshness": "live",
+        "stale": false
+      },
+      "evidence_status": "sufficient",
+      "affected_stocks": [],
+      "channel": "fixture",
+      "themes": [],
+      "confidence": 0.2,
+      "match_detail": "未找到可核验个股或板块证据",
+      "n_stocks": 0,
+      "stocks": [],
+      "status": "ok",
+      "reasons": [
+        "未命中预定义方向词，保持中性，不作利好或利空推断"
+      ],
+      "benefit_reasons": [
+        "unknown: 未命中可核验利好词"
+      ],
+      "harm_reasons": [
+        "unknown: 未命中可核验利空词"
+      ],
+      "stale": false
     }
-   ]
-  },
-  {
-   "title": "标普出台新规，3750亿美元基金将受影响",
-   "source": "wallstreetcn",
-   "time": "2026-10-25T09:41:59+08:00",
-   "url": "https://wallstreetcn.com/live/3185168",
-   "channel": "us-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "标普出台新规，3750亿美元基金将受影响",
-   "source": "wallstreetcn",
-   "time": "2026-10-25T09:41:59+08:00",
-   "url": "https://wallstreetcn.com/live/3185168",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "道指ETF收跌超1.2%，领跌美股大类资产类ETF，布油基金涨3%",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T04:36:29+08:00",
-   "url": "https://wallstreetcn.com/live/3185030",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "标普500指数的11个板块中，日用消费品板块收跌1.83%，可选消费、电信、金融、工业、保健板块至多跌1.39%，信息技",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T04:29:57+08:00",
-   "url": "https://wallstreetcn.com/live/3185028",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
-  },
-  {
-   "title": "周五（10月23日），美股行业ETF多数下跌，全球航空业ETF收跌2.5%，可选消费ETF、金融业ETF、工业指数ETF",
-   "source": "wallstreetcn",
-   "time": "2026-10-24T04:18:01+08:00",
-   "url": "https://wallstreetcn.com/live/3185024",
-   "channel": "hk-stock-channel",
-   "themes": [],
-   "direction": "neutral",
-   "confidence": 0.2,
-   "matched_by": "industry",
-   "match_detail": "industry:金融",
-   "n_stocks": 1,
-   "stocks": [
-    {
-     "code": "000001",
-     "name": "平安银行"
-    }
-   ]
+  ],
+  "meta": {
+    "public_sources": [
+      "eastmoney_724",
+      "stocks-ai-view:data/api/news.json snapshot fallback"
+    ],
+    "source_registry_count": 190,
+    "news_source_registry_count": 13,
+    "legacy_contract": "impacts[].stocks and impacts[].direction retained",
+    "evidence_policy": "missing source/time or stock evidence remains insufficient_data"
   }
- ],
- "meta": {
-  "layers": "L1概念板块 / L2个股名代码 / L3产业链→行业",
-  "sentiment": "规则式词典 (bull_words/bear_words), 同时命中判 mixed",
-  "caveat": "rule mapping may miss polysemy and irony; sentiment is not price direction; Research reference only"
- }
 }
