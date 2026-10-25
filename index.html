@@ -1343,10 +1343,20 @@ function _impactRows(items,limit){
 function _collectUnifiedNews(g){
   const out=[], seen={};
   const add=(item,kind)=>{
-    if(!item||!item.title)return;
-    const key=String(item.title).trim();
-    if(seen[key]){Object.assign(seen[key],item);return;}
-    const row=Object.assign({},item,{_kind:kind,_themes:_newsThemes(item)}); seen[key]=row; out.push(row);
+    if(!item)return;
+    const title=String(item.title||item.digest||item.newsTitle||item.content||'').trim();
+    if(!title)return;
+    const key=String(item.url||item.source_url||title);
+    const themes=_newsThemes(item);
+    const source=item.source||item.source_name||item.src||'';
+    const time=item.time||item.updated||item.published_at||item.ts||'';
+    if(seen[key]){
+      const row=seen[key];
+      Object.assign(row,item,{title,source,time,_kind:row._kind||kind});
+      row._themes=Array.from(new Set((row._themes||[]).concat(themes))).filter(Boolean);
+      return;
+    }
+    const row=Object.assign({},item,{title,source,time,_kind:kind,_themes:themes}); seen[key]=row; out.push(row);
   };
   ((g.news_extra||{}).items||[]).forEach(x=>add(x,'财经资讯'));
   ((g.hot_news||{}).items||[]).forEach(x=>add(x,'全平台热点'));
@@ -1359,7 +1369,7 @@ function _renderUnifiedNews(g){
   return Object.entries(groups).map(([theme,rows])=>{
     const body=rows.map(item=>{
       const verdict=item.verdict?'<span style="color:'+( /利空|风险/.test(String(item.verdict))?'var(--dn)':(/利好|看多/.test(String(item.verdict))?'var(--up)':'var(--amber)'))+';font-weight:700">'+_esc2(item.verdict)+'</span>':'';
-      const meta='<div class="fl" style="font-size:9px">'+_esc2(item._kind||'消息')+' · '+_esc2(item.source||'')+' · '+_esc2(item.time||item.ts||item.published_at||'')+'</div>';
+      const meta='<div class="fl" style="font-size:9px">'+_esc2(item._kind||'消息')+' · '+_esc2(item.source||item.source_name||item.src||'insufficient_data')+' · '+_esc2(item.time||item.updated||item.ts||item.published_at||'insufficient_data')+'</div>';
       const impact=item.verdict?'<div style="font-size:10px">影响板块: '+_esc2(_newsThemes(item).join('、')||'insufficient_data')+' · 个股: '+_esc2(_newsAffected(item).map(x=>x.name||x.code).join('、')||'insufficient_data')+'</div>':'';
       const summary=item.summary||item.digest||item.impact_reason||'';
       const bodyHtml=meta+(item.url?'<a href="'+_esc2(item.url)+'" target="_blank" rel="noopener noreferrer" style="color:var(--tx)">'+_esc2(item.title)+'</a>':'<b>'+_esc2(item.title)+'</b>')+(verdict?' '+verdict:'')+impact+(summary?'<div style="font-size:10px;line-height:1.55">'+_esc2(String(summary).slice(0,500))+'</div>':'');
@@ -2182,11 +2192,9 @@ function renderDailySummary(){
   } else { h+='<div class="fl">暂无复盘数据</div>'; }
   if(selfr.summary) h+='<div style="font-size:11px;line-height:1.6;margin-top:4px">复盘总结: '+_esc2(selfr.summary)+'</div>';
 
-  // 6. 盘前分析 (大A + 美股早盘)
-  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑥ 盘前分析 (大A / 美股早盘)</div>';
-  const premarketText=brief.pre_market||brief.premarket||'';
-  if(premarketText) h+=_details('展开盘前分析正文','<div style="font-size:11px;line-height:1.6">'+_esc2(premarketText)+'</div>',false);
-  else h+='<div class="fl" style="font-size:10px">仅在盘前时段生成 (daily-brief 引擎 UTC 23:30 = CST 07:30)</div>';
+  // 6. 盘前分析正文只保留在独立盘前归档/推股数据中；此处不再重复展示。
+  h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑥ 盘前分析</div>';
+  h+='<div class="fl" style="font-size:10px">盘前正文已并入统一盘面解读，盘前推股与时间窗口见上方策略模块。</div>';
 
   // 7. AI 复盘 (GitCode AI 结合算法/引擎产出生成)
   h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">⑦ AI 复盘</div>';
@@ -2919,8 +2927,11 @@ function renderNewsFlow(){
     h+='<div class="hd" style="border-top:1px solid var(--border);padding:6px 0">24小时分类摘要 <span class="sub">'+_t(digest.ts)+' · '+_esc2(digest.total||0)+' 条</span></div>';
     catRows.forEach(([name,rows])=>{
       const arr=Array.isArray(rows)?rows:(rows.items||[]);
-      h+='<div class="fl" style="margin-top:4px">'+_esc2(name)+' '+arr.length+'</div>';
-      arr.slice(0,4).forEach(it=>h+='<div style="font-size:11px;padding:2px 0"><span class="fl">'+_esc2(it.time||"")+'</span> '+_esc2(it.title||"")+'</div>');
+      const titles=new Set(unified.map(x=>String(x.title||'').trim()));
+      const unseen=arr.filter(it=>!titles.has(String(it.title||it.digest||'').trim()));
+      if(!unseen.length)return;
+      h+='<div class="fl" style="margin-top:4px">'+_esc2(name)+' '+unseen.length+' 条未归入主消息流</div>';
+      unseen.slice(0,4).forEach(it=>h+='<div style="font-size:11px;padding:2px 0"><span class="fl">'+_esc2(it.time||it.ts||'insufficient_data')+'</span> '+_esc2(it.title||it.digest||'')+'</div>');
     });
   }
   if(!h){ box.innerHTML='<div class="no-data">暂无资讯</div>'; return; }
@@ -3436,6 +3447,7 @@ const SOURCES = [
   'data/hot_impact.json',      // 热点推演
   'data/cycle.json',           // 周期池
   'data/sector_pool.json',     // 板块池
+  'data/api/sectors.json',      // 行业/概念/成分股与统一板块热度
   'data/analysis_manifest.json', // 统一数据/算法发布状态与新鲜度事实来源
   'data/freshness_audit.json', // 数据新鲜度审计 (自查哪些文件过期)
   'data/auction_engine.json',  // 竞价抢筹与日内资金结构 (腾讯逐笔分笔)
@@ -4163,7 +4175,11 @@ function renderBoardExtras(d, num){
   // 3) 行业热度：westock.sector_ranking.data 为主，退回 sector_moneyflow
   var secEl = document.getElementById('boardSector');
   if(secEl){
-    var sr = (d.westock && d.westock.sector_ranking && d.westock.sector_ranking.data) || [];
+    var pool = (window._data||{}).sector_pool||{};
+    var sr = [].concat(pool.tier1||[],pool.tier2||[],pool.tier3||[]).map(function(s){
+      return {name:s.sector||s.name,changePct:s.avg_chg_1d!=null?s.avg_chg_1d:(s.changePct!=null?s.changePct:null),leader:s.leader};
+    });
+    if(!sr.length) sr = (d.westock && d.westock.sector_ranking && d.westock.sector_ranking.data) || [];
     if(Array.isArray(sr) && sr.length){
       secEl.innerHTML = sr.slice(0, 10).map(function(s, i){
         var cp = num(Number(s.changePct));
@@ -4299,11 +4315,16 @@ function renderIndustry(){
   
   Promise.all([
     fetch('data/latest.json',{cache:'no-store'}).then(function(r){return r.json();}),
-    fetch('data/board_members.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;})
+    fetch('data/api/sectors.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;}),
+    fetch('data/sector_pool.json',{cache:'no-store'}).then(function(r){return r.json();}).catch(function(){return null;})
   ]).then(function(res){
     _indData = res[0];
-    _boards = res[1] ? (res[1].boards || {}) : {};
-    var sr = (_indData.westock && _indData.westock.sector_ranking && _indData.westock.sector_ranking.data) || [];
+    _boards = res[1] ? (res[1].board_members || {}) : {};
+    var pool = res[2] || (res[1] && res[1].sector_pool) || {};
+    var ranked = [].concat(pool.tier1||[],pool.tier2||[],pool.tier3||[]).map(function(s){
+      return {name:s.sector||s.name,changePct:s.avg_chg_1d!=null?s.avg_chg_1d:(s.changePct!=null?s.changePct:null),chg5d:s.chg_5d,leader:s.leader,code:s.code};
+    });
+    var sr = ranked.length ? ranked : ((_indData.westock && _indData.westock.sector_ranking && _indData.westock.sector_ranking.data) || []);
     if(tsEl) tsEl.textContent = ' · ' + ((_indData.westock.sector_ranking||{}).date || '');
     
     if(!sr.length){
@@ -4339,8 +4360,8 @@ function showIndustryDetail(name){
   var members = [];
   for(var k in _boards){
     var b = _boards[k];
-    if(b && b.name === name && b.stocks){
-      members = b.stocks;
+    if(b && b.name === name && (b.members || b.stocks)){
+      members = b.members || b.stocks;
       break;
     }
   }
