@@ -684,6 +684,65 @@ def _register_external_fetchers():
             registered += 1
     except Exception as e:
         print("[fetchers] fetchers_batch2 跳过: %s" % type(e).__name__)
+    # fetchers_em3: 东财剩余 19 源（2026-10-26 实测）
+    try:
+        import fetchers_em3 as _e3
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("quote", "em_dmsk_ts_stock_new"),
+                          ("event", "em_ipo_allotment"),
+                          ("event", "em_ipo_apply_yield"),
+                          ("event", "em_ipo_neeq_list"),
+                          ("event", "em_ipo_review"),
+                          ("fund", "em_kzz_ballot_num"),
+                          ("fund", "em_kzz_important_date"),
+                          ("fund", "em_kzz_invest_item"),
+                          ("fund", "em_kzz_value_hist"),
+                          ("fund", "em_macro_house_price_70"),
+                          ("fund", "em_macro_shibor"),
+                          ("fund", "em_margin_account_daily"),
+                          ("fund", "em_org_hold_allmarket"),
+                          ("event", "em_org_survey"),
+                          ("fund", "em_seo_detail"),
+                          ("event", "em_stock_participation"),
+                          ("fund", "em_hsf10_company_survey"),
+                          ("fund", "em_hsf10_operations_required"),
+                          ("fund", "em_reportapi_stock_report")):
+            if name in have:
+                continue
+            fn = getattr(_e3, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_em3 跳过: %s" % type(e).__name__)
+    # fetchers_ths: 同花顺 JSON/JSONP + F10 HTML 表格（2026-10-26 实测）
+    try:
+        import fetchers_ths as _ths
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("quote", "ths_kline_day"),
+                          ("quote", "ths_kline_month"),
+                          ("quote", "ths_timeshare"),
+                          ("news", "ths_news_push"),
+                          ("event", "ths_strong_stocks"),
+                          ("fund", "ths_f10_operate"),
+                          ("fund", "ths_f10_holder"),
+                          ("fund", "ths_f10_bonus"),
+                          ("fund", "ths_f10_worth"),
+                          ("fund", "ths_f10_capital"),
+                          ("fund", "ths_f10_equity"),
+                          ("event", "ths_f10_event"),
+                          ("fund", "ths_f10_field"),
+                          ("sector", "ths_board_constituents")):
+            if name in have:
+                continue
+            fn = getattr(_ths, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_ths 跳过: %s" % type(e).__name__)
     return registered
 
 
