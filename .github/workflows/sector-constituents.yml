@@ -27,8 +27,17 @@ jobs:
           fetch-depth: 0
       - name: Sync remote main
         run: git fetch origin main && git merge --ff-only origin/main || echo "already up to date"
-      - name: Refresh board constituents
-        run: python3 scripts/refresh_board_constituents.py --workers 3
+      - name: Refresh board constituents (multi-pass)
+        # 东财会瞬断限流：单轮常只能拿到一部分，多跑几轮逐步补齐；
+        # 单轮失败不阻断（已成功的不会重建），最终真实状态由 Report freshness 输出。
+        run: |
+          set -e
+          for i in 1 2 3 4; do
+            echo "::group::pass $i"
+            python3 scripts/refresh_board_constituents.py --workers 3 || \
+              echo "::warning::pass $i incomplete (rate limiting, partial data kept)"
+            echo "::endgroup::"
+          done
       - name: Rebuild sectors API
         run: python3 scripts/skapp_app_data.py --only-sectors
       - name: Commit constituents + sectors API
