@@ -657,6 +657,33 @@ def _register_external_fetchers():
             registered += 1
     except Exception as e:
         print("[fetchers] fetchers_hsf10 跳过: %s" % type(e).__name__)
+    # fetchers_batch2: 龙虎榜/解禁/回购/增持/业绩/腾讯K线（2026-10-26 实测）
+    try:
+        import fetchers_batch2 as _b2
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("event", "em_lhb_detail"),
+                          ("event", "em_lhb_org_daily"),
+                          ("event", "em_lhb_yyb_statistics"),
+                          ("event", "em_lhb_yyb_trade_detail"),
+                          ("event", "em_lhb_yyb_return_ranking"),
+                          ("event", "em_restricted_unlock_day"),
+                          ("event", "em_repurchase_list"),
+                          ("event", "em_shareholder_increase"),
+                          ("fund", "em_performance_express"),
+                          ("fund", "em_performance_forecast"),
+                          ("quote", "tencent_newfqkline"),
+                          ("quote", "tencent_hk_kline"),
+                          ("quote", "tencent_us_kline"),
+                          ("quote", "tencent_index_weektrends")):
+            if name in have:
+                continue
+            fn = getattr(_b2, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_batch2 跳过: %s" % type(e).__name__)
     return registered
 
 
