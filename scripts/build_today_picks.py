@@ -59,12 +59,27 @@ def names_from_master():
     if not out:
         # fallback: stock_names.json {"sz000001": "sz000001 平安银行"} — try both layouts
         for p2 in (os.path.join(DATA_DIR, "stock_names.json"),
-                   os.path.join(DATA_DIR, "data", "stock_names.json")):
+                   os.path.join(DATA_DIR, "data", "stock_names.json"),
+                   os.path.join(DATA_DIR, "search_index.json")):
             try:
-                for k, v in json.load(open(p2, encoding="utf-8")).items():
-                    code = k[2:] if len(k) > 6 else k
-                    nm = v.split(" ", 1)[1] if " " in v else v
-                    out[code] = nm
+                root = json.load(open(p2, encoding="utf-8"))
+                if isinstance(root, dict):
+                    for k, v in root.items():
+                        if k in {"items", "meta", "ts", "generated_at", "schema_version"}:
+                            continue
+                        code = bare(k)
+                        if not code or len(code) != 6:
+                            continue
+                        if isinstance(v, dict):
+                            nm = v.get("name") or v.get("display_name") or ""
+                        elif isinstance(v, str):
+                            nm = v.split(" ", 1)[1] if " " in v else v
+                        else:
+                            continue
+                        out[code] = nm
+                    for row in root.get("items", []):
+                        if isinstance(row, dict) and row.get("code"):
+                            out[bare(row["code"])] = row.get("name") or row.get("display_name") or ""
                 if out:
                     break
             except Exception:
@@ -72,12 +87,25 @@ def names_from_master():
     return out
 
 
-MAINBOARD = lambda c: c.startswith(("60", "00"))  # 主板 only: sh60x / sz00x (排除 688/300/301)
+MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002")
+INDEX_CODES = {"000001", "000300", "000905", "000852", "399001", "399006", "399300", "399905", "399673"}
 
 
 def bare(code):
     c = str(code)
     return c[2:] if c[:2] in ("sh", "sz", "bj") else c
+
+
+def is_recommendable_stock(code, name=""):
+    code = bare(code)
+    name = str(name or "")
+    if not code.startswith(MAIN_BOARD_PREFIXES) or code in INDEX_CODES:
+        return False
+    if any(token in name.upper() for token in ("ETF", "LOF", "指数", "基金", "债", "转债")):
+        return False
+    if "ST" in name.upper() or "退" in name:
+        return False
+    return True
 
 
 def buyability(code, latest, now=None):
@@ -162,8 +190,10 @@ def main():
     avoid = []
     for x in (v5.get("top") or [])[:60]:
         code = bare(x.get("code"))
-        if not MAINBOARD(code):
-            continue  # 主板 only: 排除 688/300/301 (用户不可买)
+        if not is_recommendable_stock(code, master.get(code)):
+            continue  # 推荐只保留主板普通股票，不含ETF/指数/ST
+        if x.get("price") in (None, 0) or x.get("score") is None or x.get("resonance") is None:
+            continue
         cal = empirical_edge.calibrate(x.get("votes"), calibration) \
             if calibration else {"edge_pp": None, "dir_weight": None}
         aligned, bear_w = empirical_edge.bear_aligned(x.get("votes"), calibration) \
@@ -201,7 +231,7 @@ def main():
         _scan = scan_today()
         _in_sig = {r["code"] for r in signals}
         for code in [c[2:] for c in _scan.get("G5_52w_lowvol", [])]:
-            if MAINBOARD(code) and code not in _in_sig:
+            if is_recommendable_stock(code, master.get(code)) and code not in _in_sig:
                 signals.insert(0, {
                     "code": code, "name": master.get(code) or "",
                     "score": 0.95, "resonance": ["gold_cell_G5"],
@@ -225,10 +255,13 @@ def main():
     values = []
     for x in (v4.get("picks") or [])[:20]:
         code = bare(x.get("code"))
+        name = x.get("name") or master.get(code) or ""
+        if not is_recommendable_stock(code, name):
+            continue
         buyable, buyability_reason = buyability(code, lt)
         values.append({
             "code": code,
-            "name": x.get("name") or master.get(code) or "",
+            "name": name,
             "price": x.get("price"),
             "ret_pct": x.get("ret_pct"),
             "vratio": x.get("vratio"),
@@ -239,19 +272,8 @@ def main():
             "buyability_reason": buyability_reason,
         })
 
-    # ── limit-up picks: ban_pick with T+1 probabilities ──
+    # 涨停仅用于观察/归因，不进入今日推荐，避免把不可追涨停标的误当买入候选。
     zt = []
-    for x in (bp.get("picks") or []):
-        zt.append({
-            "code": bare(x.get("code")),
-            "name": x.get("name"),
-            "lianban": x.get("lianban"),
-            "p_zt_next": x.get("p_zt_next"),
-            "p_zhaban_next": x.get("p_zhaban_next"),
-            "prior_gain_5d": x.get("prior_gain_5d"),
-            "verdict": x.get("verdict"),
-            "engine": "ban_pick",
-        })
 
     # ── historical win rates (reflect_engine) ──
     analysis = (rl.get("analysis") or {})
