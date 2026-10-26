@@ -743,6 +743,27 @@ def _register_external_fetchers():
             registered += 1
     except Exception as e:
         print("[fetchers] fetchers_ths 跳过: %s" % type(e).__name__)
+    # fetchers_batch3: 财联社/可转债/腾讯板块榜/新浪资金流/华尔街见闻（2026-10-26 实测）
+    try:
+        import fetchers_batch3 as _b3
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("news", "cls_telegraph"),
+                          ("news", "cls_telegraph_v1"),
+                          ("event", "ths_kzz_all"),
+                          ("event", "jisilu_cb_realtime"),
+                          ("sector", "tencent_board_rank"),
+                          ("fund", "sina_moneyflow_lscjfb"),
+                          ("quote", "sina_hq_node_count"),
+                          ("news", "wscn_lives")):
+            if name in have:
+                continue
+            fn = getattr(_b3, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_batch3 跳过: %s" % type(e).__name__)
     return registered
 
 
