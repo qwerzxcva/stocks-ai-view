@@ -16,6 +16,9 @@ Data policy: every value comes from a real upstream file; anything absent stays
 null or {"status": "insufficient"} — never fabricated.
 """
 import json, os, re, subprocess, sys, urllib.request
+from datetime import datetime, timezone, timedelta
+
+CST = timezone(timedelta(hours=8))
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 GH = "https://raw.githubusercontent.com"
@@ -509,6 +512,14 @@ def main():
 
     def _fetch_board(job):
         (bk, kind), board = job
+        # 优先本仓当日重建的成分股，db-market 仅作兜底（上游停更时不再当当日用）
+        local = os.path.join("data", "sector", "%s_constituents" % kind, "%s.json" % bk)
+        if os.path.exists(local):
+            try:
+                with open(local, encoding="utf-8") as f:
+                    return bk, kind, board, local, json.load(f)
+            except Exception:
+                pass
         path = f"{MARKET}/sector/{kind}_constituents/{bk}.json"
         data = gj(path)
         return bk, kind, board, path, data
@@ -525,14 +536,30 @@ def main():
             ] if isinstance(members, list) else []
             source_ts = ((data or {}).get("generated_at") or (data or {}).get("ts") or
                          (industries if kind == "industry" else concepts).get("generated_at"))
+            age_days = None
+            if source_ts:
+                try:
+                    _t = datetime.fromisoformat(str(source_ts).replace("Z", "+00:00"))
+                    if _t.tzinfo is None:
+                        _t = _t.replace(tzinfo=CST)
+                    age_days = round((datetime.now(CST) - _t).total_seconds() / 86400, 2)
+                except Exception:
+                    age_days = None
+            if not valid_members:
+                member_status = "missing"
+            elif age_days is not None and age_days > 2:
+                member_status = "stale"
+            else:
+                member_status = "ok"
             board_members[bk] = {
                 "name": board.get("name"),
                 "kind": kind,
                 "n": data.get("n") if isinstance(data, dict) else None,
                 "members": valid_members[:200],
                 "source_ts": source_ts,
+                "age_days": age_days,
                 "source": path,
-                "status": "ok" if valid_members else "insufficient_data",
+                "status": member_status,
             }
     print(f"board_members fetched: {len(board_members)} / {len(board_jobs)}", flush=True)
 
@@ -591,10 +618,46 @@ def main():
         detail = board_members.get(board.get("bk"))
         board["status"] = detail.get("status", "insufficient_data") if detail else "insufficient_data"
         board["members"] = detail.get("members", []) if detail else []
+    # ── 新鲜度门禁：不让旧板块冒充当日 ──
+    _fresh = [bk for bk, v in board_members.items() if v.get("status") == "ok"]
+    _stale = [bk for bk, v in board_members.items() if v.get("status") == "stale"]
+    _missing = [bk for bk, v in board_members.items() if v.get("status") == "missing"]
+    _total_boards = len(board_members) or 1
+    _sp_date = sector_pool.get("date")
+    _today = datetime.now(CST).strftime("%Y-%m-%d")
+    _age_days = [v["age_days"] for v in board_members.values() if v.get("age_days") is not None]
+    _reasons = []
+    if not board_members:
+        _status = "insufficient_data"
+        _reasons.append("板块成员全部获取失败")
+    elif len(_fresh) == 0:
+        _status = "stale"
+        _reasons.append("全部板块成员超过 2 天未更新")
+    elif len(_stale) + len(_missing) > _total_boards * 0.2:
+        _status = "degraded"
+        _reasons.append("过时 %d / 缺失 %d 超过总量 20%%" % (len(_stale), len(_missing)))
+    else:
+        _status = "ok"
+    if _sp_date != _today:
+        _status = "degraded" if _status == "ok" else _status
+        _reasons.append("板块池日期 %s != 今日 %s" % (_sp_date, _today))
     sectors_api = {
-        "ts": industry_source_ts or concept_source_ts or sector_pool.get("ts") or picks.get("ts"),
+        "ts": datetime.now(CST).isoformat(timespec="seconds"),
         "source_ts": {"industry": industry_source_ts, "concept": concept_source_ts},
-        "status": "ok" if board_members else "insufficient_data",
+        "status": _status,
+        "degraded_reason": "；".join(_reasons) or None,
+        "freshness": {
+            "asof": _today,
+            "max_age_days": 2,
+            "fresh_boards": len(_fresh),
+            "stale_boards": len(_stale),
+            "missing_boards": len(_missing),
+            "total_boards": len(board_members),
+            "oldest_age_days": max(_age_days) if _age_days else None,
+            "sector_pool_date": _sp_date,
+            "stale_board_ids": _stale[:20],
+            "missing_board_ids": _missing[:20],
+        },
         "industries": _ind_boards,
         "concepts": _con_boards,
         "industry_map_em": _industry_list(industry_map)[:80],
@@ -611,6 +674,10 @@ def main():
         ],
     }
     dump("data/api/sectors.json", sectors_api)
+    print(f"[sectors] status={_status} fresh={len(_fresh)} stale={len(_stale)} "
+          f"missing={len(_missing)} pool_date={_sp_date}", flush=True)
+    if "--only-sectors" in sys.argv:
+        return 0
 
     # API: market
     mkt = {

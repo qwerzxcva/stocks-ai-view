@@ -305,6 +305,32 @@ def build_cycle_pool(days=120):
 
 
 # ─── main ─────────────────────────────────────────────────────────
+def _prev_date(out_dir, name):
+    path = os.path.join(out_dir, name)
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as f:
+            return (json.load(f) or {}).get("date")
+    except Exception:
+        return None
+
+
+def _write_stage_status(out_dir, stage, status, reason, prev_date):
+    """阶段产物状态：失败时显式落盘，避免下游把旧文件当当日数据。"""
+    payload = {
+        "stage": stage,
+        "status": status,
+        "reason": reason,
+        "at": datetime.now(CST).isoformat(timespec="seconds"),
+        "prev_file_date": prev_date,
+    }
+    path = os.path.join(out_dir, f"{stage}_status.json")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=1)
+    print(f"[{stage}] status={status} reason={reason} -> {path}", file=sys.stderr)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", required=True, help="ai-view/data 目录")
@@ -324,11 +350,15 @@ def main():
         print(f"[sector_pool] {sp['total_sectors']} 板块 -> "
               f"tier1={sp['tier1_count']} tier2={sp['tier2_count']} "
               f"tier3={sp['tier3_count']} down={sp['tier_down_count']}")
+        _write_stage_status(args.out_dir, "sector_pool", "ok", None, sp["date"])
         for s in sp["tier1"][:5]:
             print(f"    {s['sector']:12s} 当日{s['avg_chg_1d']:+.2f}% "
                   f"5日{s['chg_5d']:+.2f}% 领涨 {s['leader']}")
     else:
         print("[sector_pool] ❌ 腾讯行业接口不可用")
+        _write_stage_status(args.out_dir, "sector_pool", "failed",
+                            "腾讯行业接口不可用",
+                            _prev_date(args.out_dir, "sector_pool.json"))
 
     # 2. 周期池
     # 回看窗口: INDEX_KLINE_DAYS > index_history.json 里最短的可用指数长度 > 500
@@ -367,6 +397,7 @@ def main():
             print(f"[index_kline] 上证 {len(klines['sh000001'])} 根 -> {kp}")
     else:
         print("[cycle] ❌ 腾讯指数K线不可用")
+        _write_stage_status(args.out_dir, "cycle", "failed", "腾讯指数K线不可用", None)
 
     print("\nDONE")
     return 0 if (sp and cp) else 1

@@ -58,6 +58,12 @@ jobs:
             *)   echo "::warning::engine-chain dispatch http=$code (忽略, 下游有自己的 cron 兜底)" ;;
           esac
 
+      - name: Refresh board constituents (local-first source for api/sectors.json)
+        # 东财 push2delay 会瞬断限流，部分失败属数据源限流而非代码 bug；
+        # 失败时 api/sectors.json 会以 status=degraded/stale 如实标注，不冒充当日。
+        continue-on-error: true
+        run: python3 scripts/refresh_board_constituents.py --workers 2
+
       - name: Build app data + API + AI Q&A
         env:
           GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
@@ -67,7 +73,7 @@ jobs:
       - name: Commit & push (targeted paths only)
         run: |
           python3 scripts/git_push_retry.py --msg "skapp app data $(date -u +%FT%TZ)" \
-            --dir data/data --dir data/api --user skapp-bot \
+            --dir data/data --dir data/api --dir data/sector --user skapp-bot \
             --protect data/data/decision.json --protect data/data/today_picks.json \
             --protect data/data/stock_names.json --protect data/api/index.json \
             --protect data/api/market.json --protect data/api/qa --protect data/api/stocks \
