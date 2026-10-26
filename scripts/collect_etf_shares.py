@@ -234,7 +234,14 @@ def main(argv=None):
     today = datetime.now(CST).date()
     if backfill_days > 0:
         days = weekdays_back(backfill_days)
-        print("[etf] backfill %d weekdays: %s .. %s" % (len(days), days[0], days[-1]))
+        # 只补缺失日期：已经回填过 231 天的沪深数据不该重拉一遍
+        # （2026-10-27 实测：250 天全量重拉会撞 15 分钟 job 超时）
+        sse_codes = [c for c, v in BASKET.items() if v[2] == "sse"]
+        missing = [d for d in days
+                   if any(d not in store.get(c, {}) for c in sse_codes)]
+        print("[etf] backfill window %s..%s, %d weekdays, %d still missing"
+              % (days[0], days[-1], len(days), len(missing)))
+        days = missing
         for day in days:
             try:
                 actual, shares = fetch_sse_day(day)
