@@ -65,7 +65,8 @@ def _fetch(bk, kind, timeout=15, attempts=4):
                 rows = list(diff.values()) if isinstance(diff, dict) else list(diff)
                 members = [{"code": str(x.get("f12")), "name": str(x.get("f14"))}
                            for x in rows if x.get("f12") and x.get("f14")]
-                if members:
+                if members or payload.get("data") is not None:
+                    # data 非 None 但 diff 为空 = 接口确认该板块今日无成分，不是抓取失败
                     return bk, kind, members, None
             except Exception as e:
                 last_err = "%s:%s" % (host.split("//")[1], type(e).__name__)
@@ -110,6 +111,8 @@ def main():
                 d = json.load(f)
             ts = datetime.fromisoformat(str(d.get("generated_at") or ""))
             if d.get("n") and (datetime.now(CST) - ts).total_seconds() < 86400:
+                kept.add((bk, kind))
+            elif d.get("empty_confirmed") and (datetime.now(CST) - ts).total_seconds() < 86400:
                 kept.add((bk, kind))
         except Exception:
             pass
@@ -157,6 +160,7 @@ def main():
         payload = {
             "generated_at": now,
             "n": len(members),
+            "empty_confirmed": len(members) == 0 and source.startswith("eastmoney"),
             "board": bk,
             "kind": kind,
             "source": source,

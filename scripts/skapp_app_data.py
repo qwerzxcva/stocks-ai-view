@@ -557,7 +557,10 @@ def main():
                     age_days = round((datetime.now(CST) - _t).total_seconds() / 86400, 2)
                 except Exception:
                     age_days = None
-            if not valid_members:
+            if not valid_members and isinstance(data, dict) and data.get("empty_confirmed") \
+                    and age_days is not None and age_days <= 2:
+                member_status = "empty"
+            elif not valid_members:
                 member_status = "missing"
             elif age_days is not None and age_days > 2:
                 member_status = "stale"
@@ -573,6 +576,7 @@ def main():
                 "source": path,
                 "status": member_status,
                 "usable": member_status == "ok",
+                "counted_fresh": member_status in ("ok", "empty"),
                 "fetch_error": err,
             }
     print(f"board_members fetched: {len(board_members)} / {len(board_jobs)}", flush=True)
@@ -637,7 +641,9 @@ def main():
         board["age_days"] = detail.get("age_days") if detail else None
         board["members"] = detail.get("members", []) if detail else []
     # ── 新鲜度门禁：不让旧板块冒充当日 ──
-    _fresh = [bk for bk, v in board_members.items() if v.get("status") == "ok"]
+    _fresh_ok = [bk for bk, v in board_members.items() if v.get("status") == "ok"]
+    _empty = [bk for bk, v in board_members.items() if v.get("status") == "empty"]
+    _fresh = _fresh_ok + _empty  # 空板块（接口确认当日无成分）也算当日数据
     _stale = [bk for bk, v in board_members.items() if v.get("status") == "stale"]
     _missing = [bk for bk, v in board_members.items() if v.get("status") == "missing"]
     _total_boards = len(board_members) or 1
@@ -668,6 +674,8 @@ def main():
             "asof": _today,
             "max_age_days": 2,
             "fresh_boards": len(_fresh),
+            "fresh_with_members": len(_fresh_ok),
+            "empty_boards": len(_empty),
             "stale_boards": len(_stale),
             "missing_boards": len(_missing),
             "total_boards": len(board_members),
