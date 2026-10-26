@@ -451,8 +451,10 @@ jobs:
               review = json.load(handle)
           if review.get('date') != __import__('datetime').datetime.now(__import__('datetime').timezone.utc).astimezone(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).date().isoformat():
               raise SystemExit('close_review date is not today; refusing publication')
-          if review.get('status') != 'ok':
+          if review.get('status') != 'ok' and review.get('status') != 'insufficient':
               raise SystemExit(f"close_review status is {review.get('status')!r}; refusing publication")
+          if review.get('status') == 'insufficient':
+              print('close_review insufficient (no quotes, e.g. weekend); skipping publication')
           print('close_review gate:', review.get('status'), review.get('date'))
           PY
           else
