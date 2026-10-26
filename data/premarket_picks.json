@@ -1,435 +1,547 @@
 {
- "ts": "2026-10-19T09:36:35+08:00",
- "engine": "premarket_picks v1 (多引擎共振 + 隔夜增量 + 市况闸门)",
- "date": "2026-10-19",
+ "ts": "2026-10-26T14:02:17+08:00",
+ "date": "2026-10-26",
  "session": "premarket",
- "gate": {
-  "state": "defensive",
-  "reason": "全球情绪偏空; 单票试错、严设止损",
-  "pos_cap": 0.1
- },
- "global": {
-  "score": -17.6,
-  "mood": "偏空",
-  "vix": 21.67,
-  "signals": [
-   "A50期货 -0.05% — 夜盘/早盘外资对大A的最直接定价",
-   "中概KWEB +0.40% — 隔夜中概情绪",
-   "VIX 21.67 (警惕) — 中性偏谨慎",
-   "离岸人民币 6.6926 (-0.03%) — 升值利好外资流入",
-   "费半ETF -2.13% — A股半导体链情绪锚",
-   "★ 全球K线动量: usIXIC:-1.5%/5d | usINX:-0.3%/5d | hkHSI:+0.3%/5d | hkHSTECH:-2.0%/5d",
-   "★ 全球情绪综合分: -17.62 (偏空) → 大A开盘预期"
-  ]
- },
- "n_candidates": 38,
- "tiers": {
-  "A_buy": [
-   {
-    "code": "sh603992",
-    "name": "松霖科技",
-    "price": 23.1,
-    "score": 79.9,
-    "resonance": 0.941,
-    "bull": 16,
-    "bear": 1,
-    "neutral": 2,
-    "chg_pct": -4.94,
-    "pe": 38.33,
-    "turnover": 0.42,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     22.75,
-     23.22
-    ],
-    "stop": 22.06,
-    "target": 24.49,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 79.9,
-     "resonance": 0.941,
-     "votes": "16/1/2",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sh600585",
-    "name": "海螺水泥",
-    "price": 18.66,
-    "score": 79.2,
-    "resonance": 0.882,
-    "bull": 15,
-    "bear": 2,
-    "neutral": 0,
-    "chg_pct": 0.11,
-    "pe": 15.82,
-    "turnover": 0.09,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     18.38,
-     18.75
-    ],
-    "stop": 17.82,
-    "target": 19.78,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 79.2,
-     "resonance": 0.882,
-     "votes": "15/2/0",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sz002233",
-    "name": "塔牌集团",
-    "price": 7.73,
-    "score": 78.6,
-    "resonance": 0.882,
-    "bull": 15,
-    "bear": 2,
-    "neutral": 0,
-    "chg_pct": -0.9,
-    "pe": 21.71,
-    "turnover": 0.27,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     7.61,
-     7.77
-    ],
-    "stop": 7.38,
-    "target": 8.19,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 78.6,
-     "resonance": 0.882,
-     "votes": "15/2/0",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sh600629",
-    "name": "华建集团",
-    "price": 18.41,
-    "score": 78.6,
-    "resonance": 0.933,
-    "bull": 14,
-    "bear": 1,
-    "neutral": 2,
-    "chg_pct": -4.11,
-    "pe": -395.05,
-    "turnover": 0.97,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     18.13,
-     18.5
-    ],
-    "stop": 17.58,
-    "target": 19.51,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 78.6,
-     "resonance": 0.933,
-     "votes": "14/1/2",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sz003006",
-    "name": "百亚股份",
-    "price": 23.83,
-    "score": 78.4,
-    "resonance": 0.867,
-    "bull": 13,
-    "bear": 2,
-    "neutral": 2,
-    "chg_pct": -1.08,
-    "pe": 51.47,
-    "turnover": 1.5,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     23.47,
-     23.95
-    ],
-    "stop": 22.76,
-    "target": 25.26,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 78.4,
-     "resonance": 0.867,
-     "votes": "13/2/2",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sh600562",
-    "name": "国睿科技",
-    "price": 29.31,
-    "score": 78.4,
-    "resonance": 1.0,
-    "bull": 13,
-    "bear": 0,
-    "neutral": 4,
-    "chg_pct": -0.1,
-    "pe": 63.65,
-    "turnover": 0.14,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     28.87,
-     29.46
-    ],
-    "stop": 27.99,
-    "target": 31.07,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 78.4,
-     "resonance": 1.0,
-     "votes": "13/0/4",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sz001233",
-    "name": "海安集团",
-    "price": 50.25,
-    "score": 77.8,
-    "resonance": 0.923,
-    "bull": 12,
-    "bear": 1,
-    "neutral": 4,
-    "chg_pct": 4.25,
-    "pe": 23.22,
-    "turnover": 2.79,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     49.5,
-     50.5
-    ],
-    "stop": 47.99,
-    "target": 53.27,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 77.8,
-     "resonance": 0.923,
-     "votes": "12/1/4",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   },
-   {
-    "code": "sh600199",
-    "name": "金种子酒",
-    "price": 7.78,
-    "score": 77.8,
-    "resonance": 0.929,
-    "bull": 13,
-    "bear": 1,
-    "neutral": 3,
-    "chg_pct": -4.19,
-    "pe": -26.76,
-    "turnover": 1.94,
-    "kline_date": "2026-10-16",
-    "live_price_ts": "2026-10-19 09:36",
-    "entry_zone": [
-     7.66,
-     7.82
-    ],
-    "stop": 7.43,
-    "target": 8.25,
-    "basis": {
-     "engine": "engine_v5",
-     "kline_date": "2026-10-16",
-     "score": 77.8,
-     "resonance": 0.929,
-     "votes": "13/1/3",
-     "excluded_limit_up": true,
-     "limit_up_pool_size": 50,
-     "adjust_coverage_pct": 99.15
-    }
-   }
-  ],
-  "B_watch": [
-   {
-    "code": "sz002265",
-    "name": "建设工业",
-    "price": 19.86,
-    "score": 77.7,
-    "resonance": 0.933,
-    "chg_pct": -1.14
-   },
-   {
-    "code": "sh600316",
-    "name": "洪都航空",
-    "price": 36.49,
-    "score": 77.3,
-    "resonance": 0.867,
-    "chg_pct": -3.11
-   },
-   {
-    "code": "sz002043",
-    "name": "兔 宝 宝",
-    "price": 12.61,
-    "score": 77.1,
-    "resonance": 1.0,
-    "chg_pct": -0.79
-   },
-   {
-    "code": "sh603798",
-    "name": "康普顿",
-    "price": 14.34,
-    "score": 76.8,
-    "resonance": 1.0,
-    "chg_pct": -3.5
-   },
-   {
-    "code": "sh603105",
-    "name": "芯能科技",
-    "price": 10.03,
-    "score": 76.6,
-    "resonance": 0.929,
-    "chg_pct": 2.35
-   },
-   {
-    "code": "sh600072",
-    "name": "中船科技",
-    "price": 9.94,
-    "score": 76.4,
-    "resonance": 0.933,
-    "chg_pct": -0.6
-   },
-   {
-    "code": "sh603369",
-    "name": "今世缘",
-    "price": 29.49,
-    "score": 76.4,
-    "resonance": 0.933,
-    "chg_pct": -0.51
-   },
-   {
-    "code": "sz002469",
-    "name": "三维化学",
-    "price": 6.77,
-    "score": 76.2,
-    "resonance": 0.941,
-    "chg_pct": -2.87
-   },
-   {
-    "code": "sh600329",
-    "name": "达仁堂",
-    "price": 37.74,
-    "score": 76.2,
-    "resonance": 1.0,
-    "chg_pct": 1.45
-   },
-   {
-    "code": "sh603712",
-    "name": "七一二",
-    "price": 12.04,
-    "score": 76.2,
-    "resonance": 1.0,
-    "chg_pct": -1.55
-   },
-   {
-    "code": "sh600843",
-    "name": "上工申贝",
-    "price": 9.49,
-    "score": 76.1,
-    "resonance": 1.0,
-    "chg_pct": 6.15
-   },
-   {
-    "code": "sh600252",
-    "name": "中恒集团",
-    "price": 2.34,
-    "score": 75.9,
-    "resonance": 1.0,
-    "chg_pct": -4.88
-   }
-  ],
-  "C_avoid": []
- },
- "outlook": {
-  "tomorrow": {
-   "phase": {
-    "stage": "repair",
-    "score": null,
-    "desc": null
-   },
-   "cycle": {
-    "index": null,
-    "date": null,
-    "bias": null,
-    "composite": null,
-    "n_days": 8567
-   },
-   "walkforward": {
-    "is": null,
-    "oos": null,
-    "decay_pct": null,
-    "verdict": null
-   },
-   "recent_winrate": {
-    "h1_bull": null,
-    "h1_bear": null,
-    "n": 64350
-   }
+ "engine": "today_picks_derived",
+ "status": "partial",
+ "reason": "专用premarket产物缺失或过期，由当日引擎候选（engine_v5/ai_pick_v4）回填",
+ "picks": [
+  {
+   "code": "000420",
+   "name": "",
+   "price": 3.92,
+   "date": "2026-10-23",
+   "score": 71.7,
+   "resonance": 1.0,
+   "bull": 12,
+   "bear": 0,
+   "edge_pp": -6.2,
+   "p_up": 43.8,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 3.41",
+    "MA5=3.89 MA20=3.77 偏离+3.11%",
+    "DIF=+0.062 前值+0.061 走强",
+    "RSV=63.3 (9日)"
+   ]
   },
-  "day_after": {
-   "note": "后日展望由次日盘后的 reflect/winrate 闭环修正, 此处给基准预期",
-   "basis": "当前市场相位 + walkforward OOS 胜率"
+  {
+   "code": "000065",
+   "name": "",
+   "price": 10.09,
+   "date": "2026-10-23",
+   "score": 71.4,
+   "resonance": 0.867,
+   "bull": 13,
+   "bear": 2,
+   "edge_pp": -6.12,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 9.91",
+    "MA5=9.79 MA20=9.50 偏离+3.08%",
+    "DIF=+0.088 前值+0.053 走强",
+    "RSV=73.4 (9日)"
+   ]
+  },
+  {
+   "code": "002877",
+   "name": "",
+   "price": 7.83,
+   "date": "2026-10-23",
+   "score": 71.2,
+   "resonance": 0.867,
+   "bull": 13,
+   "bear": 2,
+   "edge_pp": -6.09,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 7.72",
+    "MA5=7.43 MA20=7.33 偏离+1.34%",
+    "DIF=+0.019 前值-0.025 走强",
+    "RSV=90.4 (9日)"
+   ]
+  },
+  {
+   "code": "002535",
+   "name": "",
+   "price": 3.03,
+   "date": "2026-10-23",
+   "score": 71.1,
+   "resonance": 0.706,
+   "bull": 12,
+   "bear": 5,
+   "edge_pp": -6.02,
+   "p_up": 44.0,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 2.47",
+    "MA5=2.64 MA20=2.48 偏离+6.40%",
+    "DIF=+0.071 前值+0.031 走强",
+    "RSV=100.0 (9日)"
+   ]
+  },
+  {
+   "code": "603721",
+   "name": "",
+   "price": 21.77,
+   "date": "2026-10-23",
+   "score": 70.1,
+   "resonance": 0.8,
+   "bull": 12,
+   "bear": 3,
+   "edge_pp": -6.1,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 16.86",
+    "MA5=20.43 MA20=19.68 偏离+3.79%",
+    "DIF=+0.369 前值+0.217 走强",
+    "RSV=100.0 (9日)"
+   ]
+  },
+  {
+   "code": "000400",
+   "name": "",
+   "price": 22.84,
+   "date": "2026-10-23",
+   "score": 69.8,
+   "resonance": 0.812,
+   "bull": 13,
+   "bear": 3,
+   "edge_pp": -6.12,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 20.60",
+    "MA5=22.45 MA20=22.15 偏离+1.34%",
+    "DIF=+0.271 前值+0.248 走强",
+    "RSV=87.6 (9日)"
+   ]
+  },
+  {
+   "code": "603236",
+   "name": "",
+   "price": 80.74,
+   "date": "2026-10-23",
+   "score": 68.9,
+   "resonance": 0.846,
+   "bull": 11,
+   "bear": 2,
+   "edge_pp": -6.24,
+   "p_up": 43.8,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 68.30",
+    "MA5=81.26 MA20=72.45 偏离+12.17%",
+    "DIF=+2.808 前值+2.599 走强",
+    "RSV=80.5 (9日)"
+   ]
+  },
+  {
+   "code": "000826",
+   "name": "",
+   "price": 1.84,
+   "date": "2026-10-23",
+   "score": 68.5,
+   "resonance": 0.867,
+   "bull": 13,
+   "bear": 2,
+   "edge_pp": -6.08,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 1.84",
+    "MA5=1.80 MA20=1.74 偏离+3.74%",
+    "DIF=+0.028 前值+0.024 走强",
+    "RSV=78.3 (9日)"
+   ]
+  },
+  {
+   "code": "000156",
+   "name": "",
+   "price": 7.71,
+   "date": "2026-10-23",
+   "score": 67.8,
+   "resonance": 0.786,
+   "bull": 11,
+   "bear": 3,
+   "edge_pp": -6.08,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 6.67",
+    "DIF=+0.022 前值-0.016 走强",
+    "RSV=100.0 (9日)",
+    "带内位置 79% (中轨7.31)"
+   ]
+  },
+  {
+   "code": "002694",
+   "name": "",
+   "price": 2.89,
+   "date": "2026-10-23",
+   "score": 67.8,
+   "resonance": 0.857,
+   "bull": 12,
+   "bear": 2,
+   "edge_pp": -6.11,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 2.48",
+    "MA5=2.82 MA20=2.78 偏离+1.51%",
+    "DIF=+0.020 前值+0.012 走强",
+    "RSV=80.0 (9日)"
+   ]
+  },
+  {
+   "code": "603466",
+   "name": "",
+   "price": 14.69,
+   "date": "2026-10-23",
+   "score": 66.3,
+   "resonance": 0.846,
+   "bull": 11,
+   "bear": 2,
+   "edge_pp": -6.02,
+   "p_up": 44.0,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 11.20",
+    "MA5=14.24 MA20=13.43 偏离+6.03%",
+    "DIF=+0.507 前值+0.455 走强",
+    "RSV=88.0 (9日)"
+   ]
+  },
+  {
+   "code": "603037",
+   "name": "",
+   "price": 10.45,
+   "date": "2026-10-23",
+   "score": 63.6,
+   "resonance": 0.923,
+   "bull": 12,
+   "bear": 1,
+   "edge_pp": -6.08,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 9.40",
+    "MA5=10.52 MA20=10.07 偏离+4.47%",
+    "RSI=57.52 强势区间",
+    "DIF=+0.099 前值+0.091 走强"
+   ]
+  },
+  {
+   "code": "000063",
+   "name": "",
+   "price": 28.16,
+   "date": "2026-10-23",
+   "score": 62.6,
+   "resonance": 0.733,
+   "bull": 11,
+   "bear": 4,
+   "edge_pp": -5.85,
+   "p_up": 44.1,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=27.65 MA20=27.32 偏离+1.23%",
+    "RSV=98.1 (9日)",
+    "带内位置 73% (中轨27.56)",
+    "CMO=65.85"
+   ]
+  },
+  {
+   "code": "000034",
+   "name": "",
+   "price": 21.5,
+   "date": "2026-10-23",
+   "score": 62.3,
+   "resonance": 0.733,
+   "bull": 11,
+   "bear": 4,
+   "edge_pp": -5.8,
+   "p_up": 44.2,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=21.04 MA20=20.38 偏离+3.23%",
+    "RSV=95.9 (9日)",
+    "带内位置 75% (中轨20.72)",
+    "CMO=64.29"
+   ]
+  },
+  {
+   "code": "000039",
+   "name": "",
+   "price": 8.37,
+   "date": "2026-10-23",
+   "score": 61.7,
+   "resonance": 0.786,
+   "bull": 11,
+   "bear": 3,
+   "edge_pp": -5.79,
+   "p_up": 44.2,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=8.14 MA20=8.06 偏离+0.95%",
+    "RSV=94.8 (9日)",
+    "带内位置 71% (中轨8.11)",
+    "CMO=65.85"
+   ]
+  },
+  {
+   "code": "000333",
+   "name": "",
+   "price": 85.59,
+   "date": "2026-10-23",
+   "score": 61.6,
+   "resonance": 0.909,
+   "bull": 10,
+   "bear": 1,
+   "edge_pp": -6.16,
+   "p_up": 43.8,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 79.43",
+    "DIF=+0.460 前值+0.438 走强",
+    "RSV=62.0 (9日)",
+    "VI+=1.0343 VI-=0.9794"
+   ]
+  },
+  {
+   "code": "002036",
+   "name": "",
+   "price": 5.82,
+   "date": "2026-10-23",
+   "score": 61.4,
+   "resonance": 0.786,
+   "bull": 11,
+   "bear": 3,
+   "edge_pp": -5.7,
+   "p_up": 44.3,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=5.65 MA20=5.55 偏离+1.86%",
+    "RSV=89.1 (9日)",
+    "带内位置 77% (中轨5.61)",
+    "CMO=77.78"
+   ]
+  },
+  {
+   "code": "000062",
+   "name": "",
+   "price": 21.26,
+   "date": "2026-10-23",
+   "score": 61.0,
+   "resonance": 0.688,
+   "bull": 11,
+   "bear": 5,
+   "edge_pp": -5.72,
+   "p_up": 44.3,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=20.44 MA20=20.14 偏离+1.49%",
+    "RSV=89.8 (9日)",
+    "带内位置 86% (中轨20.29)",
+    "CMO=49.33"
+   ]
+  },
+  {
+   "code": "000028",
+   "name": "",
+   "price": 20.64,
+   "date": "2026-10-23",
+   "score": 60.8,
+   "resonance": 0.75,
+   "bull": 9,
+   "bear": 3,
+   "edge_pp": -6.11,
+   "p_up": 43.9,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "趋势多头, 线值 19.40",
+    "MA5=20.48 MA20=20.32 偏离+0.82%",
+    "DIF=+0.097 前值+0.081 走强",
+    "RSV=68.0 (9日)"
+   ]
+  },
+  {
+   "code": "000021",
+   "name": "",
+   "price": 29.19,
+   "date": "2026-10-23",
+   "score": 60.1,
+   "resonance": 0.733,
+   "bull": 11,
+   "bear": 4,
+   "edge_pp": -5.03,
+   "p_up": 45.0,
+   "bear_aligned": false,
+   "engine": "engine_v5",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核",
+   "why": [
+    "MA5=28.79 MA20=28.60 偏离+0.69%",
+    "RSI=49.67 强势区间",
+    "RSV=87.0 (9日)",
+    "CMO=44.77"
+   ]
+  },
+  {
+   "code": "605305",
+   "name": "中际联合",
+   "price": 27.56,
+   "ret_pct": 0.95,
+   "vratio": 2.39,
+   "pos240_pct": 11.0,
+   "score": 0.6136,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "000050",
+   "name": "深天马Ａ",
+   "price": 5.98,
+   "ret_pct": 3.82,
+   "vratio": 1.77,
+   "pos240_pct": 31.4,
+   "score": 0.5227,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "603205",
+   "name": "健尔康",
+   "price": 21.12,
+   "ret_pct": 1.15,
+   "vratio": 1.74,
+   "pos240_pct": 30.4,
+   "score": 0.5023,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "000410",
+   "name": "沈阳机床",
+   "price": 4.99,
+   "ret_pct": 1.63,
+   "vratio": 2.0,
+   "pos240_pct": 34.8,
+   "score": 0.4909,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "002239",
+   "name": "奥特佳",
+   "price": 2.4,
+   "ret_pct": 1.69,
+   "vratio": 1.62,
+   "pos240_pct": 33.3,
+   "score": 0.475,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "000060",
+   "name": "中金岭南",
+   "price": 5.35,
+   "ret_pct": 1.13,
+   "vratio": 1.73,
+   "pos240_pct": 15.1,
+   "score": 0.4727,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "000688",
+   "name": "国城矿业",
+   "price": 21.2,
+   "ret_pct": 2.61,
+   "vratio": 1.61,
+   "pos240_pct": 9.3,
+   "score": 0.4523,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
+  },
+  {
+   "code": "000422",
+   "name": "湖北宜化",
+   "price": 10.5,
+   "ret_pct": 1.45,
+   "vratio": 1.55,
+   "pos240_pct": 12.2,
+   "score": 0.4045,
+   "engine": "ai_pick_v4",
+   "buyable": null,
+   "buyability_reason": "实时可成交状态缺失，需盘前/盘口复核"
   }
- },
- "meta": {
-  "sources_used": [
-   "ai_pick_v4",
-   "ban_pick",
-   "engine_v5",
-   "multidim",
-   "scenario"
-  ],
-  "scoring": "共振36 + 引擎均分30 + 估值±15 + 位置15 + 资金±12",
-  "entry_rule": "入场区间=昨收±1.5%; 止损-4.5%; 目标+6%; 盈亏比1.62",
-  "caveat": "Research reference only, not investment advice. 历史胜率不代表未来; 空仓也是一种决策。"
- },
- "source_note": "engine_v5 全市场 4019 只 (3980 只K线=2026-10-16 = 上一交易日); 实时价为 2026-10-19 盘中腾讯快照; 复权因子 3985 只 (99.15%), 缺 34 只全为 B 股; 已排除涨停池 50 只与涨幅≥9.5%",
- "data_quality": {
-  "adjust_coverage_pct": 99.15,
-  "adjust_trust_level": "full",
-  "n_factor_tables": 3985,
-  "n_raw_only": 34,
-  "unadjusted_reason": "34 只全部为深市 B 股 (sz200xxx/201xxx); baostock 与东财均不提供 B 股复权因子",
-  "fresh_completeness_pct": 99.18,
-  "gates": {
-   "adjust_coverage_ok": true,
-   "freshness_ok": true,
-   "min_universe_ok": true
-  },
-  "source": "baostock backAdjustFactor (GT 结构校验通过, 区间比值恒定 0.0000%)"
- }
+ ],
+ "source_json": "today_picks.json"
 }
