@@ -22,6 +22,10 @@ CST = timezone(timedelta(hours=8))
 UsABLE = ("ok", "degraded")
 
 
+def _group_of(src):
+    return str(src.get("freq") or "other")[:24]
+
+
 def build():
     import sources_registry as sr
     try:
@@ -38,12 +42,12 @@ def build():
         items.append({
             "id": sid,
             "name": src.get("name") or sid,
-            "group": src.get("group"),
+            "group": _group_of(src),
             "status": status,
             "has_fetcher": sid in fetchers,
             "tested_at": (src.get("tested_at") or src.get("last_check")
                           or src.get("checked_at")),
-            "note": str(src.get("note") or "")[:300],
+            "note": str(src.get("notes") or src.get("note") or "")[:300],
         })
 
     usable = [i for i in items if i["status"] in UsABLE]
