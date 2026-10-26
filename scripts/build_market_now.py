@@ -113,10 +113,14 @@ def main():
         for t in n.get("theme", []):
             theme_count[t] = theme_count.get(t, 0) + 1
 
-    # 涨跌停家数优先用涨跌分布口径 (全天准确, 含20cm/30cm涨停板)
-    # 涨停池 tc 在收盘后只统计到盘中某一时刻 (2026-10-13 实测 67 vs 实际89)
-    limit_up = zdfenbu.get("zt_like") or zt["count"]
-    limit_down = zdfenbu.get("dt_like") or dtn["count"]
+    # 涨跌停家数主口径 = 东财涨停/跌停池 tc（2026-10-27 口径对齐）。
+    # 旧实现用 ±10% 直方图桶和当主值，实测同一天系统性偏高：2026-10-26 直方图 77 vs 池 55，
+    # 2026-10-23 171 vs 82（2.09 倍）。原因是平价阈值会把创业板/科创 +10~19% 未封板的票算成涨停，
+    # 又完全看不到 ST 5% 涨停。直方图值降级为对照字段 limit_up_hist / limit_down_hist，只做交叉校验。
+    limit_up = zt["count"]
+    limit_down = dtn["count"]
+    limit_up_hist = zdfenbu.get("zt_like")
+    limit_down_hist = zdfenbu.get("dt_like")
 
     # 指数站上均线 (借鉴 tick-stock-panel 市场看板, 2026-10-17)
     # index_kline.json 是日线文件, 每轮重算成本可忽略。
@@ -148,6 +152,9 @@ def main():
             "indices": indices,
             "limit_up": limit_up,
             "limit_down": limit_down,
+            # ±10% 直方图桶和：平价阈值口径，仅作对照证据，不得当主值用
+            "limit_up_hist": limit_up_hist,
+            "limit_down_hist": limit_down_hist,
             "broken": zb["count"],
             "zt_rate": round(limit_up / max(1, limit_up + zb["count"]) * 100, 1),
             "advance": zdfenbu.get("up", 0),

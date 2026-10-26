@@ -1,0 +1,78 @@
+# breadth-backfill — 市场宽度历史回填（一次性工具，可复用）
+#
+# 背景：data/market_breadth_history.json 从 2026-10-26 起才逐日累积。
+# 东财涨跌停池接口的 date= 参数可用，但只保留最近约 1 个自然月（实测窗口起点 2026-09-29），
+# 窗口每天往后滑，越晚补能补的天数越少 —— 所以要在窗口内尽快把历史补上。
+#
+# 只能补到「涨停/跌停/炸板家数 + 封板率」：
+#   - ±10% 直方图口径（limit_up_hist/limit_down_hist）的接口忽略 date=，无法回填；
+#   - advance/decline/flat/amount 无历史接口，回填记录里一律 null，不编造。
+#
+# 用法：Actions → breadth-backfill → Run workflow，填起始/结束日（YYYY-MM-DD）。
+name: breadth-backfill
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_day:
+        description: '起始日 YYYY-MM-DD（池窗口起点约 2026-09-29）'
+        required: true
+        default: '2026-09-29'
+      to_day:
+        description: '结束日 YYYY-MM-DD'
+        required: true
+        default: '2026-10-25'
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Backfill pool counts into breadth history
+        run: |
+          python3 scripts/build_market_breadth.py \
+            --backfill-from "${{ inputs.from_day }}" \
+            --backfill-to "${{ inputs.to_day }}"
+
+      - name: Verify coverage
+        run: |
+          python3 - <<'PY'
+          import json
+          b = json.load(open('data/api/market_breadth.json', encoding='utf-8'))
+          cov = b.get('coverage') or {}
+          print('coverage:', json.dumps(cov, ensure_ascii=False))
+          print('latest:', json.dumps(b.get('latest') or {}, ensure_ascii=False)[:300])
+          PY
+
+      - name: Commit & push
+        run: |
+          git config user.name "breadth-bot"
+          git config user.email "741059079@qq.com"
+          git fetch origin main
+          git reset --soft origin/main
+          git add data/market_breadth_history.json data/api/market_breadth.json
+          if git diff --quiet --cached HEAD; then
+            echo "no changes"
+          else
+            ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+            git commit -m "data: market breadth backfill ${{ inputs.from_day }}..${{ inputs.to_day }} ($ts)"
+            git -c http.version=HTTP/1.1 push origin main || {
+              git fetch origin main
+              git reset --soft origin/main
+              git add data/market_breadth_history.json data/api/market_breadth.json
+              git commit -m "data: market breadth backfill ($ts)" 2>/dev/null || true
+              git push origin main
+            }
+          fi
