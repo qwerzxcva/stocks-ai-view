@@ -5,6 +5,9 @@
 #   深交所 基金规模 www.szse.cn ShowReport（txtDm + jjlb=ETF）→ current_size 万份
 # 交易所侧可回溯约一年，所以历史用 workflow_dispatch + backfill_days 一次性回填，
 # 日常只跑当日增量（同日多次跑按日期去重，幂等）。
+#
+# 信号按「指数」聚合（每个宽基指数下全部 ETF 份额合计），成员映射在
+# data/etf_index_map.json；新增 ETF 后带 refresh_map=1 跑一次重建。
 name: etf-shares-collect
 on:
   schedule:
@@ -17,6 +20,10 @@ on:
     inputs:
       backfill_days:
         description: '回填最近 N 个工作日（0=只跑当日增量）'
+        required: false
+        default: '0'
+      refresh_map:
+        description: '重建 ETF→宽基指数 成员映射（新增 ETF 后跑，较慢）'
         required: false
         default: '0'
 permissions:
@@ -40,9 +47,12 @@ jobs:
         run: |
           set -euo pipefail
           DAYS="${{ inputs.backfill_days }}"
+          MAP="${{ inputs.refresh_map }}"
           if [ -z "$DAYS" ]; then DAYS=0; fi
-          echo "backfill_days=$DAYS"
-          python3 scripts/collect_etf_shares.py --backfill-days "$DAYS"
+          ARGS="--backfill-days $DAYS"
+          if [ "$MAP" = "1" ] || [ "$MAP" = "true" ]; then ARGS="$ARGS --refresh-map"; fi
+          echo "args=$ARGS"
+          python3 scripts/collect_etf_shares.py $ARGS
 
       - name: Commit & push
         run: |
