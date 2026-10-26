@@ -1,258 +1,11 @@
 {
- "ts": "2026-10-26T04:03:39+08:00",
+ "ts": "2026-10-26T16:43:22+08:00",
  "engine": "bull_bear_debate.py",
  "origin": "架构借鉴 guangxiangdebizi/TradingAgents-MCPmode (MIT): 多智能体分工 + 看涨/看跌辩论 + 三层风控; 裁剪为 3 角色最小闭环 (token 成本约束)",
  "n_debated": 15,
- "n_vetoed": 2,
- "veto_rate": 13.3,
+ "n_vetoed": 1,
+ "veto_rate": 6.7,
  "debates": [
-  {
-   "code": "002535",
-   "bull": {
-    "stance": "bull",
-    "case": "engine_v5 共振分 72.3 (强); 次日炸板率 9.9% (低于 22% 回避线)",
-    "n_evidence": 2
-   },
-   "bear": {
-    "stance": "bear",
-    "case": "逐笔全天主动买卖失衡 -26.0% (封板靠挂盘, 炸板风险高)",
-    "n_evidence": 1
-   },
-   "risk": {
-    "stance": "risk",
-    "verdict": "回避",
-    "final_score": 39.5,
-    "reasons": [
-     "逐笔主动卖占优 -26.0%",
-     "engine_v5 共振 72.3"
-    ]
-   },
-   "evidence_raw": {
-    "code": "002535",
-    "engine_v5": {
-     "score": 72.3,
-     "raw": 0.498,
-     "resonance": 0.737,
-     "bull": 14,
-     "bear": 5,
-     "neutral": 1,
-     "votes": [
-      {
-       "indicator": "SuperTrend",
-       "vote": 1,
-       "strength": 0.9,
-       "why": "趋势多头, 线值 2.47"
-      },
-      {
-       "indicator": "MA5/MA20",
-       "vote": 1,
-       "strength": 1,
-       "why": "MA5=2.64 MA20=2.48 偏离+6.40%"
-      },
-      {
-       "indicator": "RSI",
-       "vote": -1,
-       "strength": 0.418,
-       "why": "RSI=82.55 超买, 回踩风险"
-      },
-      {
-       "indicator": "MACD",
-       "vote": 1,
-       "strength": 1,
-       "why": "DIF=+0.071 前值+0.031 走强"
-      },
-      {
-       "indicator": "KDJ(RSV)",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "RSV=100.0 (9日)"
-      },
-      {
-       "indicator": "BOLL/Keltner",
-       "vote": 1,
-       "strength": 1,
-       "why": "带内位置 118% (中轨2.53)"
-      },
-      {
-       "indicator": "Donchian20",
-       "vote": -1,
-       "strength": 0.0,
-       "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
-      },
-      {
-       "indicator": "CMO",
-       "vote": 1,
-       "strength": 1,
-       "why": "CMO=62.75"
-      },
-      {
-       "indicator": "Vortex",
-       "vote": 1,
-       "strength": 1,
-       "why": "VI+=1.1128 VI-=0.8521"
-      },
-      {
-       "indicator": "UltimateOsc",
-       "vote": 1,
-       "strength": 0.4,
-       "why": "UO=50.69"
-      },
-      {
-       "indicator": "Choppiness",
-       "vote": 0,
-       "strength": 0.1,
-       "why": "CHOP=47.18 震荡市, 不追趋势信号"
-      },
-      {
-       "indicator": "HullMA",
-       "vote": 1,
-       "strength": 1,
-       "why": "HMA=2.50 价格上方"
-      },
-      {
-       "indicator": "ElderForce",
-       "vote": 1,
-       "strength": 0.29,
-       "why": "EF=40889"
-      },
-      {
-       "indicator": "ConnorsRSI",
-       "vote": -1,
-       "strength": 0.702,
-       "why": "CRSI=94.05 极度超买"
-      },
-      {
-       "indicator": "A/D Line",
-       "vote": -1,
-       "strength": 0.012,
-       "why": "10日派发 -1212909"
-      },
-      {
-       "indicator": "Pivot",
-       "vote": 1,
-       "strength": 0.4,
-       "why": "价格在枢轴 3.02 上方, 支撑 3.01"
-      },
-      {
-       "indicator": "VWMA",
-       "vote": 1,
-       "strength": 1,
-       "why": "VWMA=2.53 (量均价)"
-      },
-      {
-       "indicator": "SectorResonance",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "板块[] 当日 +13.84% 领涨, 板块联动"
-      },
-      {
-       "indicator": "InZTPool",
-       "vote": 1,
-       "strength": 0.333,
-       "why": "当日涨停池, 连板2板"
-      },
-      {
-       "indicator": "momentum_overheat",
-       "vote": -1,
-       "strength": 0.23,
-       "why": "距60日线 +23.0% 过热, 回测追突破为负edge"
-      }
-     ],
-     "code": "sz002535",
-     "date": "2026-10-23",
-     "price": 3.03,
-     "bars": 4803,
-     "data_age_days": 0,
-     "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
-     "data_provenance": {
-      "technical": "indicators_ext (17 指标, 等权)",
-      "external": "collect_all_sources/all_sources.json",
-      "resonance_new": [
-       "SectorResonance",
-       "CapitalFlowConsistency",
-       "InZTPool"
-      ],
-      "industry_from": "N/A"
-     }
-    },
-    "factor_lab_negative": [
-     "breakout_60",
-     "new_high_20",
-     "gap_up",
-     "rsi_overbought"
-    ],
-    "ban_pick": {
-     "code": "002535",
-     "name": "林州重机",
-     "lianban": 2,
-     "date": "2026-10-23",
-     "close": 3.03,
-     "chg_pct": 10.18,
-     "seal_strength": 1.039,
-     "vol_ratio": 0.9,
-     "prior_gain_5d": 24.69,
-     "p_zt_next": 19.09,
-     "p_zhaban_next": 9.9,
-     "exp_ret_next": 1.19,
-     "base_p": 31.81,
-     "n_samples": 2776,
-     "adj_factor": 0.6,
-     "verdict": "观察",
-     "score": 3.6,
-     "reasons": [
-      "2连板基准次日涨停率 31.81% (n=2776)",
-      "因子调整: seal_strength=一字/满封(zt_next=8.7%,n=51876), vol_ratio=<1.5(zt_next=9.77%,n=24686), prior_gain=10-25%(zt_next=7.66%,n=28471) → ×0.60",
-      "封板强度 1.04, 量比 0.9, 近5日涨幅 +24.7%",
-      "逐笔全天主动卖占优 -26.0% (封板靠挂单, 炸板风险高)",
-      "竞价异常放量 (强度 100)",
-      "盘后段有缺笔, 尾盘指标可能偏低"
-     ],
-     "factor_delta": {
-      "total_delta_to_base": -12.72,
-      "decomposition": [
-       {
-        "factor": "seal_strength",
-        "bucket": "一字/满封",
-        "layer_rate": 8.7,
-        "layer_n": 51876,
-        "ratio_to_base": 0.273,
-        "delta_to_base_pct": -23.11,
-        "delta_pct_of_total": 181.7
-       },
-       {
-        "factor": "vol_ratio",
-        "bucket": "<1.5",
-        "layer_rate": 9.77,
-        "layer_n": 24686,
-        "ratio_to_base": 0.307,
-        "delta_to_base_pct": -22.04,
-        "delta_pct_of_total": 173.3
-       },
-       {
-        "factor": "prior_gain",
-        "bucket": "10-25%",
-        "layer_rate": 7.66,
-        "layer_n": 28471,
-        "ratio_to_base": 0.241,
-        "delta_to_base_pct": -24.15,
-        "delta_pct_of_total": 189.9
-       }
-      ],
-      "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分"
-     },
-     "auction_delta": -8.0,
-     "tick_structure": {
-      "buy_sell_imbalance": -25.98,
-      "auction_strength": 100.0,
-      "large_tick_ratio": null,
-      "tail_ratio": null,
-      "tail_imbalance": null,
-      "complete": false
-     }
-    }
-   }
-  },
   {
    "code": "000420",
    "bull": {
@@ -392,7 +145,7 @@
      "bars": 6401,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -551,7 +304,7 @@
      "bars": 6401,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -569,6 +322,251 @@
      "gap_up",
      "rsi_overbought"
     ]
+   }
+  },
+  {
+   "code": "002535",
+   "bull": {
+    "stance": "bull",
+    "case": "engine_v5 共振分 71.4 (强); 次日炸板率 9.9% (低于 22% 回避线); 逐笔全天主动买卖失衡 -6.9%",
+    "n_evidence": 3
+   },
+   "bear": {
+    "stance": "bear",
+    "case": "本地数据未检出显式看空信号, 但这不等于无风险 (样本外失效/未覆盖维度仍可能存在)",
+    "n_evidence": 1
+   },
+   "risk": {
+    "stance": "risk",
+    "verdict": "观察",
+    "final_score": 54.3,
+    "reasons": [
+     "engine_v5 共振 71.4"
+    ]
+   },
+   "evidence_raw": {
+    "code": "002535",
+    "engine_v5": {
+     "score": 71.4,
+     "raw": 0.4783,
+     "resonance": 0.737,
+     "bull": 14,
+     "bear": 5,
+     "neutral": 1,
+     "votes": [
+      {
+       "indicator": "SuperTrend",
+       "vote": 1,
+       "strength": 0.9,
+       "why": "趋势多头, 线值 2.47"
+      },
+      {
+       "indicator": "MA5/MA20",
+       "vote": 1,
+       "strength": 1,
+       "why": "MA5=2.64 MA20=2.48 偏离+6.40%"
+      },
+      {
+       "indicator": "RSI",
+       "vote": -1,
+       "strength": 0.418,
+       "why": "RSI=82.55 超买, 回踩风险"
+      },
+      {
+       "indicator": "MACD",
+       "vote": 1,
+       "strength": 1,
+       "why": "DIF=+0.071 前值+0.031 走强"
+      },
+      {
+       "indicator": "KDJ(RSV)",
+       "vote": 1,
+       "strength": 1.0,
+       "why": "RSV=100.0 (9日)"
+      },
+      {
+       "indicator": "BOLL/Keltner",
+       "vote": 1,
+       "strength": 1,
+       "why": "带内位置 118% (中轨2.53)"
+      },
+      {
+       "indicator": "Donchian20",
+       "vote": -1,
+       "strength": 0.0,
+       "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
+      },
+      {
+       "indicator": "CMO",
+       "vote": 1,
+       "strength": 1,
+       "why": "CMO=62.75"
+      },
+      {
+       "indicator": "Vortex",
+       "vote": 1,
+       "strength": 1,
+       "why": "VI+=1.1128 VI-=0.8521"
+      },
+      {
+       "indicator": "UltimateOsc",
+       "vote": 1,
+       "strength": 0.4,
+       "why": "UO=50.69"
+      },
+      {
+       "indicator": "Choppiness",
+       "vote": 0,
+       "strength": 0.1,
+       "why": "CHOP=47.18 震荡市, 不追趋势信号"
+      },
+      {
+       "indicator": "HullMA",
+       "vote": 1,
+       "strength": 1,
+       "why": "HMA=2.50 价格上方"
+      },
+      {
+       "indicator": "ElderForce",
+       "vote": 1,
+       "strength": 0.29,
+       "why": "EF=40889"
+      },
+      {
+       "indicator": "ConnorsRSI",
+       "vote": -1,
+       "strength": 0.702,
+       "why": "CRSI=94.05 极度超买"
+      },
+      {
+       "indicator": "A/D Line",
+       "vote": -1,
+       "strength": 0.012,
+       "why": "10日派发 -1212909"
+      },
+      {
+       "indicator": "Pivot",
+       "vote": 1,
+       "strength": 0.4,
+       "why": "价格在枢轴 3.02 上方, 支撑 3.01"
+      },
+      {
+       "indicator": "VWMA",
+       "vote": 1,
+       "strength": 1,
+       "why": "VWMA=2.53 (量均价)"
+      },
+      {
+       "indicator": "SectorResonance",
+       "vote": 1,
+       "strength": 0.438,
+       "why": "板块[] 当日 +2.63% 领涨, 板块联动"
+      },
+      {
+       "indicator": "InZTPool",
+       "vote": 1,
+       "strength": 0.5,
+       "why": "当日涨停池, 连板3板"
+      },
+      {
+       "indicator": "momentum_overheat",
+       "vote": -1,
+       "strength": 0.23,
+       "why": "距60日线 +23.0% 过热, 回测追突破为负edge"
+      }
+     ],
+     "code": "sz002535",
+     "date": "2026-10-23",
+     "price": 3.03,
+     "bars": 4803,
+     "data_age_days": 0,
+     "data_fresh": true,
+     "source_ts": "2026-10-26T14:02:36+08:00",
+     "data_provenance": {
+      "technical": "indicators_ext (17 指标, 等权)",
+      "external": "collect_all_sources/all_sources.json",
+      "resonance_new": [
+       "SectorResonance",
+       "CapitalFlowConsistency",
+       "InZTPool"
+      ],
+      "industry_from": "N/A"
+     }
+    },
+    "factor_lab_negative": [
+     "breakout_60",
+     "new_high_20",
+     "gap_up",
+     "rsi_overbought"
+    ],
+    "ban_pick": {
+     "code": "002535",
+     "name": "林州重机",
+     "lianban": 2,
+     "date": "2026-10-23",
+     "close": 3.03,
+     "chg_pct": 10.18,
+     "seal_strength": 1.039,
+     "vol_ratio": 0.9,
+     "prior_gain_5d": 24.69,
+     "p_zt_next": 19.09,
+     "p_zhaban_next": 9.9,
+     "exp_ret_next": 1.19,
+     "base_p": 31.81,
+     "n_samples": 2776,
+     "adj_factor": 0.6,
+     "verdict": "观察",
+     "score": 10.6,
+     "reasons": [
+      "2连板基准次日涨停率 31.81% (n=2776)",
+      "因子调整: seal_strength=一字/满封(zt_next=8.7%,n=51876), vol_ratio=<1.5(zt_next=9.77%,n=24686), prior_gain=10-25%(zt_next=7.66%,n=28471) → ×0.60",
+      "封板强度 1.04, 量比 0.9, 近5日涨幅 +24.7%",
+      "逐笔主动卖略占优 -6.9%",
+      "竞价异常放量 (强度 93)"
+     ],
+     "factor_delta": {
+      "total_delta_to_base": -12.72,
+      "decomposition": [
+       {
+        "factor": "seal_strength",
+        "bucket": "一字/满封",
+        "layer_rate": 8.7,
+        "layer_n": 51876,
+        "ratio_to_base": 0.273,
+        "delta_to_base_pct": -23.11,
+        "delta_pct_of_total": 181.7
+       },
+       {
+        "factor": "vol_ratio",
+        "bucket": "<1.5",
+        "layer_rate": 9.77,
+        "layer_n": 24686,
+        "ratio_to_base": 0.307,
+        "delta_to_base_pct": -22.04,
+        "delta_pct_of_total": 173.3
+       },
+       {
+        "factor": "prior_gain",
+        "bucket": "10-25%",
+        "layer_rate": 7.66,
+        "layer_n": 28471,
+        "ratio_to_base": 0.241,
+        "delta_to_base_pct": -24.15,
+        "delta_pct_of_total": 189.9
+       }
+      ],
+      "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分"
+     },
+     "auction_delta": -1.0,
+     "tick_structure": {
+      "buy_sell_imbalance": -6.91,
+      "auction_strength": 93.1,
+      "large_tick_ratio": null,
+      "tail_ratio": null,
+      "tail_imbalance": null,
+      "complete": true
+     }
+    }
    }
   },
   {
@@ -710,7 +708,7 @@
      "bars": 4003,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -734,8 +732,8 @@
    "code": "603721",
    "bull": {
     "stance": "bull",
-    "case": "engine_v5 共振分 71.0 (强); 次日炸板率 5.62% (低于 22% 回避线)",
-    "n_evidence": 2
+    "case": "engine_v5 共振分 70.1 (强)",
+    "n_evidence": 1
    },
    "bear": {
     "stance": "bear",
@@ -745,18 +743,18 @@
    "risk": {
     "stance": "risk",
     "verdict": "观察",
-    "final_score": 54.2,
+    "final_score": 54.0,
     "reasons": [
-     "engine_v5 共振 71.0"
+     "engine_v5 共振 70.1"
     ]
    },
    "evidence_raw": {
     "code": "603721",
     "engine_v5": {
-     "score": 71.0,
-     "raw": 0.4528,
-     "resonance": 0.824,
-     "bull": 14,
+     "score": 70.1,
+     "raw": 0.4375,
+     "resonance": 0.8,
+     "bull": 12,
      "bear": 3,
      "neutral": 2,
      "votes": [
@@ -861,18 +859,6 @@
        "vote": 1,
        "strength": 1,
        "why": "VWMA=19.91 (量均价)"
-      },
-      {
-       "indicator": "SectorResonance",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "板块[影视院线] 当日 +13.66% 领涨, 板块联动"
-      },
-      {
-       "indicator": "InZTPool",
-       "vote": 1,
-       "strength": 0.167,
-       "why": "当日涨停池, 连板1板"
       }
      ],
      "code": "sh603721",
@@ -881,7 +867,7 @@
      "bars": 4803,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -898,64 +884,7 @@
      "new_high_20",
      "gap_up",
      "rsi_overbought"
-    ],
-    "ban_pick": {
-     "code": "603721",
-     "name": "中广天择",
-     "lianban": 1,
-     "date": "2026-10-23",
-     "close": 21.77,
-     "chg_pct": 10.01,
-     "seal_strength": 1.021,
-     "vol_ratio": 2.08,
-     "prior_gain_5d": 15.0,
-     "p_zt_next": 8.09,
-     "p_zhaban_next": 5.62,
-     "exp_ret_next": -3.17,
-     "base_p": 5.85,
-     "n_samples": 47533,
-     "adj_factor": 1.383,
-     "verdict": "回避",
-     "score": 0,
-     "reasons": [
-      "1连板基准次日涨停率 5.85% (n=47533)",
-      "因子调整: seal_strength=一字/满封(zt_next=8.7%,n=51876), vol_ratio=1.5-3(zt_next=7.95%,n=16984), prior_gain=10-25%(zt_next=7.66%,n=28471) → ×1.38",
-      "封板强度 1.02, 量比 2.1, 近5日涨幅 +15.0%"
-     ],
-     "factor_delta": {
-      "total_delta_to_base": 2.24,
-      "decomposition": [
-       {
-        "factor": "seal_strength",
-        "bucket": "一字/满封",
-        "layer_rate": 8.7,
-        "layer_n": 51876,
-        "ratio_to_base": 1.487,
-        "delta_to_base_pct": 2.85,
-        "delta_pct_of_total": 127.2
-       },
-       {
-        "factor": "vol_ratio",
-        "bucket": "1.5-3",
-        "layer_rate": 7.95,
-        "layer_n": 16984,
-        "ratio_to_base": 1.359,
-        "delta_to_base_pct": 2.1,
-        "delta_pct_of_total": 93.8
-       },
-       {
-        "factor": "prior_gain",
-        "bucket": "10-25%",
-        "layer_rate": 7.66,
-        "layer_n": 28471,
-        "ratio_to_base": 1.309,
-        "delta_to_base_pct": 1.81,
-        "delta_pct_of_total": 80.8
-       }
-      ],
-      "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分"
-     }
-    }
+    ]
    }
   },
   {
@@ -1095,7 +1024,7 @@
      "bars": 6521,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -1113,252 +1042,6 @@
      "gap_up",
      "rsi_overbought"
     ]
-   }
-  },
-  {
-   "code": "000156",
-   "bull": {
-    "stance": "bull",
-    "case": "engine_v5 共振分 68.9 (强); RTSI 45.8 上升趋势明确 (R²=0.289, p=0.0069, 20日斜率 5.0%); 次日炸板率 5.21% (低于 22% 回避线)",
-    "n_evidence": 3
-   },
-   "bear": {
-    "stance": "bear",
-    "case": "趋势回归 R² 仅 0.289, 趋势不显著 (接近随机游走)",
-    "n_evidence": 1
-   },
-   "risk": {
-    "stance": "risk",
-    "verdict": "观察",
-    "final_score": 45.8,
-    "reasons": [
-     "RTSI R²=0.289 趋势不显著"
-    ]
-   },
-   "evidence_raw": {
-    "code": "000156",
-    "engine_v5": {
-     "score": 68.9,
-     "raw": 0.4089,
-     "resonance": 0.812,
-     "bull": 13,
-     "bear": 3,
-     "neutral": 3,
-     "votes": [
-      {
-       "indicator": "SuperTrend",
-       "vote": 1,
-       "strength": 0.9,
-       "why": "趋势多头, 线值 6.67"
-      },
-      {
-       "indicator": "MA5/MA20",
-       "vote": 0,
-       "strength": 0.071,
-       "why": "MA5=7.32 MA20=7.31 偏离+0.21%"
-      },
-      {
-       "indicator": "RSI",
-       "vote": 0,
-       "strength": 0.2,
-       "why": "RSI=66.61 中性"
-      },
-      {
-       "indicator": "MACD",
-       "vote": 1,
-       "strength": 1,
-       "why": "DIF=+0.022 前值-0.016 走强"
-      },
-      {
-       "indicator": "KDJ(RSV)",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "RSV=100.0 (9日)"
-      },
-      {
-       "indicator": "BOLL/Keltner",
-       "vote": 1,
-       "strength": 0.583,
-       "why": "带内位置 79% (中轨7.31)"
-      },
-      {
-       "indicator": "Donchian20",
-       "vote": -1,
-       "strength": 0.0,
-       "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
-      },
-      {
-       "indicator": "CMO",
-       "vote": 1,
-       "strength": 0.59,
-       "why": "CMO=29.5"
-      },
-      {
-       "indicator": "Vortex",
-       "vote": -1,
-       "strength": 0.361,
-       "why": "VI+=0.8726 VI-=0.9448"
-      },
-      {
-       "indicator": "UltimateOsc",
-       "vote": 1,
-       "strength": 0.4,
-       "why": "UO=59.0"
-      },
-      {
-       "indicator": "Choppiness",
-       "vote": 0,
-       "strength": 0.1,
-       "why": "CHOP=57.97 震荡市, 不追趋势信号"
-      },
-      {
-       "indicator": "HullMA",
-       "vote": 1,
-       "strength": 1,
-       "why": "HMA=7.26 价格上方"
-      },
-      {
-       "indicator": "ElderForce",
-       "vote": 1,
-       "strength": 0.227,
-       "why": "EF=29289"
-      },
-      {
-       "indicator": "ConnorsRSI",
-       "vote": -1,
-       "strength": 0.138,
-       "why": "CRSI=82.75 极度超买"
-      },
-      {
-       "indicator": "A/D Line",
-       "vote": 1,
-       "strength": 0.002,
-       "why": "10日累积 +147860"
-      },
-      {
-       "indicator": "Pivot",
-       "vote": 1,
-       "strength": 0.4,
-       "why": "价格在枢轴 7.37 上方, 支撑 7.03"
-      },
-      {
-       "indicator": "VWMA",
-       "vote": 1,
-       "strength": 1,
-       "why": "VWMA=7.34 (量均价)"
-      },
-      {
-       "indicator": "SectorResonance",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "板块[] 当日 +13.84% 领涨, 板块联动"
-      },
-      {
-       "indicator": "InZTPool",
-       "vote": 1,
-       "strength": 0.167,
-       "why": "当日涨停池, 连板1板"
-      }
-     ],
-     "code": "sz000156",
-     "date": "2026-10-23",
-     "price": 7.71,
-     "bars": 6401,
-     "data_age_days": 0,
-     "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
-     "data_provenance": {
-      "technical": "indicators_ext (17 指标, 等权)",
-      "external": "collect_all_sources/all_sources.json",
-      "resonance_new": [
-       "SectorResonance",
-       "CapitalFlowConsistency",
-       "InZTPool"
-      ],
-      "industry_from": "unknown"
-     }
-    },
-    "rtsi": {
-     "rtsi": 45.8,
-     "direction": "up",
-     "trend_slope_pct": 5.0,
-     "consistency": 28.4,
-     "dir_consistency": 47.4,
-     "vol_consistency": 0.0,
-     "confidence": 28.7,
-     "r2": 0.289,
-     "p_value": 0.0069,
-     "p_value_note": null,
-     "volume_ratio": 1.23,
-     "vol_score": 58.4,
-     "slope_score": 65.0,
-     "window": 20,
-     "close": 7.71,
-     "code": "sz000156"
-    },
-    "factor_lab_negative": [
-     "breakout_60",
-     "new_high_20",
-     "gap_up",
-     "rsi_overbought"
-    ],
-    "ban_pick": {
-     "code": "000156",
-     "name": "华数传媒",
-     "lianban": 1,
-     "date": "2026-10-23",
-     "close": 7.71,
-     "chg_pct": 9.99,
-     "seal_strength": 1.019,
-     "vol_ratio": 2.33,
-     "prior_gain_5d": 7.08,
-     "p_zt_next": 7.5,
-     "p_zhaban_next": 5.21,
-     "exp_ret_next": -2.94,
-     "base_p": 5.85,
-     "n_samples": 47533,
-     "adj_factor": 1.283,
-     "verdict": "回避",
-     "score": 0,
-     "reasons": [
-      "1连板基准次日涨停率 5.85% (n=47533)",
-      "因子调整: seal_strength=一字/满封(zt_next=8.7%,n=51876), vol_ratio=1.5-3(zt_next=7.95%,n=16984), prior_gain=<10%(zt_next=6.11%,n=16375) → ×1.28",
-      "封板强度 1.02, 量比 2.3, 近5日涨幅 +7.1%"
-     ],
-     "factor_delta": {
-      "total_delta_to_base": 1.65,
-      "decomposition": [
-       {
-        "factor": "seal_strength",
-        "bucket": "一字/满封",
-        "layer_rate": 8.7,
-        "layer_n": 51876,
-        "ratio_to_base": 1.487,
-        "delta_to_base_pct": 2.85,
-        "delta_pct_of_total": 172.7
-       },
-       {
-        "factor": "vol_ratio",
-        "bucket": "1.5-3",
-        "layer_rate": 7.95,
-        "layer_n": 16984,
-        "ratio_to_base": 1.359,
-        "delta_to_base_pct": 2.1,
-        "delta_pct_of_total": 127.3
-       },
-       {
-        "factor": "prior_gain",
-        "bucket": "<10%",
-        "layer_rate": 6.11,
-        "layer_n": 16375,
-        "ratio_to_base": 1.044,
-        "delta_to_base_pct": 0.26,
-        "delta_pct_of_total": 15.8
-       }
-      ],
-      "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分"
-     }
-    }
    }
   },
   {
@@ -1498,7 +1181,7 @@
      "bars": 4003,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -1657,7 +1340,7 @@
      "bars": 6402,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -1686,6 +1369,183 @@
      "window": 20,
      "close": 1.84,
      "code": "sz000826"
+    },
+    "factor_lab_negative": [
+     "breakout_60",
+     "new_high_20",
+     "gap_up",
+     "rsi_overbought"
+    ]
+   }
+  },
+  {
+   "code": "000156",
+   "bull": {
+    "stance": "bull",
+    "case": "engine_v5 共振分 67.8 (强); RTSI 45.8 上升趋势明确 (R²=0.289, p=0.0069, 20日斜率 5.0%)",
+    "n_evidence": 2
+   },
+   "bear": {
+    "stance": "bear",
+    "case": "趋势回归 R² 仅 0.289, 趋势不显著 (接近随机游走)",
+    "n_evidence": 1
+   },
+   "risk": {
+    "stance": "risk",
+    "verdict": "观察",
+    "final_score": 45.6,
+    "reasons": [
+     "RTSI R²=0.289 趋势不显著"
+    ]
+   },
+   "evidence_raw": {
+    "code": "000156",
+    "engine_v5": {
+     "score": 67.8,
+     "raw": 0.3884,
+     "resonance": 0.786,
+     "bull": 11,
+     "bear": 3,
+     "neutral": 3,
+     "votes": [
+      {
+       "indicator": "SuperTrend",
+       "vote": 1,
+       "strength": 0.9,
+       "why": "趋势多头, 线值 6.67"
+      },
+      {
+       "indicator": "MA5/MA20",
+       "vote": 0,
+       "strength": 0.071,
+       "why": "MA5=7.32 MA20=7.31 偏离+0.21%"
+      },
+      {
+       "indicator": "RSI",
+       "vote": 0,
+       "strength": 0.2,
+       "why": "RSI=66.61 中性"
+      },
+      {
+       "indicator": "MACD",
+       "vote": 1,
+       "strength": 1,
+       "why": "DIF=+0.022 前值-0.016 走强"
+      },
+      {
+       "indicator": "KDJ(RSV)",
+       "vote": 1,
+       "strength": 1.0,
+       "why": "RSV=100.0 (9日)"
+      },
+      {
+       "indicator": "BOLL/Keltner",
+       "vote": 1,
+       "strength": 0.583,
+       "why": "带内位置 79% (中轨7.31)"
+      },
+      {
+       "indicator": "Donchian20",
+       "vote": -1,
+       "strength": 0.0,
+       "why": "距20日高 +0.00% (追突破无正edge, 不给正票)"
+      },
+      {
+       "indicator": "CMO",
+       "vote": 1,
+       "strength": 0.59,
+       "why": "CMO=29.5"
+      },
+      {
+       "indicator": "Vortex",
+       "vote": -1,
+       "strength": 0.361,
+       "why": "VI+=0.8726 VI-=0.9448"
+      },
+      {
+       "indicator": "UltimateOsc",
+       "vote": 1,
+       "strength": 0.4,
+       "why": "UO=59.0"
+      },
+      {
+       "indicator": "Choppiness",
+       "vote": 0,
+       "strength": 0.1,
+       "why": "CHOP=57.97 震荡市, 不追趋势信号"
+      },
+      {
+       "indicator": "HullMA",
+       "vote": 1,
+       "strength": 1,
+       "why": "HMA=7.26 价格上方"
+      },
+      {
+       "indicator": "ElderForce",
+       "vote": 1,
+       "strength": 0.227,
+       "why": "EF=29289"
+      },
+      {
+       "indicator": "ConnorsRSI",
+       "vote": -1,
+       "strength": 0.138,
+       "why": "CRSI=82.75 极度超买"
+      },
+      {
+       "indicator": "A/D Line",
+       "vote": 1,
+       "strength": 0.002,
+       "why": "10日累积 +147860"
+      },
+      {
+       "indicator": "Pivot",
+       "vote": 1,
+       "strength": 0.4,
+       "why": "价格在枢轴 7.37 上方, 支撑 7.03"
+      },
+      {
+       "indicator": "VWMA",
+       "vote": 1,
+       "strength": 1,
+       "why": "VWMA=7.34 (量均价)"
+      }
+     ],
+     "code": "sz000156",
+     "date": "2026-10-23",
+     "price": 7.71,
+     "bars": 6401,
+     "data_age_days": 0,
+     "data_fresh": true,
+     "source_ts": "2026-10-26T14:02:36+08:00",
+     "data_provenance": {
+      "technical": "indicators_ext (17 指标, 等权)",
+      "external": "collect_all_sources/all_sources.json",
+      "resonance_new": [
+       "SectorResonance",
+       "CapitalFlowConsistency",
+       "InZTPool"
+      ],
+      "industry_from": "unknown"
+     }
+    },
+    "rtsi": {
+     "rtsi": 45.8,
+     "direction": "up",
+     "trend_slope_pct": 5.0,
+     "consistency": 28.4,
+     "dir_consistency": 47.4,
+     "vol_consistency": 0.0,
+     "confidence": 28.7,
+     "r2": 0.289,
+     "p_value": 0.0069,
+     "p_value_note": null,
+     "volume_ratio": 1.23,
+     "vol_score": 58.4,
+     "slope_score": 65.0,
+     "window": 20,
+     "close": 7.71,
+     "code": "sz000156"
     },
     "factor_lab_negative": [
      "breakout_60",
@@ -1832,7 +1692,7 @@
      "bars": 7202,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -1856,8 +1716,8 @@
    "code": "603466",
    "bull": {
     "stance": "bull",
-    "case": "engine_v5 共振分 67.6 (强); RTSI 60.0 上升趋势明确 (R²=0.334, p=0.0027, 20日斜率 15.23%); 次日炸板率 5.5% (低于 22% 回避线)",
-    "n_evidence": 3
+    "case": "engine_v5 共振分 66.3 (强); RTSI 60.0 上升趋势明确 (R²=0.334, p=0.0027, 20日斜率 15.23%)",
+    "n_evidence": 2
    },
    "bear": {
     "stance": "bear",
@@ -1867,16 +1727,16 @@
    "risk": {
     "stance": "risk",
     "verdict": "观察",
-    "final_score": 53.5,
+    "final_score": 53.3,
     "reasons": []
    },
    "evidence_raw": {
     "code": "603466",
     "engine_v5": {
-     "score": 67.6,
-     "raw": 0.3728,
-     "resonance": 0.867,
-     "bull": 13,
+     "score": 66.3,
+     "raw": 0.348,
+     "resonance": 0.846,
+     "bull": 11,
      "bear": 2,
      "neutral": 4,
      "votes": [
@@ -1981,18 +1841,6 @@
        "vote": 1,
        "strength": 1,
        "why": "VWMA=13.59 (量均价)"
-      },
-      {
-       "indicator": "SectorResonance",
-       "vote": 1,
-       "strength": 1.0,
-       "why": "板块[数字媒体] 当日 +13.65% 领涨, 板块联动"
-      },
-      {
-       "indicator": "InZTPool",
-       "vote": 1,
-       "strength": 0.167,
-       "why": "当日涨停池, 连板1板"
       }
      ],
      "code": "sh603466",
@@ -2001,7 +1849,7 @@
      "bars": 4803,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -2036,65 +1884,7 @@
      "new_high_20",
      "gap_up",
      "rsi_overbought"
-    ],
-    "ban_pick": {
-     "code": "603466",
-     "name": "风语筑",
-     "lianban": 1,
-     "date": "2026-10-23",
-     "close": 14.69,
-     "chg_pct": 10.04,
-     "seal_strength": 1.024,
-     "vol_ratio": 0.82,
-     "prior_gain_5d": 3.23,
-     "p_zt_next": 7.92,
-     "p_zhaban_next": 5.5,
-     "exp_ret_next": -3.1,
-     "base_p": 5.85,
-     "n_samples": 47533,
-     "adj_factor": 1.355,
-     "verdict": "回避",
-     "score": 0,
-     "reasons": [
-      "1连板基准次日涨停率 5.85% (n=47533)",
-      "因子调整: seal_strength=一字/满封(zt_next=8.7%,n=51876), vol_ratio=<1.5(zt_next=9.77%,n=24686), prior_gain=<10%(zt_next=6.11%,n=16375) → ×1.35",
-      "封板强度 1.02, 量比 0.8, 近5日涨幅 +3.2%",
-      "首板且量比仅 0.8 (<1.2), 资金关注度低"
-     ],
-     "factor_delta": {
-      "total_delta_to_base": 2.07,
-      "decomposition": [
-       {
-        "factor": "seal_strength",
-        "bucket": "一字/满封",
-        "layer_rate": 8.7,
-        "layer_n": 51876,
-        "ratio_to_base": 1.487,
-        "delta_to_base_pct": 2.85,
-        "delta_pct_of_total": 137.7
-       },
-       {
-        "factor": "vol_ratio",
-        "bucket": "<1.5",
-        "layer_rate": 9.77,
-        "layer_n": 24686,
-        "ratio_to_base": 1.67,
-        "delta_to_base_pct": 3.92,
-        "delta_pct_of_total": 189.4
-       },
-       {
-        "factor": "prior_gain",
-        "bucket": "<10%",
-        "layer_rate": 6.11,
-        "layer_n": 16375,
-        "ratio_to_base": 1.044,
-        "delta_to_base_pct": 0.26,
-        "delta_pct_of_total": 12.6
-       }
-      ],
-      "note": "各因子 delta = base_p*(ratio-1); 几何平均近似, 高阶交叉未拆分"
-     }
-    }
+    ]
    }
   },
   {
@@ -2234,7 +2024,7 @@
      "bars": 4003,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -2391,7 +2181,7 @@
      "bars": 6401,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -2548,7 +2338,7 @@
      "bars": 6401,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",
@@ -2705,7 +2495,7 @@
      "bars": 7322,
      "data_age_days": 0,
      "data_fresh": true,
-     "source_ts": "2026-10-26T03:28:21+08:00",
+     "source_ts": "2026-10-26T14:02:36+08:00",
      "data_provenance": {
       "technical": "indicators_ext (17 指标, 等权)",
       "external": "collect_all_sources/all_sources.json",

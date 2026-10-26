@@ -1,41 +1,41 @@
 {
- "ts": "2026-10-26T03:50:16+08:00",
+ "ts": "2026-10-26T16:25:07+08:00",
  "engine": "limitup_attribution v1 (涨停归因)",
- "date": "20261023",
+ "date": "20261026",
  "n_zt": 50,
  "aggregate": {
   "n_zt": 50,
   "by_seal_bucket": {
-   "auction": 4,
-   "early": 20,
-   "mid_am": 4,
-   "early_pm": 22
+   "auction": 6,
+   "early": 31,
+   "mid_am": 7,
+   "early_pm": 6
   },
   "by_lianban": {
-   "1": 38,
-   "3": 1,
-   "2": 9,
-   "5": 2
+   "1": 35,
+   "4": 1,
+   "3": 5,
+   "2": 9
   },
   "by_industry": {
-   "专用设备": 5,
-   "通用设备": 4,
-   "软件开发": 4,
-   "一般零售": 3,
-   "IT服务Ⅱ": 3,
-   "汽车零部": 3,
-   "半导体": 3,
-   "其他电子": 2,
-   "电机Ⅱ": 2,
-   "影视院线": 2
+   "专用设备": 7,
+   "汽车零部": 6,
+   "通用设备": 5,
+   "休闲食品": 3,
+   "软件开发": 2,
+   "消费电子": 2,
+   "医药商业": 2,
+   "通信设备": 1,
+   "一般零售": 1,
+   "专业服务": 1
   },
   "by_price_band": {
-   "lt10": 11,
-   "b10_22": 22,
-   "b22_30": 1,
-   "ge30": 16
+   "lt10": 15,
+   "b10_22": 24,
+   "b22_30": 0,
+   "ge30": 11
   },
-  "low_price_lt22_pct": 66.0
+  "low_price_lt22_pct": 78.0
  },
  "dims": [
   "连板高度",
@@ -48,11 +48,11 @@
  "caveat": "归因基于规则与可得字段, 非涨停真实原因披露; Research reference only",
  "items": [
   {
-   "code": "002982",
-   "name": "湘佳股份",
-   "price": 13.28,
-   "chg_pct": 10.02,
-   "industry": "养殖业",
+   "code": "301314",
+   "name": "科瑞思",
+   "price": 56.14,
+   "chg_pct": 20.01,
+   "industry": "通信设备",
    "lianban": 1,
    "lianban_label": "首板",
    "seal_time": "92500",
@@ -74,18 +74,18 @@
    "reasons": [
     "首板, 新题材或资金试盘",
     "09:25 竞价即封, 隔夜资金抢筹意愿最强",
-    "行业 养殖业 独家涨停 (个股逻辑为主)"
+    "行业 通信设备 独家涨停 (个股逻辑为主)"
    ]
   },
   {
    "code": "600838",
    "name": "上海九百",
-   "price": 11.0,
+   "price": 12.1,
    "chg_pct": 10.0,
    "industry": "一般零售",
-   "lianban": 3,
-   "lianban_label": "3 连板",
-   "seal_time": "92500",
+   "lianban": 4,
+   "lianban_label": "4 连板",
+   "seal_time": "92501",
    "seal_bucket": "auction",
    "seal_label": "竞价抢筹",
    "seal_strength": null,
@@ -95,7 +95,39 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 3,
+   "peers_same_industry": 1,
+   "tags": [
+    "4 连板",
+    "竞价抢筹",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "4 连板, 市场龙头/妖股特征",
+    "09:25 竞价即封, 隔夜资金抢筹意愿最强",
+    "行业 一般零售 独家涨停 (个股逻辑为主)",
+    "题材: 商贸零售+商业地产+洗染服务"
+   ]
+  },
+  {
+   "code": "603028",
+   "name": "赛福天",
+   "price": 9.39,
+   "chg_pct": 9.95,
+   "industry": "通用设备",
+   "lianban": 3,
+   "lianban_label": "3 连板",
+   "seal_time": "92502",
+   "seal_bucket": "auction",
+   "seal_label": "竞价抢筹",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 5,
    "tags": [
     "3 连板",
     "竞价抢筹",
@@ -104,15 +136,15 @@
    "reasons": [
     "3 连板, 市场龙头/妖股特征",
     "09:25 竞价即封, 隔夜资金抢筹意愿最强",
-    "同行业 一般零售 今日 3 只涨停 (板块共振)"
+    "同行业 通用设备 今日 5 只涨停 (板块共振)"
    ]
   },
   {
-   "code": "603028",
-   "name": "赛福天",
-   "price": 8.54,
+   "code": "603081",
+   "name": "大丰实业",
+   "price": 11.72,
    "chg_pct": 10.05,
-   "industry": "通用设备",
+   "industry": "专用设备",
    "lianban": 2,
    "lianban_label": "2 连板",
    "seal_time": "92502",
@@ -125,7 +157,7 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 4,
+   "peers_same_industry": 7,
    "tags": [
     "2 连板",
     "竞价抢筹",
@@ -133,17 +165,51 @@
    ],
    "reasons": [
     "09:25 竞价即封, 隔夜资金抢筹意愿最强",
-    "同行业 通用设备 今日 4 只涨停 (板块共振)"
+    "同行业 专用设备 今日 7 只涨停 (板块共振)"
    ]
   },
   {
-   "code": "603933",
-   "name": "睿能科技",
-   "price": 20.94,
-   "chg_pct": 9.98,
-   "industry": "其他电子",
-   "lianban": 2,
-   "lianban_label": "2 连板",
+   "code": "603089",
+   "name": "正裕工业",
+   "price": 13.08,
+   "chg_pct": 10.01,
+   "industry": "汽车零部",
+   "lianban": 3,
+   "lianban_label": "3 连板",
+   "seal_time": "92502",
+   "seal_bucket": "auction",
+   "seal_label": "竞价抢筹",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 6,
+   "tags": [
+    "3 连板",
+    "竞价抢筹",
+    "板块共振",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "3 连板, 市场龙头/妖股特征",
+    "09:25 竞价即封, 隔夜资金抢筹意愿最强",
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)",
+    "题材: 机器人零部件+柔性触觉+汽车减震器",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "603528",
+   "name": "多伦科技",
+   "price": 8.95,
+   "chg_pct": 9.95,
+   "industry": "软件开发",
+   "lianban": 3,
+   "lianban_label": "3 连板",
    "seal_time": "92502",
    "seal_bucket": "auction",
    "seal_label": "竞价抢筹",
@@ -156,22 +222,221 @@
    "score": null,
    "peers_same_industry": 2,
    "tags": [
-    "2 连板",
+    "3 连板",
     "竞价抢筹"
    ],
    "reasons": [
+    "3 连板, 市场龙头/妖股特征",
     "09:25 竞价即封, 隔夜资金抢筹意愿最强"
+   ]
+  },
+  {
+   "code": "603337",
+   "name": "杰克科技",
+   "price": 43.19,
+   "chg_pct": 10.01,
+   "industry": "专用设备",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "93000",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 7,
+   "tags": [
+    "2 连板",
+    "早盘强势",
+    "板块共振",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "早盘快速封板, 资金坚决",
+    "同行业 专用设备 今日 7 只涨停 (板块共振)",
+    "题材: 人形机器人+数字成套+工业缝纫机",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "600826",
+   "name": "兰生股份",
+   "price": 8.22,
+   "chg_pct": 10.04,
+   "industry": "专业服务",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93014",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 专业服务 独家涨停 (个股逻辑为主)",
+    "题材: 机器人展区+AI科技+会展服务",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "601900",
+   "name": "南方传媒",
+   "price": 14.28,
+   "chg_pct": 10.02,
+   "industry": "出版",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93019",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 出版 独家涨停 (个股逻辑为主)",
+    "题材: 三季报增长+出版发行+AI教育+AI影视"
+   ]
+  },
+  {
+   "code": "605488",
+   "name": "福莱新材",
+   "price": 41.97,
+   "chg_pct": 10.01,
+   "industry": "塑料",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "93025",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "2 连板",
+    "早盘强势",
+    "独家涨停",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "早盘快速封板, 资金坚决",
+    "行业 塑料 独家涨停 (个股逻辑为主)",
+    "题材: 数据采集手套+机器人触觉+广告喷墨",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "001219",
+   "name": "青岛食品",
+   "price": 13.62,
+   "chg_pct": 10.02,
+   "industry": "休闲食品",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93033",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 3,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 休闲食品 今日 3 只涨停 (板块共振)",
+    "题材: 饼干食品+三季报增长+渠道拓展"
+   ]
+  },
+  {
+   "code": "002708",
+   "name": "光洋股份",
+   "price": 15.65,
+   "chg_pct": 9.98,
+   "industry": "汽车零部",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93048",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 6,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)",
+    "题材: 人形机器人+PCB+汽车零部件",
+    "命中当日热点: 机器人"
    ]
   },
   {
    "code": "002535",
    "name": "林州重机",
-   "price": 3.03,
-   "chg_pct": 10.18,
+   "price": 3.33,
+   "chg_pct": 9.9,
    "industry": "专用设备",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "93000",
+   "lianban": 3,
+   "lianban_label": "3 连板",
+   "seal_time": "93100",
    "seal_bucket": "early",
    "seal_label": "早盘强势",
    "seal_strength": 1.039,
@@ -180,543 +445,28 @@
    "p_zt_next": 19.09,
    "p_zhaban_next": 9.9,
    "verdict": "观察",
-   "score": 3.6,
-   "peers_same_industry": 5,
+   "score": 10.6,
+   "peers_same_industry": 7,
    "tags": [
-    "2 连板",
+    "3 连板",
     "早盘强势",
     "板块共振"
    ],
    "reasons": [
+    "3 连板, 市场龙头/妖股特征",
     "早盘快速封板, 资金坚决",
-    "同行业 专用设备 今日 5 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "603280",
-   "name": "南方路机",
-   "price": 31.97,
-   "chg_pct": 10.01,
-   "industry": "工程机械",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "93000",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "2 连板",
-    "早盘强势",
-    "独家涨停",
-    "有题材",
-    "热点命中"
-   ],
-   "reasons": [
-    "早盘快速封板, 资金坚决",
-    "行业 工程机械 独家涨停 (个股逻辑为主)",
-    "题材: 分拣机器人+智能体+工程搅拌",
-    "命中当日热点: 机器人"
-   ]
-  },
-  {
-   "code": "002474",
-   "name": "榕基软件",
-   "price": 7.11,
-   "chg_pct": 10.06,
-   "industry": "IT服务Ⅱ",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93157",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "同行业 IT服务Ⅱ 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "603089",
-   "name": "正裕工业",
-   "price": 11.89,
-   "chg_pct": 9.99,
-   "industry": "汽车零部",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "93247",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "2 连板",
-    "早盘强势",
-    "板块共振"
-   ],
-   "reasons": [
-    "早盘快速封板, 资金坚决",
-    "同行业 汽车零部 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "600785",
-   "name": "新华百货",
-   "price": 12.56,
-   "chg_pct": 9.98,
-   "industry": "一般零售",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93347",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "同行业 一般零售 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "301502",
-   "name": "华阳智能",
-   "price": 64.8,
-   "chg_pct": 20.0,
-   "industry": "电机Ⅱ",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "93348",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 2,
-   "tags": [
-    "2 连板",
-    "早盘强势"
-   ],
-   "reasons": [
-    "早盘快速封板, 资金坚决"
-   ]
-  },
-  {
-   "code": "002343",
-   "name": "慈文传媒",
-   "price": 10.89,
-   "chg_pct": 10.0,
-   "industry": "影视院线",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93400",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": 1.022,
-   "vol_ratio": 0.62,
-   "prior_gain_5d": 32.14,
-   "p_zt_next": 9.13,
-   "p_zhaban_next": 6.34,
-   "verdict": "回避",
-   "score": 4.0,
-   "peers_same_industry": 2,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "高位加速"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "近5日已涨 32.1% (高位加速, 风险大)"
-   ]
-  },
-  {
-   "code": "600506",
-   "name": "统一股份",
-   "price": 16.83,
-   "chg_pct": 10.0,
-   "industry": "炼化及贸",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93549",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "行业 炼化及贸 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "002354",
-   "name": "天娱数科",
-   "price": 8.03,
-   "chg_pct": 10.0,
-   "industry": "广告营销",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93712",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "独家涨停",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "行业 广告营销 独家涨停 (个股逻辑为主)",
-    "题材: 具身智能数据集+AI影视+AI营销+算力"
-   ]
-  },
-  {
-   "code": "001328",
-   "name": "登康口腔",
-   "price": 32.51,
-   "chg_pct": 10.02,
-   "industry": "个护用品",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "93921",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "独家涨停",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "行业 个护用品 独家涨停 (个股逻辑为主)",
-    "题材: 三季报增长+抗敏牙膏+智能口腔"
-   ]
-  },
-  {
-   "code": "002009",
-   "name": "天奇股份",
-   "price": 17.3,
-   "chg_pct": 9.98,
-   "industry": "专用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "94306",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 5,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "板块共振",
-    "有题材",
-    "热点命中"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "同行业 专用设备 今日 5 只涨停 (板块共振)",
-    "题材: 具身智能+工业机器人+产业合作+优必选",
-    "命中当日热点: 机器人"
-   ]
-  },
-  {
-   "code": "003021",
-   "name": "兆威机电",
-   "price": 91.73,
-   "chg_pct": 10.0,
-   "industry": "电机Ⅱ",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "94312",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 2,
-   "tags": [
-    "2 连板",
-    "早盘强势"
-   ],
-   "reasons": [
-    "早盘快速封板, 资金坚决"
-   ]
-  },
-  {
-   "code": "603677",
-   "name": "奇精机械",
-   "price": 16.3,
-   "chg_pct": 9.99,
-   "industry": "家电零部",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "94400",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "行业 家电零部 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "300584",
-   "name": "海辰药业",
-   "price": 32.08,
-   "chg_pct": 20.01,
-   "industry": "化学制药",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "94451",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "独家涨停",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "行业 化学制药 独家涨停 (个股逻辑为主)",
-    "题材: 锂电添加剂+三季报增长+固态电池"
-   ]
-  },
-  {
-   "code": "002421",
-   "name": "达实智能",
-   "price": 3.43,
-   "chg_pct": 9.94,
-   "industry": "IT服务Ⅱ",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "94557",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "同行业 IT服务Ⅱ 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "002077",
-   "name": "大港股份",
-   "price": 13.08,
-   "chg_pct": 10.01,
-   "industry": "半导体",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "94854",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "同行业 半导体 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "002724",
-   "name": "海洋王",
-   "price": 12.33,
-   "chg_pct": 9.99,
-   "industry": "照明设备",
-   "lianban": 5,
-   "lianban_label": "6 连板(高位)",
-   "seal_time": "95351",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "6 连板(高位)",
-    "早盘强势",
-    "独家涨停"
-   ],
-   "reasons": [
-    "5 连板, 市场龙头/妖股特征",
-    "早盘快速封板, 资金坚决",
-    "行业 照明设备 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "603721",
-   "name": "中广天择",
-   "price": 21.77,
-   "chg_pct": 10.01,
-   "industry": "影视院线",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "95521",
-   "seal_bucket": "early",
-   "seal_label": "早盘强势",
-   "seal_strength": 1.021,
-   "vol_ratio": 2.08,
-   "prior_gain_5d": 15.0,
-   "p_zt_next": 8.09,
-   "p_zhaban_next": 5.62,
-   "verdict": "回避",
-   "score": 0,
-   "peers_same_industry": 2,
-   "tags": [
-    "首板",
-    "早盘强势",
-    "放量"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "早盘快速封板, 资金坚决",
-    "量比 2.08 (放量突破)"
+    "同行业 专用设备 今日 7 只涨停 (板块共振)"
    ]
   },
   {
    "code": "000678",
    "name": "襄阳轴承",
-   "price": 13.23,
+   "price": 14.55,
    "chg_pct": 9.98,
    "industry": "汽车零部",
-   "lianban": 2,
-   "lianban_label": "2 连板",
-   "seal_time": "100315",
+   "lianban": 3,
+   "lianban_label": "3 连板",
+   "seal_time": "93118",
    "seal_bucket": "early",
    "seal_label": "早盘强势",
    "seal_strength": null,
@@ -726,26 +476,437 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 3,
+   "peers_same_industry": 6,
    "tags": [
-    "2 连板",
+    "3 连板",
     "早盘强势",
     "板块共振"
    ],
    "reasons": [
+    "3 连板, 市场龙头/妖股特征",
     "早盘快速封板, 资金坚决",
-    "同行业 汽车零部 今日 3 只涨停 (板块共振)"
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)"
    ]
   },
   {
-   "code": "002945",
-   "name": "华林证券",
-   "price": 15.36,
-   "chg_pct": 10.03,
-   "industry": "证券Ⅱ",
+   "code": "600558",
+   "name": "大西洋",
+   "price": 5.56,
+   "chg_pct": 10.1,
+   "industry": "通用设备",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "102306",
+   "seal_time": "93154",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 5,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 通用设备 今日 5 只涨停 (板块共振)",
+    "题材: 高端焊材+核聚变焊材+航空航天+“羊”字辈"
+   ]
+  },
+  {
+   "code": "000559",
+   "name": "万向钱潮",
+   "price": 12.71,
+   "chg_pct": 10.04,
+   "industry": "汽车零部",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "93200",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 6,
+   "tags": [
+    "2 连板",
+    "早盘强势",
+    "板块共振",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "早盘快速封板, 资金坚决",
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)",
+    "题材: 人形机器人+汽车零部件",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "002578",
+   "name": "闽发铝业",
+   "price": 3.6,
+   "chg_pct": 10.09,
+   "industry": "工业金属",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93227",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 工业金属 独家涨停 (个股逻辑为主)",
+    "题材: 机器人布局+液冷铝材+工业铝型材",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "300916",
+   "name": "朗特智能",
+   "price": 34.27,
+   "chg_pct": 19.99,
+   "industry": "消费电子",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93306",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 2,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "题材: 光通信收购+智能控制器+机器人",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "603331",
+   "name": "百达精工",
+   "price": 12.91,
+   "chg_pct": 9.97,
+   "industry": "通用设备",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93307",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 5,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 通用设备 今日 5 只涨停 (板块共振)"
+   ]
+  },
+  {
+   "code": "000810",
+   "name": "创维数字",
+   "price": 11.02,
+   "chg_pct": 9.98,
+   "industry": "黑色家电",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "93309",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "2 连板",
+    "早盘强势",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "早盘快速封板, 资金坚决",
+    "行业 黑色家电 独家涨停 (个股逻辑为主)",
+    "题材: 具身智能数据采集+智能终端+谷歌合作"
+   ]
+  },
+  {
+   "code": "600980",
+   "name": "北矿科技",
+   "price": 18.95,
+   "chg_pct": 9.98,
+   "industry": "专用设备",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93310",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 7,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 专用设备 今日 7 只涨停 (板块共振)"
+   ]
+  },
+  {
+   "code": "603657",
+   "name": "春光科技",
+   "price": 33.88,
+   "chg_pct": 10.0,
+   "industry": "家电零部",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93312",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 家电零部 独家涨停 (个股逻辑为主)",
+    "题材: 家庭机器人+清洁电器+品牌客户",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "002178",
+   "name": "延华智能",
+   "price": 5.34,
+   "chg_pct": 10.1,
+   "industry": "软件开发",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "93451",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 2,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "题材: AI医疗+智慧城市+医院智能化"
+   ]
+  },
+  {
+   "code": "002086",
+   "name": "东方海洋",
+   "price": 2.3,
+   "chg_pct": 10.05,
+   "industry": "农产品加",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "94248",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 农产品加 独家涨停 (个股逻辑为主)",
+    "题材: 质谱诊断+体外诊断+海参养殖+“羊”字辈"
+   ]
+  },
+  {
+   "code": "603716",
+   "name": "塞力医疗",
+   "price": 16.06,
+   "chg_pct": 10.0,
+   "industry": "医药商业",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "94501",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 2,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "题材: 高血压疫苗+AI诊断+医疗SPD"
+   ]
+  },
+  {
+   "code": "688648",
+   "name": "中邮科技",
+   "price": 34.66,
+   "chg_pct": 20.01,
+   "industry": "专用设备",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "94935",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 7,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 专用设备 今日 7 只涨停 (板块共振)"
+   ]
+  },
+  {
+   "code": "000411",
+   "name": "英特集团",
+   "price": 10.52,
+   "chg_pct": 10.04,
+   "industry": "医药商业",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "94957",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 2,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "题材: 三季报单季增长+医药流通+医药物流",
+    "命中当日热点: 医药"
+   ]
+  },
+  {
+   "code": "002599",
+   "name": "盛通股份",
+   "price": 6.19,
+   "chg_pct": 9.95,
+   "industry": "包装印刷",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "95209",
    "seal_bucket": "early",
    "seal_label": "早盘强势",
    "seal_strength": null,
@@ -764,20 +925,112 @@
    "reasons": [
     "首板, 新题材或资金试盘",
     "早盘快速封板, 资金坚决",
-    "行业 证券Ⅱ 独家涨停 (个股逻辑为主)"
+    "行业 包装印刷 独家涨停 (个股逻辑为主)"
    ]
   },
   {
-   "code": "301660",
-   "name": "粤芯半导-U",
-   "price": 33.64,
-   "chg_pct": 20.01,
-   "industry": "半导体",
+   "code": "002795",
+   "name": "永和智控",
+   "price": 6.9,
+   "chg_pct": 10.05,
+   "industry": "通用设备",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "103451",
-   "seal_bucket": "mid_am",
-   "seal_label": "上午中段",
+   "seal_time": "95839",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 5,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 通用设备 今日 5 只涨停 (板块共振)",
+    "题材: 水暖阀门+肿瘤放疗+资产出售"
+   ]
+  },
+  {
+   "code": "001225",
+   "name": "和泰机电",
+   "price": 31.08,
+   "chg_pct": 10.02,
+   "industry": "专用设备",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "100415",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 7,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "板块共振"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 专用设备 今日 7 只涨停 (板块共振)"
+   ]
+  },
+  {
+   "code": "000995",
+   "name": "皇台酒业",
+   "price": 13.37,
+   "chg_pct": 10.04,
+   "industry": "白酒Ⅱ",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "100854",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 白酒Ⅱ 独家涨停 (个股逻辑为主)"
+   ]
+  },
+  {
+   "code": "603719",
+   "name": "良品铺子",
+   "price": 9.39,
+   "chg_pct": 9.95,
+   "industry": "休闲食品",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "101123",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
    "seal_strength": null,
    "vol_ratio": null,
    "prior_gain_5d": null,
@@ -788,56 +1041,342 @@
    "peers_same_industry": 3,
    "tags": [
     "首板",
-    "上午中段",
+    "早盘强势",
+    "板块共振",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "同行业 休闲食品 今日 3 只涨停 (板块共振)",
+    "题材: 休闲食品+一品一链+业绩扭亏"
+   ]
+  },
+  {
+   "code": "002820",
+   "name": "桂发祥",
+   "price": 10.19,
+   "chg_pct": 10.04,
+   "industry": "休闲食品",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "101457",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 3,
+   "tags": [
+    "首板",
+    "早盘强势",
     "板块共振"
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "同行业 半导体 今日 3 只涨停 (板块共振)"
+    "早盘快速封板, 资金坚决",
+    "同行业 休闲食品 今日 3 只涨停 (板块共振)"
    ]
   },
   {
-   "code": "001216",
-   "name": "华瓷股份",
-   "price": 28.12,
-   "chg_pct": 10.02,
-   "industry": "家居用品",
+   "code": "603138",
+   "name": "海量数据",
+   "price": 17.0,
+   "chg_pct": 10.03,
+   "industry": "IT服务Ⅱ",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "104551",
-   "seal_bucket": "mid_am",
-   "seal_label": "上午中段",
-   "seal_strength": 1.02,
-   "vol_ratio": 1.37,
-   "prior_gain_5d": 1.83,
-   "p_zt_next": 7.92,
-   "p_zhaban_next": 5.5,
-   "verdict": "回避",
-   "score": 0,
+   "seal_time": "102100",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
    "peers_same_industry": 1,
    "tags": [
     "首板",
-    "上午中段",
-    "低位启动",
+    "早盘强势",
     "独家涨停",
     "有题材"
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "近5日仅涨 1.8% (低位启动)",
-    "行业 家居用品 独家涨停 (个股逻辑为主)",
-    "题材: MLCC粉体+氧化锆微珠+日用陶瓷"
+    "早盘快速封板, 资金坚决",
+    "行业 IT服务Ⅱ 独家涨停 (个股逻辑为主)",
+    "题材: 数据库+智能体应用+定增注册"
    ]
   },
   {
-   "code": "001298",
-   "name": "好上好",
-   "price": 17.36,
-   "chg_pct": 10.01,
-   "industry": "其他电子",
+   "code": "001331",
+   "name": "胜通能源",
+   "price": 35.02,
+   "chg_pct": 9.99,
+   "industry": "燃气Ⅱ",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "104657",
+   "seal_time": "102703",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 燃气Ⅱ 独家涨停 (个股逻辑为主)",
+    "题材: 机器人产业链+LNG运贸",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "001318",
+   "name": "阳光乳业",
+   "price": 12.1,
+   "chg_pct": 10.0,
+   "industry": "饮料乳品",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "102706",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": 1.018,
+   "vol_ratio": 1.68,
+   "prior_gain_5d": 14.89,
+   "p_zt_next": 8.09,
+   "p_zhaban_next": 5.62,
+   "verdict": "回避",
+   "score": 0,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "行业 饮料乳品 独家涨停 (个股逻辑为主)",
+    "题材: 乳制品+南昌产业链+冷链配送"
+   ]
+  },
+  {
+   "code": "002696",
+   "name": "百洋股份",
+   "price": 11.28,
+   "chg_pct": 10.05,
+   "industry": "饲料",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "102930",
+   "seal_bucket": "early",
+   "seal_label": "早盘强势",
+   "seal_strength": 1.025,
+   "vol_ratio": 0.13,
+   "prior_gain_5d": 33.2,
+   "p_zt_next": 9.13,
+   "p_zhaban_next": 6.34,
+   "verdict": "回避",
+   "score": 0,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "早盘强势",
+    "缩量涨停",
+    "高位加速",
+    "独家涨停"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "早盘快速封板, 资金坚决",
+    "量比 0.13 (缩量涨停, 抛压小)",
+    "近5日已涨 33.2% (高位加速, 风险大)",
+    "行业 饲料 独家涨停 (个股逻辑为主)"
+   ]
+  },
+  {
+   "code": "600822",
+   "name": "上海物贸",
+   "price": 9.37,
+   "chg_pct": 9.98,
+   "industry": "汽车服务",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "103442",
+   "seal_bucket": "mid_am",
+   "seal_label": "上午中段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "上午中段",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "行业 汽车服务 独家涨停 (个股逻辑为主)",
+    "题材: 数据要素+汽车贸易+黑色金属供应链"
+   ]
+  },
+  {
+   "code": "603258",
+   "name": "电魂网络",
+   "price": 15.3,
+   "chg_pct": 9.99,
+   "industry": "游戏Ⅱ",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "110344",
+   "seal_bucket": "mid_am",
+   "seal_label": "上午中段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "上午中段",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "行业 游戏Ⅱ 独家涨停 (个股逻辑为主)",
+    "题材: AI游戏+游戏研运+IP衍生"
+   ]
+  },
+  {
+   "code": "603200",
+   "name": "上海洗霸",
+   "price": 50.41,
+   "chg_pct": 9.99,
+   "industry": "环境治理",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "110411",
+   "seal_bucket": "mid_am",
+   "seal_label": "上午中段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "上午中段",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "行业 环境治理 独家涨停 (个股逻辑为主)",
+    "题材: 固态电池+水处理+数据中心液冷"
+   ]
+  },
+  {
+   "code": "000635",
+   "name": "英 力 特",
+   "price": 8.02,
+   "chg_pct": 10.01,
+   "industry": "化学原料",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "110606",
+   "seal_bucket": "mid_am",
+   "seal_label": "上午中段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "首板",
+    "上午中段",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "首板, 新题材或资金试盘",
+    "行业 化学原料 独家涨停 (个股逻辑为主)",
+    "题材: 控制权变更+氯碱化工+热电协同"
+   ]
+  },
+  {
+   "code": "600094",
+   "name": "大名城",
+   "price": 4.83,
+   "chg_pct": 10.02,
+   "industry": "房地产开",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "111248",
+   "seal_bucket": "mid_am",
+   "seal_label": "上午中段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 1,
+   "tags": [
+    "2 连板",
+    "上午中段",
+    "独家涨停",
+    "有题材"
+   ],
+   "reasons": [
+    "行业 房地产开 独家涨停 (个股逻辑为主)",
+    "题材: 房地产开发+低空经济+算力运营+6G通信"
+   ]
+  },
+  {
+   "code": "300976",
+   "name": "达瑞电子",
+   "price": 53.4,
+   "chg_pct": 20.0,
+   "industry": "消费电子",
+   "lianban": 1,
+   "lianban_label": "首板",
+   "seal_time": "112448",
    "seal_bucket": "mid_am",
    "seal_label": "上午中段",
    "seal_strength": null,
@@ -851,24 +1390,22 @@
    "tags": [
     "首板",
     "上午中段",
-    "有题材",
-    "热点命中"
+    "有题材"
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "题材: 存储芯片+半导体分销+人形机器人",
-    "命中当日热点: 半导体/机器人"
+    "题材: 回购+折叠屏+光模块散热"
    ]
   },
   {
-   "code": "600094",
-   "name": "大名城",
-   "price": 4.39,
-   "chg_pct": 10.03,
-   "industry": "房地产开",
+   "code": "002095",
+   "name": "生 意 宝",
+   "price": 16.48,
+   "chg_pct": 10.01,
+   "industry": "数字媒体",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "111741",
+   "seal_time": "112745",
    "seal_bucket": "mid_am",
    "seal_label": "上午中段",
    "seal_strength": null,
@@ -887,377 +1424,19 @@
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "行业 房地产开 独家涨停 (个股逻辑为主)",
-    "题材: 房地产开发+低空经济+算力运营+6G通信"
+    "行业 数字媒体 独家涨停 (个股逻辑为主)",
+    "题材: 大宗电商+商品数据+AI应用"
    ]
   },
   {
-   "code": "603337",
-   "name": "杰克科技",
-   "price": 39.26,
-   "chg_pct": 10.0,
-   "industry": "专用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130020",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 5,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振",
-    "有题材",
-    "热点命中"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 专用设备 今日 5 只涨停 (板块共振)",
-    "题材: 人形机器人+数字成套+工业缝纫机",
-    "命中当日热点: 机器人"
-   ]
-  },
-  {
-   "code": "000972",
-   "name": "中基健康",
-   "price": 4.06,
-   "chg_pct": 10.03,
-   "industry": "农产品加",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130027",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 农产品加 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "002322",
-   "name": "理工能科",
-   "price": 13.67,
-   "chg_pct": 9.98,
-   "industry": "软件开发",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130206",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 软件开发 今日 4 只涨停 (板块共振)",
-    "题材: AI应用+电力软件+业绩预增"
-   ]
-  },
-  {
-   "code": "600865",
-   "name": "百大集团",
-   "price": 11.04,
-   "chg_pct": 9.96,
-   "industry": "一般零售",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130403",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 一般零售 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "300561",
-   "name": "汇金科技",
-   "price": 15.6,
-   "chg_pct": 20.0,
-   "industry": "软件开发",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130754",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 软件开发 今日 4 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "601519",
-   "name": "大智慧",
-   "price": 9.25,
-   "chg_pct": 9.99,
-   "industry": "软件开发",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "130837",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 软件开发 今日 4 只涨停 (板块共振)",
-    "题材: 互联网金融+AI投研+并购重组"
-   ]
-  },
-  {
-   "code": "603278",
-   "name": "大业股份",
-   "price": 15.96,
+   "code": "002931",
+   "name": "锋龙股份",
+   "price": 42.37,
    "chg_pct": 9.99,
    "industry": "通用设备",
-   "lianban": 5,
-   "lianban_label": "6 连板(高位)",
-   "seal_time": "130945",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "6 连板(高位)",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "5 连板, 市场龙头/妖股特征",
-    "同行业 通用设备 今日 4 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "001301",
-   "name": "尚太科技",
-   "price": 45.71,
-   "chg_pct": 10.01,
-   "industry": "电池",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "131030",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 电池 独家涨停 (个股逻辑为主)",
-    "题材: 负极材料+三季度增长+产能扩建"
-   ]
-  },
-  {
-   "code": "603081",
-   "name": "大丰实业",
-   "price": 10.65,
-   "chg_pct": 10.02,
-   "industry": "专用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "131327",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 5,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 专用设备 今日 5 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "301699",
-   "name": "洛轴股份",
-   "price": 33.42,
-   "chg_pct": 20.0,
-   "industry": "通用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "131642",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 通用设备 今日 4 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "920091",
-   "name": "大鹏工业",
-   "price": 33.51,
-   "chg_pct": 29.98,
-   "industry": "专用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "131718",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": "无K线",
-   "score": 0,
-   "peers_same_industry": 5,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 专用设备 今日 5 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "600215",
-   "name": "派斯林",
-   "price": 6.34,
-   "chg_pct": 10.07,
-   "industry": "自动化设",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "131730",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 自动化设 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "603528",
-   "name": "多伦科技",
-   "price": 8.14,
-   "chg_pct": 10.0,
-   "industry": "软件开发",
    "lianban": 2,
    "lianban_label": "2 连板",
-   "seal_time": "131925",
+   "seal_time": "130012",
    "seal_bucket": "early_pm",
    "seal_label": "午后早段",
    "seal_strength": null,
@@ -1267,7 +1446,7 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 4,
+   "peers_same_industry": 5,
    "tags": [
     "2 连板",
     "午后早段",
@@ -1276,20 +1455,20 @@
     "热点命中"
    ],
    "reasons": [
-    "同行业 软件开发 今日 4 只涨停 (板块共振)",
-    "题材: 人形机器人+智能交通+智慧驾培",
+    "同行业 通用设备 今日 5 只涨停 (板块共振)",
+    "题材: 机器人概念+优必选入主+机电组件+电控产品",
     "命中当日热点: 机器人"
    ]
   },
   {
-   "code": "002612",
-   "name": "朗姿股份",
-   "price": 16.93,
-   "chg_pct": 10.01,
-   "industry": "医疗美容",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "132048",
+   "code": "000700",
+   "name": "模塑科技",
+   "price": 13.07,
+   "chg_pct": 10.02,
+   "industry": "汽车零部",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "130315",
    "seal_bucket": "early_pm",
    "seal_label": "午后早段",
    "seal_strength": null,
@@ -1299,90 +1478,29 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 1,
+   "peers_same_industry": 6,
    "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停",
-    "有题材"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 医疗美容 独家涨停 (个股逻辑为主)",
-    "题材: 医疗美容+时尚女装+中韩自贸区"
-   ]
-  },
-  {
-   "code": "002026",
-   "name": "山东威达",
-   "price": 11.04,
-   "chg_pct": 9.96,
-   "industry": "通用设备",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "132427",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 4,
-   "tags": [
-    "首板",
+    "2 连板",
     "午后早段",
     "板块共振",
     "有题材",
     "热点命中"
    ],
    "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 通用设备 今日 4 只涨停 (板块共振)",
-    "题材: 机器人+换电站+电动工具",
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)",
+    "题材: 人形机器人+汽车外饰件+毛利率提升",
     "命中当日热点: 机器人"
    ]
   },
   {
-   "code": "301313",
-   "name": "凡拓数创",
-   "price": 61.44,
-   "chg_pct": 20.0,
-   "industry": "数字媒体",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "132448",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 数字媒体 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "603713",
-   "name": "密尔克卫",
-   "price": 66.66,
+   "code": "603683",
+   "name": "晶华新材",
+   "price": 17.16,
    "chg_pct": 10.0,
-   "industry": "物流",
+   "industry": "化学制品",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "133213",
+   "seal_time": "130717",
    "seal_bucket": "early_pm",
    "seal_label": "午后早段",
    "seal_strength": null,
@@ -1402,78 +1520,20 @@
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "行业 物流 独家涨停 (个股逻辑为主)",
-    "题材: 三季报增长+半导体物流+化工供应链",
-    "命中当日热点: 半导体"
+    "行业 化学制品 独家涨停 (个股逻辑为主)",
+    "题材: 人形机器人+柔性传感+胶粘材料+股份回购",
+    "命中当日热点: 机器人"
    ]
   },
   {
-   "code": "605488",
-   "name": "福莱新材",
-   "price": 38.15,
-   "chg_pct": 10.01,
-   "industry": "塑料",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "133727",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 1,
-   "tags": [
-    "首板",
-    "午后早段",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 塑料 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "688787",
-   "name": "海天瑞声",
-   "price": 141.0,
-   "chg_pct": 20.0,
-   "industry": "IT服务Ⅱ",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "134201",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "同行业 IT服务Ⅱ 今日 3 只涨停 (板块共振)"
-   ]
-  },
-  {
-   "code": "603448",
-   "name": "天博智能",
-   "price": 56.24,
-   "chg_pct": 9.99,
+   "code": "605333",
+   "name": "沪光股份",
+   "price": 18.1,
+   "chg_pct": 10.03,
    "industry": "汽车零部",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "134225",
+   "seal_time": "130828",
    "seal_bucket": "early_pm",
    "seal_label": "午后早段",
    "seal_strength": null,
@@ -1483,26 +1543,62 @@
    "p_zhaban_next": null,
    "verdict": null,
    "score": null,
-   "peers_same_industry": 3,
+   "peers_same_industry": 6,
    "tags": [
     "首板",
     "午后早段",
-    "板块共振"
+    "板块共振",
+    "有题材",
+    "热点命中"
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "同行业 汽车零部 今日 3 只涨停 (板块共振)"
+    "同行业 汽车零部 今日 6 只涨停 (板块共振)",
+    "题材: 机器人线束+理想汽车+汽车线束",
+    "命中当日热点: 机器人"
    ]
   },
   {
-   "code": "300296",
-   "name": "利亚德",
-   "price": 7.32,
-   "chg_pct": 20.0,
-   "industry": "光学光电",
+   "code": "603901",
+   "name": "永创智能",
+   "price": 10.63,
+   "chg_pct": 10.04,
+   "industry": "专用设备",
+   "lianban": 2,
+   "lianban_label": "2 连板",
+   "seal_time": "130910",
+   "seal_bucket": "early_pm",
+   "seal_label": "午后早段",
+   "seal_strength": null,
+   "vol_ratio": null,
+   "prior_gain_5d": null,
+   "p_zt_next": null,
+   "p_zhaban_next": null,
+   "verdict": null,
+   "score": null,
+   "peers_same_industry": 7,
+   "tags": [
+    "2 连板",
+    "午后早段",
+    "板块共振",
+    "有题材",
+    "热点命中"
+   ],
+   "reasons": [
+    "同行业 专用设备 今日 7 只涨停 (板块共振)",
+    "题材: 人形机器人+智能包装+半年报增长",
+    "命中当日热点: 机器人"
+   ]
+  },
+  {
+   "code": "002093",
+   "name": "国脉科技",
+   "price": 7.21,
+   "chg_pct": 10.08,
+   "industry": "教育",
    "lianban": 1,
    "lianban_label": "首板",
-   "seal_time": "134306",
+   "seal_time": "131103",
    "seal_bucket": "early_pm",
    "seal_label": "午后早段",
    "seal_strength": null,
@@ -1516,42 +1612,13 @@
    "tags": [
     "首板",
     "午后早段",
-    "独家涨停"
-   ],
-   "reasons": [
-    "首板, 新题材或资金试盘",
-    "行业 光学光电 独家涨停 (个股逻辑为主)"
-   ]
-  },
-  {
-   "code": "603160",
-   "name": "汇顶科技",
-   "price": 56.49,
-   "chg_pct": 10.01,
-   "industry": "半导体",
-   "lianban": 1,
-   "lianban_label": "首板",
-   "seal_time": "134338",
-   "seal_bucket": "early_pm",
-   "seal_label": "午后早段",
-   "seal_strength": null,
-   "vol_ratio": null,
-   "prior_gain_5d": null,
-   "p_zt_next": null,
-   "p_zhaban_next": null,
-   "verdict": null,
-   "score": null,
-   "peers_same_industry": 3,
-   "tags": [
-    "首板",
-    "午后早段",
-    "板块共振",
+    "独家涨停",
     "有题材"
    ],
    "reasons": [
     "首板, 新题材或资金试盘",
-    "同行业 半导体 今日 3 只涨停 (板块共振)",
-    "题材: 指纹识别+超声波指纹传感器+端侧安全+折叠屏"
+    "行业 教育 独家涨停 (个股逻辑为主)",
+    "题材: AI应用+通信服务+养老AI+身联网"
    ]
   }
  ]

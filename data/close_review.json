@@ -1,20 +1,20 @@
 {
- "generated_at": "2026-10-25T23:34:35+08:00",
+ "generated_at": "2026-10-26T16:43:20+08:00",
  "engine": "close_review v2 (same-day premarket + midday)",
- "date": "2026-10-25",
+ "date": "2026-10-26",
  "status": "insufficient",
  "market_window": {
-  "status": "insufficient",
-  "reason": "market closed on weekend"
+  "status": "ok",
+  "reason": "at or after the 15:00 close"
  },
  "inputs": {
   "premarket": {
    "status": "insufficient",
-   "reason": "missing or wrong-date artifact"
+   "reason": "premarket was generated at or after 09:15"
   },
   "midday": {
    "status": "insufficient",
-   "reason": "missing or wrong-date artifact"
+   "reason": "midday artifact is outside 11:30-13:00"
   }
  },
  "quote_request": {
@@ -32,7 +32,7 @@
  "premarket": {
   "summary": {
    "status": "insufficient",
-   "reason": "market closed on weekend",
+   "reason": "premarket was generated at or after 09:15",
    "n_requested": 0,
    "n_quoted": 0,
    "n_missing": 0,
@@ -43,7 +43,7 @@
  "midday": {
   "summary": {
    "status": "insufficient",
-   "reason": "market closed on weekend",
+   "reason": "midday artifact is outside 11:30-13:00",
    "n_requested": 0,
    "n_quoted": 0,
    "n_missing": 0,
@@ -117,7 +117,7 @@
  "morning": {
   "summary": {
    "status": "insufficient",
-   "reason": "market closed on weekend",
+   "reason": "premarket was generated at or after 09:15",
    "n_requested": 0,
    "n_quoted": 0,
    "n_missing": 0,
@@ -131,7 +131,7 @@
  "afternoon": {
   "summary": {
    "status": "insufficient",
-   "reason": "market closed on weekend",
+   "reason": "midday artifact is outside 11:30-13:00",
    "n_requested": 0,
    "n_quoted": 0,
    "n_missing": 0,
