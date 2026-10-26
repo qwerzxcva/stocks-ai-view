@@ -57,11 +57,14 @@ def kline_series(secid: str) -> list:
     """K 线底稿（只用于历史量级参考，不用于份额增减判断）。
 
     2026-10-27 修：原实现单次请求失败就抛异常，上游限流时 7 只篮子只剩 2 只入库，
-    序列永远凑不满 20 天。改为 3 次退避重试 + 只取近 800 个交易日（响应体更小、更不易被限流）。
+    序列永远凑不满 20 天。改为重试 + 只取近 800 个交易日（响应体更小、更不易被限流）。
+    注意不要在这里叠加重试层级：curl_json() 内部已有 4 次退避重试，外层再加 3 次会把
+    单只 ETF 拖到 1 分钟以上，7 只直接撞 15 分钟的 job 超时（2026-10-27 实测跑满 12 分钟仍在跑）。
+    外层的职责只是「拿不到就认输，交给调用方用 live 快照建行」。
     """
     last = None
     root = {}
-    for attempt in range(3):
+    for attempt in range(2):
         try:
             root = curl_json("https://push2his.eastmoney.com/api/qt/stock/kline/get"
                              f"?secid={secid}&fields1=f1,f2,f3&fields2=f51,f56,f61"
@@ -174,7 +177,7 @@ def main() -> None:
     for code, (secid, name) in BASKET.items():
         try:
             series = kline_series(secid)
-            time.sleep(5.0)  # K线单只请求间隔拉长，防 Actions 出口被限流
+            time.sleep(2.0)  # 单只间隔；K线底稿不是关键路径，live 快照才是
         except Exception as e:
             print(f"[warn] {code} K线抓取失败: {e}，回退旧底稿", file=sys.stderr)
             series = (old.get(code) or {}).get("series") or []
