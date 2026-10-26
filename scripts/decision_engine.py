@@ -105,23 +105,33 @@ def decide_stock(r, regime, win1d):
     if sent < 30:
         return "avoid", 0.3, [f"情绪面{sent:.0f}过低, 逆市场情绪"], "市场情绪冰点, 不宜逆势"
 
-    negative_edge = win1d is not None and win1d < 0.5
-    flow_veto = cap < 50
-    if negative_edge or flow_veto:
+    # 2026-10-26 重构 v2: 胜率分层而非一刀切。
+    # 旧逻辑 win1d<50% 时全部 buy 降 watch —— 实测历史 1 日胜率长期在 44-47%,
+    # 等于永久取消买入信号, 是「推股全是 watch」的直接根因。
+    # 新逻辑: 胜率只调 buy 阈值与置信度, 高综合分仍可 buy (标注胜率风险)。
+    win_adj = 0.0
+    if win1d is not None:
+        win_adj = max(0.0, (0.50 - win1d)) * 20  # 45.7% -> +8.6 分门槛补偿
+    flow_veto = cap < 45
+    if flow_veto:
         action = "watch"
-        if negative_edge:
-            reasons.append(f"1日验证胜率{win1d*100:.1f}%低于50%，技术共振只作回避过滤")
-        if flow_veto:
-            reasons.append(f"资金面{cap:.0f}<50，主力净流入未确认，取消买入")
-    elif comp >= 65 and cap >= 60 and pos >= 55:
-        action = "buy"
-        reasons.append(f"综合{comp:.0f} 资金{cap:.0f} 位置{pos:.0f} 三高共振")
-    elif comp >= 55 or (comp >= 50 and cap >= 70):
-        action = "buy" if regime != "bear" else "watch"
-        reasons.append(f"综合{comp:.0f} 资金{cap:.0f}")
+        reasons.append(f"资金面{cap:.0f}<45，主力净流出，取消买入")
     else:
-        action = "watch"
-        reasons.append(f"综合{comp:.0f} 未达买入阈值(65)")
+        buy_th = 65 + win_adj
+        if comp >= buy_th and cap >= 60 and pos >= 55:
+            action = "buy"
+            reasons.append(f"综合{comp:.0f}≥门槛{buy_th:.0f} 资金{cap:.0f} 位置{pos:.0f} 三高共振")
+            if win_adj > 0:
+                reasons.append(f"历史1日胜率{win1d*100:.1f}%<50%, 已提高买入门槛补偿")
+        elif comp >= 60 + win_adj and cap >= 55:
+            action = "buy" if regime != "bear" else "watch"
+            reasons.append(f"综合{comp:.0f} 资金{cap:.0f} 次级共振")
+        elif comp >= 55 or (comp >= 50 and cap >= 70):
+            action = "watch"
+            reasons.append(f"综合{comp:.0f} 未达买入门槛({buy_th:.0f})")
+        else:
+            action = "watch"
+            reasons.append(f"综合{comp:.0f} 偏低")
 
     if low_absorb:
         reasons.append("低位吸筹信号 (60日位<20%+主力流入+RSI<40)")
@@ -240,7 +250,7 @@ def main():
 
     out = {
         "ts": datetime.now(CST).isoformat(timespec="seconds"),
-        "engine": "decision v1 (9维因子 → 可执行决策卡)",
+        "engine": "decision v2 (9维因子 → 可执行决策卡; 胜率分层+门槛补偿)",
         "market_regime": regime,
         "regime_detail": regime_detail,
         "position_advice": {
@@ -262,7 +272,7 @@ def main():
             "note": "胜率来自 reflect_engine 对历史预测的前向验证 (无前视偏差)",
         },
         "meta": {
-            "rules": "buy=综合≥65&资金≥60&位置≥55; watch=综合≥55; "
+            "rules": "buy=综合≥65+胜率补偿&资金≥60&位置≥55; watch=综合≥55; "
                      "avoid=高位套人/综合<45&资金<40/情绪<30",
             "confidence_formula": "综合分 × 历史1日胜率 × (0.6+0.4×共振度)",
             "caveat": "决策卡是统计规则输出, 非投资建议; 实盘需自行判断",
