@@ -638,6 +638,25 @@ def _register_external_fetchers():
             registered += 1
     except Exception as e:
         print("[fetchers] fetchers_f10 跳过: %s" % type(e).__name__)
+    # fetchers_hsf10: 东财 HSF10 / 机构持仓 / 股东户数（2026-10-26 实测）
+    try:
+        import fetchers_hsf10 as _h10
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("fund", "em_hsf10_capital_structure"),
+                          ("fund", "em_hsf10_bonus_financing"),
+                          ("fund", "em_hsf10_business_analysis"),
+                          ("fund", "em_hsf10_shareholder_research"),
+                          ("fund", "em_holder_num_latest"),
+                          ("fund", "em_f10_orghold_history")):
+            if name in have:
+                continue
+            fn = getattr(_h10, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_hsf10 跳过: %s" % type(e).__name__)
     return registered
 
 
