@@ -387,6 +387,41 @@ def main():
           ", ".join(f"{h}d={v.get('bull_win_rate')}%(n={v.get('n')})"
                     for h, v in sorted(winrate.items())))
     print(f"  overseas: {overseas['bias']} ({overseas['composite']})")
+
+    # ── 时段兜底产物：盘前/午盘专用文件过期时，用当日引擎候选回填 ──
+    # 背景（2026-10-26 实测）：premarket_picks.json 停在 10-19、midday 停在 10-17，
+    # 而 today_picks 每日更新，导致 App 只能显示旧推股。这里在对应时段
+    # 用当日 signals/values 生成同结构产物，并明确标注来源，不冒充专用引擎输出。
+    mins = now.hour * 60 + now.minute
+    fallback_picks = (signals[:20] + values[:10])
+    fallback_picks = [p for i, p in enumerate(fallback_picks)
+                      if p.get("code") not in {q.get("code") for q in fallback_picks[:i]}]
+
+    def write_session(name, session):
+        target = os.path.join(DATA_DIR, name)
+        existing = load(name) or {}
+        if existing.get("date") == now.strftime("%Y-%m-%d") and existing.get("picks"):
+            return
+        if not fallback_picks:
+            return
+        payload = {
+            "ts": now.isoformat(timespec="seconds"),
+            "date": now.strftime("%Y-%m-%d"),
+            "session": session,
+            "engine": "today_picks_derived",
+            "status": "partial",
+            "reason": "专用%s产物缺失或过期，由当日引擎候选（engine_v5/ai_pick_v4）回填" % session,
+            "picks": fallback_picks,
+            "source_json": "today_picks.json",
+        }
+        with open(target, "w", encoding="utf-8") as f:
+            json.dump(payload, f, ensure_ascii=False, indent=1)
+        print(f"[today_picks] -> {name} (derived, {len(fallback_picks)} picks)")
+
+    if 9 * 60 + 15 <= mins < 11 * 60 + 30:
+        write_session("premarket_picks.json", "premarket")
+    if 11 * 60 + 30 <= mins < 15 * 60 + 10:
+        write_session("midday_picks.json", "midday")
     return 0
 
 
