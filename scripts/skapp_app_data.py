@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 GH = "https://raw.githubusercontent.com"
 A = f"{GH}/qwerzxcva/stocks-ai-view/main/data"
-MARKET = f"{GH}/jiegengxiangjianxue1/db-market/main"
+MARKET = os.environ.get("MARKET_BASE") or f"{GH}/jiegengxiangjianxue1/db-market/main"
 
 SHARD = {
     "00": "jiegengxiangjianxue1/db-stocks-a", "30": "jiegengxiangjianxue2/db-stocks-b",
@@ -512,27 +512,39 @@ def main():
 
     def _fetch_board(job):
         (bk, kind), board = job
-        # 优先本仓当日重建的成分股，db-market 仅作兜底（上游停更时不再当当日用）
-        local = os.path.join("data", "sector", "%s_constituents" % kind, "%s.json" % bk)
+        # 优先本仓当日重建的成分股（可用 SECTOR_LOCAL_DIR 覆盖目录，便于容错测试），
+        # db-market 仅作兜底（上游停更时不得当当日用）
+        local = os.path.join(os.environ.get("SECTOR_LOCAL_DIR", os.path.join("data", "sector")),
+                             "%s_constituents" % kind, "%s.json" % bk)
         if os.path.exists(local):
             try:
                 with open(local, encoding="utf-8") as f:
-                    return bk, kind, board, local, json.load(f)
-            except Exception:
-                pass
+                    return bk, kind, board, local, json.load(f), None
+            except Exception as exc:
+                err = "local_parse:%s" % type(exc).__name__  # 降级到云端兜底，不直接放弃
+        else:
+            err = None
         path = f"{MARKET}/sector/{kind}_constituents/{bk}.json"
-        data = gj(path)
-        return bk, kind, board, path, data
+        try:
+            data = gj(path)
+        except Exception as exc:
+            return bk, kind, board, path, None, (err or "remote:%s" % type(exc).__name__)
+        if not isinstance(data, dict):
+            return bk, kind, board, path, None, (err or "remote_empty")
+        return bk, kind, board, path, data, err
 
+    source_errors = []
     with ThreadPoolExecutor(max_workers=8) as executor:
         futures = [executor.submit(_fetch_board, job) for job in board_jobs.items()]
         for future in as_completed(futures):
-            bk, kind, board, path, data = future.result()
+            bk, kind, board, path, data, err = future.result()
+            if err:
+                source_errors.append({"board": bk, "kind": kind, "error": err})
             members = data.get("members") if isinstance(data, dict) else None
             valid_members = [
-                {"code": str(m["code"]), "name": m["name"]}
+                {"code": str(m["code"]), "name": m.get("name") or str(m["code"])}
                 for m in (members or [])
-                if isinstance(m, dict) and m.get("code") and m.get("name")
+                if isinstance(m, dict) and m.get("code")
             ] if isinstance(members, list) else []
             source_ts = ((data or {}).get("generated_at") or (data or {}).get("ts") or
                          (industries if kind == "industry" else concepts).get("generated_at"))
@@ -560,6 +572,8 @@ def main():
                 "age_days": age_days,
                 "source": path,
                 "status": member_status,
+                "usable": member_status == "ok",
+                "fetch_error": err,
             }
     print(f"board_members fetched: {len(board_members)} / {len(board_jobs)}", flush=True)
 
@@ -612,11 +626,15 @@ def main():
         board.update({"source_ts": industry_source_ts, "source": "db-market:sector/industry.json"})
         detail = board_members.get(board.get("bk"))
         board["status"] = detail.get("status", "insufficient_data") if detail else "insufficient_data"
+        board["usable"] = bool(detail.get("usable")) if detail else False
+        board["age_days"] = detail.get("age_days") if detail else None
         board["members"] = detail.get("members", []) if detail else []
     for board in _con_boards:
         board.update({"source_ts": concept_source_ts, "source": "db-market:sector/concept.json"})
         detail = board_members.get(board.get("bk"))
         board["status"] = detail.get("status", "insufficient_data") if detail else "insufficient_data"
+        board["usable"] = bool(detail.get("usable")) if detail else False
+        board["age_days"] = detail.get("age_days") if detail else None
         board["members"] = detail.get("members", []) if detail else []
     # ── 新鲜度门禁：不让旧板块冒充当日 ──
     _fresh = [bk for bk, v in board_members.items() if v.get("status") == "ok"]
@@ -655,9 +673,13 @@ def main():
             "total_boards": len(board_members),
             "oldest_age_days": max(_age_days) if _age_days else None,
             "sector_pool_date": _sp_date,
+            "requirement_met": len(_fresh) == len(board_members) and len(board_members) > 0,
+            "fetch_error_count": len(source_errors),
             "stale_board_ids": _stale[:20],
             "missing_board_ids": _missing[:20],
+            "degraded_board_ids": (_stale + _missing)[:20],
         },
+        "source_errors": source_errors[:20],
         "industries": _ind_boards,
         "concepts": _con_boards,
         "industry_map_em": _industry_list(industry_map)[:80],
@@ -722,6 +744,8 @@ def main():
         dump("data/api/sources.json", build_sources_status.build())
         import build_source_disposition
         build_source_disposition.main()
+        import build_sectors_health
+        build_sectors_health.main()
     except Exception as exc:
         print(f"[sources] status build skipped: {type(exc).__name__} {exc}", file=sys.stderr)
 
