@@ -54,9 +54,26 @@ def curl_json(url: str) -> dict:
 
 
 def kline_series(secid: str) -> list:
-    root = curl_json("https://push2his.eastmoney.com/api/qt/stock/kline/get"
-                     f"?secid={secid}&fields1=f1,f2,f3&fields2=f51,f56,f61"
-                     "&klt=101&fqt=1&beg=19900101&end=20500101")
+    """K 线底稿（只用于历史量级参考，不用于份额增减判断）。
+
+    2026-10-27 修：原实现单次请求失败就抛异常，上游限流时 7 只篮子只剩 2 只入库，
+    序列永远凑不满 20 天。改为 3 次退避重试 + 只取近 800 个交易日（响应体更小、更不易被限流）。
+    """
+    last = None
+    root = {}
+    for attempt in range(3):
+        try:
+            root = curl_json("https://push2his.eastmoney.com/api/qt/stock/kline/get"
+                             f"?secid={secid}&fields1=f1,f2,f3&fields2=f51,f56,f61"
+                             "&klt=101&fqt=1&beg=20200101&end=20500101")
+            if (root.get("data") or {}).get("klines"):
+                break
+            last = RuntimeError("klines empty")
+        except Exception as e:  # 限流/断连都走重试
+            last = e
+        time.sleep(6 + attempt * 8)
+    else:
+        raise last if last else RuntimeError("kline unavailable")
     rows = (root.get("data") or {}).get("klines") or []
     out = []
     for line in rows:
@@ -77,6 +94,7 @@ def live_snapshot_all(codes_secs: dict) -> dict:
     东财对出口限流时腾讯兜底；腾讯引引号里 index 6=成交量(手)、38=换手率(%)。"""
     date = datetime.now(CST).strftime("%Y-%m-%d")
     secids = ",".join(v[0] for v in codes_secs.values())
+    out = {}
     try:
         root = curl_json("https://push2.eastmoney.com/api/qt/ulist.np/get"
                          f"?secids={secids}&fields=f12,f5,f8&fltt=2&invt=2")
@@ -90,9 +108,11 @@ def live_snapshot_all(codes_secs: dict) -> dict:
                 continue
             out[code] = {"date": date, "vol": vol, "turnover": turnover,
                          "live_shares_yi": round(vol / turnover / 1e4, 2)}
-        if out:
+        if out and len(out) >= len(codes_secs):
             return out
-        print("[warn] 东财 ulist 无数据，转腾讯", file=sys.stderr)
+        if out:
+            print(f"[warn] 东财 ulist 只回 {len(out)}/{len(codes_secs)} 只，缺的用腾讯补",
+                  file=sys.stderr)
     except Exception as e:
         print(f"[warn] 东财 ulist 失败({e})，转腾讯", file=sys.stderr)
     # 腾讯 qt 批量（会 GBK 编码）
@@ -111,11 +131,13 @@ def live_snapshot_all(codes_secs: dict) -> dict:
             time.sleep(2 + attempt)
     else:
         raise last
-    out = {}
+    merged = dict(out)
     for line in text.split(";"):
         if "=" not in line:
             continue
         code = line.split("=")[0].strip().lstrip("v_")[2:]
+        if code in merged:
+            continue  # 东财已有真实份额口径，优先
         fields = line.split("~")
         if len(fields) < 39:
             continue
@@ -126,9 +148,9 @@ def live_snapshot_all(codes_secs: dict) -> dict:
             continue
         if vol <= 0 or turnover <= 0:
             continue
-        out[code] = {"date": date, "vol": vol, "turnover": turnover,
-                     "live_shares_yi": round(vol / turnover / 1e4, 2)}
-    return out
+        merged[code] = {"date": date, "vol": vol, "turnover": turnover,
+                        "live_shares_yi": round(vol / turnover / 1e4, 2)}
+    return merged
 
 
 def pct(a, b):
@@ -154,11 +176,13 @@ def main() -> None:
             series = kline_series(secid)
             time.sleep(5.0)  # K线单只请求间隔拉长，防 Actions 出口被限流
         except Exception as e:
-            print(f"[warn] {code} 抓取失败: {e}，回退旧数据", file=sys.stderr)
-            if code not in old:
-                continue
-            series = old[code].get("series") or []
+            print(f"[warn] {code} K线抓取失败: {e}，回退旧底稿", file=sys.stderr)
+            series = (old.get(code) or {}).get("series") or []
         live = live_map.get(code)
+        if not series and not live:
+            # 底稿和实时快照都拿不到才算缺席；只有 live 也能入库，否则序列永远凑不满 20 天
+            print(f"[warn] {code} 底稿与 live 均缺失，本日跳过", file=sys.stderr)
+            continue
 
         # 合并 live 序列（按日期去重，新值覆盖）
         live_series = {x["date"]: x for x in (old.get(code, {}).get("live_series") or [])}

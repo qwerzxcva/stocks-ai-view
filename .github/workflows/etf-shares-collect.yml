@@ -5,8 +5,11 @@
 name: etf-shares-collect
 on:
   schedule:
-    # CST 16:30 工作日（收盘后）→ UTC 08:30
-    - cron: '30 8 * * 1-5'
+    # 三个时点采集（均为 CST，换 UTC 减 8）：收盘后首采 / 主采 / 补采。
+    # 当日 live 份额按日期去重覆盖，多跑不会产生重复点，只提高「当天不缺席」的概率。
+    - cron: '10 7 * * 1-5'   # CST 15:10
+    - cron: '30 8 * * 1-5'   # CST 16:30
+    - cron: '20 9 * * 1-5'   # CST 17:20
   workflow_dispatch: {}
 permissions:
   contents: write
