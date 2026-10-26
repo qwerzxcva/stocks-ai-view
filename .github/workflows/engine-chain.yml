@@ -340,7 +340,7 @@ jobs:
               --out data/all_sources.json --workers 6 --groups quote,event,sector \
               || echo "::warning::all_sources 采集失败, 引擎将仅用技术指标"
           fi
-          python3 scripts/valuation_engine.py --inject
+          python3 scripts/valuation_engine.py --inject || echo "valuation inject skipped (no snapshot)"
           python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
 
           echo "--- tier 1: resonance + AI pick + rotation ---"
