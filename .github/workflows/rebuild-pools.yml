@@ -92,11 +92,30 @@ jobs:
           python3 scripts/rebuild_pools.py --out-dir data
 
 
-      # 1b) 行业映射先于周期池准备, 缺失时尝试重建
+      # 1b) 行业映射先于周期池准备。已有真实映射直接复用，避免周一全量反查阻塞周期池。
       - name: Prepare industry map for cycle pool
+        timeout-minutes: 5
         run: |
-          if [ "$(date +%u)" = "1" ] || [ ! -s data/industry_map_em.json ]; then
-            python3 scripts/build_industry_map_em.py --out data/industry_map_em.json
+          if [ -s data/industry_map_em.json ]; then
+            python3 - <<'PY'
+          import json
+          d = json.load(open('data/industry_map_em.json', encoding='utf-8'))
+          n = len(d.get('map') or {})
+          if n < 100:
+              raise SystemExit('industry_map_em.json exists but is not usable')
+          print('reuse industry_map_em:', n, 'stocks')
+          PY
+          else
+            tmp=data/industry_map_em.json.tmp
+            timeout 240s python3 scripts/build_industry_map_em.py --out "$tmp"
+            python3 - <<'PY'
+          import json
+          p='data/industry_map_em.json.tmp'
+          d=json.load(open(p, encoding='utf-8'))
+          if len(d.get('map') or {}) < 100:
+              raise SystemExit('new industry map is incomplete')
+          PY
+            mv "$tmp" data/industry_map_em.json
           fi
 
       # 1c) 周期池 v2 (实时需求榜, 失败时使用 sector_pool + 行业映射)
@@ -141,18 +160,18 @@ jobs:
             python3 scripts/collect_market_extras.py --merge data/latest.json || true
           fi
 
-      # 4a-2) 个股 → 东财中文行业映射 (板块面的数据基础)
-      #       multidim 的「板块面」此前恒为占位分 50, 因为 TradingView 英文行业
-      #       与 sector_pool 的中文板块名永不匹配。周一重建 (个股行业归属极少变),
-      #       其余天只验证文件在 (缺失会让 dim_sector 退回中性分)。
-      - name: Build industry map (东财中文行业)
+      # 4a-2) 个股 → 东财中文行业映射已在周期池之前准备。
+      #       这里只验证可用性，禁止重复网络反查或用旧文件缺失继续发布。
+      - name: Verify industry map (东财中文行业)
         run: |
-          if [ "$(date +%u)" = "1" ] || [ ! -s data/industry_map_em.json ]; then
-            python3 scripts/build_industry_map_em.py --out data/industry_map_em.json || true
-          else
-            echo "非周一且映射已存在, 跳过重建"
-          fi
-          python3 -c "import json;d=json.load(open('data/industry_map_em.json'));print('  个股→行业:',d['n_stocks'],'只 /',d['n_industries_ok'],'板块')" || echo "  映射缺失"
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/industry_map_em.json', encoding='utf-8'))
+          n = len(d.get('map') or {})
+          if n < 100:
+              raise SystemExit('industry_map_em.json missing or incomplete')
+          print('个股→行业:', n, '只 /', d.get('n_industries_ok'), '板块')
+          PY
       # 4b) 打板概率 (实证统计: 次日涨停率/炸板率/期望收益 + 因子分层)
       - name: Build ban_prob
         run: |
@@ -173,15 +192,28 @@ jobs:
 
       - name: Verify outputs
         run: |
-          for f in sector_pool.json cycle.json lowpool.json; do
-            if [ -f "data/$f" ]; then
-              size=$(wc -c < "data/$f")
-              echo "  data/$f = ${size}B"
-              python3 -c "import json;json.load(open('data/$f'));print('    JSON valid')" || exit 1
-            else
-              echo "  data/$f MISSING"
-            fi
-          done
+          python3 - <<'PY'
+          import json
+          required = {
+              'sector_pool.json': lambda d: bool(d.get('tier1') or d.get('tier2') or d.get('tier3')),
+              'cycle_pool_v2.json': lambda d: isinstance(d.get('stocks'), list) and isinstance(d.get('stocks_meta'), dict),
+              'lowpool.json': lambda d: isinstance(d, dict),
+              'industry_map_em.json': lambda d: len(d.get('map') or {}) >= 100,
+          }
+          for name, check in required.items():
+              path = 'data/' + name
+              try:
+                  with open(path, encoding='utf-8') as handle:
+                      data = json.load(handle)
+              except (OSError, json.JSONDecodeError) as exc:
+                  raise SystemExit(f'{name} missing or invalid: {exc}')
+              if not check(data):
+                  raise SystemExit(f'{name} failed required structure check')
+              print(name, 'valid', 'bytes=', __import__('os').path.getsize(path))
+          cycle = json.load(open('data/cycle_pool_v2.json', encoding='utf-8'))
+          meta = cycle.get('stocks_meta') or {}
+          print('cycle_pool_v2 stocks=', len(cycle.get('stocks') or []), 'status=', meta.get('status'), 'reason=', meta.get('reason'))
+          PY
 
       - name: Commit & push
         run: |

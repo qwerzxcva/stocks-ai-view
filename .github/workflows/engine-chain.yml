@@ -269,7 +269,7 @@ jobs:
       # ── the chain ──────────────────────────────────────────────
       - name: Engine chain (tier 0-8 / light)
         run: |
-          set +e
+          set -euo pipefail
           # MODE=light: 只跑网站直接消费的四个引擎 (实测本地 65s)。
           #   盘中每 5 分钟一轮, 保证 index.html 的 engine_v5 / decision /
           #   today_picks / ai_pick_v4 是几分钟内的新结果。
@@ -289,13 +289,13 @@ jobs:
             fi
             python3 scripts/valuation_engine.py --out data/valuation.json || echo "valuation skipped"
             # limit 4200: 全市场 4019 只, 原 2000 只覆盖一半 (云端实测加载 2820)
-            python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only || echo "engine_v5 skipped"
+            python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only
             python3 scripts/news_transmission.py --in data/hot_news.json --news data/news_extra.json --out data/news_transmission.json || echo "news transmission skipped"
             python3 scripts/theme_lifecycle.py --themes data/hot_themes.json --history data/theme_lifecycle_history.json --out data/theme_lifecycle.json || echo "theme lifecycle skipped"
             python3 scripts/concept_strength.py --out data/concept_strength.json || echo "concept strength skipped"
             python3 scripts/tape_structure.py --out data/tape_structure.json || echo "tape structure skipped"
             python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
-            python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
+            python3 scripts/build_today_picks.py --force
             python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
             # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度
             python3 scripts/key_levels.py || echo "key_levels skipped"
@@ -319,6 +319,14 @@ jobs:
 
           if [ "$MODE" = "full" ]; then
           echo "--- tier 0: valuation + market phase ---"
+          cst_hour=$(TZ=Asia/Shanghai date +%H)
+          cst_min=$(TZ=Asia/Shanghai date +%M)
+          if [ "$cst_hour" = "08" ] || { [ "$cst_hour" = "09" ] && [ "$cst_min" -lt 15 ]; }; then
+            python3 scripts/premarket_picks.py --out data/premarket_picks.json
+          fi
+          if { [ "$cst_hour" = "11" ] && [ "$cst_min" -ge 30 ]; } || [ "$cst_hour" = "12" ]; then
+            python3 scripts/midday_picks.py --out data/midday_picks.json
+          fi
           # 2026-10-19: full 档也要先补 all_sources, 否则引擎全线
           # 「仅用技术指标」(板块共振/资金流/涨停池三个外部维度全失效)。
           # 上面 light 分支的补采集条件在这里同样适用。
@@ -328,11 +336,11 @@ jobs:
               --out data/all_sources.json --workers 6 --groups quote,event,sector \
               || echo "::warning::all_sources 采集失败, 引擎将仅用技术指标"
           fi
-          python3 scripts/valuation_engine.py --inject || echo "valuation skipped"
+          python3 scripts/valuation_engine.py --inject
           python3 scripts/phase_runner.py --days 90 --out data/market_phase.json || echo "phase skipped"
 
           echo "--- tier 1: resonance + AI pick + rotation ---"
-          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only || echo "engine_v5 skipped"
+          python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only
           python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
           # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度 + 区间高点追踪
@@ -409,14 +417,14 @@ jobs:
           python3 scripts/self_reflect.py --out data/self_reflect.json || echo "self_reflect skipped"
 
           echo "--- tier 6: validation + scenario + audit + risk ---"
-          python3 scripts/numeric_validator.py --out data/validation_report.json || echo "validator skipped"
-          python3 scripts/scenario_engine.py || echo "scenario skipped"
-          python3 scripts/signal_auditor.py || echo "auditor skipped"
-          python3 scripts/risk_engine.py || echo "risk skipped"
+          python3 scripts/numeric_validator.py --out data/validation_report.json
+          python3 scripts/scenario_engine.py
+          python3 scripts/signal_auditor.py
+          python3 scripts/risk_engine.py
 
           echo "--- tier 7: portfolio + anomaly ---"
-          python3 scripts/portfolio_optimizer.py || echo "portfolio skipped"
-          python3 scripts/anomaly_detector.py || echo "anomaly skipped"
+          python3 scripts/portfolio_optimizer.py
+          python3 scripts/anomaly_detector.py
 
           echo "--- tier 8: session review + close review ---"
           python3 scripts/morning_review.py || echo "morning_review skipped"
@@ -424,7 +432,7 @@ jobs:
           python3 scripts/entry_planner.py || echo "entry_planner skipped"
           python3 scripts/afternoon_picks.py || echo "afternoon_picks skipped"
           python3 scripts/stop_analysis.py || echo "stop_analysis skipped"
-          python3 scripts/build_today_picks.py --force || echo "build_today_picks skipped"
+          python3 scripts/build_today_picks.py --force
           # Closing review is a post-close stage only. A pre-open full run must
           # preserve the previous close artifact instead of overwriting it.
           cst_hour=$(TZ=Asia/Shanghai date +%H)
@@ -439,8 +447,8 @@ jobs:
               review = json.load(handle)
           if review.get('date') != __import__('datetime').datetime.now(__import__('datetime').timezone.utc).astimezone(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).date().isoformat():
               raise SystemExit('close_review date is not today; refusing publication')
-          if review.get('status') == 'insufficient':
-              raise SystemExit('close_review is insufficient; refusing publication')
+          if review.get('status') != 'ok':
+              raise SystemExit(f"close_review status is {review.get('status')!r}; refusing publication")
           print('close_review gate:', review.get('status'), review.get('date'))
           PY
           else
@@ -465,11 +473,10 @@ jobs:
           if [ "$cst_hour" -gt 15 ] || { [ "$cst_hour" = "15" ] && [ "$cst_min" -ge 10 ]; }; then
             python3 scripts/horizon_features.py --out data/horizon_features.json || echo "horizon features skipped"
           fi
-          python3 scripts/prediction_bundle.py --out data/prediction_bundle.json \
-            || echo "::warning::prediction_bundle 构建失败"
-          python3 scripts/overseas_impact.py || echo "::warning::overseas_impact skipped"
-          python3 scripts/pool_audit.py || echo "::warning::pool_audit skipped"
-          python3 scripts/build_analysis_manifest.py || echo "::warning::analysis_manifest 构建失败"
+          python3 scripts/prediction_bundle.py --out data/prediction_bundle.json
+          python3 scripts/overseas_impact.py
+          python3 scripts/pool_audit.py
+          python3 scripts/build_analysis_manifest.py
 
           # AI 复盘 (GitCode 免费 AI 额度): 把上面所有引擎产出喂给 LLM 写结构化复盘
           # 放在 tier 8 最后, 这样十维/海外关联/推股/收盘复盘全部就绪

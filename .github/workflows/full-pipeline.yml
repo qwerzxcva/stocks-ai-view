@@ -115,8 +115,7 @@ jobs:
       # 必须在 Collect all sources 之后: 输入是 all_sources.json 的 news 组。
       - name: Build news digest
         run: |
-          python3 scripts/build_news_digest.py --keep-hours 24 || \
-            echo "::warning::news_digest 生成失败, 保留上一版"
+          python3 scripts/build_news_digest.py --keep-hours 24
 
       # ── 5. 预测快照持久化 ─────────────────────────────────────
       # 复盘闭环的时间基准: 今天存, 明天验证 1 日, 后天验证 3 日…
@@ -128,19 +127,21 @@ jobs:
       - name: Persist prediction snapshot
         run: |
           mkdir -p data/predictions
-          ts=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          ts=$(TZ=Asia/Shanghai date +%Y-%m-%d_%H%M%S)
+          run_id=${GITHUB_RUN_ID:-local_$(date +%s)}
           if [ -f data/engine_v5.json ]; then
             # 引擎链已算出当日评分 → 直接快照 (复盘要的 top/votes 都在)
-            cp data/engine_v5.json "data/predictions/engine_v5_${ts}.json"
-            echo "prediction snapshot <- engine_v5.json ($(ls -la data/engine_v5.json | awk '{print $5}') bytes)"
+            cp data/engine_v5.json "data/predictions/engine_v5_${ts}_${run_id}.json"
+            echo "prediction snapshot <- engine_v5.json ($(ls -la data/engine_v5.json | awk '{print $5}') bytes), run_id=${run_id}"
           else
-            echo "::notice::engine_v5.json 尚未生成, 本次不建快照"
+            echo "::error::engine_v5.json 尚未生成, refusing incomplete prediction snapshot"
+            exit 1
           fi
           echo "predictions/: $(ls data/predictions | wc -l) 份"
 
       # ── 6. 全局 FX (轻量, 前端常驻展示) ──
       - name: Global FX
-        run: python3 scripts/build_global_fx.py --out data/global_fx.json || true
+        run: python3 scripts/build_global_fx.py --out data/global_fx.json
 
       # Engine steps (balancer / scenario / calibrator / auditor / edge miner /
       # anomaly) moved to engine-chain.yml. They were duplicated here, and the
@@ -164,14 +165,14 @@ jobs:
       # ── 6e. 瘦身预测快照 (votes 瘦成 dict, 107M -> 22M, 防仓库膨胀) ──
       - name: Slim prediction snapshots
         run: |
-          python3 scripts/slim_predictions.py --dir data/predictions || echo "slim skipped"
+          python3 scripts/slim_predictions.py --dir data/predictions
           du -sh data/predictions/
 
       # ── 7. 数据校验 (采集侧) ──
       - name: Audit collected data
         run: |
-          python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1 || true
-          python3 scripts/numeric_validator.py --out data/validation_report.json || true
+          python3 scripts/audit_data.py > data/audit_data_report.txt 2>&1
+          python3 scripts/numeric_validator.py --out data/validation_report.json
           python3 - <<'PY'
           import json
           report=json.load(open('data/validation_report.json', encoding='utf-8'))

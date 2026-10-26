@@ -62,6 +62,7 @@ jobs:
       # B 仓部署时改成 b, C 仓改成 c
       SHARD: ${{ github.event.inputs.shard || 'a' }}
       SHARD_EXTRA: ${{ github.event.inputs.shard || 'e' }}
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -185,10 +186,27 @@ jobs:
       # ── 热点→股票影响映射 (news_impact) ──────────────────────
       - name: News impact mapping
         run: |
-          python3 scripts/build_news_maps.py || echo "::warning::maps 构建失败"
-          python3 scripts/news_impact.py --in data/hot_news.json \
-            --news data/news_extra.json --out data/news_impact.json \
-            || echo "::warning::news_impact 失败, 保留上一版"
+          set -euo pipefail
+          python3 scripts/build_news_maps.py
+          python3 scripts/news_impact_analyze.py --limit 50 --no-push \
+            --hot-news data/hot_news.json --news-extra data/news_extra.json
+          python3 - <<'PY'
+          import json
+          d = json.load(open("data/news_impact.json", encoding="utf-8"))
+          if d.get("schema_version") != "news-impact.v2":
+              raise SystemExit("unexpected news impact schema")
+          if d.get("n") != 50 or len(d.get("items") or []) != 50:
+              raise SystemExit(f"news impact must contain exactly 50 items, got n={d.get('n')}")
+          required = {"title", "source", "published_at", "ts", "sentiment", "direction", "verdict", "positive_reason", "negative_reason", "affected_stocks", "matched_by", "evidence", "confidence", "stale", "provenance"}
+          missing = sorted(required - set(d["items"][0])) if d.get("items") else sorted(required)
+          if missing:
+              raise SystemExit("news impact fields missing: " + ",".join(missing))
+          if d.get("push_status") != "dry_run":
+              raise SystemExit("news structural validation must run with --no-push")
+          if len(d.get("impacts") or []) != len(d["items"]):
+              raise SystemExit("news impact items/impacts are not aligned")
+          print("validated news impact: 50 items, aligned impacts, dry-run")
+          PY
           python3 scripts/news_transmission.py --in data/hot_news.json \
             --news data/news_extra.json --out data/news_transmission.json \
             || echo "::warning::news_transmission 失败, 保留上一版"
