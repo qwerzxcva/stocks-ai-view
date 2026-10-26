@@ -64,7 +64,7 @@ def kline_series(secid: str) -> list:
     """
     last = None
     root = {}
-    for attempt in range(2):
+    for attempt in range(1):
         try:
             root = curl_json("https://push2his.eastmoney.com/api/qt/stock/kline/get"
                              f"?secid={secid}&fields1=f1,f2,f3&fields2=f51,f56,f61"
@@ -174,12 +174,21 @@ def main() -> None:
         live_map = live_snapshot_all(BASKET)  # 一次批量请求拿全篮子快照
     except Exception as e:
         print(f"[warn] 批量 live 快照失败: {e}", file=sys.stderr)
+    # K 线底稿只用于历史量级参考，不是关键路径：给总预算，超时就跳过剩余底稿。
+    # 教训（2026-10-27）：东财从 Actions 出口限流时，单只 kline 的退避重试能把
+    # 7 只拖到 15 分钟 job 超时，整轮白跑、当天的 live 份额也跟着丢。
+    kline_budget_end = time.time() + 300.0
     for code, (secid, name) in BASKET.items():
-        try:
-            series = kline_series(secid)
-            time.sleep(2.0)  # 单只间隔；K线底稿不是关键路径，live 快照才是
-        except Exception as e:
-            print(f"[warn] {code} K线抓取失败: {e}，回退旧底稿", file=sys.stderr)
+        series = []
+        if time.time() < kline_budget_end:
+            try:
+                series = kline_series(secid)
+                time.sleep(1.0)  # 单只间隔
+            except Exception as e:
+                print(f"[warn] {code} K线抓取失败: {e}，回退旧底稿", file=sys.stderr)
+        else:
+            print(f"[warn] {code} 跳过 K线底稿（超出 {int(300)}s 预算）", file=sys.stderr)
+        if not series:
             series = (old.get(code) or {}).get("series") or []
         live = live_map.get(code)
         if not series and not live:
