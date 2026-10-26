@@ -418,7 +418,7 @@ def main():
             json.dump(payload, f, ensure_ascii=False, indent=1)
         print(f"[today_picks] -> {name} (derived, {len(fallback_picks)} picks)")
 
-    if 9 * 60 + 15 <= mins < 11 * 60 + 30:
+    if 9 * 60 + 15 <= mins < 15 * 60 + 10:
         write_session("premarket_picks.json", "premarket")
     if 11 * 60 + 30 <= mins < 15 * 60 + 10:
         write_session("midday_picks.json", "midday")
