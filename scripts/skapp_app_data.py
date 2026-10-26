@@ -720,6 +720,8 @@ def main():
     try:
         import build_sources_status
         dump("data/api/sources.json", build_sources_status.build())
+        import build_source_disposition
+        build_source_disposition.main()
     except Exception as exc:
         print(f"[sources] status build skipped: {type(exc).__name__} {exc}", file=sys.stderr)
 
