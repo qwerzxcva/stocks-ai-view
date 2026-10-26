@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-27T03:01:32+08:00",
+ "ts": "2026-10-27T05:21:43+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 478,
- "n_transmissions": 3,
+ "n_input": 473,
+ "n_transmissions": 2,
  "n_rules": 16,
  "rules": [
   {
@@ -78,56 +78,6 @@
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
-  {
-   "title": "财联社10月26日电，国际油价拉升，布伦特原油收复盘中2.2%的跌幅，现报116.8美元/桶。",
-   "source": "财联社电报",
-   "time": "2026-10-27T03:01:19+08:00",
-   "url": "https://www.cls.cn/detail/2515806",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "601808"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    },
-    {
-     "sector": "物流",
-     "stocks": [
-      "600180",
-      "688648"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-26",
-    "event_date": "2026-10-27",
-    "matched_codes": []
-   }
-  },
   {
    "title": "WTI 12月原油期货收跌1.51美元，跌幅超过1.46%，报101.76美元/桶。\n\n布伦特12月原油期货收跌0.91",
    "source": "wallstreetcn",
