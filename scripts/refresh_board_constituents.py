@@ -82,6 +82,8 @@ def main():
     ap.add_argument("--workers", type=int, default=3)
     ap.add_argument("--no-invert", action="store_true",
                     help="禁用云端库反演兜底（默认开启）")
+    ap.add_argument("--timeout", type=int, default=15, help="单次请求超时秒")
+    ap.add_argument("--attempts", type=int, default=4, help="每板块重试次数")
     ap.add_argument("--invert-only", action="store_true",
                     help="跳东财直取，只用云端库反演（限流时的快速全量模式）")
     args = ap.parse_args()
@@ -132,7 +134,7 @@ def main():
     derived = 0
     results = {}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = [] if args.invert_only else [pool.submit(_fetch, bk, kind) for bk, kind in jobs]
+        futures = [] if args.invert_only else [pool.submit(_fetch, bk, kind, args.timeout, args.attempts) for bk, kind in jobs]
         for fut in as_completed(futures):
             bk, kind, members, err = fut.result()
             if members:

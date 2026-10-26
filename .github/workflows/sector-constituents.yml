@@ -32,9 +32,9 @@ jobs:
         # 单轮失败不阻断（已成功的不会重建），最终真实状态由 Report freshness 输出。
         run: |
           set -e
-          for i in 1 2 3 4; do
+          for i in 1 2 3 4 5 6; do
             echo "::group::pass $i"
-            python3 scripts/refresh_board_constituents.py --workers 3 || \
+            python3 scripts/refresh_board_constituents.py --workers 4 --timeout 8 --attempts 2 || \
               echo "::warning::pass $i incomplete (rate limiting, partial data kept)"
             echo "::endgroup::"
           done
