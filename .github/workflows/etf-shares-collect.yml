@@ -1,7 +1,10 @@
-# etf-shares-collect — 宽基 ETF 份额估算（聪明钱仓位信号）
+# etf-shares-collect — 宽基 ETF 份额跟踪（聪明钱仓位信号）
 #
-# 方法：份额(亿份) = 成交量/换手率（公众号「多多拾贝」盯份额抄作业法，用户指定借鉴 2026-10-24）。
-# 本地容器出口被东财按 IP 限流，Actions 北美出口可达；每日收盘后一轮，增量追加 data/etf_shares.json。
+# 份额改为交易所官方日度披露（2026-10-27 起）：
+#   上交所 ETF规模 query.sse.com.cn（STAT_DATE）→ TOT_VOL 万份，一次请求覆盖全部沪市 ETF
+#   深交所 基金规模 www.szse.cn ShowReport（txtDm + jjlb=ETF）→ current_size 万份
+# 交易所侧可回溯约一年，所以历史用 workflow_dispatch + backfill_days 一次性回填，
+# 日常只跑当日增量（同日多次跑按日期去重，幂等）。
 name: etf-shares-collect
 on:
   schedule:
@@ -10,7 +13,12 @@ on:
     - cron: '10 7 * * 1-5'   # CST 15:10
     - cron: '30 8 * * 1-5'   # CST 16:30
     - cron: '20 9 * * 1-5'   # CST 17:20
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      backfill_days:
+        description: '回填最近 N 个工作日（0=只跑当日增量）'
+        required: false
+        default: '0'
 permissions:
   contents: write
 
@@ -28,8 +36,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Collect ETF share estimates
-        run: python3 scripts/collect_etf_shares.py
+      - name: Collect ETF shares
+        run: |
+          set -euo pipefail
+          DAYS="${{ inputs.backfill_days }}"
+          if [ -z "$DAYS" ]; then DAYS=0; fi
+          echo "backfill_days=$DAYS"
+          python3 scripts/collect_etf_shares.py --backfill-days "$DAYS"
 
       - name: Commit & push
         run: |
