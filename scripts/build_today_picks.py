@@ -80,8 +80,6 @@ def names_from_master():
                     for row in root.get("items", []):
                         if isinstance(row, dict) and row.get("code"):
                             out[bare(row["code"])] = row.get("name") or row.get("display_name") or ""
-                if out:
-                    break
             except Exception:
                 continue
     return out
