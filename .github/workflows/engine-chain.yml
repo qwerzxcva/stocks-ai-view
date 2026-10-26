@@ -294,6 +294,10 @@ jobs:
             python3 scripts/theme_lifecycle.py --themes data/hot_themes.json --history data/theme_lifecycle_history.json --out data/theme_lifecycle.json || echo "theme lifecycle skipped"
             python3 scripts/concept_strength.py --out data/concept_strength.json || echo "concept strength skipped"
             python3 scripts/tape_structure.py --out data/tape_structure.json || echo "tape structure skipped"
+            # 2026-10-26 重构: decision 的唯一候选源是 multidim.table。light 不跑
+            # multidim 时候选=上次 full 的残表(实测只剩4只且全是watch) — 候选枯
+            # 竭是推股质量差根因之一。补上, limit 2000 (原 full 也才 300)。
+            python3 scripts/multidim_engine.py --out data/multidim.json --limit 2000 || echo "multidim skipped"
             python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
             python3 scripts/build_today_picks.py --force
             python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
@@ -383,7 +387,7 @@ jobs:
           # 海外关联性 (大盘/板块 与 纳指/恒指/日经/KOSPI 的相关/贝塔/滞后/隔夜)
           # 必须在 multidim 之前: multidim 的「海外面」维度读它
           python3 scripts/overseas_linkage.py --out data/overseas_linkage.json || echo "linkage skipped"
-          python3 scripts/multidim_engine.py --out data/multidim.json --limit 300 || echo "multidim skipped"
+          python3 scripts/multidim_engine.py --out data/multidim.json --limit 2000 || echo "multidim skipped"
           python3 scripts/decision_engine.py --out data/decision.json || echo "decision skipped"
           python3 scripts/ban_prob.py --out data/ban_prob.json || echo "ban_prob skipped"
           python3 scripts/ban_pick.py --out data/ban_pick.json || echo "ban_pick skipped"
