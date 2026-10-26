@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-26T14:07:38+08:00",
+ "ts": "2026-10-26T19:43:28+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 474,
- "n_transmissions": 2,
+ "n_input": 476,
+ "n_transmissions": 1,
  "n_rules": 16,
  "rules": [
   {
@@ -79,142 +79,57 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "吧友中病毒写检讨,吧主严肃批阅",
-   "source": "贴吧热议",
-   "time": "2026-10-26T14:07:32+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28367997&amp;topic_name=%E5%90%A7%E5%8F%8B%E4%B8%AD%E7%97%85%E6%AF%92%E5%86%99%E6%A3%80%E8%AE%A8%2C%E5%90%A7%E4%B8%BB%E4%B8%A5%E8%82%83%E6%89%B9%E9%98%85",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "688410"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "300144"
-     ]
-    },
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306",
-      "600258"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-26",
-    "event_date": "2026-10-26",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "美国总统特朗普：你们很快就会看到伊朗冲突以某种方式结束。\n\n中期选举结束后不久将发放5000美元分红。",
+   "title": "美股Neocloud公司盘前普跌，Nebius、CoreWeave、Iren均跌超4％。",
    "source": "wallstreetcn",
-   "time": "2026-10-26T04:58:00+08:00",
-   "url": "https://wallstreetcn.com/live/3185262",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-10-26T16:30:56+08:00",
+   "url": "https://wallstreetcn.com/live/3185651",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "银行",
      "stocks": [
-      "002977"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "inverse_bear": [],
+   "hedge": [
     {
-     "sector": "航空",
+     "sector": "银行",
      "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "300144"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
      ]
     }
    ],
-   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-26",
     "event_date": "2026-10-26",
     "matched_codes": []
-   }
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   }
  ]
 }
