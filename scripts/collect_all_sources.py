@@ -620,6 +620,24 @@ def _register_external_fetchers():
             registered += 1
     except Exception as e:
         print("[fetchers] fetchers_new_sources 跳过: %s" % type(e).__name__)
+    # fetchers_f10: 东财 F10 + 股权质押（2026-10-26 实测 200 有数据）
+    try:
+        import fetchers_f10 as _f10
+        have = {n for g in FETCHERS.values() for n, _ in g}
+        for grp, name in (("fund", "em_f10_mainop"),
+                          ("fund", "em_f10_freeholders"),
+                          ("sector", "em_f10_coretheme_board"),
+                          ("fund", "em_equity_pledge_detail"),
+                          ("fund", "em_equity_pledge_market")):
+            if name in have:
+                continue
+            fn = getattr(_f10, "f_" + name, None)
+            if fn is None:
+                continue
+            FETCHERS.setdefault(grp, []).append((name, fn))
+            registered += 1
+    except Exception as e:
+        print("[fetchers] fetchers_f10 跳过: %s" % type(e).__name__)
     return registered
 
 

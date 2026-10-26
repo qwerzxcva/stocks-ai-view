@@ -649,6 +649,12 @@ def main():
         "sources": src,
     }
     dump("data/api/index.json", idx)
+    # 数据源台账：登记/可用/已接执行器/缺口/不可用，供 App 状态页读取
+    try:
+        import build_sources_status
+        dump("data/api/sources.json", build_sources_status.build())
+    except Exception as exc:
+        print(f"[sources] status build skipped: {type(exc).__name__} {exc}", file=sys.stderr)
 
     print(f"done: pctChg aliases={n_pct} names={len(names)} universe={len(codes)} "
           f"bundles={n_ok} new_qa={n_new_qa}", flush=True)
