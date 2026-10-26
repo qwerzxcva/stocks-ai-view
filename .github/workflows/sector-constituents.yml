@@ -1,0 +1,43 @@
+# 板块成员重建（云端只做数据采集与落库；成分反演等计算由本地/脚本完成）
+#
+# 背景（2026-10-26）：东财 push2/push2delay 对开发容器出口 IP 封禁，
+# 本地只能拿到部分板块成分；GH runner 出口 IP 不同，用它补齐并落库。
+# 失败时不掩盖：脚本返回非 0 即 job 失败，api/sectors.json 仍按 stale 标注。
+name: sector-constituents
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '20 0 * * 1-5'   # CST 08:20 盘前
+    - cron: '30 7 * * 1-5'   # CST 15:30 收盘后
+permissions:
+  contents: write
+concurrency:
+  group: sector-constituents
+  cancel-in-progress: true
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Sync remote main
+        run: git fetch origin main && git merge --ff-only origin/main || echo "already up to date"
+      - name: Refresh board constituents
+        run: python3 scripts/refresh_board_constituents.py --workers 3
+      - name: Rebuild sectors API
+        run: python3 scripts/skapp_app_data.py --only-sectors
+      - name: Commit constituents + sectors API
+        run: |
+          python3 scripts/git_push_retry.py --msg "sector constituents $(date -u +%FT%TZ)" \
+            --dir data/sector --dir data/api --user skapp-bot \
+            --protect data/api/sectors.json --protect data/api/sectors_health.json \
+            --protect data/api/source_disposition.json
+      - name: Report freshness
+        if: always()
+        run: |
+          python3 -c "import json,os;p='data/api/sectors.json';d=json.load(open(p,encoding='utf-8')) if os.path.exists(p) else {};f=d.get('freshness') or {};print('fresh=%s stale=%s missing=%s met=%s' % (f.get('fresh_boards'),f.get('stale_boards'),f.get('missing_boards'),f.get('requirement_met')))"
