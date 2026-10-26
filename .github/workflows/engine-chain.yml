@@ -492,6 +492,31 @@ jobs:
           echo "--- engine chain done ---"
           fi
 
+      # ── daily market breadth accumulation ──
+      # market_now.json (limit-up / limit-down / turnover snapshot) is a single
+      # overwritten file: hot-impact-realtime and ai-update rewrite it every few
+      # minutes, so nothing is ever kept per day. This step folds the snapshot
+      # into data/market_breadth_history.json (idempotent per date), and the
+      # publish step below commits it so the history survives the overwrite.
+      # The script is a no-op (exit 0) when market_now.json is absent.
+      - name: Build market breadth history (daily accumulation)
+        run: |
+          python3 scripts/build_market_breadth.py || echo "market_breadth skipped"
+          python3 - <<'PY'
+          import json
+          try:
+              with open('data/api/market_breadth.json', encoding='utf-8') as handle:
+                  bundle = json.load(handle)
+              cov = bundle.get('coverage') or {}
+              latest = bundle.get('latest') or {}
+              print("market_breadth: days=%s %s..%s latest=%s limit_up=%s limit_down=%s amount_yi=%s"
+                    % (cov.get('days'), cov.get('first'), cov.get('last'),
+                       latest.get('date'), latest.get('limit_up'),
+                       latest.get('limit_down'), latest.get('amount_yi')))
+          except Exception as exc:
+              print("market_breadth unavailable:", exc)
+          PY
+
       # ── publish to the warehouse the site reads ──
       - name: Sync mirror shards (B/C 仓分片数据汇聚)
         run: |
@@ -519,6 +544,7 @@ jobs:
             data/key_levels.json data/pick_high_track.json \
             data/shard_b.json data/shard_c.json \
             data/vango_articles.json data/training_v7.json \
+            data/market_breadth_history.json data/api/market_breadth.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -536,7 +562,9 @@ jobs:
             --protect data/ban_pick.json --protect data/pool_audit.json \
             --protect data/key_levels.json --protect data/pick_high_track.json \
             --protect data/shard_b.json --protect data/shard_c.json \
-            --protect data/vango_articles.json --protect data/training_v7.json
+            --protect data/vango_articles.json --protect data/training_v7.json \
+            --protect data/market_breadth_history.json \
+            --protect data/api/market_breadth.json
 
       - name: Publish to the data warehouse
         env:

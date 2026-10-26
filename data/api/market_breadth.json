@@ -1,0 +1,61 @@
+{
+  "latest": {
+    "date": "2026-10-26",
+    "limit_up": 55,
+    "limit_down": 26,
+    "limit_up_hist": 77,
+    "limit_down_hist": 77,
+    "broken": 23,
+    "seal_rate_pct": 70.5,
+    "advance": 2180,
+    "decline": 3050,
+    "flat": 145,
+    "up_pct": 40.6,
+    "amount_yi": 16087.9,
+    "source": "market_now",
+    "recorded_at": "2026-10-26T20:20:42+08:00",
+    "notes": [
+      "limit_up_from_pool_zt_count",
+      "limit_down_from_pool_dt_count",
+      "seal_rate_mixed_caliber_limitup_pool_broken_hist",
+      "limit_up_vs_hist_divergence"
+    ],
+    "revisions": 1
+  },
+  "history": [
+    {
+      "date": "2026-10-26",
+      "limit_up": 55,
+      "limit_down": 26,
+      "limit_up_hist": 77,
+      "limit_down_hist": 77,
+      "broken": 23,
+      "seal_rate_pct": 70.5,
+      "advance": 2180,
+      "decline": 3050,
+      "flat": 145,
+      "up_pct": 40.6,
+      "amount_yi": 16087.9,
+      "source": "market_now",
+      "recorded_at": "2026-10-26T20:20:42+08:00",
+      "notes": [
+        "limit_up_from_pool_zt_count",
+        "limit_down_from_pool_dt_count",
+        "seal_rate_mixed_caliber_limitup_pool_broken_hist",
+        "limit_up_vs_hist_divergence"
+      ],
+      "revisions": 1
+    }
+  ],
+  "coverage": {
+    "days": 1,
+    "first": "2026-10-26",
+    "last": "2026-10-26",
+    "missing": [],
+    "missing_method": "weekday-gap; A-share holidays also show up here"
+  },
+  "caliber": "涨停=主板10%/双创20%/ST5%/北交所30%；封板率=涨停/(涨停+炸板)",
+  "caliber_caveat": "limit_up/limit_down come from market_now.json, which sums the eastmoney rise/fall histogram buckets >= +10% / <= -10%; that is a 10% flat threshold, not the per-board limits in 'caliber'. pool_zt_count/pool_dt_count in market_now.json follow the real per-board rules and can differ.",
+  "updated_at": "2026-10-26T20:20:42+08:00",
+  "revisions_total": 1
+}
