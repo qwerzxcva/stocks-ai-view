@@ -17,11 +17,16 @@
 
 ## 做法
 
-不猜名字，直接用东财的板块列表接口拿到**与 sector_engine 同一套**板块及其 BK 代码，
-再按 BK 拉成分股——板块天然一一对应，全程不做名称匹配。
+主路径：拉**全市场股票列表**（一次分页就够，约 6000 只），它的 `f100` 字段直接就是
+「东财行业板块」名称——与 sector_engine 同一套命名（实测样例：「计算机设备」「光伏设备」
+「汽车零部件」，sector_engine 里就是这些名字）。一步得到 code→板块，不做任何名称匹配。
 
-    GET push2.eastmoney.com/api/qt/clist/get?fs=m:90+t:2   → 行业板块列表(f12=BK, f14=名称)
-    GET push2.eastmoney.com/api/qt/clist/get?fs=b:{BK}     → 该板块成分股
+    GET clist?fs=m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048&fields=f12,f14,f100
+
+补充路径（主路径失败时）：板块列表 + 逐板块成分股。
+
+    GET clist?fs=m:90+t:2   → 行业板块(f12=BK,f14=名称)     ← 实测常返回 502，仅作备选
+    GET clist?fs=b:{BK}     → 该板块成分股
 
 ## 输出 data/stock_sector_map.json
 
@@ -124,12 +129,94 @@ def load_json(path):
         return None
 
 
+ALL_MARKET_FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
+MARKET_FIELDS = "f12,f14,f100,f13"
+
+
+def fetch_market_direct(passes=3):
+    """主路径：全市场列表自带的 f100 就是板块名。返回 {code: sector}。"""
+    result = {}
+    for attempt in range(passes):
+        pn, total = 1, None
+        while pn <= 15:
+            url = (f"{HOSTS[pn % len(HOSTS)]}/api/qt/clist/get?pn={pn}&pz=500&po=1&np=1"
+                   f"&fltt=2&invt=2&fid=f3&fs={ALL_MARKET_FS}&fields={MARKET_FIELDS}")
+            try:
+                req = urllib.request.Request(url, headers=UA)
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    data = json.loads(r.read().decode("utf-8", "replace"))
+            except Exception as e:  # noqa: BLE001
+                print(f"    direct page {pn} failed: {e}")
+                break
+            dd = data.get("data") or {}
+            if total is None:
+                total = dd.get("total") or 0
+            diff = dd.get("diff") or []
+            if not diff:
+                break
+            for row in diff:
+                code = str(row.get("f12") or "").strip()
+                ind = str(row.get("f100") or "").strip()
+                if code and ind and ind != "-":
+                    result[code] = ind
+            print(f"    direct page {pn}: {len(result)}/{total}")
+            if total and len(result) >= total:
+                break
+            pn += 1
+            time.sleep(0.4)
+        if len(result) >= 1000:
+            return result
+        print(f"  direct attempt {attempt + 1} got only {len(result)}, retrying")
+        time.sleep(3)
+    return result
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--passes", type=int, default=3, help="多轮补齐（东财会瞬断）")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--timeout", type=int, default=10)
     args = ap.parse_args()
+
+    # ── 主路径：全市场 f100（一步到位，不依赖板块列表接口）──
+    direct = fetch_market_direct()
+    banked = load_json(OUT_FILE) or {}
+    if len(direct) >= 1000:
+        prev_map = banked.get("map") or {}
+        merged = dict(prev_map)
+        merged.update(direct)  # 本次结果覆盖旧值
+        # 分档从 sector_engine 带过来（只用于展示）
+        grade_of = {}
+        se0 = load_json(os.path.join(DATA, "sector_engine.json")) or {}
+        for row in (se0.get("sectors") or []):
+            if row.get("sector"):
+                grade_of[row["sector"]] = row.get("grade") or ""
+        sectors = {}
+        for code, name in merged.items():
+            slot = sectors.setdefault(name, {"bk": "", "grade": grade_of.get(name, ""), "members": []})
+            slot["members"].append(code)
+        for v in sectors.values():
+            v["members"].sort()
+        boards = sorted(sectors.keys())
+        out = {
+            "ts": now_iso(),
+            "engine": "build_stock_sector_map v2 (全市场 f100 行业字段, 不做名称匹配)",
+            "source": "push2.eastmoney.com clist fs=全市场, fields 含 f100(行业名)",
+            "n_sectors": len(boards),
+            "n_sectors_ok": len(boards),
+            "n_stocks": len(merged),
+            "sectors": sectors,
+            "map": merged,
+            "failed": [],
+            "backfilled": [],
+            "note": ("个股→板块取自东财 clist 的 f100 字段，与 sector_engine 同一套行业命名；"
+                     "f100 为空或 '-' 的股票不入映射"),
+        }
+        with open(OUT_FILE, "w", encoding="utf-8") as f:
+            json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+        print(f"主路径写入 {OUT_FILE}: {len(merged)} 只股票 / {len(boards)} 个板块")
+        return 0
+    print(f"::warning::主路径只拿到 {len(direct)} 只，转用板块列表兜底", file=sys.stderr)
 
     # 板块列表（东财行业板块，与 sector_engine 同一套命名）
     try:
