@@ -121,6 +121,12 @@ def code_of(row):
     return str(row.get("f12") or "").strip()
 
 
+def get_json(url, timeout=20):
+    req = urllib.request.Request(url, headers=UA)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return json.loads(r.read().decode("utf-8", "replace"))
+
+
 def load_json(path):
     try:
         with open(path, encoding="utf-8") as f:
@@ -132,43 +138,64 @@ def load_json(path):
 ALL_MARKET_FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
 MARKET_FIELDS = "f12,f14,f100,f13"
 
+# 落盘门槛：宁可拿一部分并标注覆盖，也不要整份缺失
+MIN_ACCEPT = 500
 
-def fetch_market_direct(passes=3):
-    """主路径：全市场列表自带的 f100 就是板块名。返回 {code: sector}。"""
+
+def fetch_market_direct(passes=4, pz=100, max_pages=70):
+    """主路径：全市场列表自带的 f100 就是板块名。返回 (map, note)。
+
+    东财实测翻到第 8 页左右开始返 502，整轮就断在那里。所以逐页重试 + 失败页跳过，
+    不因为一页挂掉就丢掉已经拿到的部分；多轮 pass 逐步补齐。
+    """
     result = {}
+    total = None
     for attempt in range(passes):
-        pn, total = 1, None
-        while pn <= 15:
-            url = (f"{HOSTS[pn % len(HOSTS)]}/api/qt/clist/get?pn={pn}&pz=500&po=1&np=1"
-                   f"&fltt=2&invt=2&fid=f3&fs={ALL_MARKET_FS}&fields={MARKET_FIELDS}")
-            try:
-                req = urllib.request.Request(url, headers=UA)
-                with urllib.request.urlopen(req, timeout=20) as r:
-                    data = json.loads(r.read().decode("utf-8", "replace"))
-            except Exception as e:  # noqa: BLE001
-                print(f"    direct page {pn} failed: {e}")
+        pn, misses = 1, 0
+        while pn <= max_pages:
+            row_set, ok = None, False
+            for host in HOSTS:
+                url = (host + "/api/qt/clist/get?pn=" + str(pn) + "&pz=" + str(pz)
+                       + "&po=1&np=1&fltt=2&invt=2&fid=f3&fs=" + ALL_MARKET_FS
+                       + "&fields=" + MARKET_FIELDS)
+                try:
+                    data = get_json(url)
+                    dd = data.get("data") or {}
+                    row_set = dd.get("diff") or []
+                    if total is None:
+                        total = dd.get("total") or 0
+                    ok = True
+                    break
+                except Exception as e:  # noqa: BLE001
+                    print("    page %d @ %s: %s" % (pn, host.split("//")[1][:14], e))
+                    time.sleep(1.2)
+            if not ok:
+                misses += 1
+                if misses >= 6:
+                    print("    连续 %d 页失败，本轮停在 pn=%d" % (misses, pn))
+                    break
+                pn += 1
+                continue
+            misses = 0
+            if not row_set:
                 break
-            dd = data.get("data") or {}
-            if total is None:
-                total = dd.get("total") or 0
-            diff = dd.get("diff") or []
-            if not diff:
-                break
-            for row in diff:
+            for row in row_set:
                 code = str(row.get("f12") or "").strip()
                 ind = str(row.get("f100") or "").strip()
                 if code and ind and ind != "-":
                     result[code] = ind
-            print(f"    direct page {pn}: {len(result)}/{total}")
             if total and len(result) >= total:
                 break
             pn += 1
-            time.sleep(0.4)
-        if len(result) >= 1000:
-            return result
-        print(f"  direct attempt {attempt + 1} got only {len(result)}, retrying")
-        time.sleep(3)
-    return result
+            time.sleep(0.25)
+        print("  pass %d: %d/%s" % (attempt + 1, len(result), total if total else "?"))
+        if total and len(result) >= total:
+            break
+        if len(result) >= 3000:
+            break
+        time.sleep(2)
+    note = "覆盖全市场" if len(result) >= 5000 else ("全市场约 5900 只，本次拿到 %d 只" % len(result))
+    return result, note
 
 
 def main():
@@ -179,9 +206,9 @@ def main():
     args = ap.parse_args()
 
     # ── 主路径：全市场 f100（一步到位，不依赖板块列表接口）──
-    direct = fetch_market_direct()
+    direct, coverage_note = fetch_market_direct(passes=args.passes)
     banked = load_json(OUT_FILE) or {}
-    if len(direct) >= 1000:
+    if len(direct) >= MIN_ACCEPT:
         prev_map = banked.get("map") or {}
         merged = dict(prev_map)
         merged.update(direct)  # 本次结果覆盖旧值
@@ -205,6 +232,7 @@ def main():
             "n_sectors": len(boards),
             "n_sectors_ok": len(boards),
             "n_stocks": len(merged),
+            "coverage_note": coverage_note,
             "sectors": sectors,
             "map": merged,
             "failed": [],
