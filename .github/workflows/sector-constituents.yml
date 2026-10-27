@@ -38,12 +38,20 @@ jobs:
               echo "::warning::pass $i incomplete (rate limiting, partial data kept)"
             echo "::endgroup::"
           done
+      # 个股 → 板块（供 App 板块主线）：用东财行业板块列表 + 逐板块成分股，
+      # 与 sector_engine 同一套命名，不做任何行业名模糊匹配。
+      - name: Build stock→sector map
+        run: |
+          python3 scripts/build_stock_sector_map.py --passes 3 --workers 4 || \
+            echo "::warning::stock_sector_map 未完全生成（部分板块失败时保留上一版成员）"
+
       - name: Rebuild sectors API
         run: python3 scripts/skapp_app_data.py --only-sectors
       - name: Commit constituents + sectors API
         run: |
-          python3 scripts/git_push_retry.py --msg "sector constituents $(date -u +%FT%TZ)" \
-            --dir data/sector --dir data/api --user skapp-bot \
+          python3 scripts/git_push_retry.py --msg "sector constituents + stock_sector_map $(date -u +%FT%TZ)" \
+            data/stock_sector_map.json --dir data/sector --dir data/api \
+            --protect data/stock_sector_map.json --user skapp-bot \
             --protect data/api/sectors.json --protect data/api/sectors_health.json \
             --protect data/api/source_disposition.json
       - name: Report freshness
