@@ -1,20 +1,18 @@
 {
- "ts": "2026-10-27T20:44:31+08:00",
+ "ts": "2026-10-27T21:53:42+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 145,
- "n_scored": 144,
- "n_confirmed_divergence": 27,
- "n_no_flow": 1,
- "n_rejected": 1,
- "rejection_reasons": {
-  "source_unavailable": 1
- },
+ "n_scored": 145,
+ "n_confirmed_divergence": 30,
+ "n_no_flow": 0,
+ "n_rejected": 0,
+ "rejection_reasons": {},
  "coverage": {
   "totals": {
    "kline_days": 125108,
-   "flow_days": 8640,
-   "aligned_days": 8495
+   "flow_days": 8700,
+   "aligned_days": 8552
   },
   "by_code": [
    {
@@ -530,12 +528,12 @@
    {
     "code": "sz002036",
     "kline_days": 812,
-    "flow_days": 0,
-    "aligned_days": 0,
+    "flow_days": 60,
+    "aligned_days": 57,
     "kline_date_start": "2023-06-02",
     "kline_date_end": "2026-10-26",
-    "flow_date_start": null,
-    "flow_date_end": null
+    "flow_date_start": "2026-07-28",
+    "flow_date_end": "2026-10-27"
    },
    {
     "code": "sz000035",
@@ -1468,7 +1466,7 @@
     "flow_date_end": "2026-10-27"
    }
   ],
-  "flow_source_ratio": 0.9931,
+  "flow_source_ratio": 1.0,
   "minimum_flow_source_ratio": 0.8,
   "rule": "exact trading-day match; latest day and all 20 recent sessions must have funds"
  },
@@ -1833,6 +1831,69 @@
    }
   },
   {
+   "code": "sz000009",
+   "date": "2026-10-26",
+   "close": 6.66,
+   "score": 10.9,
+   "signal": "派发背离",
+   "diverge": -1,
+   "price_accel_pct": 1.2012,
+   "flow_accel_norm": -0.4842,
+   "flow_persist": 0.4,
+   "vol_compress": 0.772,
+   "n_flow_days": 60,
+   "n_aligned_days": 59,
+   "flow_date_start": "2026-07-28",
+   "flow_date_end": "2026-10-27",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-26"
+   }
+  },
+  {
+   "code": "sz002036",
+   "date": "2026-10-26",
+   "close": 5.7,
+   "score": 11.6,
+   "signal": "派发背离",
+   "diverge": -1,
+   "price_accel_pct": 1.0877,
+   "flow_accel_norm": -0.7903,
+   "flow_persist": 0.4,
+   "vol_compress": 0.665,
+   "n_flow_days": 60,
+   "n_aligned_days": 57,
+   "flow_date_start": "2026-07-28",
+   "flow_date_end": "2026-10-27",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-26"
+   }
+  },
+  {
+   "code": "sz002824",
+   "date": "2026-10-26",
+   "close": 19.96,
+   "score": 14.4,
+   "signal": "派发背离",
+   "diverge": -1,
+   "price_accel_pct": 1.4128,
+   "flow_accel_norm": -0.2672,
+   "flow_persist": 0.4,
+   "vol_compress": 0.901,
+   "n_flow_days": 60,
+   "n_aligned_days": 59,
+   "flow_date_start": "2026-07-28",
+   "flow_date_end": "2026-10-27",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-26"
+   }
+  },
+  {
    "code": "sz000035",
    "date": "2026-10-26",
    "close": 4.5,
@@ -2052,7 +2113,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-27T20:44:31+08:00"
+   "snapshot_ts": "2026-10-27T21:53:42+08:00"
   }
  }
 }
