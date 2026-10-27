@@ -138,11 +138,55 @@ def load_json(path):
 ALL_MARKET_FS = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
 MARKET_FIELDS = "f12,f14,f100,f13"
 
+# 按代码排序，不按涨幅。
+# 2026-10-27 实测教训：原来用 fid=f3（按涨幅）只抓到 2706/5900，拿到的基本是当日涨幅榜
+# 前段的票，贵州茅台/五粮液/建设银行/中国中车这类大票系统性缺失——不是抓漏，是排序决定的。
+# 按 f12 代码排序后，即使同样只翻到一半，拿到的也是全市场均匀抽样（每 2 只取 1），
+# 不会整类股票消失；配合 pz=500 把请求数从 70 降到 14，也更不容易触发东财限流。
+MARKET_FID = "f12"
+
 # 落盘门槛：宁可拿一部分并标注覆盖，也不要整份缺失
 MIN_ACCEPT = 500
 
 
-def fetch_market_direct(passes=4, pz=100, max_pages=70):
+def load_alias_rules():
+    """人工确认的板块名对照：东财 f100 名 -> sector_engine 名（可带成员白名单）。
+
+    表在 data/sector_alias.json，逐条人工核对过。刻意不用模糊匹配——
+    『非白酒』也含『白酒』二字，模糊匹配就会把黄酒啤酒并进白酒。
+    """
+    doc = load_json(os.path.join(DATA, "sector_alias.json")) or {}
+    rules = {}
+    for engine_name, spec in (doc.get("aliases") or {}).items():
+        if not isinstance(spec, dict):
+            continue
+        to = spec.get("to")
+        if not to:
+            continue
+        rules[to] = {"engine": engine_name, "only": set(spec.get("only") or [])}
+    return rules
+
+
+def apply_alias(mapping, rules):
+    """把东财行业名归一化到 sector_engine 的命名，让 App 端 byName 能直接命中。
+
+    带 only 白名单的规则（银行Ⅱ -> 国有大型银行）只认白名单里的股票：
+    银行Ⅱ 里混着招商(600036)、兰州(001227)等股份行/城商行，全量映射就是错配，
+    剩下的一律保持原名不动。宁可少归位，也不为了凑数把招行说成国有大行。
+    """
+    if not rules:
+        return mapping
+    out = {}
+    for code, name in mapping.items():
+        rule = rules.get(name)
+        if rule is not None and (not rule["only"] or code in rule["only"]):
+            out[code] = rule["engine"]
+        else:
+            out[code] = name
+    return out
+
+
+def fetch_market_direct(passes=4, pz=500, max_pages=14):
     """主路径：全市场列表自带的 f100 就是板块名。返回 (map, note)。
 
     东财实测翻到第 8 页左右开始返 502，整轮就断在那里。所以逐页重试 + 失败页跳过，
@@ -156,7 +200,7 @@ def fetch_market_direct(passes=4, pz=100, max_pages=70):
             row_set, ok = None, False
             for host in HOSTS:
                 url = (host + "/api/qt/clist/get?pn=" + str(pn) + "&pz=" + str(pz)
-                       + "&po=1&np=1&fltt=2&invt=2&fid=f3&fs=" + ALL_MARKET_FS
+                       + "&po=1&np=1&fltt=2&invt=2&fid=" + MARKET_FID + "&fs=" + ALL_MARKET_FS
                        + "&fields=" + MARKET_FIELDS)
                 try:
                     data = get_json(url)
@@ -212,6 +256,9 @@ def main():
         prev_map = banked.get("map") or {}
         merged = dict(prev_map)
         merged.update(direct)  # 本次结果覆盖旧值
+        # 归一化板块名到 sector_engine 的命名（人工确认的别名表）
+        alias_rules = load_alias_rules()
+        merged = apply_alias(merged, alias_rules)
         # 分档从 sector_engine 带过来（只用于展示）
         grade_of = {}
         se0 = load_json(os.path.join(DATA, "sector_engine.json")) or {}
@@ -237,6 +284,10 @@ def main():
             "map": merged,
             "failed": [],
             "backfilled": [],
+            "alias_applied": {
+                "table": "data/sector_alias.json",
+                "rules": {to: r["engine"] for to, r in alias_rules.items()},
+            },
             "note": ("个股→板块取自东财 clist 的 f100 字段，与 sector_engine 同一套行业命名；"
                      "f100 为空或 '-' 的股票不入映射"),
         }
@@ -325,6 +376,8 @@ def main():
         for code in s["members"]:
             # 同一只股票命中多个板块时取第一个（东财按涨幅排序，先命中的更强）
             stock_map.setdefault(code, name)
+    # 与主路径一致：兜底路径也要归一化到 sector_engine 的命名
+    stock_map = apply_alias(stock_map, load_alias_rules())
 
     out = {
         "ts": now_iso(),
