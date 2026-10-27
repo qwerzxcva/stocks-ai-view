@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-27T14:18:47+08:00",
+ "ts": "2026-10-27T14:29:01+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 478,
- "n_transmissions": 3,
+ "n_transmissions": 2,
  "n_rules": 16,
  "rules": [
   {
@@ -72,128 +72,16 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-10-26",
+  "trade_date": "2026-10-27",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "去年逾2.4万儿童在冲突中遭严重侵害",
-   "source": "今日头条",
-   "time": "2026-10-27T13:57:53+08:00",
-   "url": "https://www.toutiao.com/trending/7701103356391194687/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "002187"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "000089"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000888"
-     ]
-    }
-   ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "002187"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-26",
-    "event_date": "2026-10-27",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "英国家庭突被要求囤水囤粮，防长警告，1000天内准备应对战争",
-   "source": "凤凰网",
-   "time": "2026-10-27T14:18:41+08:00",
-   "url": "https://news.ifeng.com/c/8xYiwtGSAq4",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "002187"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "000089"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000888"
-     ]
-    }
-   ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "002187"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-26",
-    "event_date": "2026-10-27",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "只有美伊冲突结束黄金才能复苏？美银策略师强调关键利空仍未解决",
-   "source": "cls",
-   "time": "2026-10-27T14:05:28+08:00",
+   "source": "财联社电报",
+   "time": "2026-10-27T14:18:42+08:00",
    "url": "https://www.cls.cn/detail/2516337",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -241,7 +129,63 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-26",
+    "trade_date": "2026-10-27",
+    "event_date": "2026-10-27",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "英国家庭突被要求囤水囤粮，防长警告，1000天内准备应对战争",
+   "source": "凤凰网",
+   "time": "2026-10-27T14:15:37+08:00",
+   "url": "https://news.ifeng.com/c/8xYiwtGSAq4",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "黄金",
+     "stocks": [
+      "002187"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "000089"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000888"
+     ]
+    }
+   ],
+   "hedge": [
+    {
+     "sector": "黄金",
+     "stocks": [
+      "002187"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-27",
     "event_date": "2026-10-27",
     "matched_codes": []
    }
