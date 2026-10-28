@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-28T21:42:38+08:00",
+ "ts": "2026-10-28T21:54:06+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 477,
- "n_transmissions": 2,
+ "n_input": 476,
+ "n_transmissions": 1,
  "n_rules": 16,
  "rules": [
   {
@@ -79,52 +79,9 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "财联社10月28日电，国内商品期货夜盘开盘涨跌不一，沥青涨超3%，乙二醇涨2.65%，燃油涨2.41%，原油涨2.16%，烧碱跌1.76%，焦炭跌0.86%。",
-   "source": "财联社电报",
-   "time": "2026-10-28T21:20:52+08:00",
-   "url": "https://www.cls.cn/detail/2518306",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "603727"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
-    "event_date": "2026-10-28",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "夜盘期货开盘，沥青涨超3%，乙二醇、燃油、原油涨超2%，塑料、甲醇、短纤、瓶片、低硫燃油等涨超1%；烧碱跌超1%。",
    "source": "华尔街见闻",
-   "time": "2026-10-28T21:42:25+08:00",
+   "time": "2026-10-28T21:41:21+08:00",
    "url": "https://wallstreetcn.com/livenews/3189198",
    "transmission_id": "oil_up",
    "label": "油价上涨",
