@@ -48,6 +48,27 @@ def load_json(path):
         return None
 
 
+def load_news_db(path):
+    """端上消息库 → {code: {"label": "受益"/"受损"}}。
+
+    消息库按条存（benefit/harm 两个数组），午盘这里只需要「某只票今天有没有被消息
+    站在利好/利空一边」，所以拍平成 code → label；同一只票既有受益又有受损时以「受损」
+    为准——宁可让用户在标签上多看一眼风险。
+    """
+    raw = load_json(path)
+    if not isinstance(raw, dict):
+        return {}
+    out = {}
+    for row in raw.get("items") or []:
+        if not isinstance(row, dict):
+            continue
+        for code in row.get("benefit") or []:
+            out.setdefault(code, {"label": "受益"})
+        for code in row.get("harm") or []:
+            out[code] = {"label": "受损"}
+    return out
+
+
 def is_main_board(code):
     return isinstance(code, str) and len(code) == 6 and code.startswith(MAIN_BOARD_PREFIXES)
 
@@ -177,6 +198,7 @@ def from_today(today, news, top, today_limit=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--push-dir", default="开盘推股历史数据")
+    ap.add_argument("--news-db-dir", default="消息数据库", help="端上消息库目录（端上每次开 App 持续写入）")
     ap.add_argument("--out-dir", default="data")
     ap.add_argument("--date", default=None, help="默认今天（CST）")
     ap.add_argument("--top", type=int, default=TOP_N)
@@ -188,12 +210,16 @@ def main():
     today = load_json(os.path.join(args.out_dir, "today_picks.json"))
     push_path = os.path.join(args.push_dir, f"{date}.json")
     push = load_json(push_path)
-    news_raw = load_json(os.path.join(args.out_dir, "news_impact.json"))
-    news = {}
+    news_raw = None
+    news = load_news_db(os.path.join(args.news_db_dir, f"{date}.json"))
+    if not news:
+        news_raw = load_json(os.path.join(args.out_dir, "news_impact.json"))
     if isinstance(news_raw, dict):
         for row in news_raw.get("items") or news_raw.get("news") or []:
             if isinstance(row, dict) and row.get("code"):
                 news[row["code"]] = row
+
+    caveats = []
 
     caveats = []
     if not today:
