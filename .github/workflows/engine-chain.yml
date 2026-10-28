@@ -517,6 +517,29 @@ jobs:
               print("market_breadth unavailable:", exc)
           PY
 
+      # ── 每日个股涨停名单（端上连板/RPS 的历史源，替代端上本地囤日级快照）──
+      # 东财涨停池只给「此刻」且不接受历史日期（实测请求 20261016 仍回 qdate 20261028），
+      # 所以历史只能从全市场日线回算；每日增量还是用东财官方口径更好，但端上现在只需要
+      # 一条时间序列，先用回算版把「端上不再本地囤历史」这件事落地。
+      - name: Build limit-up history (daily accumulation)
+        run: |
+          python3 scripts/build_limit_history.py \
+            --bulk ../stocks-data-kline/data/bulk \
+            --out data/limit_history.json --days 260 || echo "limit_history skipped"
+          python3 - <<'PY'
+          import json
+          try:
+              with open('data/limit_history.json', encoding='utf-8') as handle:
+                  bundle = json.load(handle)
+              cov = bundle.get('coverage') or {}
+              days = bundle.get('days') or []
+              print("limit_history: days=%s %s..%s latest_n=%s"
+                    % (cov.get('n_days'), cov.get('first_date'), cov.get('last_date'),
+                       days[-1].get('n') if days else None))
+          except Exception as exc:
+              print("limit_history unavailable:", exc)
+          PY
+
       # ── publish to the warehouse the site reads ──
       - name: Sync mirror shards (B/C 仓分片数据汇聚)
         run: |
