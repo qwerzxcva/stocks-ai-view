@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-28T21:54:06+08:00",
+ "ts": "2026-10-29T05:34:44+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 476,
- "n_transmissions": 1,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,53 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "夜盘期货开盘，沥青涨超3%，乙二醇、燃油、原油涨超2%，塑料、甲醇、短纤、瓶片、低硫燃油等涨超1%；烧碱跌超1%。",
+   "title": "福特上调业绩指引，虽然战争、通胀带来的拖累累积",
    "source": "华尔街见闻",
-   "time": "2026-10-28T21:41:21+08:00",
-   "url": "https://wallstreetcn.com/livenews/3189198",
+   "time": "2026-10-29T05:12:12+08:00",
+   "url": "https://wallstreetcn.com/livenews/3189388",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "301682"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300900"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-28",
+    "event_date": "2026-10-29",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "WTI 12月原油期货收报102.78美元/桶。\n\n布伦特12月原油期货收报115.32美元/桶。\n\nNYMEX 11月汽油期货收报3.1734美元/加仑，NYMEX 11月取暖油",
+   "source": "华尔街见闻",
+   "time": "2026-10-29T05:12:12+08:00",
+   "url": "https://wallstreetcn.com/livenews/3189381",
    "transmission_id": "oil_up",
    "label": "油价上涨",
    "direct_bear": [],
@@ -117,7 +160,50 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-28",
-    "event_date": "2026-10-28",
+    "event_date": "2026-10-29",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "WTI 12月原油期货收报102.78美元/桶。\n\n布伦特12月原油期货收报115.32美元/桶。\n\nNYMEX 11月",
+   "source": "wallstreetcn",
+   "time": "2026-10-29T03:53:10+08:00",
+   "url": "https://wallstreetcn.com/live/3189381",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "603727"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-28",
+    "event_date": "2026-10-29",
     "matched_codes": []
    }
   }
