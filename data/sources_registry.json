@@ -1,10 +1,10 @@
 {
-  "generated": "2026-10-29T05:38:37+08:00",
+  "generated": "2026-10-29T06:12:55+08:00",
   "total": 190,
   "by_status": {
-    "ok": 140,
+    "ok": 142,
     "degraded": 19,
-    "blocked": 21,
+    "blocked": 19,
     "unauth": 8,
     "untested": 2
   },
@@ -893,13 +893,13 @@
     {
       "id": "xueqiu_hot",
       "name": "雪球热门股",
-      "url": "https://xueqiu.com/v5/statuses/hot/stock_list.json",
-      "auth": "cookie",
-      "status": "blocked",
+      "url": "https://stock.xueqiu.com/v5/stock/hot_stock/list.json?size=20&type={type}",
+      "auth": "cookie (匿名 xq_a_token 即可, 无需登录)",
+      "status": "ok",
       "freq": "minute",
-      "fields": "热门股票列表 (需 xq_a_token)",
+      "fields": "热门股 code/name/value/percent/current/rank_change/increment; type=12 A股 13 港股 10/11/14 美股",
       "provides": [],
-      "notes": "无 cookie 时返回 400 / 302 反爬 JS; 需 xq_a_token cookie 认证; 容器内无法获取有效 cookie; 考虑替代: 东方财富股吧热帖 / 同花顺热榜"
+      "notes": "2026-10-28 实测: 先 GET https://xueqiu.com/hq 拿匿名 xq_a_token, 再带 Cookie → 200, type=12 返 20 条 A 股热搜 (size 上限实测 100); 匿名 token 与登录 token 取行情字段/值完全一致 (63/63); 参数名是 type 不是 _type (写 _type 返 100002 Required Integer parameter 'type'); Host 头必须 stock.xueqiu.com, 写 xueqiu.com 会被 302; 原登记的 xueqiu.com/v5/statuses/hot/stock_list.json 属主站域, 被阿里云 WAF 拦, 已弃用"
     },
     {
       "id": "cninfo_announce",
@@ -1567,14 +1567,14 @@
     },
     {
       "id": "xueqiu_screener_dead_paths",
-      "name": "雪球其他 API 路径 (全失效, 留档)",
-      "url": "https://stock.xueqiu.com/v5/stock/{chart/kline,capital/flow,quote,f10/*}.json",
-      "auth": "none",
-      "status": "blocked",
-      "freq": "-",
-      "fields": "K线/资金流/快照/F10/龙虎榜",
+      "name": "雪球 v5 其余 API 路径 (带匿名 token 后可用)",
+      "url": "https://stock.xueqiu.com/v5/stock/{quote,chart/kline,chart/minute,capital/flow,f10/cn/*,finance/cn/*}.json",
+      "auth": "cookie (匿名 xq_a_token, 无需登录)",
+      "status": "ok",
+      "freq": "realtime",
+      "fields": "快照/K线/分时/资金流/F10 公司·股东·分红·行业/财务三表·指标/选股器",
       "provides": [],
-      "notes": "2026-10-15 实测 15 个路径: stock.xueqiu.com/v5/* 全 404, service/v5/stock/batch/quote.json 403, hot_stock/list 400, screener/{industry,block,f10,fund,hot,follow}/list 全 404/400; 结论: 雪球 web 端只开放 screener 一个端点给匿名访问, 其余要登录态; 不要再重复探测这些路径"
+      "notes": "2026-10-28 复测推翻 2026-10-15 的 blocked 结论: 当时探测未带任何 cookie (auth=none) 所以全 404/400; 先 GET https://xueqiu.com/hq 取匿名 xq_a_token 后, quote(63 字段)/batch quote/kline(day|week)/minute(1d|5d)/capital flow/f10 cn company·holders·bonus·industry/finance cn income·balance·cash_flow·indicator/screener quote 均 200; 仍不可用: pankou、quotec 返 200 但 0 字节; f10 shares、f10 fund detail 404; block rank 403; 账号私有接口 (portfolio) 仍需登录态, 匿名返 60201 用户id无效; Host 头须为 stock.xueqiu.com (写 xueqiu.com 会被 302)"
     },
     {
       "id": "tencent_board_rank",
