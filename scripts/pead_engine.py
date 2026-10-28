@@ -120,6 +120,10 @@ def main():
     ap.add_argument("--fin", default=os.path.join(DATA, "fin"))
     ap.add_argument("--bulk", default=os.path.join(DATA, "bulk"))
     ap.add_argument("--out", default=os.path.join(DATA, "pead_events.json"))
+    ap.add_argument("--max-age-days", type=int, default=90,
+                    help="只输出最近 N 天公告的事件（更早的公告漂移窗口已走完）")
+    ap.add_argument("--max-events", type=int, default=4000,
+                    help="输出事件条数上限（按公告日倒序取最新）")
     args = ap.parse_args()
 
     fin = load_fin(args.fin)
@@ -184,6 +188,20 @@ def main():
     if len(scored) < 20:
         warnings.append(f"有效事件仅 {len(scored)} 个，无法做十分位分层。")
 
+    # 事件按公告日倒序 + 只留最近 N 天。旧公告的 CAR 5/10/20 日窗口早已走完，
+    # 拿它当当前信号就是拿旧充新。原实现 `events[:200]` 是**按股票代码顺序**截断的，
+    # 实测 1409 只 10 月披露的票只进来 1 条（前 200 只恰好全是 8 月披露的），
+    # 端上拿到的就全是两个月前的旧信号。
+    events.sort(key=lambda e: e["announce_date"], reverse=True)
+    cutoff = (datetime.now(CST) - timedelta(days=args.max_age_days)).strftime("%Y-%m-%d")
+    recent = [e for e in events if e["announce_date"][:10] >= cutoff]
+    out_events = (recent or events)[: args.max_events]
+    if len(recent) < len(events):
+        warnings.append(
+            f"events 只输出最近 {args.max_age_days} 天公告的 {len(recent)} 条（全量 {len(events)} 条）；"
+            f"更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
+        )
+
     out = {
         "ts": datetime.now(CST).isoformat(timespec="seconds"),
         "engine": "pead_engine",
@@ -201,7 +219,14 @@ def main():
                 sum(1 for e in scored if e["car_10d"] > 0) / len(scored) * 100, 2) if scored else None,
         },
         "deciles": deciles,
-        "events": events[:200],
+        "events": out_events,
+        "events_window": {
+            "max_age_days": args.max_age_days,
+            "cutoff": cutoff,
+            "n_total": len(events),
+            "n_output": len(out_events),
+            "order": "announce_date desc",
+        },
         "warnings": warnings,
         "provenance": {
             "source": "data/fin/*.json (财报) + data/bulk/day_qfq_*.csv (价格)",
