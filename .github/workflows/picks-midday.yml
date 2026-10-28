@@ -1,0 +1,72 @@
+# picks-midday.yml — 午盘推股名单（闭环里的 E 段，11:40 CST）
+#
+# 为什么单独一个 workflow 而不塞进 engine-chain：
+#   1. engine-chain 最早 09:05、最晚 16:40，11:30–12:00 这个窗口它根本不在跑；
+#   2. 本任务只读 today_picks / 开盘推股历史 / news_impact，不需要 bulk kline，
+#      单独跑约 30 秒，塞进 engine-chain 反而要等它整条链。
+#
+# 输入：
+#   data/today_picks.json        统一候选源（补名字、入场计划）
+#   开盘推股历史数据/<date>.json  端上盘中推送记录（缺了脚本会降级并写 caveats）
+#   data/news_impact.json        消息面影响（可选）
+# 输出：
+#   data/picks_midday.json       午盘名单（12:00 后固定）
+name: picks-midday
+on:
+  schedule:
+    # 11:40 CST 工作日（UTC 03:40）：早盘 11:30 收，留 10 分钟给端上写最后一轮
+    - cron: '40 3 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: '指定日期 YYYY-MM-DD（默认今天 CST）'
+        required: false
+permissions:
+  contents: write
+concurrency:
+  group: picks-midday
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build midday picks
+        run: |
+          python3 scripts/build_picks_midday.py \
+            --push-dir 开盘推股历史数据 --out-dir data ${{ inputs.date && format('--date {0}', inputs.date) || '' }}
+          python3 - <<'PY'
+          import json
+          try:
+              with open('data/picks_midday.json', encoding='utf-8') as handle:
+                  d = json.load(handle)
+              print("picks_midday: n=%s source=%s" % (d.get('n'), d.get('source')))
+              for c in d.get('caveats') or []:
+                  print("  caveat:", c)
+          except Exception as exc:
+              print("picks_midday unavailable:", exc)
+          PY
+      - name: Commit midday picks
+        run: |
+          git config user.name "skapp-ci"
+          git config user.email "ci@skapp.local"
+          git add data/picks_midday.json
+          if git diff --cached --quiet; then
+            echo "no change"
+            exit 0
+          fi
+          git commit -m "[CI] midday picks $(date +%Y%m%d_%H%M)"
+          for i in 1 2 3; do
+            if git push origin HEAD:main; then echo pushed; break; fi
+            git pull --rebase origin main || true
+            sleep 5
+          done

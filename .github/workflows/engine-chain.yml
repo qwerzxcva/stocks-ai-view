@@ -434,7 +434,8 @@ jobs:
           python3 scripts/morning_review.py || echo "morning_review skipped"
           python3 scripts/review_yesterday.py || echo "review_yesterday skipped"
           python3 scripts/entry_planner.py || echo "entry_planner skipped"
-          python3 scripts/afternoon_picks.py || echo "afternoon_picks skipped"
+          # afternoon_picks 已停用（停在 10-14、脚本无时段闸门、失败被 || echo 吞掉）：
+          # 午后建议改由端上的「开盘推股名单」实时给出，云端不再产出
           python3 scripts/stop_analysis.py || echo "stop_analysis skipped"
           python3 scripts/build_today_picks.py --force
           # Closing review is a post-close stage only. A pre-open full run must
@@ -538,6 +539,24 @@ jobs:
                        days[-1].get('n') if days else None))
           except Exception as exc:
               print("limit_history unavailable:", exc)
+          PY
+
+      # ── 收盘定稿候选：A 超短线 / B 短中线（端上开盘前 30 分钟二次分析要用）──
+      # 从 today_picks 派生，只做筛选（主板/非涨停/非ST）、分类、打标签，不另起一套选股。
+      - name: Build daily picks (ultra-short / swing)
+        run: |
+          python3 scripts/build_picks_daily.py --out-dir data || echo "daily picks skipped"
+          python3 - <<'PY'
+          import json
+          for name in ('picks_ultra_short', 'picks_swing'):
+              try:
+                  with open('data/%s.json' % name, encoding='utf-8') as handle:
+                      d = json.load(handle)
+                  print("%s: n=%s date=%s" % (name, d.get('n'), d.get('date')))
+                  for c in d.get('caveats') or []:
+                      print("  caveat:", c)
+              except Exception as exc:
+                  print("%s unavailable:" % name, exc)
           PY
 
       # ── publish to the warehouse the site reads ──

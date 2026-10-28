@@ -22,7 +22,8 @@ CMDS = [
     ("global_kline", ["scripts/global_kline.py", "--out", "data/global_kline.json"], "data/global_kline.json"),
     ("global_panel", ["scripts/global_panel.py", "--out-dir", "data/global"], "data/global/latest.json"),
     ("strategy_card", ["scripts/strategy_card.py", "--out", "data/strategy_card.json"], "data/strategy_card.json"),
-    ("intraday_signal", ["scripts/intraday_signal.py", "--out", "data/intraday_signal.json"], "data/intraday_signal.json"),
+    # intraday_signal 已停用：停在 10-13、无任何 workflow 调度；
+    # 盘中实时名单改由端上「开盘推股名单」承担（云端算不过来）
     ("engine_fusion", ["scripts/engine_fusion.py", "--out", "data/engine_fusion.json"], "data/engine_fusion.json"),
 ]
 
