@@ -1,9 +1,9 @@
 {
- "ts": "2026-10-29T22:26:56+08:00",
+ "ts": "2026-10-29T23:17:57+08:00",
  "engine": "overseas_linkage v1 (相关/贝塔/滞后/隔夜)",
  "n_targets": 5,
- "n_drivers": 9,
- "n_pairs": 45,
+ "n_drivers": 10,
+ "n_pairs": 50,
  "window": "共同交易日对齐; 最少 20 个样本",
  "method": {
   "corr": "皮尔逊相关系数 (日收益)",
@@ -21,42 +21,20 @@
    "driver_name": "恒生科技",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.625,
-   "beta": 0.354,
-   "r2": 0.39,
+   "n": 485,
+   "corr": 0.644,
+   "beta": 0.351,
+   "r2": 0.414,
    "best_lag": 0,
-   "lag_corr": 0.625,
+   "lag_corr": 0.644,
    "lag_rows": {
     "lag-2": -0.018,
-    "lag-1": -0.136,
-    "lag1": 0.058,
-    "lag2": -0.055
+    "lag-1": -0.128,
+    "lag1": -0.022,
+    "lag2": -0.045
    },
-   "overnight_corr": 0.058,
-   "overnight_beta": 0.032
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "hkHSI",
-   "driver_name": "恒生指数",
-   "level": "强",
-   "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.62,
-   "beta": 0.444,
-   "r2": 0.385,
-   "best_lag": 0,
-   "lag_corr": 0.62,
-   "lag_rows": {
-    "lag-2": -0.015,
-    "lag-1": -0.109,
-    "lag1": 0.058,
-    "lag2": -0.07
-   },
-   "overnight_corr": 0.058,
-   "overnight_beta": 0.039
+   "overnight_corr": -0.022,
+   "overnight_beta": -0.012
   },
   {
    "target": "sh000001",
@@ -65,20 +43,42 @@
    "driver_name": "恒生科技",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.62,
-   "beta": 0.305,
-   "r2": 0.384,
+   "n": 485,
+   "corr": 0.643,
+   "beta": 0.301,
+   "r2": 0.413,
    "best_lag": 0,
-   "lag_corr": 0.62,
+   "lag_corr": 0.643,
    "lag_rows": {
     "lag-2": -0.03,
-    "lag-1": -0.116,
-    "lag1": 0.07,
-    "lag2": -0.068
+    "lag-1": -0.106,
+    "lag1": -0.017,
+    "lag2": -0.053
    },
-   "overnight_corr": 0.07,
-   "overnight_beta": 0.033
+   "overnight_corr": -0.017,
+   "overnight_beta": -0.008
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "hkHSI",
+   "driver_name": "恒生指数",
+   "level": "强",
+   "note": "明显联动: 用对方做择时信号有效",
+   "n": 485,
+   "corr": 0.637,
+   "beta": 0.435,
+   "r2": 0.406,
+   "best_lag": 0,
+   "lag_corr": 0.637,
+   "lag_rows": {
+    "lag-2": -0.015,
+    "lag-1": -0.083,
+    "lag1": -0.037,
+    "lag2": -0.054
+   },
+   "overnight_corr": -0.037,
+   "overnight_beta": -0.025
   },
   {
    "target": "sh000001",
@@ -87,20 +87,20 @@
    "driver_name": "国企指数",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.604,
-   "beta": 0.405,
-   "r2": 0.365,
+   "n": 485,
+   "corr": 0.619,
+   "beta": 0.396,
+   "r2": 0.383,
    "best_lag": 0,
-   "lag_corr": 0.604,
+   "lag_corr": 0.619,
    "lag_rows": {
     "lag-2": -0.022,
-    "lag-1": -0.12,
-    "lag1": 0.056,
-    "lag2": -0.064
+    "lag-1": -0.092,
+    "lag1": -0.04,
+    "lag2": -0.048
    },
-   "overnight_corr": 0.056,
-   "overnight_beta": 0.036
+   "overnight_corr": -0.04,
+   "overnight_beta": -0.025
   },
   {
    "target": "sh000300",
@@ -109,20 +109,20 @@
    "driver_name": "恒生指数",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.603,
-   "beta": 0.499,
-   "r2": 0.364,
+   "n": 485,
+   "corr": 0.616,
+   "beta": 0.489,
+   "r2": 0.379,
    "best_lag": 0,
-   "lag_corr": 0.603,
+   "lag_corr": 0.616,
    "lag_rows": {
     "lag-2": -0.011,
-    "lag-1": -0.137,
-    "lag1": 0.051,
-    "lag2": -0.05
+    "lag-1": -0.115,
+    "lag1": -0.036,
+    "lag2": -0.039
    },
-   "overnight_corr": 0.051,
-   "overnight_beta": 0.04
+   "overnight_corr": -0.036,
+   "overnight_beta": -0.029
   },
   {
    "target": "sz399001",
@@ -131,20 +131,20 @@
    "driver_name": "恒生科技",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.602,
-   "beta": 0.475,
-   "r2": 0.363,
+   "n": 485,
+   "corr": 0.614,
+   "beta": 0.471,
+   "r2": 0.376,
    "best_lag": 0,
-   "lag_corr": 0.602,
+   "lag_corr": 0.614,
    "lag_rows": {
     "lag-2": -0.016,
-    "lag-1": -0.142,
-    "lag1": 0.062,
-    "lag2": 0.008
+    "lag-1": -0.135,
+    "lag1": -0.004,
+    "lag2": 0.001
    },
-   "overnight_corr": 0.062,
-   "overnight_beta": 0.047
+   "overnight_corr": -0.004,
+   "overnight_beta": -0.003
   },
   {
    "target": "sh000300",
@@ -153,20 +153,20 @@
    "driver_name": "国企指数",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.581,
-   "beta": 0.45,
-   "r2": 0.338,
+   "n": 485,
+   "corr": 0.592,
+   "beta": 0.44,
+   "r2": 0.351,
    "best_lag": 0,
-   "lag_corr": 0.581,
+   "lag_corr": 0.592,
    "lag_rows": {
     "lag-2": -0.018,
-    "lag-1": -0.147,
-    "lag1": 0.051,
-    "lag2": -0.05
+    "lag-1": -0.122,
+    "lag1": -0.037,
+    "lag2": -0.038
    },
-   "overnight_corr": 0.051,
-   "overnight_beta": 0.038
+   "overnight_corr": -0.037,
+   "overnight_beta": -0.027
   },
   {
    "target": "sz399006",
@@ -175,20 +175,20 @@
    "driver_name": "恒生科技",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.577,
-   "beta": 0.62,
-   "r2": 0.333,
+   "n": 485,
+   "corr": 0.586,
+   "beta": 0.615,
+   "r2": 0.344,
    "best_lag": 0,
-   "lag_corr": 0.577,
+   "lag_corr": 0.586,
    "lag_rows": {
     "lag-2": -0.007,
-    "lag-1": -0.14,
-    "lag1": 0.029,
-    "lag2": 0.033
+    "lag-1": -0.133,
+    "lag1": -0.036,
+    "lag2": 0.016
    },
-   "overnight_corr": 0.029,
-   "overnight_beta": 0.029
+   "overnight_corr": -0.036,
+   "overnight_beta": -0.038
   },
   {
    "target": "sz399001",
@@ -197,20 +197,20 @@
    "driver_name": "恒生指数",
    "level": "强",
    "note": "明显联动: 用对方做择时信号有效",
-   "n": 486,
-   "corr": 0.528,
-   "beta": 0.607,
-   "r2": 0.278,
+   "n": 485,
+   "corr": 0.532,
+   "beta": 0.595,
+   "r2": 0.283,
    "best_lag": 0,
-   "lag_corr": 0.528,
+   "lag_corr": 0.532,
    "lag_rows": {
     "lag-2": -0.002,
-    "lag-1": -0.127,
-    "lag1": 0.053,
-    "lag2": 0.004
+    "lag-1": -0.108,
+    "lag1": -0.018,
+    "lag2": -0.004
    },
-   "overnight_corr": 0.053,
-   "overnight_beta": 0.058
+   "overnight_corr": -0.018,
+   "overnight_beta": -0.02
   },
   {
    "target": "sz399001",
@@ -219,20 +219,20 @@
    "driver_name": "国企指数",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.494,
-   "beta": 0.532,
-   "r2": 0.244,
+   "n": 485,
+   "corr": 0.497,
+   "beta": 0.521,
+   "r2": 0.247,
    "best_lag": 0,
-   "lag_corr": 0.494,
+   "lag_corr": 0.497,
    "lag_rows": {
     "lag-2": -0.012,
-    "lag-1": -0.136,
-    "lag1": 0.054,
-    "lag2": 0.003
+    "lag-1": -0.115,
+    "lag1": -0.018,
+    "lag2": -0.005
    },
-   "overnight_corr": 0.054,
-   "overnight_beta": 0.055
+   "overnight_corr": -0.018,
+   "overnight_beta": -0.018
   },
   {
    "target": "sz399006",
@@ -241,20 +241,20 @@
    "driver_name": "恒生指数",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.487,
-   "beta": 0.763,
-   "r2": 0.237,
+   "n": 485,
+   "corr": 0.49,
+   "beta": 0.749,
+   "r2": 0.24,
    "best_lag": 0,
-   "lag_corr": 0.487,
+   "lag_corr": 0.49,
    "lag_rows": {
     "lag-2": 0.006,
-    "lag-1": -0.134,
-    "lag1": 0.029,
-    "lag2": 0.035
+    "lag-1": -0.116,
+    "lag1": -0.04,
+    "lag2": 0.017
    },
-   "overnight_corr": 0.029,
-   "overnight_beta": 0.044
+   "overnight_corr": -0.04,
+   "overnight_beta": -0.061
   },
   {
    "target": "sh000688",
@@ -263,20 +263,64 @@
    "driver_name": "恒生科技",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
+   "n": 485,
    "corr": 0.487,
-   "beta": 0.581,
+   "beta": 0.579,
    "r2": 0.237,
    "best_lag": 0,
    "lag_corr": 0.487,
    "lag_rows": {
     "lag-2": 0.022,
-    "lag-1": -0.103,
-    "lag1": 0.015,
-    "lag2": -0.035
+    "lag-1": -0.101,
+    "lag1": 0.001,
+    "lag2": -0.061
    },
-   "overnight_corr": 0.015,
-   "overnight_beta": 0.017
+   "overnight_corr": 0.001,
+   "overnight_beta": 0.001
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "hk09988",
+   "driver_name": "阿里",
+   "level": "中",
+   "note": "有联动但自有逻辑更强",
+   "n": 485,
+   "corr": 0.461,
+   "beta": 0.145,
+   "r2": 0.213,
+   "best_lag": 0,
+   "lag_corr": 0.461,
+   "lag_rows": {
+    "lag-2": -0.004,
+    "lag-1": -0.046,
+    "lag1": -0.031,
+    "lag2": -0.082
+   },
+   "overnight_corr": -0.031,
+   "overnight_beta": -0.01
+  },
+  {
+   "target": "sh000300",
+   "target_name": "沪深300",
+   "driver": "hk09988",
+   "driver_name": "阿里",
+   "level": "中",
+   "note": "有联动但自有逻辑更强",
+   "n": 485,
+   "corr": 0.461,
+   "beta": 0.168,
+   "r2": 0.213,
+   "best_lag": 0,
+   "lag_corr": 0.461,
+   "lag_rows": {
+    "lag-2": 0.017,
+    "lag-1": -0.075,
+    "lag1": -0.02,
+    "lag2": -0.06
+   },
+   "overnight_corr": -0.02,
+   "overnight_beta": -0.007
   },
   {
    "target": "sz399006",
@@ -285,64 +329,20 @@
    "driver_name": "国企指数",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.455,
-   "beta": 0.668,
-   "r2": 0.207,
+   "n": 485,
+   "corr": 0.457,
+   "beta": 0.653,
+   "r2": 0.208,
    "best_lag": 0,
-   "lag_corr": 0.455,
+   "lag_corr": 0.457,
    "lag_rows": {
     "lag-2": -0.007,
-    "lag-1": -0.141,
-    "lag1": 0.033,
-    "lag2": 0.03
+    "lag-1": -0.121,
+    "lag1": -0.037,
+    "lag2": 0.011
    },
-   "overnight_corr": 0.033,
-   "overnight_beta": 0.045
-  },
-  {
-   "target": "sh000300",
-   "target_name": "沪深300",
-   "driver": "hk09988",
-   "driver_name": "阿里",
-   "level": "中",
-   "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.449,
-   "beta": 0.171,
-   "r2": 0.201,
-   "best_lag": 0,
-   "lag_corr": 0.449,
-   "lag_rows": {
-    "lag-2": 0.017,
-    "lag-1": -0.084,
-    "lag1": 0.019,
-    "lag2": -0.065
-   },
-   "overnight_corr": 0.019,
-   "overnight_beta": 0.007
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "hk09988",
-   "driver_name": "阿里",
-   "level": "中",
-   "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.446,
-   "beta": 0.147,
-   "r2": 0.199,
-   "best_lag": 0,
-   "lag_corr": 0.446,
-   "lag_rows": {
-    "lag-2": -0.004,
-    "lag-1": -0.057,
-    "lag1": 0.011,
-    "lag2": -0.089
-   },
-   "overnight_corr": 0.011,
-   "overnight_beta": 0.004
+   "overnight_corr": -0.037,
+   "overnight_beta": -0.053
   },
   {
    "target": "sh000300",
@@ -351,20 +351,20 @@
    "driver_name": "腾讯",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.435,
-   "beta": 0.239,
-   "r2": 0.189,
+   "n": 485,
+   "corr": 0.447,
+   "beta": 0.236,
+   "r2": 0.2,
    "best_lag": 0,
-   "lag_corr": 0.435,
+   "lag_corr": 0.447,
    "lag_rows": {
     "lag-2": 0.004,
-    "lag-1": -0.124,
-    "lag1": 0.042,
-    "lag2": -0.058
+    "lag-1": -0.122,
+    "lag1": -0.009,
+    "lag2": -0.051
    },
-   "overnight_corr": 0.042,
-   "overnight_beta": 0.023
+   "overnight_corr": -0.009,
+   "overnight_beta": -0.005
   },
   {
    "target": "sz399001",
@@ -373,20 +373,20 @@
    "driver_name": "阿里",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.431,
-   "beta": 0.228,
-   "r2": 0.186,
+   "n": 485,
+   "corr": 0.438,
+   "beta": 0.225,
+   "r2": 0.191,
    "best_lag": 0,
-   "lag_corr": 0.431,
+   "lag_corr": 0.438,
    "lag_rows": {
     "lag-2": 0.026,
-    "lag-1": -0.082,
-    "lag1": 0.02,
-    "lag2": -0.016
+    "lag-1": -0.074,
+    "lag1": -0.012,
+    "lag2": -0.019
    },
-   "overnight_corr": 0.02,
-   "overnight_beta": 0.01
+   "overnight_corr": -0.012,
+   "overnight_beta": -0.006
   },
   {
    "target": "sh000001",
@@ -395,42 +395,42 @@
    "driver_name": "腾讯",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
+   "n": 485,
+   "corr": 0.432,
+   "beta": 0.197,
+   "r2": 0.187,
+   "best_lag": 0,
+   "lag_corr": 0.432,
+   "lag_rows": {
+    "lag-2": 0.006,
+    "lag-1": -0.08,
+    "lag1": -0.014,
+    "lag2": -0.042
+   },
+   "overnight_corr": -0.014,
+   "overnight_beta": -0.007
+  },
+  {
+   "target": "sz399006",
+   "target_name": "创业板指",
+   "driver": "hk09988",
+   "driver_name": "阿里",
+   "level": "中",
+   "note": "有联动但自有逻辑更强",
+   "n": 485,
    "corr": 0.418,
-   "beta": 0.2,
+   "beta": 0.294,
    "r2": 0.175,
    "best_lag": 0,
    "lag_corr": 0.418,
    "lag_rows": {
-    "lag-2": 0.006,
-    "lag-1": -0.083,
-    "lag1": 0.041,
-    "lag2": -0.052
-   },
-   "overnight_corr": 0.041,
-   "overnight_beta": 0.019
-  },
-  {
-   "target": "sz399006",
-   "target_name": "创业板指",
-   "driver": "hk09988",
-   "driver_name": "阿里",
-   "level": "中",
-   "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.413,
-   "beta": 0.298,
-   "r2": 0.171,
-   "best_lag": 0,
-   "lag_corr": 0.413,
-   "lag_rows": {
     "lag-2": 0.043,
-    "lag-1": -0.081,
-    "lag1": 0.003,
-    "lag2": 0.017
+    "lag-1": -0.073,
+    "lag1": -0.028,
+    "lag2": 0.009
    },
-   "overnight_corr": 0.003,
-   "overnight_beta": 0.002
+   "overnight_corr": -0.028,
+   "overnight_beta": -0.019
   },
   {
    "target": "sz399001",
@@ -439,20 +439,20 @@
    "driver_name": "腾讯",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.388,
-   "beta": 0.297,
-   "r2": 0.151,
+   "n": 485,
+   "corr": 0.394,
+   "beta": 0.294,
+   "r2": 0.155,
    "best_lag": 0,
-   "lag_corr": 0.388,
+   "lag_corr": 0.394,
    "lag_rows": {
     "lag-2": 0.02,
-    "lag-1": -0.134,
-    "lag1": 0.047,
-    "lag2": -0.023
+    "lag-1": -0.132,
+    "lag1": 0.005,
+    "lag2": -0.027
    },
-   "overnight_corr": 0.047,
-   "overnight_beta": 0.035
+   "overnight_corr": 0.005,
+   "overnight_beta": 0.004
   },
   {
    "target": "sz399006",
@@ -461,20 +461,20 @@
    "driver_name": "腾讯",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.379,
-   "beta": 0.395,
-   "r2": 0.143,
+   "n": 485,
+   "corr": 0.384,
+   "beta": 0.391,
+   "r2": 0.147,
    "best_lag": 0,
-   "lag_corr": 0.379,
+   "lag_corr": 0.384,
    "lag_rows": {
     "lag-2": 0.02,
-    "lag-1": -0.133,
-    "lag1": 0.033,
-    "lag2": -0.006
+    "lag-1": -0.131,
+    "lag1": -0.007,
+    "lag2": -0.018
    },
-   "overnight_corr": 0.033,
-   "overnight_beta": 0.034
+   "overnight_corr": -0.007,
+   "overnight_beta": -0.007
   },
   {
    "target": "sh000688",
@@ -483,20 +483,20 @@
    "driver_name": "恒生指数",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.354,
-   "beta": 0.615,
-   "r2": 0.125,
+   "n": 485,
+   "corr": 0.353,
+   "beta": 0.612,
+   "r2": 0.124,
    "best_lag": 0,
-   "lag_corr": 0.354,
+   "lag_corr": 0.353,
    "lag_rows": {
     "lag-2": 0.01,
-    "lag-1": -0.095,
-    "lag1": 0.004,
-    "lag2": -0.035
+    "lag-1": -0.091,
+    "lag1": -0.012,
+    "lag2": -0.063
    },
-   "overnight_corr": 0.004,
-   "overnight_beta": 0.006
+   "overnight_corr": -0.012,
+   "overnight_beta": -0.02
   },
   {
    "target": "sh000688",
@@ -505,20 +505,20 @@
    "driver_name": "国企指数",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
-   "corr": 0.326,
-   "beta": 0.53,
-   "r2": 0.106,
+   "n": 485,
+   "corr": 0.325,
+   "beta": 0.528,
+   "r2": 0.105,
    "best_lag": 0,
-   "lag_corr": 0.326,
+   "lag_corr": 0.325,
    "lag_rows": {
     "lag-2": 0.003,
-    "lag-1": -0.104,
-    "lag1": 0.013,
-    "lag2": -0.038
+    "lag-1": -0.099,
+    "lag1": -0.002,
+    "lag2": -0.067
    },
-   "overnight_corr": 0.013,
-   "overnight_beta": 0.02
+   "overnight_corr": -0.002,
+   "overnight_beta": -0.003
   },
   {
    "target": "sh000688",
@@ -527,20 +527,20 @@
    "driver_name": "阿里",
    "level": "中",
    "note": "有联动但自有逻辑更强",
-   "n": 486,
+   "n": 485,
    "corr": 0.316,
-   "beta": 0.253,
+   "beta": 0.252,
    "r2": 0.1,
    "best_lag": 0,
    "lag_corr": 0.316,
    "lag_rows": {
     "lag-2": 0.067,
-    "lag-1": -0.074,
-    "lag1": 0.011,
-    "lag2": -0.057
+    "lag-1": -0.072,
+    "lag1": 0.004,
+    "lag2": -0.069
    },
-   "overnight_corr": 0.011,
-   "overnight_beta": 0.009
+   "overnight_corr": 0.004,
+   "overnight_beta": 0.004
   },
   {
    "target": "sh000688",
@@ -549,20 +549,20 @@
    "driver_name": "腾讯",
    "level": "弱",
    "note": "基本独立, 偶发共振",
-   "n": 486,
-   "corr": 0.279,
-   "beta": 0.322,
-   "r2": 0.078,
+   "n": 485,
+   "corr": 0.278,
+   "beta": 0.321,
+   "r2": 0.077,
    "best_lag": 0,
-   "lag_corr": 0.279,
+   "lag_corr": 0.278,
    "lag_rows": {
     "lag-2": -0.018,
-    "lag-1": -0.151,
-    "lag1": 0.039,
-    "lag2": -0.045
+    "lag-1": -0.15,
+    "lag1": 0.031,
+    "lag2": -0.061
    },
-   "overnight_corr": 0.039,
-   "overnight_beta": 0.044
+   "overnight_corr": 0.031,
+   "overnight_beta": 0.035
   },
   {
    "target": "sh000688",
@@ -571,20 +571,42 @@
    "driver_name": "英伟达",
    "level": "弱",
    "note": "基本独立, 偶发共振",
-   "n": 483,
+   "n": 482,
    "corr": 0.151,
-   "beta": 0.133,
+   "beta": 0.132,
    "r2": 0.023,
    "best_lag": 0,
    "lag_corr": 0.151,
    "lag_rows": {
-    "lag-2": -0.035,
-    "lag-1": 0.047,
-    "lag1": 0.051,
-    "lag2": 0.02
+    "lag-2": -0.036,
+    "lag-1": 0.049,
+    "lag1": 0.055,
+    "lag2": 0.025
    },
-   "overnight_corr": 0.051,
-   "overnight_beta": 0.045
+   "overnight_corr": 0.055,
+   "overnight_beta": 0.048
+  },
+  {
+   "target": "sz399001",
+   "target_name": "深证成指",
+   "driver": "usNVDA",
+   "driver_name": "英伟达",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.131,
+   "beta": 0.074,
+   "r2": 0.017,
+   "best_lag": 1,
+   "lag_corr": 0.166,
+   "lag_rows": {
+    "lag-2": -0.058,
+    "lag-1": 0.031,
+    "lag1": 0.166,
+    "lag2": 0.003
+   },
+   "overnight_corr": 0.166,
+   "overnight_beta": 0.093
   },
   {
    "target": "sh000688",
@@ -593,42 +615,42 @@
    "driver_name": "特斯拉",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.132,
-   "beta": 0.085,
+   "n": 482,
+   "corr": 0.131,
+   "beta": 0.084,
    "r2": 0.017,
    "best_lag": 0,
-   "lag_corr": 0.132,
+   "lag_corr": 0.131,
    "lag_rows": {
-    "lag-2": -0.092,
-    "lag-1": 0.009,
+    "lag-2": -0.098,
+    "lag-1": 0.008,
     "lag1": 0.023,
-    "lag2": 0.027
+    "lag2": 0.029
    },
    "overnight_corr": 0.023,
    "overnight_beta": 0.015
   },
   {
-   "target": "sz399001",
-   "target_name": "深证成指",
+   "target": "sh000300",
+   "target_name": "沪深300",
    "driver": "usNVDA",
    "driver_name": "英伟达",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.129,
-   "beta": 0.075,
-   "r2": 0.017,
+   "n": 482,
+   "corr": 0.125,
+   "beta": 0.05,
+   "r2": 0.016,
    "best_lag": 1,
-   "lag_corr": 0.146,
+   "lag_corr": 0.174,
    "lag_rows": {
-    "lag-2": -0.055,
-    "lag-1": 0.024,
-    "lag1": 0.146,
-    "lag2": 0.002
+    "lag-2": -0.074,
+    "lag-1": 0.067,
+    "lag1": 0.174,
+    "lag2": -0.018
    },
-   "overnight_corr": 0.146,
-   "overnight_beta": 0.084
+   "overnight_corr": 0.174,
+   "overnight_beta": 0.07
   },
   {
    "target": "sz399006",
@@ -637,42 +659,20 @@
    "driver_name": "英伟达",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.123,
-   "beta": 0.097,
-   "r2": 0.015,
+   "n": 482,
+   "corr": 0.125,
+   "beta": 0.096,
+   "r2": 0.016,
    "best_lag": 1,
-   "lag_corr": 0.155,
+   "lag_corr": 0.174,
    "lag_rows": {
-    "lag-2": -0.068,
-    "lag-1": 0.043,
-    "lag1": 0.155,
-    "lag2": -0.003
+    "lag-2": -0.071,
+    "lag-1": 0.051,
+    "lag1": 0.174,
+    "lag2": 0.001
    },
-   "overnight_corr": 0.155,
-   "overnight_beta": 0.122
-  },
-  {
-   "target": "sh000300",
-   "target_name": "沪深300",
-   "driver": "usNVDA",
-   "driver_name": "英伟达",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 483,
-   "corr": 0.122,
-   "beta": 0.051,
-   "r2": 0.015,
-   "best_lag": 1,
-   "lag_corr": 0.148,
-   "lag_rows": {
-    "lag-2": -0.07,
-    "lag-1": 0.057,
-    "lag1": 0.148,
-    "lag2": -0.015
-   },
-   "overnight_corr": 0.148,
-   "overnight_beta": 0.062
+   "overnight_corr": 0.174,
+   "overnight_beta": 0.134
   },
   {
    "target": "sh000001",
@@ -681,20 +681,20 @@
    "driver_name": "英伟达",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.105,
-   "beta": 0.038,
-   "r2": 0.011,
+   "n": 482,
+   "corr": 0.109,
+   "beta": 0.037,
+   "r2": 0.012,
    "best_lag": 1,
-   "lag_corr": 0.145,
+   "lag_corr": 0.173,
    "lag_rows": {
-    "lag-2": -0.094,
-    "lag-1": 0.054,
-    "lag1": 0.145,
-    "lag2": -0.0
+    "lag-2": -0.1,
+    "lag-1": 0.065,
+    "lag1": 0.173,
+    "lag2": -0.005
    },
-   "overnight_corr": 0.145,
-   "overnight_beta": 0.052
+   "overnight_corr": 0.173,
+   "overnight_beta": 0.06
   },
   {
    "target": "sh000300",
@@ -703,42 +703,42 @@
    "driver_name": "特斯拉",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.094,
-   "beta": 0.029,
-   "r2": 0.009,
-   "best_lag": 1,
-   "lag_corr": 0.117,
-   "lag_rows": {
-    "lag-2": -0.054,
-    "lag-1": 0.017,
-    "lag1": 0.117,
-    "lag2": 0.016
-   },
-   "overnight_corr": 0.117,
-   "overnight_beta": 0.036
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "usTSLA",
-   "driver_name": "特斯拉",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 483,
-   "corr": 0.091,
-   "beta": 0.024,
+   "n": 482,
+   "corr": 0.092,
+   "beta": 0.027,
    "r2": 0.008,
    "best_lag": 1,
-   "lag_corr": 0.115,
+   "lag_corr": 0.127,
    "lag_rows": {
-    "lag-2": -0.065,
-    "lag-1": 0.023,
-    "lag1": 0.115,
+    "lag-2": -0.089,
+    "lag-1": 0.014,
+    "lag1": 0.127,
     "lag2": 0.016
    },
-   "overnight_corr": 0.115,
-   "overnight_beta": 0.03
+   "overnight_corr": 0.127,
+   "overnight_beta": 0.037
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "usTSLA",
+   "driver_name": "特斯拉",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.089,
+   "beta": 0.023,
+   "r2": 0.008,
+   "best_lag": 1,
+   "lag_corr": 0.125,
+   "lag_rows": {
+    "lag-2": -0.104,
+    "lag-1": 0.019,
+    "lag1": 0.125,
+    "lag2": 0.015
+   },
+   "overnight_corr": 0.125,
+   "overnight_beta": 0.032
   },
   {
    "target": "sz399001",
@@ -747,20 +747,42 @@
    "driver_name": "特斯拉",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.091,
-   "beta": 0.038,
+   "n": 482,
+   "corr": 0.088,
+   "beta": 0.036,
    "r2": 0.008,
    "best_lag": 1,
-   "lag_corr": 0.13,
+   "lag_corr": 0.138,
    "lag_rows": {
-    "lag-2": -0.068,
-    "lag-1": 0.002,
-    "lag1": 0.13,
+    "lag-2": -0.097,
+    "lag-1": -0.001,
+    "lag1": 0.138,
     "lag2": 0.027
    },
-   "overnight_corr": 0.13,
-   "overnight_beta": 0.055
+   "overnight_corr": 0.138,
+   "overnight_beta": 0.057
+  },
+  {
+   "target": "sh000688",
+   "target_name": "科创50",
+   "driver": "usDJI",
+   "driver_name": "道琼斯",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.088,
+   "beta": 0.231,
+   "r2": 0.008,
+   "best_lag": 1,
+   "lag_corr": 0.111,
+   "lag_rows": {
+    "lag-2": -0.1,
+    "lag-1": 0.044,
+    "lag1": 0.111,
+    "lag2": 0.047
+   },
+   "overnight_corr": 0.111,
+   "overnight_beta": 0.291
   },
   {
    "target": "sz399006",
@@ -769,20 +791,20 @@
    "driver_name": "特斯拉",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": 0.088,
-   "beta": 0.051,
-   "r2": 0.008,
+   "n": 482,
+   "corr": 0.086,
+   "beta": 0.048,
+   "r2": 0.007,
    "best_lag": 1,
-   "lag_corr": 0.132,
+   "lag_corr": 0.139,
    "lag_rows": {
-    "lag-2": -0.079,
-    "lag-1": 0.029,
-    "lag1": 0.132,
-    "lag2": 0.03
+    "lag-2": -0.107,
+    "lag-1": 0.027,
+    "lag1": 0.139,
+    "lag2": 0.031
    },
-   "overnight_corr": 0.132,
-   "overnight_beta": 0.076
+   "overnight_corr": 0.139,
+   "overnight_beta": 0.078
   },
   {
    "target": "sh000688",
@@ -791,20 +813,42 @@
    "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.074,
-   "beta": -0.101,
-   "r2": 0.006,
+   "n": 482,
+   "corr": -0.073,
+   "beta": -0.099,
+   "r2": 0.005,
    "best_lag": -2,
-   "lag_corr": -0.104,
+   "lag_corr": -0.103,
    "lag_rows": {
-    "lag-2": -0.104,
-    "lag-1": 0.063,
-    "lag1": 0.022,
-    "lag2": 0.017
+    "lag-2": -0.103,
+    "lag-1": 0.062,
+    "lag1": 0.024,
+    "lag2": 0.019
    },
-   "overnight_corr": 0.022,
-   "overnight_beta": 0.03
+   "overnight_corr": 0.024,
+   "overnight_beta": 0.032
+  },
+  {
+   "target": "sz399001",
+   "target_name": "深证成指",
+   "driver": "usDJI",
+   "driver_name": "道琼斯",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.057,
+   "beta": 0.096,
+   "r2": 0.003,
+   "best_lag": 1,
+   "lag_corr": 0.22,
+   "lag_rows": {
+    "lag-2": -0.115,
+    "lag-1": 0.071,
+    "lag1": 0.22,
+    "lag2": 0.049
+   },
+   "overnight_corr": 0.22,
+   "overnight_beta": 0.369
   },
   {
    "target": "sh000300",
@@ -813,20 +857,42 @@
    "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.056,
-   "beta": -0.036,
+   "n": 482,
+   "corr": -0.053,
+   "beta": -0.033,
    "r2": 0.003,
    "best_lag": -2,
-   "lag_corr": -0.147,
+   "lag_corr": -0.152,
+   "lag_rows": {
+    "lag-2": -0.152,
+    "lag-1": 0.123,
+    "lag1": 0.125,
+    "lag2": 0.041
+   },
+   "overnight_corr": 0.125,
+   "overnight_beta": 0.077
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "usDJI",
+   "driver_name": "道琼斯",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.049,
+   "beta": 0.051,
+   "r2": 0.002,
+   "best_lag": 1,
+   "lag_corr": 0.226,
    "lag_rows": {
     "lag-2": -0.147,
-    "lag-1": 0.121,
-    "lag1": 0.111,
-    "lag2": 0.043
+    "lag-1": 0.084,
+    "lag1": 0.226,
+    "lag2": 0.039
    },
-   "overnight_corr": 0.111,
-   "overnight_beta": 0.072
+   "overnight_corr": 0.226,
+   "overnight_beta": 0.232
   },
   {
    "target": "sz399001",
@@ -835,20 +901,64 @@
    "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.051,
-   "beta": -0.046,
-   "r2": 0.003,
+   "n": 482,
+   "corr": -0.048,
+   "beta": -0.042,
+   "r2": 0.002,
    "best_lag": -2,
-   "lag_corr": -0.135,
+   "lag_corr": -0.138,
    "lag_rows": {
-    "lag-2": -0.135,
-    "lag-1": 0.103,
-    "lag1": 0.12,
-    "lag2": 0.04
+    "lag-2": -0.138,
+    "lag-1": 0.102,
+    "lag1": 0.131,
+    "lag2": 0.041
    },
-   "overnight_corr": 0.12,
-   "overnight_beta": 0.108
+   "overnight_corr": 0.131,
+   "overnight_beta": 0.114
+  },
+  {
+   "target": "sh000300",
+   "target_name": "沪深300",
+   "driver": "usDJI",
+   "driver_name": "道琼斯",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.048,
+   "beta": 0.057,
+   "r2": 0.002,
+   "best_lag": 1,
+   "lag_corr": 0.211,
+   "lag_rows": {
+    "lag-2": -0.106,
+    "lag-1": 0.08,
+    "lag1": 0.211,
+    "lag2": 0.042
+   },
+   "overnight_corr": 0.211,
+   "overnight_beta": 0.253
+  },
+  {
+   "target": "sz399006",
+   "target_name": "创业板指",
+   "driver": "usDJI",
+   "driver_name": "道琼斯",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.045,
+   "beta": 0.104,
+   "r2": 0.002,
+   "best_lag": 1,
+   "lag_corr": 0.2,
+   "lag_rows": {
+    "lag-2": -0.114,
+    "lag-1": 0.095,
+    "lag1": 0.2,
+    "lag2": 0.041
+   },
+   "overnight_corr": 0.2,
+   "overnight_beta": 0.46
   },
   {
    "target": "sz399006",
@@ -857,20 +967,20 @@
    "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.041,
-   "beta": -0.05,
-   "r2": 0.002,
+   "n": 482,
+   "corr": -0.038,
+   "beta": -0.045,
+   "r2": 0.001,
    "best_lag": -2,
-   "lag_corr": -0.134,
+   "lag_corr": -0.137,
    "lag_rows": {
-    "lag-2": -0.134,
-    "lag-1": 0.102,
-    "lag1": 0.098,
-    "lag2": 0.027
+    "lag-2": -0.137,
+    "lag-1": 0.101,
+    "lag1": 0.108,
+    "lag2": 0.029
    },
-   "overnight_corr": 0.098,
-   "overnight_beta": 0.12
+   "overnight_corr": 0.108,
+   "overnight_beta": 0.128
   },
   {
    "target": "sh000001",
@@ -879,19 +989,85 @@
    "driver_name": "微软",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.015,
-   "beta": -0.009,
+   "n": 482,
+   "corr": -0.011,
+   "beta": -0.006,
    "r2": 0.0,
    "best_lag": -2,
-   "lag_corr": -0.165,
+   "lag_corr": -0.172,
    "lag_rows": {
-    "lag-2": -0.165,
-    "lag-1": 0.116,
-    "lag1": 0.13,
-    "lag2": 0.056
+    "lag-2": -0.172,
+    "lag-1": 0.117,
+    "lag1": 0.146,
+    "lag2": 0.054
    },
-   "overnight_corr": 0.13,
+   "overnight_corr": 0.146,
+   "overnight_beta": 0.078
+  },
+  {
+   "target": "sh000688",
+   "target_name": "科创50",
+   "driver": "usAAPL",
+   "driver_name": "苹果",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.011,
+   "beta": 0.015,
+   "r2": 0.0,
+   "best_lag": -1,
+   "lag_corr": 0.103,
+   "lag_rows": {
+    "lag-2": -0.059,
+    "lag-1": 0.103,
+    "lag1": 0.019,
+    "lag2": -0.022
+   },
+   "overnight_corr": 0.019,
+   "overnight_beta": 0.027
+  },
+  {
+   "target": "sz399006",
+   "target_name": "创业板指",
+   "driver": "usAAPL",
+   "driver_name": "苹果",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.008,
+   "beta": 0.009,
+   "r2": 0.0,
+   "best_lag": -1,
+   "lag_corr": 0.151,
+   "lag_rows": {
+    "lag-2": -0.092,
+    "lag-1": 0.151,
+    "lag1": 0.088,
+    "lag2": -0.024
+   },
+   "overnight_corr": 0.088,
+   "overnight_beta": 0.106
+  },
+  {
+   "target": "sh000001",
+   "target_name": "上证指数",
+   "driver": "usAAPL",
+   "driver_name": "苹果",
+   "level": "极弱",
+   "note": "几乎无关",
+   "n": 482,
+   "corr": 0.003,
+   "beta": 0.002,
+   "r2": 0.0,
+   "best_lag": -1,
+   "lag_corr": 0.151,
+   "lag_rows": {
+    "lag-2": -0.149,
+    "lag-1": 0.151,
+    "lag1": 0.136,
+    "lag2": -0.023
+   },
+   "overnight_corr": 0.136,
    "overnight_beta": 0.073
   },
   {
@@ -901,64 +1077,20 @@
    "driver_name": "苹果",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.012,
-   "beta": -0.011,
+   "n": 482,
+   "corr": -0.003,
+   "beta": -0.002,
    "r2": 0.0,
    "best_lag": -1,
-   "lag_corr": 0.132,
+   "lag_corr": 0.134,
    "lag_rows": {
-    "lag-2": -0.093,
-    "lag-1": 0.132,
-    "lag1": 0.103,
-    "lag2": -0.015
+    "lag-2": -0.101,
+    "lag-1": 0.134,
+    "lag1": 0.117,
+    "lag2": -0.014
    },
-   "overnight_corr": 0.103,
-   "overnight_beta": 0.093
-  },
-  {
-   "target": "sh000001",
-   "target_name": "上证指数",
-   "driver": "usAAPL",
-   "driver_name": "苹果",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 483,
-   "corr": -0.009,
-   "beta": -0.005,
-   "r2": 0.0,
-   "best_lag": -1,
-   "lag_corr": 0.147,
-   "lag_rows": {
-    "lag-2": -0.136,
-    "lag-1": 0.147,
-    "lag1": 0.116,
-    "lag2": -0.02
-   },
-   "overnight_corr": 0.116,
-   "overnight_beta": 0.066
-  },
-  {
-   "target": "sh000688",
-   "target_name": "科创50",
-   "driver": "usAAPL",
-   "driver_name": "苹果",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 483,
-   "corr": 0.009,
-   "beta": 0.012,
-   "r2": 0.0,
-   "best_lag": -1,
-   "lag_corr": 0.103,
-   "lag_rows": {
-    "lag-2": -0.058,
-    "lag-1": 0.103,
-    "lag1": 0.017,
-    "lag2": -0.026
-   },
-   "overnight_corr": 0.017,
-   "overnight_beta": 0.024
+   "overnight_corr": 0.117,
+   "overnight_beta": 0.103
   },
   {
    "target": "sh000300",
@@ -967,42 +1099,20 @@
    "driver_name": "苹果",
    "level": "极弱",
    "note": "几乎无关",
-   "n": 483,
-   "corr": -0.008,
-   "beta": -0.005,
+   "n": 482,
+   "corr": 0.003,
+   "beta": 0.002,
    "r2": 0.0,
    "best_lag": -1,
-   "lag_corr": 0.141,
+   "lag_corr": 0.145,
    "lag_rows": {
-    "lag-2": -0.092,
-    "lag-1": 0.141,
-    "lag1": 0.094,
-    "lag2": -0.012
+    "lag-2": -0.101,
+    "lag-1": 0.145,
+    "lag1": 0.111,
+    "lag2": -0.014
    },
-   "overnight_corr": 0.094,
-   "overnight_beta": 0.061
-  },
-  {
-   "target": "sz399006",
-   "target_name": "创业板指",
-   "driver": "usAAPL",
-   "driver_name": "苹果",
-   "level": "极弱",
-   "note": "几乎无关",
-   "n": 483,
-   "corr": -0.002,
-   "beta": -0.002,
-   "r2": 0.0,
-   "best_lag": -1,
-   "lag_corr": 0.149,
-   "lag_rows": {
-    "lag-2": -0.086,
-    "lag-1": 0.149,
-    "lag1": 0.076,
-    "lag2": -0.027
-   },
-   "overnight_corr": 0.076,
-   "overnight_beta": 0.093
+   "overnight_corr": 0.111,
+   "overnight_beta": 0.069
   }
  ]
 }
