@@ -1,0 +1,36 @@
+name: app-ci-probe
+
+# 诊断用：用 secrets.GH_TOKEN（对端上私有仓有读权限）查 skapp-app 的 Actions 状态。
+# 本机 gh 凭据属于另一个账号，读不到那个私有仓，所以借这条工作流把真实状态打出来。
+# 只在手动触发时运行，不参与任何闸门。
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: 端上仓 workflows / 最近 runs
+        env:
+          T: ${{ secrets.GH_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${T:-}" ]; then echo "::error::缺少 secrets.GH_TOKEN"; exit 1; fi
+          api() { curl -sf -H "Authorization: Bearer $T" -H "Accept: application/vnd.github+json" "$1"; }
+
+          echo "== repo =="
+          api https://api.github.com/repos/jiegengxiangjianxue/skapp-app \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); print("private=%s default=%s pushed_at=%s" % (d.get("private"), d.get("default_branch"), d.get("pushed_at")))'
+
+          echo "== workflows =="
+          api https://api.github.com/repos/jiegengxiangjianxue/skapp-app/actions/workflows \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); [print("%-24s %-10s %s" % (w["name"], w["state"], w["path"])) for w in d.get("workflows", [])]'
+
+          echo "== recent runs (10) =="
+          api "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/actions/runs?per_page=10" \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); print("total=%s" % d.get("total_count")); [print("%-22s %-12s %-10s %-10s %s %s" % (r["name"], r["head_branch"], r["status"], str(r["conclusion"]), r["created_at"], r["head_sha"][:8])) for r in d.get("workflow_runs", [])]'
