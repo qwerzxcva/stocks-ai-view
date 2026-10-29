@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-29T05:43:43+08:00",
+ "ts": "2026-10-29T10:32:50+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 476,
- "n_transmissions": 2,
+ "n_input": 477,
+ "n_transmissions": 1,
  "n_rules": 16,
  "rules": [
   {
@@ -79,82 +79,43 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "福特上调业绩指引，虽然战争、通胀带来的拖累累积",
+   "title": "贝森特：强劲增长下美联储加息未必有错，债市已经替我们完成了大量紧缩",
    "source": "wallstreetcn",
-   "time": "2026-10-29T04:05:41+08:00",
-   "url": "https://wallstreetcn.com/live/3189388",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-10-29T07:26:26+08:00",
+   "url": "https://wallstreetcn.com/live/3189470",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "银行",
      "stocks": [
-      "301682"
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336",
+      "300399"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "300900"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
-    "event_date": "2026-10-29",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "WTI 12月原油期货收涨2.9%，报102.78美元/桶。\n\n布伦特12月原油期货收涨1.3%，报115.32美元/桶",
-   "source": "wallstreetcn",
-   "time": "2026-10-29T03:53:10+08:00",
-   "url": "https://wallstreetcn.com/live/3189381",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "603727"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
