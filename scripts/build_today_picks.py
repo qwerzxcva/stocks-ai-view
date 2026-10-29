@@ -23,6 +23,7 @@ if HERE not in sys.path:
     sys.path.insert(0, HERE)
 
 import empirical_edge
+import limit_caliber as LC  # noqa: E402  主板/涨停口径唯一来源
 
 CST = timezone(timedelta(hours=8))
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -85,7 +86,7 @@ def names_from_master():
     return out
 
 
-MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002")
+MAIN_BOARD_PREFIXES = LC.MAIN_BOARD_PREFIXES
 INDEX_CODES = {"000001", "000300", "000905", "000852", "399001", "399006", "399300", "399905", "399673"}
 
 

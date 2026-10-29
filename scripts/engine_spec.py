@@ -73,6 +73,7 @@ CALIB = load_calibration()
 
 sys.path.insert(0, HERE)
 from engines_v2 import FLOW_P, TAPE_P, ROT_P, VOL_P  # noqa: E402  参数单源：两端菜单都读这里
+import limit_caliber as _LC  # noqa: E402  涨停/主板口径的唯一代码来源
 
 # ── 聚合与打分（唯一来源，两端都读这里）─────────────────────────────
 AGGREGATION = {
@@ -484,12 +485,16 @@ PRODUCTS = [
 ]
 
 # ── 单一口径表：任何脚本要这些常数就查这里，不再各写一份 ──────────────
+# limit_up / main_board 的数值不在这里写死，而是从 limit_caliber 导入——代码是唯一源，
+# 本表只是把源码里的常量发布成下游（含端上）可读的契约，避免两份数字脉动。
+LIMIT_PREFIX_PCT = {"/".join(g): pct for g, pct in _LC.BOARD_LIMITS}
+LIMIT_PREFIX_PCT["ST"] = _LC.ST_LIMIT
+LIMIT_PREFIX_PCT["default"] = _LC.DEFAULT_LIMIT
 CALIBERS = {
-    "limit_up": {"impl": "scripts/limit_caliber.py", "tolerance_pct": 0.15,
-                 "prefix_pct": {"688/689/30": 20.0, "43/83/87/88/92": 30.0, "ST": 5.0,
-                                "default": 10.0}},
+    "limit_up": {"impl": "scripts/limit_caliber.py", "tolerance_pct": _LC.TOLERANCE,
+                 "prefix_pct": LIMIT_PREFIX_PCT},
     "main_board": {"impl": "scripts/limit_caliber.py:is_main_board",
-                   "prefix": ["600", "601", "603", "605", "000", "001", "002"]},
+                   "prefix": list(_LC.MAIN_BOARD_PREFIXES)},
     "indicator_lib": {"impl": "scripts/indicators_ext.py",
                       "consumers": ["engine_v5.py", "key_levels.py", "trend_strength.py"]},
 }

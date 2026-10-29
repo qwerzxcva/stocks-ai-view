@@ -25,9 +25,10 @@ import sys
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
-MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002")
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+import limit_caliber as LC  # noqa: E402  主板/涨停口径唯一来源
+MAIN_BOARD_PREFIXES = LC.MAIN_BOARD_PREFIXES
 
 try:
     from paths import BULK, AI_VIEW_DATA
@@ -76,7 +77,7 @@ def load_bulk_klines(codes=None, bulk_dir=None):
     return out
 
 
-def compute_features(rows):
+def compute_features(rows, code="", name=""):
     """从K线算 ai_pick v4 所需的全部特征。rows 按日期升序, 至少 60 根。"""
     if len(rows) < 60:
         return None
@@ -114,12 +115,13 @@ def compute_features(rows):
     else:
         mom60 = 0.0
 
-    # 近期涨停基因: 近20日是否有涨幅>=9.5% 的天数
+    # 近期涨停基因: 近20日涨停天数（按板块口径，20cm/30cm 不再漏判）
     zt_genes = sum(1 for i in range(max(0, last - 19), last + 1)
-                   if close[i] > 0 and i > 0 and close[i] / close[i - 1] - 1 >= 0.095)
+                   if close[i] > 0 and i > 0
+                   and LC.is_limit_up(code, (close[i] / close[i - 1] - 1) * 100, name))
 
     # 当日是否已涨停 (硬过滤)
-    is_zt_today = ret >= 0.095
+    is_zt_today = LC.is_limit_up(code, ret * 100, name)
 
     return {
         "symbol": None, "date": dates[last], "price": px,
@@ -157,7 +159,7 @@ def main():
 
     feats = []
     for sym, rows in klines.items():
-        f = compute_features(rows)
+        f = compute_features(rows, sym)
         if f:
             f["symbol"] = sym
             feats.append(f)

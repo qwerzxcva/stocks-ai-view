@@ -38,6 +38,7 @@ except Exception:
 
 # shared analysis layer: quotes/klines cache, tradability, cross-engine verdicts
 import signal_hub as H
+import limit_caliber as LC
 
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
 DISCLAIMER = ("Rule engine output on public data. Research reference only, "
@@ -137,24 +138,12 @@ def atr(rows, n=14):
     return sum(trs) / len(trs)
 
 
-def limit_pct(code):
-    c = str(code)
-    bare = c[2:] if c[:2] in ("sh", "sz", "bj") else c
-    if bare.startswith(("30", "301")):
-        return 0.20          # ChiNext
-    if bare.startswith("688"):
-        return 0.20          # STAR
-    if bare.startswith("bj") or bare.startswith(("43", "83", "87", "88", "92")):
-        return 0.30          # BSE
-    return 0.10              # main board
-
-
 def is_tradable(code, q):
     """Reject anything that cannot realistically be bought now."""
     c = str(code)
     if q["price"] <= 0 or q["prev_close"] <= 0:
         return False, "no quote"
-    lim = limit_pct(c)
+    lim = LC.limit_pct_ratio(c)
     up = q["prev_close"] * (1 + lim)
     # within 1% of the limit, or already AT/above it
     if q["price"] >= up * 0.99:

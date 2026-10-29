@@ -8,7 +8,7 @@ phase_runner.py — 市场阶段机数据供给器: 从日K自算涨停结构 �
 
 数据源 (本项目): stocks-data-kline bulk day_qfq_*.csv (code|date|open|close|high|low|vol)
   上游原版读 stockdb/stock.duckdb 的 daily 表 — 本项目无该库, 改用 bulk CSV 等价计算。
-涨停口径与上游一致: 收盘/前收-1 >= 9.5% (主板10%近似)。
+涨停口径: 不再自带阈值，全部走 limit_caliber（ST 5% / 主板 10% / 创科 20% / 北交所 30%，容差 0.15pp）。
 """
 import argparse
 import csv

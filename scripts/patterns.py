@@ -29,6 +29,10 @@ except Exception:
     BULK = os.path.join(os.path.dirname(os.path.dirname(HERE)), "stocks-data-kline", "data", "bulk")
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
+# 形态阈值：大阳日 / 旗形前两根的涨幅门槛。这是形态定义，与 limit_caliber 的涨停判定无关，
+# 不要拿它当涨停口径——涨停要按板块（ST 5% / 主板 10% / 创科 20% / 北交所 30%）判。
+BIG_UP_PCT = 0.095
+
 
 def _upto(df: pd.DataFrame, date) -> pd.DataFrame:
     idx = df.index[df["date"] == date]
@@ -38,7 +42,7 @@ def _upto(df: pd.DataFrame, date) -> pd.DataFrame:
 
 
 def parking_apron(df: pd.DataFrame, date) -> bool:
-    """停机坪: 近15日出现>9.5%放量上涨(量>5日均量2倍)的次日, 高开收涨且收盘距开盘<3% — 当日即符合。"""
+    """停机坪: 近15日出现>BIG_UP_PCT 放量上涨(量>5日均量2倍)的次日, 高开收涨且收盘距开盘<3% — 当日即符合。"""
     d = _upto(df, date)
     if len(d) < 16:
         return False
@@ -47,14 +51,14 @@ def parking_apron(df: pd.DataFrame, date) -> bool:
             and (today.close / today.open - 1) < 0.03):
         return False
     vol5 = d["volume"].shift(1).rolling(5).mean()
-    big = d["close"].pct_change() > 0.095
+    big = d["close"].pct_change() > BIG_UP_PCT
     heavy = d["volume"] > 2 * vol5
     # 大涨日与今日为相邻两日(大涨日是昨日)
     return bool(big.iloc[-2] and heavy.iloc[-2])
 
 
 def high_tight_flag(df: pd.DataFrame, date) -> bool:
-    """高而窄的旗形: close / min(low[近10日..24日前]) >= 1.9 且最近两日涨幅均>=9.5%。"""
+    """高而窄的旗形: close / min(low[近10日..24日前]) >= 1.9 且最近两日涨幅均>=BIG_UP_PCT。"""
     d = _upto(df, date)
     if len(d) < 25:
         return False
@@ -62,7 +66,7 @@ def high_tight_flag(df: pd.DataFrame, date) -> bool:
     if low24_10 <= 0 or d["close"].iloc[-1] / low24_10 < 1.9:
         return False
     r = d["close"].pct_change()
-    return bool(r.iloc[-1] >= 0.095 and r.iloc[-2] >= 0.095)
+    return bool(r.iloc[-1] >= BIG_UP_PCT and r.iloc[-2] >= BIG_UP_PCT)
 
 
 def backtrace_ma250(df: pd.DataFrame, date) -> bool:

@@ -35,7 +35,11 @@ from datetime import datetime, timedelta, timezone
 
 CST = timezone(timedelta(hours=8))
 
-MAIN_BOARD_PREFIXES = ("600", "601", "603", "605", "000", "001", "002")
+HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
+import limit_caliber as LC  # noqa: E402  主板/涨停口径唯一来源
+MAIN_BOARD_PREFIXES = LC.MAIN_BOARD_PREFIXES
 LIMIT_PCT = 9.6          # >= 这个涨幅按涨停处理，不进推荐
 TOP_N = 15
 

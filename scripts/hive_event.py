@@ -4,7 +4,12 @@
 策略3 calendar_alpha: 星期/月历 (周五规避, 月初加分)
 """
 import duckdb
+import os
 import pandas as pd
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import limit_caliber as LC  # 涨停口径唯一来源
 
 
 def run(ctx):
@@ -14,14 +19,15 @@ def run(ctx):
     try:
         con = duckdb.connect(f"{t1}/qfq_all.duckdb", read_only=True)
         con.execute("SET memory_limit='2GB'")
-        zt = con.execute("""
+        zt_case = LC.sql_limit_up_case('ret', 'sym')
+        zt = con.execute(f"""
           WITH px AS (SELECT sym, CAST(d AS DATE) dd, c, o FROM qfq WHERE (sym LIKE 'sh60%' OR sym LIKE 'sz00%')),
           r AS (SELECT sym, dd, o, c, c/lag(c) OVER (PARTITION BY sym ORDER BY dd) - 1 AS ret FROM px),
           seq AS (SELECT sym, dd, ret,
-                    SUM(CASE WHEN ret>0.095 THEN 1 ELSE 0 END) OVER
+                    SUM(CASE WHEN {zt_case} THEN 1 ELSE 0 END) OVER
                       (PARTITION BY sym ORDER BY dd ROWS BETWEEN 4 PRECEDING AND CURRENT ROW) AS zt5
                   FROM r)
-          SELECT sym, zt5 FROM seq WHERE dd = (SELECT max(dd) FROM seq) AND ret > 0.095
+          SELECT sym, zt5 FROM seq WHERE dd = (SELECT max(dd) FROM seq) AND {zt_case}
         """).fetchdf()
         con.close()
         for _, r in zt.iterrows():

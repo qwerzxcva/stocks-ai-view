@@ -8,7 +8,10 @@
   Tier1(前80) 每分钟采 / Tier2(前300) 每5分 / Tier3 其余 每30分
 输出: data/sampler_tiers.json (minute1_collect读取并按tier调度)
 """
-import json, os, urllib.request, datetime, math, duckdb
+import json, os, urllib.request, datetime, math, sys, duckdb
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import limit_caliber as LC  # 涨停口径唯一来源
 
 UA = {"User-Agent": "Mozilla/5.0", "Referer": "https://gu.qq.com/"}
 STOCKDB = os.environ.get("STOCKS_STOCKDB") or os.path.join(
@@ -44,7 +47,7 @@ def main():
         SELECT symbol FROM (
           SELECT symbol, date, close/LAG(close) OVER (PARTITION BY symbol ORDER BY date)-1 AS ret
           FROM daily WHERE date >= (SELECT strftime(MAX(date)::DATE - 7, '%Y-%m-%d') FROM daily))
-        WHERE ret >= 0.095 GROUP BY symbol""").fetchall()}
+        WHERE {LC.sql_limit_up_case('ret', 'symbol')} GROUP BY symbol""").fetchall()}
     # RPS top池(简化: 近10日涨幅前300)
     rps = con.execute("""
         SELECT symbol, ret FROM (
