@@ -220,6 +220,8 @@ def main():
                     help="按成交额降序处理 (需要最近快照)")
     ap.add_argument("--codes", default="",
                     help="逗号分隔的裸码列表, 只处理这些 code (定向补K线, 忽略 universe/min_days)")
+    ap.add_argument("--force", action="store_true",
+                    help="忽略「已覆盖」判定, 按 universe 全量重抓（用于刷最新交易日与补缺口）")
     args = ap.parse_args()
 
     # 定向模式: 直接抓指定 code (带交易所前缀归一化)
@@ -246,6 +248,10 @@ def main():
             liq = snapshot_liquidity()
             uni.sort(key=lambda x: -liq.get(x["code"][2:], 0))
         have = existing_coverage(args.min_days) | existing_expand_codes()
+        if args.force:
+            # 已覆盖集合会把「有旧数据但缺最近交易日」的股票全跳过（--min-days 0 时更是全跳），
+            # 所以刷新场景必须显式清空，否则工作流打印 done 却一行没拉。
+            have = set()
         todo = [x for x in uni if x["code"] not in have]
         if args.limit:
             todo = todo[: args.limit]

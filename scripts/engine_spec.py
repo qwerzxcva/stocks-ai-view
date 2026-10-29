@@ -609,8 +609,13 @@ def build_spec():
 
 
 # ── 黄金向量 ────────────────────────────────────────────────────────
-def _read_bars(bulk_dir, want_codes, bars):
-    """从分片 CSV 读 (code → bars)。列: code|date|open|close|high|low|vol。"""
+def _read_bars(bulk_dir, want_codes, bars, asof=""):
+    """从分片 CSV 读 (code → bars)。列: code|date|open|close|high|low|vol。
+
+    同一个 code 可能同时出现在分片与 `day_qfq_expand.csv`（补数脚本增量写）里，
+    所以按日期去重（后者覆盖前者）再按日期升序，避免把重复/乱序的行当成窗口；
+    `asof` 用来把窗口截到「最后一个已收盘交易日」，排除当日盘中未完成的日线。
+    """
     need = set(want_codes) | {"__seen__"}
     series = {}
     files = sorted(f for f in os.listdir(bulk_dir) if f.startswith("day_qfq_") and f.endswith(".csv"))
@@ -623,6 +628,8 @@ def _read_bars(bulk_dir, want_codes, bars):
                 if len(parts) < 7:
                     continue
                 code = parts[0]
+                if asof and parts[1] > asof:
+                    continue
                 if code not in need and len(series) >= 400:
                     continue
                 try:
@@ -633,7 +640,10 @@ def _read_bars(bulk_dir, want_codes, bars):
                 series.setdefault(code, []).append(row)
     out = {}
     for code in sorted(series):
-        rows = series[code]
+        by_date = {}
+        for r in series[code]:
+            by_date[r[0]] = r
+        rows = [by_date[d] for d in sorted(by_date)]
         if len(rows) < bars + 1:
             continue
         out[code] = rows[-bars:]
@@ -701,7 +711,7 @@ def snapshot_stats(bulk_dir):
                     max_date = parts[1]
     return {"codes": len(codes), "max_date": max_date}
 
-def build_golden(bulk_dir, samples=6, bars=130):
+def build_golden(bulk_dir, samples=6, bars=130, asof=""):
     """按代码排序固定抽样，用 engine_v5 生成黄金向量。"""
     ev5 = _reference()
     # 先取足够多的候选代码，再按序抽前 samples 只（保证可复现）
@@ -718,7 +728,7 @@ def build_golden(bulk_dir, samples=6, bars=130):
         if len(codes) >= samples * 4:
             break
     picked = codes[: max(samples * 2, samples)]
-    data = _read_bars(bulk_dir, picked, bars)
+    data = _read_bars(bulk_dir, picked, bars, asof=asof)
     cases = []
     for code in sorted(data)[:samples]:
         rows = data[code]
@@ -739,6 +749,7 @@ def build_golden(bulk_dir, samples=6, bars=130):
         "generated_at": datetime.now(CST).isoformat(timespec="seconds"),
         "bars_per_case": bars,
         "snapshot": snapshot_stats(bulk_dir),
+        "asof": asof or "",
         "note": "端上 CanonicalEngine 必须逐票复现 vote 与 strength(±0.001)，score 误差 <= 0.05",
         "cases": cases,
     }
@@ -850,6 +861,8 @@ def main():
                     help="按注册表校验 data/*.json 产物是否满足契约")
     ap.add_argument("--samples", type=int, default=6)
     ap.add_argument("--bars", type=int, default=130)
+    ap.add_argument("--asof", default="",
+                    help="只用到该交易日为止的 K 线（YYYY-MM-DD，排除当日盘中未完成的日线）")
     ap.add_argument("--force", action="store_true",
                     help="允许用覆盖面更小 / 更旧的快照覆盖已有黄金向量（会写进 snapshot 字段留痕）")
     args = ap.parse_args()
@@ -888,7 +901,7 @@ def main():
         if not bulk or not os.path.isdir(bulk):
             print("K 线分片目录不存在: %r（用 --bulk 指定）" % bulk, file=sys.stderr)
             return 2
-        golden = build_golden(bulk, samples=args.samples, bars=args.bars)
+        golden = build_golden(bulk, samples=args.samples, bars=args.bars, asof=args.asof)
         if os.path.exists(args.golden) and not args.force:
             old = _load(args.golden)
             snap = old.get("snapshot") or {}

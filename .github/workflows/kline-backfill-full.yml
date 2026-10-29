@@ -30,6 +30,9 @@ on:
       codes:
         description: '定向补齐的裸码 (逗号分隔, 留空=自动找缺口)'
         default: ''
+      force:
+        description: '忽略「已覆盖」判定, 按 universe 全量重抓 (刷最新交易日/补缺口用, 较慢)'
+        default: 'false'
 
 permissions:
   contents: write
@@ -119,6 +122,7 @@ jobs:
             --min-days 0 \
             --workers "${{ github.event.inputs.workers || '8' }}" \
             --codes "${{ github.event.inputs.codes || '' }}" \
+            ${{ github.event.inputs.force == 'true' && '--force' || '' }} \
             || echo "::warning::K线补齐部分失败, 保留已拉到的部分"
 
       # ── 3. 瘦身与格式统一 ────────────────────────────────────
