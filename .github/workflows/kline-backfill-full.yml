@@ -60,11 +60,13 @@ jobs:
           git fetch origin main
           git merge --ff-only origin/main || echo "already up to date"
 
+      # GITHUB_TOKEN 只对本工作流所在仓有写权限，推 K 线仓会 403
+      # （2026-10-29 实测：commit 成功、push 被拒 → 895 MB 补数结果随 runner 一起销毁）
       - name: Checkout kline repo (full, not sparse)
         uses: actions/checkout@v4
         with:
           repository: qwerzxcva/t1
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GH_TOKEN }}
           path: kline-repo
           fetch-depth: 0
 
@@ -176,8 +178,13 @@ jobs:
           git reset --soft origin/main
           git add -A data/bulk/
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
-          test -s data/bulk/day_qfq_expand.csv || { echo "::error::day_qfq_expand.csv 不存在或为空，补数没落到仓库工作树"; exit 1; }
-          echo "expand rows: $(wc -l < data/bulk/day_qfq_expand.csv)  size: $(du -h data/bulk/day_qfq_expand.csv | cut -f1)"
+          EXP=data/bulk/day_qfq_expand.csv
+          test -s "$EXP" || { echo "::error::day_qfq_expand.csv 不存在或为空，补数没落到仓库工作树"; exit 1; }
+          echo "expand rows: $(wc -l < "$EXP")  size: $(du -h "$EXP" | cut -f1)"
+          # 全量文本约 900 MB，仓库里按 gz 存（engine_spec / kline_sim 都会读 .csv.gz）
+          gzip -9 -f "$EXP"
+          test -s "$EXP.gz" || { echo "::error::gzip 失败"; exit 1; }
+          echo "expand gz size: $(du -h "$EXP.gz" | cut -f1)"
           if git diff --quiet --cached HEAD; then
             echo "::error::补数后 data/bulk 无改动（补数结果被丢弃），拒绝静默成功"
             exit 1
@@ -190,13 +197,14 @@ jobs:
       - name: Stamp kline version in main repo
         run: |
           python3 - <<'PY'
-          import json, os, glob
+          import gzip, json, os, glob
           from collections import defaultdict
           BULK = "../stocks-data-kline/data/bulk"
           by_code = defaultdict(dict)
-          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv")):
-              comma = os.path.basename(p) in ("day_qfq_extra.csv", "day_qfq_recent.csv")
-              with open(p, encoding="utf-8", errors="replace") as f:
+          for p in glob.glob(os.path.join(BULK, "day_qfq_*.csv*")):
+              comma = os.path.basename(p).startswith(("day_qfq_extra", "day_qfq_recent"))
+              op = gzip.open if p.endswith(".gz") else open
+              with op(p, "rt", encoding="utf-8", errors="replace") as f:
                   for line in f:
                       if line.startswith("#") or "|" not in line:
                           continue

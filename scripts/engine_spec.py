@@ -35,6 +35,7 @@ parity 测试立刻红——这才是「双端算法一致」的可执行定义�
   保证同一份数据下 golden 可复现。
 """
 import argparse
+import gzip
 import json
 import os
 import sys
@@ -609,35 +610,47 @@ def build_spec():
 
 
 # ── 黄金向量 ────────────────────────────────────────────────────────
+def _iter_shard_lines(name, path):
+    """分片可能是 .csv 或 .csv.gz（大分片在仓库里按 gz 存）。"""
+    if name.endswith(".gz"):
+        with gzip.open(path, "rt", encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                yield line
+    else:
+        with open(path, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                yield line
+
+def _is_shard(name):
+    return name.startswith("day_qfq_") and (name.endswith(".csv") or name.endswith(".csv.gz"))
+
 def _read_bars(bulk_dir, want_codes, bars, asof=""):
-    """从分片 CSV 读 (code → bars)。列: code|date|open|close|high|low|vol。
+    """从分片读 (code → bars)。列: code|date|open|close|high|low|vol。
 
     同一个 code 可能同时出现在分片与 `day_qfq_expand.csv`（补数脚本增量写）里，
-    所以按日期去重（后者覆盖前者）再按日期升序，避免把重复/乱序的行当成窗口；
+    所以按日期去重（后写覆盖先写）再按日期升序，避免把重复 / 乱序的行当成窗口；
     `asof` 用来把窗口截到「最后一个已收盘交易日」，排除当日盘中未完成的日线。
     """
     need = set(want_codes) | {"__seen__"}
     series = {}
-    files = sorted(f for f in os.listdir(bulk_dir) if f.startswith("day_qfq_") and f.endswith(".csv"))
-    for name in files:
-        with open(os.path.join(bulk_dir, name), encoding="utf-8") as fh:
-            for line in fh:
-                if line.startswith("#") or "|" not in line:
-                    continue
-                parts = line.rstrip("\n").split("|")
-                if len(parts) < 7:
-                    continue
-                code = parts[0]
-                if asof and parts[1] > asof:
-                    continue
-                if code not in need and len(series) >= 400:
-                    continue
-                try:
-                    row = (parts[1], float(parts[2]), float(parts[3]),
-                           float(parts[4]), float(parts[5]), float(parts[6]))
-                except ValueError:
-                    continue
-                series.setdefault(code, []).append(row)
+    for name in sorted(f for f in os.listdir(bulk_dir) if _is_shard(f)):
+        for line in _iter_shard_lines(name, os.path.join(bulk_dir, name)):
+            if line.startswith("#") or "|" not in line:
+                continue
+            parts = line.rstrip("\n").split("|")
+            if len(parts) < 7:
+                continue
+            code = parts[0]
+            if asof and parts[1] > asof:
+                continue
+            if code not in need and len(series) >= 400:
+                continue
+            try:
+                row = (parts[1], float(parts[2]), float(parts[3]),
+                       float(parts[4]), float(parts[5]), float(parts[6]))
+            except ValueError:
+                continue
+            series.setdefault(code, []).append(row)
     out = {}
     for code in sorted(series):
         by_date = {}
@@ -650,7 +663,6 @@ def _read_bars(bulk_dir, want_codes, bars, asof=""):
         if len(out) >= len(want_codes):
             break
     return out
-
 
 def _reference():
     """导入云端参考实现（不复制公式）。"""
@@ -697,18 +709,16 @@ def snapshot_stats(bulk_dir):
     """
     codes = set()
     max_date = ""
-    for name in sorted(f for f in os.listdir(bulk_dir)
-                       if f.startswith("day_qfq_") and f.endswith(".csv")):
-        with open(os.path.join(bulk_dir, name), encoding="utf-8") as fh:
-            for line in fh:
-                if line.startswith("#") or "|" not in line:
-                    continue
-                parts = line.rstrip("\n").split("|")
-                if len(parts) < 7:
-                    continue
-                codes.add(parts[0])
-                if parts[1] > max_date:
-                    max_date = parts[1]
+    for name in sorted(f for f in os.listdir(bulk_dir) if _is_shard(f)):
+        for line in _iter_shard_lines(name, os.path.join(bulk_dir, name)):
+            if line.startswith("#") or "|" not in line:
+                continue
+            parts = line.rstrip("\n").split("|")
+            if len(parts) < 7:
+                continue
+            codes.add(parts[0])
+            if parts[1] > max_date:
+                max_date = parts[1]
     return {"codes": len(codes), "max_date": max_date}
 
 def build_golden(bulk_dir, samples=6, bars=130, asof=""):
@@ -725,12 +735,26 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
                 code = line.split("|", 1)[0]
                 if code and code not in codes:
                     codes.append(code)
-        if len(codes) >= samples * 4:
+        if len(codes) >= samples * 8:
             break
-    picked = codes[: max(samples * 2, samples)]
+    picked = codes[: max(samples * 8, samples)]
     data = _read_bars(bulk_dir, picked, bars, asof=asof)
+    # 抽样准则：优先挑「能触发条件票」的代码。below_ma60 / momentum_overheat 只在
+    # 特定区间才有票（距 60 日线 -10%~-5% 或 >20%），按代码顺序抽会整批漏掉这两个指标，
+    # 端上 21 票执法就永远考不到它们（2026-10-29 实测：按序抽样 6 只全部只有 17 票）。
+    scored = []
+    for code in sorted(data):
+        rows = data[code]
+        try:
+            votes = ev5.build_votes([r[2] for r in rows], [r[3] for r in rows],
+                                     [r[4] for r in rows], [r[5] for r in rows], None, "") or []
+        except Exception:
+            votes = []
+        scored.append((-len(votes), code))
+    scored.sort()
+    picked_codes = sorted(code for _, code in scored[:samples])
     cases = []
-    for code in sorted(data)[:samples]:
+    for code in picked_codes:
         rows = data[code]
         expect = expect_from_bars(rows)
         if not expect:
@@ -750,6 +774,7 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
         "bars_per_case": bars,
         "snapshot": snapshot_stats(bulk_dir),
         "asof": asof or "",
+        "selection": "max_indicator_coverage",
         "note": "端上 CanonicalEngine 必须逐票复现 vote 与 strength(±0.001)，score 误差 <= 0.05",
         "cases": cases,
     }
