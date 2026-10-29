@@ -29,6 +29,7 @@ except Exception:
     DATA_DIR = os.path.join(os.path.dirname(HERE), "data")
 
 from market_phase import classify
+from limit_caliber import is_limit_up
 
 LABELS = {"ice": "冰点", "ignite": "启动", "rally": "主升", "climax": "高潮", "ebb": "退潮", "repair": "修复"}
 
@@ -79,7 +80,8 @@ def daily_structure(closes: dict, days: int = 90):
         today_zt = {}
         for code, rets in per_code.items():
             r = next((x for x in rets if x[0] == dt), None)
-            if r is None or r[1] < 0.095:
+            # 口径收敛到 limit_caliber（此前写死 9.5%，20cm/30cm 板块全漏判）
+            if r is None or not is_limit_up(code, r[1] * 100):
                 continue
             n = prev_zt.get(code, 0) + 1
             today_zt[code] = n
@@ -123,7 +125,7 @@ def main():
         "label": LABELS.get(last, "?"),
         "recent": list(zip([x["date"] for x in daily[-5:]], phases[-5:])),
         "structure": daily[-10:],
-        "source": f"bulk day_qfq ({os.path.basename(bulk)}), 涨停口径=收盘/前收>=9.5%",
+        "source": f"bulk day_qfq ({os.path.basename(bulk)}), 涨停口径=limit_caliber",
     }
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:

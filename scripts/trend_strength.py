@@ -161,27 +161,32 @@ def linreg(xs, ys):
 
 
 def rsi(closes, end, period=14):
-    if end < period:
+    """委托 indicators_ext._rsi（Wilder 平滑）。
+
+    此前这里是「最近 period 根累加」的 SMA 近似版，与 engine_v5/key_levels 用的
+    Wilder 版不是同一个数；同一只票在 trend_strength.json 与 engine_v5.json 里
+    RSI 分量对不上。现统一到唯一实现，端上复刻也只对一份。
+    """
+    try:
+        import indicators_ext as _IE
+        seq = _IE._rsi(closes[: end + 1], period)
+        return None if not seq else seq[-1]
+    except Exception:
         return None
-    g = l = 0.0
-    for j in range(end - period + 1, end + 1):
-        ch = closes[j] - closes[j - 1]
-        if ch > 0:
-            g += ch
-        else:
-            l -= ch
-    if l == 0:
-        return 100.0
-    return 100 - 100 / (1 + g / l)
 
 
 def macd_at(closes, i):
-    """SMA 近似 EMA 的 MACD (DIF, DEA, hist)。i<25 返回 None。"""
+    """DIF = EMA12 - EMA26，委托 indicators_ext.ema（真 EMA，非 SMA 近似）。"""
     if i < 25:
         return None
-    ma12 = sum(closes[i - 11:i + 1]) / 12
-    ma26 = sum(closes[i - 25:i + 1]) / 26
-    return ma12 - ma26
+    try:
+        import indicators_ext as _IE
+        seg = closes[: i + 1]
+        e12, e26 = _IE.ema(seg, 12), _IE.ema(seg, 26)
+        a, b = e12[-1] if e12 else None, e26[-1] if e26 else None
+        return None if a is None or b is None else a - b
+    except Exception:
+        return None
 
 
 def macd_signal(closes, end):

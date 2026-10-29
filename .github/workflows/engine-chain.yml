@@ -347,6 +347,10 @@ jobs:
           python3 scripts/engine_v5.py --out data/engine_v5.json --limit 4200 --main-board-only
           python3 scripts/ai_pick_v4.py --out data/ai_pick_v4.json || echo "ai_pick_v4 skipped"
           python3 scripts/rps_rotation.py --top 30 --out data/rps_rotation.json || echo "rps skipped"
+          # v1 新增: 横截面多因子合成（z-score, winsor 2%），只依赖 K 线
+          python3 scripts/factor_composite.py --limit 4200 || echo "factor_composite skipped"
+          # v1 新增: 行业级轮动（行业 RPS + 扩散广度 + 龙头），行业映射缺失时跳过
+          python3 scripts/sector_rotation.py --limit 4200 || echo "sector_rotation skipped"
           # 关键价位 (候选股 Pivot/布林/Keltner/ATR/偏离第N) + 60日广度 + 区间高点追踪
           # full 档也要跑: 周末/盘后是 full 档, 只在 light 档会周末全断 (2026-10-17 实测)
           python3 scripts/key_levels.py || echo "key_levels skipped"
@@ -396,6 +400,17 @@ jobs:
           python3 scripts/patterns.py --out data/patterns_smoke.json || echo "patterns skipped"
           python3 scripts/strategy_card.py || echo "strategy_card skipped"
           python3 scripts/engine_fusion.py || echo "engine_fusion skipped"
+          # v1 新增: 风险预算（融合状态 + 相位 + 半凯利 + 波动率目标 → 仓位上限）
+          python3 scripts/risk_budget.py || echo "risk_budget skipped"
+
+          echo "--- 契约层: 产物理赔 (注册表 + 黄金向量漂移) ---"
+          # 双端一致性闸门。任一项失败即让整步红：宁可当轮全链红，也不要端上静默用错口径。
+          python3 scripts/engine_spec.py --out data/engine_spec.json
+          # 这两条硬失败: 产物契约 / 黄金向量是「双端一致」的判据本身, 不能降级成警告。
+          python3 scripts/engine_spec.py --check-products
+          python3 scripts/engine_spec.py --verify data/parity/golden_v5.json --samples 6 --bars 130
+          python3 scripts/build_engine_manifest.py || echo "manifest skipped"
+          python3 scripts/verify_engine_consistency.py || echo "::error::端云引擎版本不一致"
 
           echo "--- tier 3: backtest + reflection + winrate ---"
           python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --max-signals 3000 || echo "kline_sim skipped"

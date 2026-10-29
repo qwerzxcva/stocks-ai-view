@@ -27,9 +27,12 @@ v5 设计:
 """
 import argparse
 import bisect
+import pickle
 import json
 import os
 import sys
+import tempfile
+import shutil
 from datetime import datetime, timezone, timedelta
 
 CST = timezone(timedelta(hours=8))
@@ -573,6 +576,13 @@ def load_klines(bulk_dir, limit=None):
 
 MAIN_BOARD_PREFIX = ("600", "601", "603", "605", "000", "001", "002")
 
+# 指标票数：17 技术 + 4 外部(SectorResonance/CapitalFlowConsistency/InZTPool/below_ma60)。
+# 此前产物里写死 20，与实际 build_votes 能产出的票数不符，下游按 indicators 做循环会错位。
+EXPECTED_VOTES = 21
+
+# 权重文件：唯一写者是 weight_calibrator_v2.py（见 docs/CLOUD_DEVICE_CONTRACT.md）。
+WEIGHTS_FILE = os.path.join(_data_dir(), "engine_weights.json")
+
 
 def _board_filter(rows):
     """只保留沪深主板 (用户无科创/创业板交易权限)。"""
@@ -585,6 +595,111 @@ def _board_filter(rows):
     return out
 
 
+# ── 并行打分 ────────────────────────────────────────────────────────
+# 2026-10-29: 全市场 4766 只 × 21 票，单进程在本机要 >10 分钟，GitHub runner 也要
+# 6-9 分钟，逼近 workflow 超时。打分是纯函数（输入 OHLCV + 只读外部数据），可以
+# 直接按股票切分到进程池。fork 出来的子进程共享 all_sources 的页表，不会复制 22MB。
+_PAR = {}
+
+
+def _age_days(d):
+    try:
+        return (datetime.strptime(_PAR["market_asof"], "%Y-%m-%d")
+                - datetime.strptime(d, "%Y-%m-%d")).days
+    except Exception:
+        return 999
+
+
+def _score_one(item):
+    """单票打分（进程池工作单元）。异常不冒泡：一只票算崩不该拖垮整轮。"""
+    code, bars = item
+    if len(bars) < 30:
+        return None
+    g = _PAR
+    close = [b[2] for b in bars]
+    high = [b[3] for b in bars]
+    low = [b[4] for b in bars]
+    vol = [b[5] for b in bars]
+    bare = str(code).zfill(6) if isinstance(code, str) else code
+    source_info = None
+    if g["all_sources"] and not g["no_ext"]:
+        source_info = {
+            "all_sources": g["all_sources"],
+            "industry": g["industry_map"].get(bare, ""),
+        }
+    try:
+        r = score_stock(close, high, low, vol, weights=g["weights"],
+                        source_info=source_info, code_bare=bare)
+    except Exception:
+        return None
+    if not r:
+        return None
+    r["code"] = bare
+    r["date"] = bars[-1][0]
+    r["price"] = close[-1]
+    r["bars"] = len(bars)
+    age = _age_days(r["date"])
+    r["data_age_days"] = age
+    r["data_fresh"] = age <= g["stale_days_limit"]
+    r["source_ts"] = (g["all_sources"] or {}).get("summary", {}).get("ts")
+    r["data_provenance"] = {
+        "technical": "indicators_ext (17 指标)",
+        "external": "collect_all_sources/all_sources.json" if source_info else "none",
+        "resonance_new": ["SectorResonance", "CapitalFlowConsistency", "InZTPool"],
+        "industry_from": g["industry_map"].get(bare, "unknown") or "N/A",
+    }
+    return r
+
+
+def _score_all(klines, workers):
+    """按股票切分到 fork 子进程，结果按原顺序合并。
+
+    不用 multiprocessing.Pool：本容器没有 /dev/shm，Pool 的 SemLock 直接
+    FileNotFoundError。fork + 临时文件没有信号量依赖，行为也更容易预测。
+    """
+    items = list(klines.items())
+    if workers <= 1 or len(items) < 200:
+        return [r for r in map(_score_one, items) if r]
+    workers = max(1, min(workers, len(items) // 50))
+    shards = [items[i::workers] for i in range(workers)]
+    tmpdir = tempfile.mkdtemp(prefix="ev5-")
+    paths, pids = [], []
+    for idx, shard in enumerate(shards):
+        path = os.path.join(tmpdir, "%02d.pkl" % idx)
+        sys.stdout.flush()
+        pid = os.fork()
+        if pid == 0:  # 子进程
+            try:
+                res = [r for r in map(_score_one, shard) if r]
+                with open(path, "wb") as f:
+                    pickle.dump(res, f, protocol=4)
+            finally:
+                os._exit(0)
+        paths.append(path)
+        pids.append(pid)
+    merged = []
+    for pid in pids:
+        os.waitpid(pid, 0)
+    for path in paths:
+        try:
+            with open(path, "rb") as f:
+                merged.extend(pickle.load(f))
+        except Exception as e:
+            print(f"[engine_v5] 分片读取失败 {path}: {e}", file=sys.stderr)
+        finally:
+            try:
+                os.unlink(path)
+            except OSError:
+                pass
+    shutil.rmtree(tmpdir, ignore_errors=True)
+    # 还原 klines 的原始次序：imap 保序、fork 分片不保序，下游 sort 稳定性依赖这一点
+    order = {}
+    for i, (code, _bars) in enumerate(items):
+        order[str(code).zfill(6) if isinstance(code, str) else code] = i
+    merged.sort(key=lambda r: order.get(r["code"], 1 << 30))
+    return merged
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--bulk", default=None, help="K线 bulk 目录 (默认 paths.BULK)")
@@ -592,6 +707,10 @@ def main():
     ap.add_argument("--limit", type=int, default=200)
     ap.add_argument("--min-score", type=float, default=60)
     ap.add_argument("--no-ext", action="store_true", help="禁用外部数据源增强 (仅指标共振)")
+    ap.add_argument("--workers", type=int, default=1,
+                    help="打分进程数（纯 CPU，1=串行；全市场建议 4-8）")
+    ap.add_argument("--weights", default=None,
+                    help="指标权重 JSON (默认自动读 data/engine_weights.json; 传 none 强制等权)")
     # 2026-10-19 用户约束: 无科创/创业板交易权限。打分仍覆盖全市场
     # (训练/测试需要), 但推荐输出只留主板。
     ap.add_argument("--main-board-only", action="store_true",
@@ -606,6 +725,24 @@ def main():
     klines = load_klines(bulk, args.limit)
     adj_stats = getattr(load_klines, "stats", {}) or {}
     print(f"[engine_v5] 加载 {len(klines)} 只K线", flush=True)
+
+    # ── 权重：此前 score_stock 永远拿不到 weights，engine_weights.json 空转 ──
+    # 现在默认消费它；文件缺失/损坏时退回等权，但把来源写进产物，下游能看出这次是不是等权。
+    weights, weights_src = {}, "equal(等权)"
+    wpath = None
+    if args.weights != "none":
+        wpath = args.weights or WEIGHTS_FILE
+        if os.path.exists(wpath):
+            try:
+                with open(wpath, encoding="utf-8") as f:
+                    raw = json.load(f)
+                weights = {k: float(v) for k, v in (raw.get("weights") or {}).items()}
+                if weights:
+                    weights_src = f"{os.path.basename(wpath)}@{raw.get('ts', '?')}"
+            except Exception as e:
+                print(f"[engine_v5] 权重文件不可用({e})，退回等权", file=sys.stderr)
+        elif args.weights:
+            print(f"[engine_v5] --weights 指定文件不存在: {wpath}，退回等权", file=sys.stderr)
 
     all_sources = None if args.no_ext else load_all_sources()
     print(f"[engine_v5] all_sources {'已加载' if all_sources else '未找到 (仅用技术指标)'}", flush=True)
@@ -639,38 +776,12 @@ def main():
             for x in (q.get('detail') or []):
                 industry_map.setdefault(str(x.get('code', '')).zfill(6), x.get('industry', ''))
 
-    for code, bars in klines.items():
-        if len(bars) < 30:
-            continue
-        close = [b[2] for b in bars]
-        high = [b[3] for b in bars]
-        low = [b[4] for b in bars]
-        vol = [b[5] for b in bars]
-        bare = str(code).zfill(6) if isinstance(code, str) else code
-        source_info = None
-        if all_sources and not args.no_ext:
-            source_info = {
-                "all_sources": all_sources,
-                "industry": industry_map.get(bare, ''),
-            }
-        r = score_stock(close, high, low, vol, source_info=source_info, code_bare=bare)
-        if not r:
-            continue
-        r["code"] = bare
-        r["date"] = bars[-1][0]
-        r["price"] = close[-1]
-        r["bars"] = len(bars)
-        age = _age_days(r["date"])
-        r["data_age_days"] = age
-        r["data_fresh"] = age <= stale_days_limit
-        r["source_ts"] = (all_sources or {}).get('summary', {}).get('ts')
-        r["data_provenance"] = {
-            "technical": "indicators_ext (17 指标, 等权)",
-            "external": "collect_all_sources/all_sources.json" if all_sources and source_info else "none",
-            "resonance_new": ["SectorResonance", "CapitalFlowConsistency", "InZTPool"],
-            "industry_from": industry_map.get(bare, "unknown") or "N/A",
-        }
-        results.append(r)
+    _PAR.update({
+        "all_sources": all_sources, "no_ext": args.no_ext, "industry_map": industry_map,
+        "weights": weights, "market_asof": market_asof, "stale_days_limit": stale_days_limit,
+    })
+    # 结果顺序由 imap 保序，与单进程完全一致（下游 sort 稳定性不变）
+    results = _score_all(klines, args.workers)
 
     results.sort(key=lambda x: -x["score"])
     fresh = [r for r in results if r.get("data_fresh")]
@@ -705,14 +816,22 @@ def main():
             "stale_codes": [r["code"] for r in stale[:50]],
             "note": "K线分片可能不同步; 旧数据不冒充今日信号",
         },
-        "indicators": 20,  # 17 tech + 3 external
+        "indicators": EXPECTED_VOTES,  # 容量: 17 tech + 4 external(含 below_ma60)
+        # 实际每只票能拿到几票取决于输入（无 all_sources 时只有 17）。写进产物，
+        # 下游和端上据此判断「这次是不是降级跑」。
+        "votes_observed": {
+            "min": min((r["bull"] + r["bear"] + r["neutral"]) for r in results) if results else 0,
+            "max": max((r["bull"] + r["bear"] + r["neutral"]) for r in results) if results else 0,
+            "external_available": bool(all_sources),
+        },
         "formula": "score = 50 + 50 * (Σ w·vote·strength / Σ w) * (0.6 + 0.4*共振率)",
         # top 只给新鲜数据; 陈旧分片的股票单列, 不用旧信号冒充今日推荐
         "top": _board_filter(fresh)[:50] if args.main_board_only else fresh[:50],
         "stale_top": stale[:20],
         "meta": {
             "resonance": "同向票数/方向票数, 分歧大时降权 (0.6~1.0 系数)",
-            "weights": "默认等权; 可由 optimizer.py walk_forward 校准后写入",
+            "weights": weights_src,
+            "weights_used": weights,
             "external_enhancement": [
                 "SectorResonance: 行业板块当日涨幅 + 板块内股票共振",
                 "CapitalFlowConsistency: 主力资金近 3 日净流入方向",

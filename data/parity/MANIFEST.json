@@ -1,0 +1,75 @@
+{
+ "ts": "2026-10-29T09:35:45+08:00",
+ "writer": "session-b953eca0",
+ "policy": {
+  "single_writer": "scripts/sync_parity_artifacts.py publish",
+  "forbidden": "手工 cp / 其它脚本直接写这些目标文件；一旦绕过，check 会报指纹不符",
+  "rationale": "这两类文件是生成物、无合并语义；并发会话谁写谁赢且不会报错，必须收敛到一个入口"
+ },
+ "gates": {
+  "failed": [],
+  "forced": false
+ },
+ "artifacts": {
+  "engine-algo/src/main/resources/engine_spec.json": {
+   "source": "data/engine_spec.json",
+   "source_sha256": "ec732bb4c57ef8074f022ab87bf100d2e537288e7dab32ba4ba405775f05fa39",
+   "sha256": "ec732bb4c57ef8074f022ab87bf100d2e537288e7dab32ba4ba405775f05fa39",
+   "bytes": 36851
+  },
+  "testdata/parity/golden_v5.json": {
+   "source": "data/parity/golden_v5.json",
+   "source_sha256": "c1d906b3a99bf568a1fafa3c503cbabecdc54cf367ea9eccbaa2c4c8efac50fd",
+   "sha256": "c1d906b3a99bf568a1fafa3c503cbabecdc54cf367ea9eccbaa2c4c8efac50fd",
+   "bytes": 71137
+  },
+  "testdata/parity/golden_v2.json": {
+   "source": "data/parity/golden_v2.json",
+   "source_sha256": "0890d1a6ec9a8931d380d5184761c946dbc35584712e229f55df65848cc9eb3e",
+   "sha256": "0890d1a6ec9a8931d380d5184761c946dbc35584712e229f55df65848cc9eb3e",
+   "bytes": 273859
+  },
+  "testdata/parity/golden_21.json": {
+   "source": "data/parity/golden_21.json",
+   "source_sha256": "985d63f6d4199df05429583789aacaa28762cb47a4e469de20a56b3051fe8346",
+   "sha256": "985d63f6d4199df05429583789aacaa28762cb47a4e469de20a56b3051fe8346",
+   "bytes": 102683
+  },
+  "testdata/cloud/engine_v5.json": {
+   "source": "data/engine_v5.json",
+   "source_sha256": "413a787581bce18dc54a6ca76e987a715c327ec11af2a99c83e63be78f1691d8",
+   "sha256": "413a787581bce18dc54a6ca76e987a715c327ec11af2a99c83e63be78f1691d8",
+   "bytes": 227587
+  },
+  "testdata/cloud/engine_spec.json": {
+   "source": "data/engine_spec.json",
+   "source_sha256": "ec732bb4c57ef8074f022ab87bf100d2e537288e7dab32ba4ba405775f05fa39",
+   "sha256": "ec732bb4c57ef8074f022ab87bf100d2e537288e7dab32ba4ba405775f05fa39",
+   "bytes": 36851
+  },
+  "testdata/cloud/risk_budget.json": {
+   "source": "data/risk_budget.json",
+   "source_sha256": "abe9925fb0bf58c74a618e4056810b60d392e4aea04cc66824f429d36d051f59",
+   "sha256": "abe9925fb0bf58c74a618e4056810b60d392e4aea04cc66824f429d36d051f59",
+   "bytes": 696
+  },
+  "testdata/cloud/engine_fusion.json": {
+   "source": "data/engine_fusion.json",
+   "source_sha256": "16b1ee626e0272149e07ed45ab1def16580e75b157a4ca215542f4b0239afc35",
+   "sha256": "16b1ee626e0272149e07ed45ab1def16580e75b157a4ca215542f4b0239afc35",
+   "bytes": 495
+  },
+  "testdata/cloud/market_phase.json": {
+   "source": "data/market_phase.json",
+   "source_sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
+   "sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
+   "bytes": 3499
+  },
+  "testdata/cloud/limit_history.json": {
+   "source": "data/limit_history.json",
+   "source_sha256": "713b89c5bf5df6adde52c8d1d72fdeeebcb0dd25f23abab09db6fe5e565e8f3b",
+   "sha256": "713b89c5bf5df6adde52c8d1d72fdeeebcb0dd25f23abab09db6fe5e565e8f3b",
+   "bytes": 75198
+  }
+ }
+}

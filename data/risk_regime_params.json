@@ -1,0 +1,452 @@
+{
+ "ts": "2026-10-29T08:01:18+08:00",
+ "engine": "risk_regime_calibration_v1",
+ "spec_version": "3.0.0",
+ "data": {
+  "start": "2024-10-08",
+  "end": "2026-10-28",
+  "bars": 500,
+  "indices": [
+   "sh000001",
+   "sh000300",
+   "sh000688",
+   "sz399001",
+   "sz399006"
+  ],
+  "primary": "sh000300",
+  "cost_bps": 5.0,
+  "vol_window": 60,
+  "folds": 3
+ },
+ "regime_cap": {
+  "bull": 0.9,
+  "range": 0.6,
+  "bear": 0.3
+ },
+ "params": {
+  "vol_target_annual": 0.12,
+  "max_pos": 0.8,
+  "ma_fast": 30,
+  "ma_slow": 90,
+  "dwell": 5
+ },
+ "calibration": {
+  "train": {
+   "n_days": 331,
+   "total_return": 0.1224,
+   "cagr": 0.0919,
+   "vol_annual": 0.0889,
+   "sharpe": 1.033,
+   "max_drawdown": -0.0592,
+   "calmar": 1.55,
+   "avg_exposure": 0.523,
+   "turnover_annual": 1.85
+  },
+  "oos": {
+   "n_days": 168,
+   "total_return": -0.0592,
+   "cagr": -0.0875,
+   "vol_annual": 0.0968,
+   "sharpe": -0.897,
+   "max_drawdown": -0.0704,
+   "calmar": -1.24,
+   "avg_exposure": 0.446,
+   "turnover_annual": 2.85
+  },
+  "oos_buy_hold": {
+   "n_days": 168,
+   "total_return": -0.1336,
+   "cagr": -0.1936,
+   "vol_annual": 0.1935,
+   "sharpe": -1.014,
+   "max_drawdown": -0.2023,
+   "calmar": -0.96,
+   "avg_exposure": 1.0,
+   "turnover_annual": 0.0
+  },
+  "oos_fixed_60": {
+   "n_days": 168,
+   "total_return": -0.0797,
+   "cagr": -0.1171,
+   "vol_annual": 0.1161,
+   "sharpe": -1.014,
+   "max_drawdown": -0.1253,
+   "calmar": -0.93,
+   "avg_exposure": 0.6,
+   "turnover_annual": 0.0
+  },
+  "per_fold": [
+   {
+    "days": 166,
+    "strategy": {
+     "n_days": 165,
+     "total_return": -0.0336,
+     "cagr": -0.0508,
+     "vol_annual": 0.0709,
+     "sharpe": -0.7,
+     "max_drawdown": -0.0592,
+     "calmar": -0.86,
+     "avg_exposure": 0.322,
+     "turnover_annual": 2.13
+    },
+    "fixed_60": {
+     "n_days": 165,
+     "total_return": -0.0492,
+     "cagr": -0.0741,
+     "vol_annual": 0.1195,
+     "sharpe": -0.584,
+     "max_drawdown": -0.0944,
+     "calmar": -0.78,
+     "avg_exposure": 0.6,
+     "turnover_annual": 0.0
+    },
+    "buy_hold": {
+     "n_days": 165,
+     "total_return": -0.0855,
+     "cagr": -0.1276,
+     "vol_annual": 0.1992,
+     "sharpe": -0.584,
+     "max_drawdown": -0.1566,
+     "calmar": -0.81,
+     "avg_exposure": 1.0,
+     "turnover_annual": 0.0
+    }
+   },
+   {
+    "days": 166,
+    "strategy": {
+     "n_days": 165,
+     "total_return": 0.1647,
+     "cagr": 0.2623,
+     "vol_annual": 0.1032,
+     "sharpe": 2.31,
+     "max_drawdown": -0.0399,
+     "calmar": 6.57,
+     "avg_exposure": 0.725,
+     "turnover_annual": 1.55
+    },
+    "fixed_60": {
+     "n_days": 165,
+     "total_return": 0.1284,
+     "cagr": 0.2026,
+     "vol_annual": 0.0837,
+     "sharpe": 2.246,
+     "max_drawdown": -0.0382,
+     "calmar": 5.31,
+     "avg_exposure": 0.6,
+     "turnover_annual": 0.0
+    },
+    "buy_hold": {
+     "n_days": 165,
+     "total_return": 0.2199,
+     "cagr": 0.3547,
+     "vol_annual": 0.1396,
+     "sharpe": 2.246,
+     "max_drawdown": -0.0631,
+     "calmar": 5.62,
+     "avg_exposure": 1.0,
+     "turnover_annual": 0.0
+    }
+   },
+   {
+    "days": 168,
+    "strategy": {
+     "n_days": 167,
+     "total_return": -0.0602,
+     "cagr": -0.0894,
+     "vol_annual": 0.0971,
+     "sharpe": -0.915,
+     "max_drawdown": -0.0704,
+     "calmar": -1.27,
+     "avg_exposure": 0.444,
+     "turnover_annual": 2.87
+    },
+    "fixed_60": {
+     "n_days": 167,
+     "total_return": -0.0804,
+     "cagr": -0.1188,
+     "vol_annual": 0.1165,
+     "sharpe": -1.027,
+     "max_drawdown": -0.1253,
+     "calmar": -0.95,
+     "avg_exposure": 0.6,
+     "turnover_annual": 0.0
+    },
+    "buy_hold": {
+     "n_days": 167,
+     "total_return": -0.1347,
+     "cagr": -0.1961,
+     "vol_annual": 0.1941,
+     "sharpe": -1.027,
+     "max_drawdown": -0.2023,
+     "calmar": -0.97,
+     "avg_exposure": 1.0,
+     "turnover_annual": 0.0
+    }
+   }
+  ],
+  "state_days": {
+   "bull": 239,
+   "range": 176,
+   "bear": 85
+  },
+  "grid_top5": [
+   {
+    "sharpe": 1.033,
+    "vol_target_annual": 0.12,
+    "max_pos": 0.8,
+    "ma_fast": 30,
+    "ma_slow": 90,
+    "dwell": 5
+   },
+   {
+    "sharpe": 0.983,
+    "vol_target_annual": 0.12,
+    "max_pos": 0.8,
+    "ma_fast": 30,
+    "ma_slow": 90,
+    "dwell": 3
+   },
+   {
+    "sharpe": 0.933,
+    "vol_target_annual": 0.12,
+    "max_pos": 0.8,
+    "ma_fast": 30,
+    "ma_slow": 90,
+    "dwell": 1
+   },
+   {
+    "sharpe": 0.931,
+    "vol_target_annual": 0.15,
+    "max_pos": 0.8,
+    "ma_fast": 30,
+    "ma_slow": 90,
+    "dwell": 5
+   },
+   {
+    "sharpe": 0.895,
+    "vol_target_annual": 0.18,
+    "max_pos": 0.8,
+    "ma_fast": 30,
+    "ma_slow": 90,
+    "dwell": 5
+   }
+  ]
+ },
+ "baselines_all_indices": {
+  "sh000001": {
+   "buy_hold": {
+    "n_days": 499,
+    "total_return": 0.0549,
+    "cagr": 0.0274,
+    "vol_annual": 0.156,
+    "sharpe": 0.252,
+    "max_drawdown": -0.1401,
+    "calmar": 0.2,
+    "avg_exposure": 1.0,
+    "turnover_annual": 0.0
+   },
+   "fixed_60": {
+    "n_days": 499,
+    "total_return": 0.0387,
+    "cagr": 0.0194,
+    "vol_annual": 0.0936,
+    "sharpe": 0.252,
+    "max_drawdown": -0.0854,
+    "calmar": 0.23,
+    "avg_exposure": 0.6,
+    "turnover_annual": 0.0
+   }
+  },
+  "sz399001": {
+   "buy_hold": {
+    "n_days": 499,
+    "total_return": -0.0019,
+    "cagr": -0.001,
+    "vol_annual": 0.2499,
+    "sharpe": 0.122,
+    "max_drawdown": -0.3131,
+    "calmar": -0.0,
+    "avg_exposure": 1.0,
+    "turnover_annual": 0.0
+   },
+   "fixed_60": {
+    "n_days": 499,
+    "total_return": 0.014,
+    "cagr": 0.0071,
+    "vol_annual": 0.1499,
+    "sharpe": 0.122,
+    "max_drawdown": -0.1985,
+    "calmar": 0.04,
+    "avg_exposure": 0.6,
+    "turnover_annual": 0.0
+   }
+  },
+  "sh000300": {
+   "buy_hold": {
+    "n_days": 499,
+    "total_return": -0.0405,
+    "cagr": -0.0206,
+    "vol_annual": 0.18,
+    "sharpe": -0.025,
+    "max_drawdown": -0.2023,
+    "calmar": -0.1,
+    "avg_exposure": 1.0,
+    "turnover_annual": 0.0
+   },
+   "fixed_60": {
+    "n_days": 499,
+    "total_return": -0.0168,
+    "cagr": -0.0085,
+    "vol_annual": 0.108,
+    "sharpe": -0.025,
+    "max_drawdown": -0.1253,
+    "calmar": -0.07,
+    "avg_exposure": 0.6,
+    "turnover_annual": 0.0
+   }
+  },
+  "sz399006": {
+   "buy_hold": {
+    "n_days": 499,
+    "total_return": 0.0331,
+    "cagr": 0.0166,
+    "vol_annual": 0.3401,
+    "sharpe": 0.22,
+    "max_drawdown": -0.4172,
+    "calmar": 0.04,
+    "avg_exposure": 1.0,
+    "turnover_annual": 0.0
+   },
+   "fixed_60": {
+    "n_days": 499,
+    "total_return": 0.0486,
+    "cagr": 0.0243,
+    "vol_annual": 0.2041,
+    "sharpe": 0.22,
+    "max_drawdown": -0.2712,
+    "calmar": 0.09,
+    "avg_exposure": 0.6,
+    "turnover_annual": 0.0
+   }
+  },
+  "sh000688": {
+   "buy_hold": {
+    "n_days": 499,
+    "total_return": 0.2529,
+    "cagr": 0.1206,
+    "vol_annual": 0.3792,
+    "sharpe": 0.489,
+    "max_drawdown": -0.4328,
+    "calmar": 0.28,
+    "avg_exposure": 1.0,
+    "turnover_annual": 0.0
+   },
+   "fixed_60": {
+    "n_days": 499,
+    "total_return": 0.1845,
+    "cagr": 0.0892,
+    "vol_annual": 0.2275,
+    "sharpe": 0.489,
+    "max_drawdown": -0.2812,
+    "calmar": 0.32,
+    "avg_exposure": 0.6,
+    "turnover_annual": 0.0
+   }
+  }
+ },
+ "strategy_all_indices": {
+  "sh000001": {
+   "n_days": 499,
+   "total_return": 0.0645,
+   "cagr": 0.0321,
+   "vol_annual": 0.0819,
+   "sharpe": 0.426,
+   "max_drawdown": -0.0773,
+   "calmar": 0.41,
+   "avg_exposure": 0.535,
+   "turnover_annual": 2.07
+  },
+  "sz399001": {
+   "n_days": 499,
+   "total_return": 0.1187,
+   "cagr": 0.0583,
+   "vol_annual": 0.1033,
+   "sharpe": 0.6,
+   "max_drawdown": -0.0862,
+   "calmar": 0.68,
+   "avg_exposure": 0.392,
+   "turnover_annual": 1.87
+  },
+  "sh000300": {
+   "n_days": 499,
+   "total_return": 0.0559,
+   "cagr": 0.0278,
+   "vol_annual": 0.0918,
+   "sharpe": 0.345,
+   "max_drawdown": -0.0734,
+   "calmar": 0.38,
+   "avg_exposure": 0.497,
+   "turnover_annual": 2.19
+  },
+  "sz399006": {
+   "n_days": 499,
+   "total_return": 0.1691,
+   "cagr": 0.0821,
+   "vol_annual": 0.1089,
+   "sharpe": 0.779,
+   "max_drawdown": -0.0885,
+   "calmar": 0.93,
+   "avg_exposure": 0.301,
+   "turnover_annual": 1.45
+  },
+  "sh000688": {
+   "n_days": 499,
+   "total_return": 0.1871,
+   "cagr": 0.0905,
+   "vol_annual": 0.1104,
+   "sharpe": 0.84,
+   "max_drawdown": -0.0735,
+   "calmar": 1.23,
+   "avg_exposure": 0.27,
+   "turnover_annual": 1.92
+  }
+ },
+ "decision": {
+  "wire": true,
+  "criteria": {
+   "oos_sharpe_ge_bh": {
+    "pass": true,
+    "oos": -0.897,
+    "bh": -1.014
+   },
+   "oos_maxdd_le_80pct_bh": {
+    "pass": true,
+    "oos": -0.0704,
+    "bh": -0.2023,
+    "threshold": 0.1618
+   },
+   "folds_beating_fixed60": {
+    "pass": true,
+    "count": 2,
+    "need": 2,
+    "total": 3,
+    "per_fold": [
+     {
+      "strategy": -0.7,
+      "fixed_60": -0.584
+     },
+     {
+      "strategy": 2.31,
+      "fixed_60": 2.246
+     },
+     {
+      "strategy": -0.915,
+      "fixed_60": -1.027
+     }
+    ]
+   }
+  }
+ },
+ "note": "pos 由 t 日收盘后的状态/波动决定，收益从 t+1 计；成本 5bp×|Δpos|；参数量由前 2 折选、最后 1 折样本外评估"
+}

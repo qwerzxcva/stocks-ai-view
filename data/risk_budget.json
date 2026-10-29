@@ -1,0 +1,30 @@
+{
+ "ts": "2026-10-29T08:07:37+08:00",
+ "engine": "risk_budget_v1",
+ "spec_version": "3.1.0",
+ "E": 31.0,
+ "fusion_state": "进攻",
+ "regime": "bull",
+ "phase": "ignite",
+ "budget": 0.325,
+ "kelly": {
+  "half": 0.325,
+  "source": "pick_log(n=5)"
+ },
+ "vol_target": {
+  "annual_target": 0.12,
+  "realized": 0.0938,
+  "scale": 1.0,
+  "source": "market_index_proxy"
+ },
+ "gates": {
+  "regime_cap": 0.9,
+  "vol_scale": 1.0,
+  "phase_cap": 0.8
+ },
+ "meta": {
+  "formula": "budget=min(max_pos, min(kelly,regime_cap)*vol_scale) 经 gates 降档",
+  "cap_source": "engine_spec.PRODUCTS[risk_budget].params",
+  "note": "只在市场状态可信时给仓位；missing_inputs 存在时上限压到 0.5"
+ }
+}

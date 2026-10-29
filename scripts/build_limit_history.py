@@ -40,19 +40,17 @@ from datetime import datetime, timedelta, timezone
 
 CST = timezone(timedelta(hours=8))
 
-CALIBER = "涨停=主板>=9.9% / 创业板科创板>=19.9% / 北交所>=29.9%（前复权日涨幅）"
-CAVEAT = ("按前复权收盘价涨幅判定，不等同交易所涨停价：ST 股 5% 涨停会漏判，"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import limit_caliber as LC  # noqa: E402  涨停口径唯一来源
+
+CALIBER = "涨停=limit_caliber（主板9.85 / 创业科创19.85 / 北交所29.85 触发线，前复权日涨幅）"
+CAVEAT = (LC.caveats() + " 按前复权收盘价涨幅判定，不等同交易所涨停价：ST 股 5% 涨停会漏判，"
           "新股上市首日无涨跌幅限制会误判；名单只含代码，不含封单量与炸板信息（日线没有）")
 
 
 def threshold_of(code: str) -> float:
-    """按代码前缀给涨停阈值（百分点）。"""
-    n = code[2:] if code[:2] in ("sh", "sz", "bj") else code
-    if n.startswith(("30", "68")):
-        return 19.9
-    if n.startswith(("43", "83", "87", "88", "92")):
-        return 29.9
-    return 9.9
+    """涨停触发线（百分点）——统一走 limit_caliber，本文件不再自带阈值表。"""
+    return LC.limit_line(code)
 
 
 def load_series(bulk_dir: str, tail: int) -> dict:

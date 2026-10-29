@@ -129,7 +129,10 @@ def from_daily_klines(kline_getter, dates):
 if __name__ == "__main__":
     # 冒烟: 纯算法库, 用一组合成梯队跑通 classify
     ap = argparse.ArgumentParser(description="市场阶段机 (算法库冒烟)")
-    ap.add_argument("--out", default=None, help="可选: 落盘 JSON")
+    ap.add_argument("--out", default=None,
+                    help="可选: 落盘 JSON。禁止写 data/market_phase.json（权威写者是 phase_runner.py）")
+    ap.add_argument("--force", action="store_true",
+                    help="确实要覆盖权威产物时才加（会破坏 engine_fusion 契约）")
     args = ap.parse_args()
 
     demo = []
@@ -141,6 +144,13 @@ if __name__ == "__main__":
     labels = classify(demo)
     print("阶段序列:", list(zip([d["date"] for d in demo], labels)))
     if args.out:
+        canon = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                             "data", "market_phase.json")
+        if os.path.abspath(args.out) == canon and not args.force:
+            print("[market_phase] 拒绝覆盖权威产物 data/market_phase.json："
+                  "本文件是算法库冒烟入口，写入的是合成 demo 数据；权威写者是 phase_runner.py。"
+                  "确需覆盖请加 --force。", file=sys.stderr)
+            sys.exit(2)
         os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
         with open(args.out, "w", encoding="utf-8") as f:
             json.dump({"ts": datetime.now().isoformat(timespec="seconds"),

@@ -1,0 +1,1659 @@
+{
+  "spec_id": "skapp-engine-spec",
+  "spec_version": "3.1.0",
+  "generated_at": "2026-10-29T08:09:41+08:00",
+  "source": "stocks-ai-view/scripts/engine_spec.py",
+  "reference_impl": "stocks-ai-view/scripts/engine_v5.py (build_votes/score_stock)",
+  "aggregation": {
+    "kind": "weighted_vote",
+    "score_center": 50.0,
+    "score_scale": 50.0,
+    "resonance_base": 0.6,
+    "resonance_span": 0.4,
+    "resonance_kind": "directional_share",
+    "signal_bullish": 65.0,
+    "signal_bearish": 35.0,
+    "round": {
+      "score": 1,
+      "resonance": 3,
+      "strength": 3
+    }
+  },
+  "runtime": {
+    "min_bars": 30,
+    "screen_bars": 120,
+    "snapshot_stale_ms": 300000,
+    "engine_cache_ms": 45000,
+    "missing_vote_policy": "drop",
+    "ai_pick_basis": "local-score"
+  },
+  "weights": {
+    "SuperTrend": 1.0,
+    "MA5/MA20": 1.0,
+    "RSI": 1.0,
+    "MACD": 1.0,
+    "KDJ(RSV)": 1.0,
+    "BOLL/Keltner": 0.6,
+    "Donchian20": 1.0,
+    "CMO": 1.0,
+    "Vortex": 1.0,
+    "UltimateOsc": 1.0,
+    "Choppiness": 0.6,
+    "HullMA": 1.0,
+    "ElderForce": 1.0,
+    "ConnorsRSI": 1.0,
+    "A/D Line": 1.0,
+    "Pivot": 1.0,
+    "VWMA": 1.0
+  },
+  "weights_source": "data/engine_weights.json",
+  "engines": [
+    {
+      "id": "supertrend",
+      "family": "trend",
+      "weight_key": "SuperTrend",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 10,
+        "multiplier": 3.0,
+        "strength": 0.9
+      },
+      "vote_rule": "supertrend.trend (1/-1)",
+      "strength_rule": "const(strength) when trend != 0 else 0",
+      "note": "趋势族主力；trend 为 0（未形成）时不投票"
+    },
+    {
+      "id": "ma_golden",
+      "family": "trend",
+      "weight_key": "MA5/MA20",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "fast": 5,
+        "slow": 20,
+        "deadband_pct": 0.3,
+        "strength_scale_pct": 3.0
+      },
+      "vote_rule": "dev>deadband→1, dev<-deadband→-1, else 0 (dev=MAfast/MAslow-1 的百分数)",
+      "strength_rule": "min(|dev|/strength_scale_pct, 1)",
+      "note": "0.3% 死区用于过滤均线贴合时的抖动"
+    },
+    {
+      "id": "rsi",
+      "family": "momentum",
+      "weight_key": "RSI",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70,
+        "strong_lo": 45,
+        "strong_hi": 60,
+        "strong_strength": 0.4,
+        "neutral_strength": 0.2
+      },
+      "vote_rule": "rsi<oversold→1, rsi>overbought→-1, 45<=rsi<=60→1, else 0",
+      "strength_rule": "超卖 (oversold-rsi)/oversold；超买 (rsi-overbought)/30；强势 0.4；中性 0.2",
+      "note": "超买不直接给负票以外的高强度：RSI 高位钝化在牛市是常态"
+    },
+    {
+      "id": "macd",
+      "family": "momentum",
+      "weight_key": "MACD",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "fast": 12,
+        "slow": 26,
+        "strength_floor": 0.3
+      },
+      "vote_rule": "sign(EMA_fast - EMA_slow)",
+      "strength_rule": "max(min(|hist-prev_hist|/max(|prev_hist|,0.01),1), strength_floor)",
+      "note": "strength 衡量的是「柱体变化」而不是柱体绝对值"
+    },
+    {
+      "id": "kdj",
+      "family": "momentum",
+      "weight_key": "KDJ(RSV)",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "period": 9,
+        "mid": 50.0
+      },
+      "vote_rule": "rsv>mid→1, rsv<mid→-1（rsv 为 9 日 RSV）",
+      "strength_rule": "|rsv-mid|/mid",
+      "note": "云端只用 RSV 单点，不用 K/D 平滑；端上若用完整 KDJ 会造成口径差异"
+    },
+    {
+      "id": "boll_keltner",
+      "family": "channel",
+      "weight_key": "BOLL/Keltner",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "ema_n": 20,
+        "atr_n": 10,
+        "k": 2.0,
+        "upper": 0.7,
+        "lower": 0.3
+      },
+      "vote_rule": "pos>upper→1, pos<lower→-1, else 0（pos=(close-lower)/(upper-lower)）",
+      "strength_rule": "|pos-0.5|*2",
+      "note": "云端名义写 BOLL，实际调用的是 Keltner(EMA±k·ATR)；以代码为准，spec 记 keltner"
+    },
+    {
+      "id": "donchian",
+      "family": "channel",
+      "weight_key": "Donchian20",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 20,
+        "near_high_pct": -1.0,
+        "strength_scale_pct": 8.0,
+        "strength_cap": 0.5
+      },
+      "vote_rule": "dev>near_high_pct→-1, else 0（不给突破正票）",
+      "strength_rule": "min(|dev|/strength_scale_pct,1)*strength_cap",
+      "note": "factor_lab 实测追突破为全历史负期望（new_high_20 胜率 40.76%），故只给负票"
+    },
+    {
+      "id": "cmo",
+      "family": "momentum",
+      "weight_key": "CMO",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 14,
+        "threshold": 20.0,
+        "strength_scale": 50.0
+      },
+      "vote_rule": "cmo>threshold→1, cmo<-threshold→-1, else 0",
+      "strength_rule": "min(|cmo|/strength_scale,1)",
+      "note": ""
+    },
+    {
+      "id": "vortex",
+      "family": "trend",
+      "weight_key": "Vortex",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 14,
+        "strength_scale": 5.0
+      },
+      "vote_rule": "vi_plus>vi_minus→1 else -1",
+      "strength_rule": "min(|vi_plus-vi_minus|*strength_scale,1)",
+      "note": "只有两种方向，永不中性——族级共振靠 family 折叠来抵消"
+    },
+    {
+      "id": "ultimate_osc",
+      "family": "momentum",
+      "weight_key": "UltimateOsc",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n1": 7,
+        "n2": 14,
+        "n3": 28,
+        "lo": 30.0,
+        "hi": 70.0,
+        "mid": 50.0,
+        "strength_active": 0.4,
+        "strength_neutral": 0.2
+      },
+      "vote_rule": "lo<uo<hi and uo>mid→1；uo>=hi→-1；lo<=uo<=mid→0",
+      "strength_rule": "vote!=0 → strength_active，否则 strength_neutral",
+      "note": ""
+    },
+    {
+      "id": "choppiness",
+      "family": "structure",
+      "weight_key": "Choppiness",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 14,
+        "trend_below": 40.0,
+        "ma_n": 20
+      },
+      "vote_rule": "chop<trend_below → sign(close-SMA_ma_n)；否则 0",
+      "strength_rule": "trend 时 (50-chop)/50，震荡时 0.1",
+      "note": "震荡市闸门：无趋势时不投方向票"
+    },
+    {
+      "id": "hull_ma",
+      "family": "trend",
+      "weight_key": "HullMA",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 9,
+        "strength_scale_pct": 2.0
+      },
+      "vote_rule": "close>hma→1 else -1",
+      "strength_rule": "min(|close-hma|/hma*100/strength_scale_pct,1)",
+      "note": ""
+    },
+    {
+      "id": "elder_force",
+      "family": "volume",
+      "weight_key": "ElderForce",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 13,
+        "strength_scale": 100000.0
+      },
+      "vote_rule": "ef>0→1 else -1",
+      "strength_rule": "min(|ef|/(|ef|+strength_scale),1)",
+      "note": "strength 是饱和函数，不会因成交额放大而失真"
+    },
+    {
+      "id": "connors_rsi",
+      "family": "momentum",
+      "weight_key": "ConnorsRSI",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "rsi_n": 3,
+        "streak_n": 2,
+        "rank_n": 100,
+        "lo": 20.0,
+        "hi": 80.0,
+        "neutral_strength": 0.2
+      },
+      "vote_rule": "crsi<lo→1, crsi>hi→-1, else 0",
+      "strength_rule": "超卖 (lo-crsi)/lo；超买 (crsi-hi)/20；中性 0.2",
+      "note": "需要 100 根以上 K 线才有 rank 分量"
+    },
+    {
+      "id": "ad_line",
+      "family": "volume",
+      "weight_key": "A/D Line",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "lookback": 10
+      },
+      "vote_rule": "sign(ad[-1]-ad[-1-lookback])",
+      "strength_rule": "min(|Δad|/(|ad[-1]|+1),1)",
+      "note": "要求序列长度 >= lookback+1"
+    },
+    {
+      "id": "pivot",
+      "family": "structure",
+      "weight_key": "Pivot",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "strength": 0.4
+      },
+      "vote_rule": "close>pp→1 else -1（pp=(H+L+C)/3）",
+      "strength_rule": "const(strength)",
+      "note": "只用当根的枢轴，不是多日结构"
+    },
+    {
+      "id": "vwma",
+      "family": "volume",
+      "weight_key": "VWMA",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "n": 20,
+        "strength_scale_pct": 2.0
+      },
+      "vote_rule": "close>vwma→1 else -1",
+      "strength_rule": "min(|close-vwma|/vwma*100/strength_scale_pct,1)",
+      "note": ""
+    },
+    {
+      "id": "below_ma60",
+      "family": "position",
+      "weight_key": "below_ma60",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "ma_n": 60,
+        "min_bars": 80,
+        "core_dev_lo": -10.0,
+        "core_dev_hi": -5.0,
+        "near_high_pct": 0.98,
+        "ret20_cap": 15.0,
+        "deep_dev_pct": -25.0,
+        "overheat_dev_pct": 20.0,
+        "strength_core": 0.9,
+        "strength_deep": 0.5
+      },
+      "vote_rule": "core 区间 -10<=dev<-5 且未近高且 20 日涨幅<=15 → +1；dev<deep 且 dev<-25 → -1；dev>overheat → momentum_overheat -1",
+      "strength_rule": "core 0.9 / deep 0.5 / overheat min(dev/100,0.8)",
+      "note": "唯一有实测正 edge 的技术特征（factor_lab 292 万样本胜率 51.39%）"
+    },
+    {
+      "id": "sector_resonance",
+      "family": "external",
+      "weight_key": "SectorResonance",
+      "availability": [
+        "cloud"
+      ],
+      "params": {},
+      "vote_rule": "行业板块当日涨幅共振（云端 all_sources）",
+      "strength_rule": "由板块强度决定",
+      "note": "端上无全市场行业映射的权威快照，无法复刻 → 只在云端计票"
+    },
+    {
+      "id": "capital_flow",
+      "family": "external",
+      "weight_key": "CapitalFlowConsistency",
+      "availability": [
+        "cloud"
+      ],
+      "params": {},
+      "vote_rule": "主力资金方向与价格方向一致性",
+      "strength_rule": "由净额占成交额比例决定",
+      "note": "端上只有换手/量比代理（见 flow 引擎），不等于真资金流"
+    },
+    {
+      "id": "limit_pool",
+      "family": "external",
+      "weight_key": "InZTPool",
+      "availability": [
+        "cloud"
+      ],
+      "params": {
+        "strength_lianban_scale": 6.0,
+        "dt_strength": 0.9
+      },
+      "vote_rule": "在涨停池→+1（强度按连板数）；在跌停池→-1",
+      "strength_rule": "min(lianban/6,1) / dt_strength",
+      "note": "端上用 snapshot 的 atLimitUp 近似，但拿不到连板数 → 不作主票"
+    }
+  ],
+  "products": [
+    {
+      "id": "engine_v5",
+      "path": "data/engine_v5.json",
+      "writer": "scripts/engine_v5.py",
+      "layer": "engine",
+      "version": "v5",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "n_scanned",
+        "n_scored",
+        "market_asof",
+        "data_quality",
+        "freshness",
+        "indicators",
+        "votes_observed",
+        "formula",
+        "top",
+        "stale_top",
+        "meta"
+      ],
+      "optional_fields": [
+        "votes_observed"
+      ],
+      "item_fields": [
+        "code",
+        "score",
+        "raw",
+        "resonance",
+        "bull",
+        "bear",
+        "neutral",
+        "votes",
+        "date",
+        "price",
+        "bars",
+        "data_fresh"
+      ],
+      "params": {
+        "score_center": 50.0,
+        "score_scale": 50.0,
+        "resonance_base": 0.6,
+        "resonance_span": 0.4,
+        "stale_days_limit": 0,
+        "top_n": 50,
+        "main_board_only": true,
+        "weights_file": "data/engine_weights.json"
+      },
+      "inputs": [
+        "kline_bulk",
+        "all_sources"
+      ],
+      "external_inputs": [
+        "industry_map",
+        "moneyflow",
+        "limit_pool"
+      ]
+    },
+    {
+      "id": "decision",
+      "path": "data/decision.json",
+      "writer": "scripts/decision_engine.py",
+      "layer": "decision",
+      "version": "v2",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "market_regime",
+        "regime_detail",
+        "position_advice",
+        "cards",
+        "avoid",
+        "strategy_summary",
+        "evidence",
+        "meta"
+      ],
+      "item_fields": [],
+      "params": {
+        "bull": {
+          "net_ge": 8,
+          "up_pct_ge": 58,
+          "limit_up_ge": 50
+        },
+        "bear": {
+          "net_le": -8,
+          "limit_down_ge": 20,
+          "up_pct_le": 42
+        },
+        "position_cap": {
+          "bear": 0.3,
+          "range": 0.6,
+          "bull": 0.9
+        }
+      },
+      "inputs": [
+        "multidim",
+        "market_now"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "market_phase",
+      "path": "data/market_phase.json",
+      "writer": "scripts/phase_runner.py",
+      "layer": "engine",
+      "version": "v2",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "dates",
+        "phases",
+        "phase",
+        "label",
+        "recent",
+        "structure",
+        "source"
+      ],
+      "item_fields": [
+        "date",
+        "first_board",
+        "ge2",
+        "height",
+        "promo"
+      ],
+      "params": {
+        "days": 90,
+        "limit_caliber": "limit_caliber"
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "engine_fusion",
+      "path": "data/engine_fusion.json",
+      "writer": "scripts/engine_fusion.py",
+      "layer": "fusion",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "E",
+        "state",
+        "agreement",
+        "parts",
+        "missing_inputs",
+        "n_missing",
+        "note"
+      ],
+      "item_fields": [],
+      "params": {
+        "weights": {
+          "market_phase": 0.3,
+          "cycle_v2": 0.25,
+          "global": 0.2,
+          "win_loop": 0.15,
+          "kelly": 0.1
+        },
+        "agree": 0.6,
+        "attack": 30.0,
+        "defend": -30.0
+      },
+      "inputs": [
+        "market_phase",
+        "kline_sim",
+        "global",
+        "pick_log"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "strategy_card",
+      "path": "data/strategy_card.json",
+      "writer": "scripts/strategy_card.py",
+      "layer": "decision",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "strategy",
+        "source",
+        "backtest",
+        "gate",
+        "candidates",
+        "discipline",
+        "picks_db",
+        "note"
+      ],
+      "item_fields": [],
+      "params": {
+        "candidate_limit": 12
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "rps_rotation",
+      "path": "data/rps_rotation.json",
+      "writer": "scripts/rps_rotation.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "source",
+        "date",
+        "n_universe",
+        "top",
+        "note"
+      ],
+      "item_fields": [
+        "symbol",
+        "rps_250",
+        "rps_120",
+        "rps_60",
+        "rps_20",
+        "strong_score"
+      ],
+      "params": {
+        "windows": [
+          250,
+          120,
+          60,
+          20
+        ],
+        "top_n": 30,
+        "strong_score": "mean(rps_250,rps_120,rps_60,rps_20)"
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "cycle_pool_v2",
+      "path": "data/cycle_pool_v2.json",
+      "writer": "scripts/cycle_pool_v2.py",
+      "layer": "engine",
+      "version": "v2",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "meta",
+        "status",
+        "yearly_kline",
+        "annual_rotation",
+        "regimes",
+        "cycle_law",
+        "demand_shift",
+        "stocks",
+        "stocks_meta"
+      ],
+      "item_fields": [
+        "code",
+        "name",
+        "industry",
+        "chg_pct",
+        "reason",
+        "algorithm",
+        "price"
+      ],
+      "params": {},
+      "inputs": [
+        "kline_bulk",
+        "industry_map"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "ai_pick_v4",
+      "path": "data/ai_pick_v4.json",
+      "writer": "scripts/ai_pick_v4.py",
+      "layer": "engine",
+      "version": "v4",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "date",
+        "data_date",
+        "stale",
+        "provenance",
+        "n_scanned",
+        "n_candidates",
+        "global",
+        "adapt",
+        "cycle_note",
+        "picks",
+        "meta"
+      ],
+      "item_fields": [
+        "code",
+        "symbol",
+        "date",
+        "name",
+        "price",
+        "score",
+        "pattern_bonus"
+      ],
+      "params": {
+        "rank_weights": {
+          "vratio": 0.2,
+          "mom60": 0.2,
+          "pos240_inv": 0.2,
+          "zt_genes": 0.15,
+          "close_pos": 0.15,
+          "ret": 0.1
+        },
+        "pattern_bonus": {
+          "停机坪/高而窄旗形": 0.08,
+          "无大幅回撤": 0.04
+        }
+      },
+      "inputs": [
+        "kline_bulk",
+        "global_fx"
+      ],
+      "external_inputs": [
+        "patterns"
+      ]
+    },
+    {
+      "id": "multidim",
+      "path": "data/multidim.json",
+      "writer": "scripts/multidim_engine.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "n_scanned",
+        "weights",
+        "top",
+        "meta"
+      ],
+      "item_fields": [
+        "code",
+        "name",
+        "price",
+        "composite",
+        "dims",
+        "why",
+        "resonance"
+      ],
+      "params": {
+        "weights": {
+          "技术面": 0.22,
+          "资金面": 0.14,
+          "高低位": 0.13,
+          "基本面": 0.09,
+          "板块面": 0.1,
+          "市场面": 0.08,
+          "情绪面": 0.07,
+          "周期面": 0.05,
+          "消息面": 0.05,
+          "海外面": 0.07
+        }
+      },
+      "inputs": [
+        "snapshot",
+        "sector_map",
+        "global_markets",
+        "linkage"
+      ],
+      "external_inputs": [
+        "eastmoney_fflow"
+      ]
+    },
+    {
+      "id": "key_levels",
+      "path": "data/key_levels.json",
+      "writer": "scripts/key_levels.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "date",
+        "engine",
+        "n",
+        "breadth",
+        "fields",
+        "stocks"
+      ],
+      "item_fields": [
+        "price",
+        "kline_date",
+        "pivot",
+        "boll",
+        "keltner"
+      ],
+      "params": {
+        "min_bars": 30,
+        "boll": {
+          "n": 20,
+          "k": 2.0
+        },
+        "keltner": [
+          [
+            10,
+            10,
+            1.5
+          ],
+          [
+            20,
+            10,
+            2.0
+          ],
+          [
+            30,
+            10,
+            2.5
+          ]
+        ]
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "trend_strength",
+      "path": "data/trend_strength.json",
+      "writer": "scripts/trend_strength.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "origin",
+        "rtsi",
+        "tma",
+        "msci",
+        "meta"
+      ],
+      "item_fields": [
+        "code",
+        "rtsi"
+      ],
+      "params": {
+        "rtsi_window": 20,
+        "limit": 500
+      },
+      "inputs": [
+        "kline_bulk",
+        "global_markets"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "premarket_picks",
+      "path": "data/premarket_picks.json",
+      "writer": "scripts/premarket_picks.py",
+      "layer": "decision",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "date",
+        "session",
+        "engine",
+        "status",
+        "reason",
+        "picks",
+        "source_json"
+      ],
+      "item_fields": [
+        "code",
+        "name",
+        "price",
+        "score",
+        "resonance",
+        "buyable",
+        "why"
+      ],
+      "params": {
+        "resonance": "min(n_src*12, 36)",
+        "engine_avg": "mean(0-100)*0.3",
+        "valuation": "clamp(-dev*0.3, ±15)",
+        "position": "15-|pos240-55|*0.25",
+        "flow": {
+          "buy": 12,
+          "sell": -10
+        }
+      },
+      "inputs": [
+        "engine_v5",
+        "multidim",
+        "ai_pick_v4",
+        "flow_divergence"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "today_picks",
+      "path": "data/today_picks.json",
+      "writer": "scripts/build_today_picks.py",
+      "layer": "decision",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "date",
+        "session",
+        "generated_by",
+        "market",
+        "overseas",
+        "picks",
+        "winrate",
+        "review",
+        "entry_plans",
+        "engines",
+        "disclaimer"
+      ],
+      "item_fields": [],
+      "params": {},
+      "inputs": [
+        "engine_v5",
+        "market_now"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "limit_history",
+      "path": "data/limit_history.json",
+      "writer": "scripts/build_limit_history.py",
+      "layer": "data",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "coverage",
+        "caliber",
+        "caveat",
+        "days",
+        "warnings"
+      ],
+      "item_fields": [],
+      "params": {
+        "caliber": "limit_caliber",
+        "abs_pct_guard": 35.0
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "market_breadth_history",
+      "path": "data/market_breadth_history.json",
+      "writer": "scripts/build_market_breadth.py",
+      "layer": "data",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [],
+      "item_fields": [
+        "date",
+        "limit_up",
+        "limit_down",
+        "broken",
+        "seal_rate_pct",
+        "advance",
+        "decline",
+        "flat",
+        "up_pct",
+        "amount_yi"
+      ],
+      "params": {
+        "history_limit": 120
+      },
+      "inputs": [
+        "market_now"
+      ],
+      "external_inputs": [
+        "eastmoney_zt_pool"
+      ]
+    },
+    {
+      "id": "factor_composite",
+      "path": "data/factor_composite.json",
+      "writer": "scripts/factor_composite.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "version",
+        "n_scanned",
+        "weights",
+        "top",
+        "meta"
+      ],
+      "item_fields": [
+        "code",
+        "z",
+        "score",
+        "factors"
+      ],
+      "params": {
+        "winsor_pct": 2.0,
+        "factors": {
+          "mom20": 0.25,
+          "mom60": 0.2,
+          "low_vol": 0.2,
+          "turnover": 0.15,
+          "dev_ma20": 0.2
+        }
+      },
+      "inputs": [
+        "kline_bulk"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "sector_rotation",
+      "path": "data/sector_rotation.json",
+      "writer": "scripts/sector_rotation.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "sectors",
+        "leaders",
+        "meta"
+      ],
+      "item_fields": [
+        "sector",
+        "rps",
+        "ret5",
+        "ret20",
+        "n",
+        "state"
+      ],
+      "params": {
+        "windows": [
+          5,
+          20,
+          60
+        ],
+        "state_bull": 60.0,
+        "state_bear": 40.0
+      },
+      "inputs": [
+        "kline_bulk",
+        "industry_map"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "risk_budget",
+      "path": "data/risk_budget.json",
+      "writer": "scripts/risk_budget.py",
+      "layer": "decision",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "ts",
+        "engine",
+        "E",
+        "regime",
+        "budget",
+        "kelly",
+        "vol_target",
+        "gates",
+        "meta"
+      ],
+      "item_fields": [],
+      "params": {
+        "vol_target_annual": 0.12,
+        "max_pos": 0.8,
+        "half_kelly": 0.5,
+        "drawdown_guard": -0.15,
+        "regime_cap": {
+          "bull": 0.9,
+          "range": 0.6,
+          "bear": 0.3
+        }
+      },
+      "calibration": "data/risk_regime_params.json",
+      "inputs": [
+        "engine_fusion",
+        "market_phase",
+        "pick_log"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "vol_target",
+      "path": "(device-inline)",
+      "writer": "skapp-app VolTargetGate.kt / scripts/engines_v2.py",
+      "layer": "decision",
+      "version": "v1",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "top_fields": [
+        "scale",
+        "realizedVol",
+        "status"
+      ],
+      "item_fields": [],
+      "params": {
+        "vol_target_annual": 0.12,
+        "window": 60,
+        "floor": 0.2,
+        "max_pos": 0.8,
+        "min_sample": 30
+      },
+      "artifact": false,
+      "parity_golden": "data/parity/golden_v2.json#vol_target",
+      "inputs": [
+        "market_days_archive"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "regime",
+      "path": "(inline)",
+      "writer": "scripts/calibrate_risk_regime.py",
+      "layer": "engine",
+      "version": "v1",
+      "availability": [
+        "cloud"
+      ],
+      "top_fields": [
+        "state",
+        "params",
+        "calibration"
+      ],
+      "item_fields": [],
+      "params": {
+        "ma_fast": 30,
+        "ma_slow": 90,
+        "dwell": 5,
+        "regime_cap": {
+          "bull": 0.9,
+          "range": 0.6,
+          "bear": 0.3
+        }
+      },
+      "artifact": false,
+      "calibration": "data/risk_regime_params.json",
+      "inputs": [
+        "index_kline"
+      ],
+      "external_inputs": []
+    }
+  ],
+  "calibers": {
+    "limit_up": {
+      "impl": "scripts/limit_caliber.py",
+      "tolerance_pct": 0.15,
+      "prefix_pct": {
+        "688/689/30": 20.0,
+        "43/83/87/88/92": 30.0,
+        "ST": 5.0,
+        "default": 10.0
+      }
+    },
+    "main_board": {
+      "impl": "scripts/limit_caliber.py:is_main_board",
+      "prefix": [
+        "600",
+        "601",
+        "603",
+        "605",
+        "000",
+        "001",
+        "002"
+      ]
+    },
+    "indicator_lib": {
+      "impl": "scripts/indicators_ext.py",
+      "consumers": [
+        "engine_v5.py",
+        "key_levels.py",
+        "trend_strength.py"
+      ]
+    }
+  },
+  "weight_policy": {
+    "file": "data/engine_weights.json",
+    "writer": "scripts/weight_calibrator_v2.py",
+    "candidate_writer": "scripts/weight_calibrator.py",
+    "report_only": [
+      "scripts/weight_calibrator_v3.py"
+    ],
+    "reader": "scripts/engine_v5.py",
+    "load_order": [
+      "--weights 显式路径",
+      "data/engine_weights.json",
+      "等权 1.0"
+    ],
+    "missing_fallback": "equal",
+    "provenance_field": "meta.weights / meta.weights_used",
+    "bounds": [
+      0.6,
+      1.5
+    ]
+  },
+  "device_engines": [
+    "supertrend",
+    "ma_golden",
+    "rsi",
+    "macd",
+    "kdj",
+    "boll_keltner",
+    "donchian",
+    "cmo",
+    "vortex",
+    "ultimate_osc",
+    "choppiness",
+    "hull_ma",
+    "elder_force",
+    "connors_rsi",
+    "ad_line",
+    "pivot",
+    "vwma",
+    "below_ma60"
+  ],
+  "cloud_only_engines": [
+    "sector_resonance",
+    "capital_flow",
+    "limit_pool"
+  ],
+  "pipeline": [
+    {
+      "id": "snapshot",
+      "needs": [],
+      "produces": [
+        "market_rows"
+      ],
+      "blocking": true,
+      "desc": "全市场实时盘口（东财 clist）"
+    },
+    {
+      "id": "pulse",
+      "needs": [
+        "snapshot"
+      ],
+      "produces": [
+        "breadth",
+        "phase_score",
+        "label"
+      ],
+      "blocking": true,
+      "desc": "宽度/涨跌停/中位涨幅 → 相位"
+    },
+    {
+      "id": "screen",
+      "needs": [
+        "snapshot"
+      ],
+      "produces": [
+        "candidates"
+      ],
+      "blocking": false,
+      "desc": "候选池筛选 + 逐只日 K 评分"
+    },
+    {
+      "id": "sectors",
+      "needs": [
+        "snapshot"
+      ],
+      "produces": [
+        "sector_rows"
+      ],
+      "blocking": false,
+      "desc": "板块强弱聚合"
+    },
+    {
+      "id": "rotation",
+      "needs": [
+        "sectors"
+      ],
+      "produces": [
+        "rotation"
+      ],
+      "blocking": false,
+      "desc": "板块轮动状态"
+    },
+    {
+      "id": "execution",
+      "needs": [
+        "screen",
+        "pulse",
+        "snapshot"
+      ],
+      "produces": [
+        "flow",
+        "tape"
+      ],
+      "blocking": false,
+      "desc": "资金流/盘口结构引擎"
+    },
+    {
+      "id": "emotion",
+      "needs": [
+        "snapshot"
+      ],
+      "produces": [
+        "limit_board",
+        "emotion_series"
+      ],
+      "blocking": false,
+      "desc": "连板高度/晋级率/封板率"
+    },
+    {
+      "id": "regime",
+      "needs": [
+        "pulse",
+        "emotion"
+      ],
+      "produces": [
+        "regime"
+      ],
+      "blocking": false,
+      "desc": "市场状态机"
+    },
+    {
+      "id": "risk",
+      "needs": [
+        "regime",
+        "rotation",
+        "emotion"
+      ],
+      "produces": [
+        "risk_budget"
+      ],
+      "blocking": false,
+      "desc": "风险预算/仓位闸门"
+    },
+    {
+      "id": "decision",
+      "needs": [
+        "screen",
+        "risk",
+        "regime"
+      ],
+      "produces": [
+        "cards",
+        "avoid"
+      ],
+      "blocking": false,
+      "desc": "决策卡与回避清单"
+    }
+  ],
+  "state_engines": [
+    {
+      "id": "flow",
+      "version": 1,
+      "device_impl": "FlowEngine.kt",
+      "cloud_impl": "scripts/engines_v2.py:flow_screen",
+      "authority": "dual",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "tiers": {
+        "local": 0.7,
+        "local_main": 0.85,
+        "cloud": 0.95,
+        "local_abs": 0.42
+      },
+      "params": {
+        "pctSd": 5.0,
+        "tanhK": 1.5,
+        "turnoverFloor": 0.5,
+        "turnoverHigh": 20.0,
+        "lowTurnWeight": 0.3,
+        "highTurnWeight": 0.5,
+        "volRatioK": 0.5,
+        "volRatioCap": 2.0,
+        "wCross": 0.6,
+        "wAbs": 0.4,
+        "gatedWCross": 0.3,
+        "minPeerN": 300,
+        "limitAmountRatio": 0.5,
+        "limitWeight": 0.2,
+        "mainUnit": 0.05,
+        "bullThreshold": 65.0,
+        "bearThreshold": 35.0,
+        "bullBreadthGate": 0.85,
+        "bearBreadthGate": 0.15,
+        "minCloudN": 30,
+        "minAmountYuan": 10000000.0
+      },
+      "parity_golden": "data/parity/golden_v2.json#flow",
+      "inputs": [
+        "live_row"
+      ],
+      "external_inputs": [
+        "main_net_5d_series"
+      ]
+    },
+    {
+      "id": "tape",
+      "version": 1,
+      "device_impl": "TapeEngine.kt",
+      "cloud_impl": "scripts/engines_v2.py:tape_compute",
+      "authority": "dual",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "items": [
+        "buy_proxy",
+        "divergence",
+        "shadow",
+        "gap",
+        "close_pos5"
+      ],
+      "params": {
+        "ampK": 3.0,
+        "divergePerVr": 1.0,
+        "divergeScale": 2.0,
+        "wBuy": 12.0,
+        "wDiverge": 8.0,
+        "wShadow": 6.0,
+        "wGap": 6.0,
+        "wPos": 6.0,
+        "bullThreshold": 62.0,
+        "bearThreshold": 38.0,
+        "gapMinPct": 1.0,
+        "shadowLong": 0.5,
+        "abnormalGapPct": 11.0,
+        "posBars": 5,
+        "minBars": 2,
+        "minAmountYuan": 10000000.0,
+        "openMinute": 570,
+        "closeAuctionMinute": 897,
+        "closeConfidence": 0.8,
+        "minUsedWeight": 10
+      },
+      "parity_golden": "data/parity/golden_v2.json#tape",
+      "inputs": [
+        "kline",
+        "live_row"
+      ],
+      "external_inputs": []
+    },
+    {
+      "id": "rotation",
+      "version": 1,
+      "device_impl": "RotationEngine.kt",
+      "cloud_impl": "scripts/engines_v2.py:rotation_compute",
+      "authority": "dual",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "wStrength": 0.35,
+        "wMom5": 0.25,
+        "wBreadth": 0.2,
+        "wAmt": 0.2,
+        "minSectors": 8,
+        "minMembers": 5,
+        "dispGate": 1.2,
+        "attackE": 30.0,
+        "defenseE": -30.0,
+        "bullRot": 0.35,
+        "bearRot": -0.35,
+        "breadthPanic": 0.15,
+        "limitHotShare": 0.02,
+        "minCoverage": 0.75,
+        "minUsableWeight": 0.4,
+        "topN": 3,
+        "mom5Days": 5
+      },
+      "parity_golden": "data/parity/golden_v2.json#rotation",
+      "inputs": [
+        "sector_rows"
+      ],
+      "external_inputs": [
+        "sector_mom5",
+        "amount_share_delta"
+      ]
+    },
+    {
+      "id": "vol_target",
+      "version": 1,
+      "device_impl": "VolTargetGate.kt",
+      "cloud_impl": "scripts/engines_v2.py:vol_target_compute",
+      "authority": "dual",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {
+        "volTargetAnnual": 0.12,
+        "window": 60,
+        "floor": 0.2,
+        "maxPos": 0.8
+      },
+      "parity_golden": "data/parity/golden_v2.json#vol_target",
+      "min_sample": 30,
+      "inputs": [
+        "market_days_archive"
+      ],
+      "external_inputs": []
+    }
+  ],
+  "calibration": {
+    "src": "data/risk_regime_params.json",
+    "generated_at": "2026-10-29T08:01:18+08:00",
+    "data": {
+      "start": "2024-10-08",
+      "end": "2026-10-28",
+      "bars": 500,
+      "indices": [
+        "sh000001",
+        "sh000300",
+        "sh000688",
+        "sz399001",
+        "sz399006"
+      ],
+      "primary": "sh000300",
+      "cost_bps": 5.0,
+      "vol_window": 60,
+      "folds": 3
+    },
+    "params": {
+      "vol_target_annual": 0.12,
+      "max_pos": 0.8,
+      "ma_fast": 30,
+      "ma_slow": 90,
+      "dwell": 5
+    },
+    "oos": {
+      "n_days": 168,
+      "total_return": -0.0592,
+      "cagr": -0.0875,
+      "vol_annual": 0.0968,
+      "sharpe": -0.897,
+      "max_drawdown": -0.0704,
+      "calmar": -1.24,
+      "avg_exposure": 0.446,
+      "turnover_annual": 2.85
+    },
+    "oos_buy_hold": {
+      "n_days": 168,
+      "total_return": -0.1336,
+      "cagr": -0.1936,
+      "vol_annual": 0.1935,
+      "sharpe": -1.014,
+      "max_drawdown": -0.2023,
+      "calmar": -0.96,
+      "avg_exposure": 1.0,
+      "turnover_annual": 0.0
+    },
+    "decision": {
+      "wire": true,
+      "criteria": {
+        "oos_sharpe_ge_bh": {
+          "pass": true,
+          "oos": -0.897,
+          "bh": -1.014
+        },
+        "oos_maxdd_le_80pct_bh": {
+          "pass": true,
+          "oos": -0.0704,
+          "bh": -0.2023,
+          "threshold": 0.1618
+        },
+        "folds_beating_fixed60": {
+          "pass": true,
+          "count": 2,
+          "need": 2,
+          "total": 3,
+          "per_fold": [
+            {
+              "strategy": -0.7,
+              "fixed_60": -0.584
+            },
+            {
+              "strategy": 2.31,
+              "fixed_60": 2.246
+            },
+            {
+              "strategy": -0.915,
+              "fixed_60": -1.027
+            }
+          ]
+        }
+      }
+    }
+  }
+}

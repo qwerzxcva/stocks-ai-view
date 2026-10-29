@@ -7,7 +7,8 @@
 输出: data/decision.json — 仓位建议/买卖清单/风控线/执行检查单
 原则: 防守优先(弱市空仓), T+1纪律(14:45唯一决策点), 数据库回测证据说话
 """
-import json, duckdb, datetime, os
+import json
+import os, duckdb, datetime, os
 
 BASE = "/home/agentuser/stockdb"
 OUT = f"{BASE}/data/decision.json"
@@ -116,7 +117,18 @@ def main():
                   "纪律胜率<40%自动降仓 — ADAPT自适应"],
         "note": "不构成投资建议",
     }
-    json.dump(out, open(OUT, "w"), ensure_ascii=False, indent=1)
+    # 契约: data/decision.json 的权威写者是 decision_engine.py（cards/avoid/position_advice）。
+    # 本文件输出的是另一套结构（凯利仓位树，无 cards），直接覆盖会让 risk_engine /
+    # portfolio_optimizer / pool_audit 静默读到空。默认改写 *_legacy.json。
+    _repo_data = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                              "data", "decision.json")
+    canonical = os.path.abspath(OUT) == os.path.abspath(_repo_data) or OUT.endswith("stockdb/data/decision.json")
+    target = OUT
+    if canonical and not os.environ.get("ALLOW_DECISION_OVERWRITE"):
+        target = OUT.replace("decision.json", "decision_legacy.json")
+        print("[decision] 权威产物 data/decision.json 由 decision_engine.py 写；"
+              "本次改写 %s（设 ALLOW_DECISION_OVERWRITE=1 可强行覆盖）" % target)
+    json.dump(out, open(target, "w"), ensure_ascii=False, indent=1)
     print(f"决策: {action} 仓位{pos:.0%} 预算{capital*pos:.0f} | 近{n_recent}笔胜率{win_rate:.0%}")
     for r_ in reasons: print(" ·", r_)
     print(f"买入清单: {len(buy_list)}笔" if buy_list else "买入清单: 无(空仓/观察)")

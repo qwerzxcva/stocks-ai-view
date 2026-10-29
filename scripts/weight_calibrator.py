@@ -121,7 +121,9 @@ def calibrate(reflect):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="inp", default=os.path.join(DATA_DIR, "reflect_latest.json"))
-    ap.add_argument("--out", default=os.path.join(DATA_DIR, "engine_weights.json"))
+    # 权威写者收敛为 weight_calibrator_v2.py（链上 engine-chain.yml 每轮都跑它，且带
+    # provenance）。v1 默认只产候选文件，防止两套权重互相覆盖。
+    ap.add_argument("--out", default=os.path.join(DATA_DIR, "engine_weights.candidate.json"))
     ap.add_argument("--apply", action="store_true",
                     help="写入 engine_v5.py 的 DEFAULT_WEIGHTS")
     args = ap.parse_args()

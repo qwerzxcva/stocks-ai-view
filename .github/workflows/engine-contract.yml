@@ -1,0 +1,147 @@
+# engine-contract.yml — 双端算法一致性契约闸门（PR / push 触发，不依赖行情采集）。
+#
+# 这个 workflow 只做一件事：证明「端上算的和云端算的是同一件事」，
+# 以及「data/ 下的产物仍然符合注册表契约」。它不跑引擎全链（那要 6-9 分钟且需要
+# 行情数据），所以能在每个 PR 上跑。
+#
+# 闸门，任一失败即红：
+#   1.  engine_spec.py --check-products    产物字段/单写者（防 market_phase 被 demo 覆盖这类事故）
+#   2.  engine_spec.py --verify            golden_v5（18 技术票）是否漂移
+#   2b. engines_v2.py --verify             golden_v2（flow/tape/rotation/vol_target）是否漂移
+#   2c. golden_21.py --verify              golden_21（21 票含 3 张云端外部票）是否漂移
+#   2d. calibrate_risk_regime.py --verify  riskBudget/regime 校准参数是否漂移
+#   2e. sync_parity_artifacts.py check     规格/parity 夹具是否被「非登记写入方」改过
+#   3.  build_engine_manifest.py --check   参数文件指纹 vs 清单
+#   4.  verify_engine_consistency.py       清单版本 vs 端上 EngineManifest.EXPECTED_VERSIONS
+#
+# 2e / 4 需要端上仓 skapp-app 在同级目录，本 workflow 自己检出它（path: skapp-app
+# + 软链到 ../skapp-app）；检不出来就直接红，不再退回 ::notice:: 静默跳过。
+name: engine-contract
+on:
+  push:
+    paths:
+      - 'scripts/**'
+      - 'data/engine_spec.json'
+      - 'data/parity/**'
+      - 'data/engine_weights.json'
+      - '.github/workflows/engine-contract.yml'
+  pull_request:
+    paths: ['scripts/**', 'data/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # 2e/4、4/4 要比对端上仓生成物与 EngineManifest，端上仓必须真的检出。
+      # 缺 secret / 检出失败 → 本 workflow 直接红（刻意不设跳过分支）。
+      - name: 前置检查 secrets.GH_TOKEN（读端上仓 skapp-app 用）
+        env:
+          SKAPP_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          if [ -z "$SKAPP_TOKEN" ]; then
+            echo "::error::缺少 secrets.GH_TOKEN：2e/4、4/4 需要读 jiegengxiangjianxue/skapp-app，未配置即失败"
+            exit 1
+          fi
+
+      # 端上仓：仅用于 2e/4 归属校验与 4/4 版本比对。取不到时**不阻断**——
+      # 云端产物与黄金向量的闸门（1/2b/2c/2d/3）不依赖它，让整个契约工作流因为
+      # 另一个仓的凭据不可用而全红，等于用无关故障掩盖真问题。
+      - uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: jiegengxiangjianxue/skapp-app
+          token: ${{ secrets.GH_TOKEN }}
+          path: skapp-app
+          fetch-depth: 1
+
+      # 脚本按「与本仓同级」定位端上仓（sync_parity_artifacts.py、verify_engine_consistency.py），
+      # checkout 只能落在 workspace 内，故软链到上一级。
+      - name: 端上仓就位（../skapp-app）
+        run: |
+          if [ -d "$GITHUB_WORKSPACE/skapp-app" ]; then
+            ln -sfn "$GITHUB_WORKSPACE/skapp-app" ../skapp-app
+          else
+            echo "::warning::端上仓不可用（凭据或无权限），2e/4 与 4/4 将跳过，其余闸门照常"
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 只装脚本真正 import 的东西；引擎本体是纯标准库 + pandas（rps_rotation）
+      - name: Install deps
+        run: pip install --quiet pandas || echo "pandas skipped (非必需)"
+
+      # 2/4 要重算黄金向量，必须有真实 K 线分片（engine_spec.py glob day_qfq_*.csv）；
+      # 分片在 t1 仓且以 .csv.gz 存储，解压到 ../stocks-data-kline/data/bulk
+      # （engine_spec._default_bulk() 的默认查找位）。
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GITHUB_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          sparse-checkout-cone-mode: false
+          path: kline-repo
+
+      - name: K 线分片就位（../stocks-data-kline/data/bulk）
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/
+          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import ensure_bulk_uncompressed; print('uncompressed', ensure_bulk_uncompressed('../stocks-data-kline/data/bulk'))"
+          n=$(ls ../stocks-data-kline/data/bulk | grep -c day_qfq || true)
+          echo "day_qfq shards: $n"
+          test "$n" -gt 0 || { echo "::error::K 线分片为空，2/4 无法重算黄金向量"; exit 1; }
+
+      - name: 1/4 产物契约
+        run: python3 scripts/engine_spec.py --check-products
+
+      - name: 2/4 黄金向量未漂移
+        run: |
+          test -f data/parity/golden_v5.json || { echo "::error::缺少 data/parity/golden_v5.json"; exit 1; }
+          python3 scripts/engine_spec.py --verify data/parity/golden_v5.json --samples 6 --bars 130
+
+      - name: 2b/4 状态引擎黄金向量未漂移（flow/tape/rotation/vol_target）
+        run: |
+          test -f data/parity/golden_v2.json || { echo "::error::缺少 data/parity/golden_v2.json"; exit 1; }
+          python3 scripts/engines_v2.py --verify data/parity/golden_v2.json
+
+      - name: 2c/4 21 票全量黄金向量未漂移（18 技术 + 3 外部）
+        run: |
+          test -f data/parity/golden_21.json || { echo "::error::缺少 data/parity/golden_21.json"; exit 1; }
+          python3 scripts/golden_21.py --verify data/parity/golden_21.json
+
+      - name: 2d/4 riskBudget/regime 校准参数未漂移
+        run: |
+          test -f data/risk_regime_params.json || { echo "::error::缺少 data/risk_regime_params.json"; exit 1; }
+          python3 scripts/calibrate_risk_regime.py --verify data/risk_regime_params.json
+
+      - name: 2e/4 规格与 parity 夹具的写入归属未变（唯一写入方）
+        run: |
+          test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出，2e/4 无法比对（检查 checkout 步骤与 secrets.GH_TOKEN）"; exit 1; }
+          python3 scripts/sync_parity_artifacts.py check
+
+      - name: 3/4 引擎参数清单指纹
+        run: python3 scripts/build_engine_manifest.py --check
+
+      - name: 4/4 端云版本一致
+        run: |
+          test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出，4/4 无法比对引擎版本"; exit 1; }
+          python3 scripts/verify_engine_consistency.py
+
+      - name: 语法检查（改动过的 Python）
+        run: |
+          python3 -m compileall -q scripts/ >/dev/null && echo "compileall ok"

@@ -72,7 +72,26 @@ def phase_score(missing):
         missing.append("market_phase.json")
         return 0
     m = {"ice": -80, "ebb": -50, "repair": -20, "ignite": 40, "rally": 70, "climax": 20}
-    return m.get(ph.get("phase", ""), 0)
+    # 契约: phase_runner 写 {ts, dates, phases[], phase, label, recent, structure, source}。
+    # 历史坑: scripts/market_phase.py 的 --out 会用合成 demo 覆盖同一路径，格式是
+    # {ts, daily, phases, labels} 且没有 phase 键 —— 旧代码 ph.get("phase","") 静默返回 0，
+    # 0.30 权重的一路被无声吞掉（data/market_phase.json 2026-10-17 版就是这个状态）。
+    # 现在按 phase → phases[-1] 兜底，仍解不出就记进 missing_inputs，绝不静默。
+    if ph.get("phase"):
+        phase = ph["phase"]
+    elif ph.get("dates") and ph.get("phases"):
+        # 仍是 phase_runner 写的规范格式，只是缺 phase 键（老版本产物）：取序列末位
+        phase = ph["phases"][-1]
+    else:
+        # 既无 phase 也无 dates → 这份文件是 scripts/market_phase.py 的 demo 输出
+        # （格式 {ts, daily, phases, labels}，内容是 2026-10-01..09 的合成梯队）。
+        # 拿它算阶段等于用假数据定价，宁可报缺。
+        missing.append("market_phase.json(legacy/demo 格式，权威写者 phase_runner.py 未跑)")
+        return 0
+    if phase not in m:
+        missing.append("market_phase.phase=%r 不在阶段机取值内" % phase)
+        return 0
+    return m[phase]
 
 
 def cycle_score(missing):
@@ -155,6 +174,7 @@ def main():
            "E": E, "state": state, "agreement": round(agree, 2),
            "parts": {k: {"score": v, "weight": w} for k, (v, w) in parts.items()},
            "missing_inputs": missing,
+           "n_missing": len(missing),
            "note": "多引擎加权融合, 一致性低→观望, 不构成投资建议"}
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:
