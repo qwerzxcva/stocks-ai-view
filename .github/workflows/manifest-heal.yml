@@ -1,0 +1,91 @@
+name: manifest-heal
+
+# 引擎清单自愈。
+#
+# ## 为什么需要它
+#
+# `data/engine_manifest.json` 记的是「端上依赖的那些参数文件」的 sha256 与派生字段。
+# 只要任何一个写这些文件的流程改动了内容，清单就必须同批重建 —— 否则端上
+# `android-build` 的 engine-gate 会报
+#   `FAIL decision: sha256 不符（文件被改但清单未重建）f881b34a83bc != f89ee7b41879`
+# 并让后 4 个 job（engine-kotlin / ui-render-gate / build）全部 skip，于是没有新 release。
+#
+# 2026-10-29 实测：写 `data/decision.json` 的不止 engine-chain，`hot-impact`、`ai-update`
+# 等都会写，它们都不重建清单。给每个流程都补一遍既容易漏又会重复劳动，所以做成
+# 「只要 main 上的 data/** 变了，就比对一次；不一致就重建并提交」的自愈步骤。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/**'
+      - 'scripts/build_engine_manifest.py'
+      - '.github/workflows/manifest-heal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: manifest-heal
+  cancel-in-progress: true
+
+jobs:
+  heal:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 需要时重建引擎清单
+        id: heal
+        run: |
+          set -uo pipefail
+          if python3 scripts/build_engine_manifest.py --check; then
+            echo "清单与数据一致，无需自愈"
+            echo "healed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "检测到漂移 → 重建清单"
+          python3 scripts/build_engine_manifest.py
+          if ! python3 scripts/build_engine_manifest.py --check; then
+            echo "::error::重建后仍不一致，清单脚本本身有问题"
+            exit 1
+          fi
+          if ! python3 scripts/verify_engine_consistency.py; then
+            echo "::warning::重建后端云版本仍不一致（可能是端上没跟上云端升版），本步仍然提交清单修复"
+          fi
+          echo "healed=true" >> "$GITHUB_OUTPUT"
+
+      - name: 提交重建后的清单
+        if: steps.heal.outputs.healed == 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "manifest-bot"
+          git config user.email "manifest-bot@users.noreply.github.com"
+          git add data/engine_manifest.json
+          if git diff --cached --quiet; then
+            echo "没有可提交的变更"
+            exit 0
+          fi
+          git commit -m "chore(manifest): 自愈重建引擎清单（数据文件已变而清单未跟上）"
+          python3 - <<'PY'
+          import subprocess, time
+          for attempt in range(5):
+              p = subprocess.run(["git", "push"], capture_output=True, text=True)
+              if p.returncode == 0:
+                  print("pushed")
+                  break
+              print("push failed (attempt %d): %s" % (attempt + 1, (p.stderr or "").strip()[:200]))
+              subprocess.run(["git", "pull", "--rebase", "--autostash"], capture_output=True, text=True)
+              time.sleep(5)
+          else:
+              raise SystemExit("push 连续失败")
+          PY
