@@ -197,11 +197,23 @@ def parity_items():
         return
     with open(man_path, encoding="utf-8") as fh:
         man = json.load(fh)
+
+    def layout():
+        parent = os.path.dirname(sync.ROOT)
+        try:
+            entries = sorted(os.listdir(parent))[:8]
+        except OSError as e:
+            entries = ["<%s>" % e]
+        ok = os.path.isdir(sync.APP)
+        return ok, "APP=%s 存在=%s 父目录 %s 内容=%s" % (
+            sync.APP, os.path.isdir(sync.APP), parent, entries)
+
+    record("parity.layout", layout)
     for dst_rel, rec in (man.get("artifacts") or {}).items():
         def check(dst_rel=dst_rel, rec=rec):
             dst = os.path.join(sync.APP, dst_rel)
             if not os.path.exists(dst):
-                return False, "端上文件缺失"
+                return False, "端上文件缺失: %s（APP=%s）" % (dst, sync.APP)
             actual = sync.sha256(dst)
             if actual != rec.get("sha256"):
                 return False, "端上指纹不符（登记 %s… 实际 %s…）" % (rec["sha256"][:12], actual[:12])
