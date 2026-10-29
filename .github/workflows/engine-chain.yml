@@ -409,8 +409,10 @@ jobs:
           # 这两条硬失败: 产物契约 / 黄金向量是「双端一致」的判据本身, 不能降级成警告。
           python3 scripts/engine_spec.py --check-products
           python3 scripts/engine_spec.py --verify data/parity/golden_v5.json --samples 6 --bars 130
-          python3 scripts/build_engine_manifest.py || echo "manifest skipped"
-          python3 scripts/verify_engine_consistency.py || echo "::error::端云引擎版本不一致"
+          # 清单重建 + 端云一致性校验不在这里: tier 3-8 之后还会改写 walkforward /
+          # weight_calibration 这类被清单记账的参数文件, 在这一行重建必然留下 drift
+          # (清单记下的 sha 是写之前的)。统一挪到 publish 之前的「Contract gate」step,
+          # light / full 两档都经过, 保证新参数与重建后的清单落在同一次提交里。
 
           echo "--- tier 3: backtest + reflection + winrate ---"
           python3 scripts/kline_sim.py --source predictions --out data/kline_sim.json --days 1,3,5,10 --max-signals 3000 || echo "kline_sim skipped"
@@ -580,6 +582,25 @@ jobs:
           # B 仓 (push2 系) / C 仓 (交易所+同花顺) 各自采集落自己仓,
           # 这里把分片数据拉回 A 仓供引擎/前端消费。公开仓 raw 拉取, 零鉴权。
           python3 scripts/sync_mirror_shards.py || echo "mirror shard sync skipped"
+
+      # ── 契约层闸门：清单必须在所有参数文件写完之后重建 ──
+      # 原先把 build_engine_manifest 放在 full 分支里, light 档完全不重建清单:
+      # light 档会重写 data/decision.json, 却把旧的 engine_manifest.json 一起提交,
+      # 端上 android-build 的 verify 步骤随即报
+      # 「decision: sha256 不符（文件被改但清单未重建）」并让整条 CI 红
+      # (2026-10-29 实测, 提交 engine(light): 20261029_1036 / f062f15e)。
+      # 两条都是硬失败, 不允许 || echo 静默放行: 宁可当轮全链红, 也不要端上按错口径静默算分。
+      - name: Contract gate - rebuild engine manifest then verify parity
+        run: |
+          set -euo pipefail
+          # --check 只比内容（忽略 generated_at / age_hours）: 没有漂移就不重写,
+          # 否则 light 档每 5 分钟都会刷一次 engine_manifest.json 造成无意义提交。
+          # 有漂移或参数文件缺失时 --check 退出码 1, 交给下面的重建: 重建仍失败则整步红。
+          if ! python3 scripts/build_engine_manifest.py --check; then
+            echo "manifest 与参数文件已漂移 -> 重建"
+            python3 scripts/build_engine_manifest.py
+          fi
+          python3 scripts/verify_engine_consistency.py
 
       - name: Publish engine outputs to this repo
         run: |
