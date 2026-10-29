@@ -72,7 +72,7 @@ jobs:
                   out=chat(prompt, os.environ["LLM_MODEL_FALLBACK"])
               except Exception as e2:
                   print("llm err:", str(e2)[:200], flush=True)
-                  exit(0)
+                  raise SystemExit(1)  # 两个模型都挂 = 本次复盘没产出，不能静默转绿
           md=f"# 每日LLM复盘 {__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}\n\n"+out
           os.makedirs("review", exist_ok=True)
           open(f"review/{__import__('datetime').datetime.now(__import__('datetime').timezone(__import__('datetime').timedelta(hours=8))).strftime('%Y-%m-%d')}.md","w").write(md)
@@ -80,6 +80,6 @@ jobs:
           PYEOF
       - name: Commit & push
         run: |
-          python3 scripts/git_push_retry.py --msg "review" --dir data \
+          python3 scripts/git_push_retry.py --msg "review" --dir data review \
             --user ai-bot \
-            --protect data/ai_review.json --protect data/ai_review.md
+            --protect data/ai_review.json --protect data/ai_review.md --protect review
