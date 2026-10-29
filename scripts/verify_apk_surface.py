@@ -32,9 +32,10 @@ APP = os.path.join(os.path.dirname(ROOT), "skapp-app")
 MANIFEST = os.path.join(ROOT, "data", "parity", "MANIFEST.json")
 
 SPEC_IN_APK = "engine_spec.json"
-# 逐屏清单：屏幕类 → (人话用途, 目前由哪个自动化契约把关展示数据)。
-# 第四列为 None 表示**没有**渲染数据契约——真机截图缺位时，这些屏的展示内容未被任何
-# 自动化断言覆盖，只能证明「类在包里」，不能证明「屏上数对」。宁可写明缺口，不装作覆盖。
+# 逐屏清单：屏幕类 → (人话用途, 哪一层自动化契约在喂它的**数据**)。
+# 注意「数据层契约」不等于「屏幕渲染契约」：app_test_matrix.py 实测 19 个屏类**没有任何
+# 测试提及**，屏本身（布局、位置、空态、对比度）零自动化覆盖。这里标注的是它消费的数据
+# 有没有断言，别读成「这一屏验过了」。
 SCREENS = [
     ("DecisionScreen", "决策页：仓位上限 / 风险预算 / E / 波动率闸门",
      "UiRenderContractTest（云端真实产物）"),
@@ -184,9 +185,10 @@ def main():
         problems.append("APK 缺屏幕类：%s" % ", ".join(missing_screens))
 
     gap = len(SCREENS) - len(covered)
-    print("\n[apk] 数据契约覆盖 %d/%d 屏；其余 %d 屏只有「类在包内」这一层证据——"
-          "它们的展示内容需要真机截图才能验收（本环境无 root/Shizuku/无障碍）"
-          % (len(covered), len(SCREENS), gap))
+    print("\n[apk] 数据层契约覆盖 %d/%d 屏；其余 %d 屏连数据层都没有断言。"
+          "所有 %d 屏的**渲染**一律无自动化覆盖（app_test_matrix.py：没有任何测试提及屏类）——"
+          "展示内容只能靠真机截图验收（本环境无 root/Shizuku/无障碍）"
+          % (len(covered), len(SCREENS), gap, len(SCREENS)))
 
     for n in notes:
         print("[apk] 注意：%s" % n)
