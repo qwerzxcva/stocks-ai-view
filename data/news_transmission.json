@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-29T14:57:18+08:00",
+ "ts": "2026-10-29T15:09:10+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 475,
- "n_transmissions": 6,
+ "n_transmissions": 8,
  "n_rules": 16,
  "rules": [
   {
@@ -72,7 +72,7 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-10-28",
+  "trade_date": "2026-10-29",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
@@ -81,7 +81,7 @@
   {
    "title": "上古病毒现世,网友中熊猫烧香",
    "source": "贴吧热议",
-   "time": "2026-10-29T14:33:41+08:00",
+   "time": "2026-10-29T15:08:57+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28368378&amp;topic_name=%E4%B8%8A%E5%8F%A4%E7%97%85%E6%AF%92%E7%8E%B0%E4%B8%96%2C%E7%BD%91%E5%8F%8B%E4%B8%AD%E7%86%8A%E7%8C%AB%E7%83%A7%E9%A6%99",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -162,7 +162,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    }
@@ -211,7 +211,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    }
@@ -262,7 +262,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    }
@@ -270,7 +270,7 @@
   {
    "title": "郑丽文：台北选战是场不对称战争",
    "source": "今日头条",
-   "time": "2026-10-29T14:33:41+08:00",
+   "time": "2026-10-29T15:08:56+08:00",
    "url": "https://www.toutiao.com/trending/7701603088918020646/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -313,7 +313,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    }
@@ -359,7 +359,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    }
@@ -386,7 +386,63 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-28",
+    "trade_date": "2026-10-29",
+    "event_date": "2026-10-29",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "商务部回应“美将中企列入实体清单”",
+   "source": "今日头条",
+   "time": "2026-10-29T15:08:56+08:00",
+   "url": "https://www.toutiao.com/trending/7701951314036834345/",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "自主可控",
+     "stocks": [
+      "600118"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-29",
+    "event_date": "2026-10-29",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "商务部：坚决反对美将中国企业列入所谓涉疆法案实体清单",
+   "source": "cls",
+   "time": "2026-10-29T15:05:07+08:00",
+   "url": "https://www.cls.cn/detail/2519079",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "自主可控",
+     "stocks": [
+      "600118"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-29",
     "event_date": "2026-10-29",
     "matched_codes": []
    },
