@@ -70,7 +70,7 @@
       "version": "3.1.0"
     },
     "market_phase": {
-      "age_hours": 0.6,
+      "age_hours": 23.8,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -84,12 +84,12 @@
         "phase_labels": []
       },
       "produced_by": "scripts/phase_runner.py",
-      "sha256": "4d248c332bdcc106c1af8c6fac54107637d1720d0ddf227e207c7c9b6dacfdeb",
-      "ts": "2026-10-30T05:47:12",
+      "sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
+      "ts": "2026-10-29T06:37:01",
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 0.3,
+      "age_hours": 367.0,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -105,17 +105,17 @@
         "strategy": "B规则(低位+温和量+涨0-5%)+5日持有"
       },
       "produced_by": "scripts/strategy_card.py",
-      "sha256": "e69f6fafa8d245cb3743ffe99c5b86f3db192e5efc40b7bab12d6008cae5e526",
-      "ts": "2026-10-30T06:07:21",
+      "sha256": "a5069c2b6f6a6ae0cb1ba2e215da6e8dbdad5b94411db4f37a3707b9f4c81d15",
+      "ts": "2026-10-14T23:23:50",
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 0.3,
+      "age_hours": 370.6,
       "baseline": {
-        "mean_is_win": 48.36,
-        "mean_oos_win": 48.35,
-        "n_folds_valid": 46,
-        "oos_vs_is_decay": 0.01
+        "mean_is_win": 47.2,
+        "mean_oos_win": 48.62,
+        "n_folds_valid": 45,
+        "oos_vs_is_decay": -1.42
       },
       "consumers": [
         "SignalCalibration.kt"
@@ -123,7 +123,7 @@
       "file": "data/walkforward.json",
       "max_age_hours": 168,
       "params": {
-        "end": "2026-10-26",
+        "end": "2026-10-14",
         "horizon_days": 5,
         "start": "2023-11-20",
         "step_days": 20,
@@ -131,8 +131,8 @@
         "train_days": 120
       },
       "produced_by": "scripts/walkforward.py",
-      "sha256": "e3012fe731b7061e4030858657485e6d403baf54bcf77133e79a5474bdbafa20",
-      "ts": "2026-10-30T06:08:32",
+      "sha256": "74be1af291abe437e4ddfffbea1ace3597471976012f431da2c835ba2434be51",
+      "ts": "2026-10-14T19:45:52",
       "version": "walkforward_v1"
     },
     "weight_calibration": {
@@ -185,7 +185,7 @@
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-10-30T06:24:11+08:00",
+  "generated_at": "2026-10-30T06:24:29+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }
