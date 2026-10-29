@@ -87,7 +87,9 @@ python3 scripts/sync_parity_artifacts.py who                          # 看租�
 - `publish` 先跑四道闸门（engines_v2 / golden_21 / calibrate 的 `--verify` + `--check-products`），
   任一红就**拒绝同步**；通过后拿 `flock`、原子写（`tmp` + `os.replace`）、把每个目标的 sha256 登记进
   `data/parity/MANIFEST.json`（含 writer 与时间）
-- `check` 重算磁盘指纹与登记比对：文件被**登记写入方以外**的进程改过就红，并打印登记/实际两份哈希
+- `check` 双向比对：端上文件指纹 + **云端源**指纹。端上被改 → 「指纹不符」；源变了但没重新 publish →
+  「源已漂移（端上是旧产物）」。只比端上一端的写法会漏掉「源更新了但没同步」这一整类事故
+- `publish` 遇到缺源默认**拒绝同步**（`return 7`），`--force` 才继续并把缺项写进 `gates.failed` 留痕
 - 租约只在 publish 期间持有：`flock` 只对活着的描述符有效，跨会话长期占锁不成立，
   跨会话的事后防护靠 MANIFEST 指纹
 
