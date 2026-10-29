@@ -746,6 +746,8 @@ def verify(golden_path, bulk_dir, samples, bars):
                 fresh_cases.append({"code": c["code"], "bars": c["bars"], "expect": expect})
         fresh = {"spec_version": SPEC_VERSION, "cases": fresh_cases}
     else:
+        if not bulk_dir or not os.path.isdir(bulk_dir):
+            return False, "老黄金向量缺内嵌 bars，且未提供 K 线分片（--bulk）"
         fresh = build_golden(bulk_dir, samples=len(old["cases"]) or samples, bars=bars)
     if fresh["spec_version"] != old.get("spec_version"):
         return False, "spec_version 不一致: %s vs %s" % (fresh["spec_version"], old.get("spec_version"))
@@ -851,14 +853,15 @@ def main():
         wrote = True
 
     if args.golden or args.verify:
+        # verify 需要分片**只**在老黄金向量缺内嵌 bars 时；生成 golden 必须要有分片。
+        if args.verify:
+            ok, msg = verify(args.verify, args.bulk or _default_bulk(), args.samples, args.bars)
+            print(("OK  " if ok else "DRIFT  ") + msg)
+            return 0 if ok else 1
         bulk = args.bulk or _default_bulk()
         if not bulk or not os.path.isdir(bulk):
             print("K 线分片目录不存在: %r（用 --bulk 指定）" % bulk, file=sys.stderr)
             return 2
-        if args.verify:
-            ok, msg = verify(args.verify, bulk, args.samples, args.bars)
-            print(("OK  " if ok else "DRIFT  ") + msg)
-            return 0 if ok else 1
         golden = build_golden(bulk, samples=args.samples, bars=args.bars)
         os.makedirs(os.path.dirname(os.path.abspath(args.golden)) or ".", exist_ok=True)
         with open(args.golden, "w", encoding="utf-8") as fh:
