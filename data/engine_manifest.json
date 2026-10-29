@@ -1,7 +1,7 @@
 {
   "engines": {
     "decision": {
-      "age_hours": 3.8,
+      "age_hours": 1.0,
       "baseline": {
         "cards": 12,
         "market_regime": "bull",
@@ -17,12 +17,12 @@
         "dimensions": 9
       },
       "produced_by": "scripts/decision_engine.py",
-      "sha256": "f10a885df536f1ec10dfe752cda16609d5a2569f27ea364e0d5086e791167e07",
-      "ts": "2026-10-29T05:53:56+08:00",
+      "sha256": "a2665e7a334a5ab2208555f5672ceb9b2321b3cfba31aec477ee94294fd7f9a2",
+      "ts": "2026-10-29T08:49:28+08:00",
       "version": "decision v2"
     },
     "engine_fusion": {
-      "age_hours": 0.1,
+      "age_hours": 0.2,
       "baseline": {
         "E": 31.0,
         "agreement": 0.75
@@ -70,7 +70,7 @@
       "version": "3.1.0"
     },
     "market_phase": {
-      "age_hours": 3.1,
+      "age_hours": 3.2,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -89,7 +89,7 @@
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 346.3,
+      "age_hours": 346.4,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -110,7 +110,7 @@
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 349.9,
+      "age_hours": 350.0,
       "baseline": {
         "mean_is_win": 47.2,
         "mean_oos_win": 48.62,
@@ -136,13 +136,13 @@
       "version": "walkforward_v1"
     },
     "weight_calibration": {
-      "age_hours": 3.7,
+      "age_hours": 0.7,
       "baseline": {
         "horizon_5": {
           "avg_ret_pct": 0.12,
-          "bear_win_rate": 55.5,
+          "bear_win_rate": 55.3,
           "bull_win_rate": 44.3,
-          "n": 64319
+          "n": 64373
         }
       },
       "consumers": [
@@ -160,32 +160,32 @@
         ],
         "indicators": [
           "Donchian20",
-          "UltimateOsc",
           "Choppiness",
+          "UltimateOsc",
           "CMO",
           "BOLL/Keltner",
           "SuperTrend",
-          "KDJ(RSV)",
-          "HullMA",
-          "Pivot",
           "MA5/MA20",
+          "Vortex",
+          "VWMA",
+          "MACD",
+          "Pivot",
           "ElderForce",
           "A/D Line",
-          "VWMA",
-          "Vortex",
-          "MACD",
+          "HullMA",
+          "KDJ(RSV)",
           "RSI"
         ],
         "min_n": 5000,
         "preferred_horizon": 5
       },
       "produced_by": "scripts/weight_calibrator_v3.py",
-      "sha256": "bf9a4cccb84fbc72840b8f02fe1a17da73c6ba83eab7d4c9a0d329a3fef0063e",
-      "ts": "2026-10-29T06:01:25+08:00",
+      "sha256": "fb315adfefc200ea7f7d4d28070b283ca7ad702878b45f593c8546f57de83499",
+      "ts": "2026-10-29T09:06:28+08:00",
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-10-29T09:41:59+08:00",
+  "generated_at": "2026-10-29T09:48:44+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }

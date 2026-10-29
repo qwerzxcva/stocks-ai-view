@@ -281,7 +281,7 @@ def main():
         with open(MANIFEST_PATH, "r", encoding="utf-8") as f:
             old = json.load(f)
         if comparable(old) != comparable(manifest):
-            a, b = comparable(old).get("engines", {}), manifest["engines"]
+            a, b = comparable(old).get("engines", {}), comparable(manifest)["engines"]
             print("FAIL manifest 与数据文件不一致:", file=sys.stderr)
             for eid in sorted(set(a) | set(b)):
                 if a.get(eid) != b.get(eid):
