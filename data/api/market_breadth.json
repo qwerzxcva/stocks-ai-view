@@ -1,26 +1,25 @@
 {
   "latest": {
     "date": "2026-10-29",
-    "limit_up": 38,
-    "limit_down": 43,
+    "limit_up": 39,
+    "limit_down": 41,
     "limit_up_hist": 49,
-    "limit_down_hist": 183,
-    "broken": 26,
-    "seal_rate_pct": 59.4,
-    "advance": 751,
-    "decline": 4578,
-    "flat": 47,
-    "up_pct": 14.0,
-    "amount_yi": 15372.2,
+    "limit_down_hist": 180,
+    "broken": 25,
+    "seal_rate_pct": 60.9,
+    "advance": 757,
+    "decline": 4563,
+    "flat": 56,
+    "up_pct": 14.1,
+    "amount_yi": 15565.2,
     "source": "market_now",
-    "recorded_at": "2026-10-29T15:23:46+08:00",
+    "recorded_at": "2026-10-29T22:57:48+08:00",
     "notes": [
-      "intraday_snapshot_not_settled",
       "limit_up_from_pool_zt_count",
       "limit_down_from_pool_dt_count",
       "limit_up_vs_hist_divergence"
     ],
-    "revisions": 2
+    "revisions": 3
   },
   "history": [
     {
@@ -385,26 +384,25 @@
     },
     {
       "date": "2026-10-29",
-      "limit_up": 38,
-      "limit_down": 43,
+      "limit_up": 39,
+      "limit_down": 41,
       "limit_up_hist": 49,
-      "limit_down_hist": 183,
-      "broken": 26,
-      "seal_rate_pct": 59.4,
-      "advance": 751,
-      "decline": 4578,
-      "flat": 47,
-      "up_pct": 14.0,
-      "amount_yi": 15372.2,
+      "limit_down_hist": 180,
+      "broken": 25,
+      "seal_rate_pct": 60.9,
+      "advance": 757,
+      "decline": 4563,
+      "flat": 56,
+      "up_pct": 14.1,
+      "amount_yi": 15565.2,
       "source": "market_now",
-      "recorded_at": "2026-10-29T15:23:46+08:00",
+      "recorded_at": "2026-10-29T22:57:48+08:00",
       "notes": [
-        "intraday_snapshot_not_settled",
         "limit_up_from_pool_zt_count",
         "limit_down_from_pool_dt_count",
         "limit_up_vs_hist_divergence"
       ],
-      "revisions": 2
+      "revisions": 3
     }
   ],
   "coverage": {
@@ -422,6 +420,6 @@
   },
   "caliber": "涨停=主板10%/双创20%/ST5%/北交所30%；封板率=涨停/(涨停+炸板)",
   "caliber_caveat": "limit_up/limit_down are the eastmoney limit-up/limit-down pool counts (pool_zt_count/pool_dt_count) and follow the per-board rules in 'caliber'. limit_up_hist/limit_down_hist keep the older >=+10% / <=-10% histogram-bucket sum for cross-checking only: that flat threshold over-counts ChiNext/STAR names up 10-19% without a sealed limit and never sees 5% ST limit-ups (2026-10-26: hist 77 vs pool 55; 2026-10-23: 171 vs 82). Caliber switched on 2026-10-27, so the series steps down at that date - a caliber change, not a market move.",
-  "updated_at": "2026-10-29T15:23:46+08:00",
-  "revisions_total": 8
+  "updated_at": "2026-10-29T22:57:48+08:00",
+  "revisions_total": 9
 }
