@@ -46,6 +46,12 @@ jobs:
               | tr -d '\r' | grep -E "FAIL |WARN |结论|DIFF |不一致|error" | tail -20 || echo "(日志取不到)"
           done
 
+          echo "== dispatch android-build (verify a clean run) =="
+          curl -s -o /dev/null -w "dispatch_http=%{http_code}\n" -X POST \
+            -H "Authorization: Bearer $T" -H "Accept: application/vnd.github+json" \
+            -d '{"ref":"main"}' \
+            "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/actions/workflows/android-build.yml/dispatches"
+
           echo "== releases =="
           api "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/releases?per_page=3" \
             | python3 -c 'import json,sys; d=json.load(sys.stdin); [print("%-10s %-8s %s | %s" % (r.get("tag_name"), "draft" if r.get("draft") else ("pre" if r.get("prerelease") else "release"), r.get("published_at"), ", ".join(a["name"]+"("+str(a["size"])+")" for a in r.get("assets",[])))) for r in d]'
