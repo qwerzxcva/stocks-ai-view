@@ -1,36 +1,36 @@
 {
- "ts": "2026-10-29T06:01:41+08:00",
+ "ts": "2026-10-29T09:06:49+08:00",
  "engine": "prediction_bundle.py",
- "snapshot_id": "2026-10-29T05:36:52+08:00",
+ "snapshot_id": "2026-10-29T06:01:52+08:00",
  "trading_date": "20261029",
  "pipeline_status": "partial",
  "group_status": {
   "market_snapshot": "stale",
-  "global_markets": "stale",
+  "global_markets": "fresh",
   "hot_news": "stale",
   "picks": "stale",
   "engines": "fresh",
-  "review": "stale"
+  "review": "fresh"
  },
  "today_action": {
   "status": "no_fresh_buy_signal",
   "reason": "主快照或引擎数据未满足新鲜度门槛，只输出观察候选，不把旧数据写成今日买入信号。",
   "candidates": [
    {
-    "code": "000156",
+    "code": "600281",
     "name": "",
-    "score": 61.3,
+    "score": 72.0,
     "model_probability": null,
     "probability_status": "uncalibrated",
     "forecast_horizon": "next_trading_day",
     "predicted_direction": "up",
     "expected_return_range": null,
-    "ma20": 7.2385,
-    "ma60": 6.9578,
-    "ma120": 6.8321,
-    "ma252": 7.3248,
-    "history_days": 811,
-    "history_last_date": "2026-10-26",
+    "ma20": 4.9315,
+    "ma60": 4.744,
+    "ma120": 4.7058,
+    "ma252": 5.3838,
+    "history_days": 814,
+    "history_last_date": "2026-10-28",
     "data_quality": "sufficient",
     "supporting_engines": [
      "engine_v5",
@@ -39,14 +39,54 @@
     "contradicting_engines": [],
     "action": "watch_stale_data",
     "evidence": [
-     "engine_v5=74.0",
+     "engine_v5=63.1",
      "trend_strength=covered"
     ],
     "data_ts": {
-     "engine_v5": "2026-10-29T05:43:17+08:00",
-     "multidim": "2026-10-29T05:53:55+08:00",
-     "trend_strength": "2026-10-29T05:44:12+08:00",
-     "debate": "2026-10-29T06:01:41+08:00"
+     "engine_v5": "2026-10-29T08:34:35+08:00",
+     "multidim": "2026-10-29T08:49:27+08:00",
+     "trend_strength": "2026-10-29T08:35:43+08:00",
+     "debate": "2026-10-29T09:06:49+08:00"
+    },
+    "invalidation": [
+     "最新主快照/引擎超过 freshness 门槛",
+     "开盘跳空超过预设波动区间",
+     "资金/趋势/红队反转"
+    ]
+   },
+   {
+    "code": "002181",
+    "name": "",
+    "score": 60.1,
+    "model_probability": null,
+    "probability_status": "uncalibrated",
+    "forecast_horizon": "next_trading_day",
+    "predicted_direction": "unknown",
+    "expected_return_range": null,
+    "ma20": 9.6775,
+    "ma60": 9.2702,
+    "ma120": 10.9365,
+    "ma252": 10.7307,
+    "history_days": 814,
+    "history_last_date": "2026-10-28",
+    "data_quality": "sufficient",
+    "supporting_engines": [
+     "engine_v5",
+     "multidim",
+     "premarket"
+    ],
+    "contradicting_engines": [],
+    "action": "watch_stale_data",
+    "evidence": [
+     "engine_v5=67.4",
+     "multidim=56.4",
+     "premarket=28.9"
+    ],
+    "data_ts": {
+     "engine_v5": "2026-10-29T08:34:35+08:00",
+     "multidim": "2026-10-29T08:49:27+08:00",
+     "trend_strength": "2026-10-29T08:35:43+08:00",
+     "debate": "2026-10-29T09:06:49+08:00"
     },
     "invalidation": [
      "最新主快照/引擎超过 freshness 门槛",
@@ -58,20 +98,20 @@
  },
  "next_day_candidates": [
   {
-   "code": "000156",
+   "code": "600281",
    "name": "",
-   "score": 61.3,
+   "score": 72.0,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "up",
    "expected_return_range": null,
-   "ma20": 7.2385,
-   "ma60": 6.9578,
-   "ma120": 6.8321,
-   "ma252": 7.3248,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
+   "ma20": 4.9315,
+   "ma60": 4.744,
+   "ma120": 4.7058,
+   "ma252": 5.3838,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5",
@@ -80,14 +120,238 @@
    "contradicting_engines": [],
    "action": "watch_stale_data",
    "evidence": [
-    "engine_v5=74.0",
+    "engine_v5=63.1",
     "trend_strength=covered"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "603466",
+   "name": "",
+   "score": 70.4,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "up",
+   "expected_return_range": null,
+   "ma20": 12.95,
+   "ma60": 12.2035,
+   "ma120": 11.5127,
+   "ma252": 10.61,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5",
+    "trend_strength"
+   ],
+   "contradicting_engines": [],
+   "action": "watch",
+   "evidence": [
+    "engine_v5=59.9",
+    "trend_strength=covered"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "002181",
+   "name": "",
+   "score": 60.1,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "unknown",
+   "expected_return_range": null,
+   "ma20": 9.6775,
+   "ma60": 9.2702,
+   "ma120": 10.9365,
+   "ma252": 10.7307,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5",
+    "multidim",
+    "premarket"
+   ],
+   "contradicting_engines": [],
+   "action": "watch_stale_data",
+   "evidence": [
+    "engine_v5=67.4",
+    "multidim=56.4",
+    "premarket=28.9"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "002590",
+   "name": "",
+   "score": 59.9,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "unknown",
+   "expected_return_range": null,
+   "ma20": 9.565,
+   "ma60": 9.6128,
+   "ma120": 10.278,
+   "ma252": 12.0721,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5"
+   ],
+   "contradicting_engines": [],
+   "action": "watch",
+   "evidence": [
+    "engine_v5=72.0"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "603037",
+   "name": "",
+   "score": 59.5,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "unknown",
+   "expected_return_range": null,
+   "ma20": 10.435,
+   "ma60": 10.2528,
+   "ma120": 10.9932,
+   "ma252": 12.8604,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5"
+   ],
+   "contradicting_engines": [],
+   "action": "watch",
+   "evidence": [
+    "engine_v5=71.1"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "000058",
+   "name": "",
+   "score": 59.2,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "unknown",
+   "expected_return_range": null,
+   "ma20": 7.276,
+   "ma60": 7.0472,
+   "ma120": 6.9626,
+   "ma252": 8.0625,
+   "history_days": 813,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5"
+   ],
+   "contradicting_engines": [],
+   "action": "watch",
+   "evidence": [
+    "engine_v5=70.4"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
+   },
+   "invalidation": [
+    "最新主快照/引擎超过 freshness 门槛",
+    "开盘跳空超过预设波动区间",
+    "资金/趋势/红队反转"
+   ]
+  },
+  {
+   "code": "000156",
+   "name": "",
+   "score": 58.9,
+   "model_probability": null,
+   "probability_status": "uncalibrated",
+   "forecast_horizon": "next_trading_day",
+   "predicted_direction": "up",
+   "expected_return_range": null,
+   "ma20": 7.2665,
+   "ma60": 6.992,
+   "ma120": 6.8363,
+   "ma252": 7.3243,
+   "history_days": 813,
+   "history_last_date": "2026-10-28",
+   "data_quality": "sufficient",
+   "supporting_engines": [
+    "engine_v5",
+    "trend_strength"
+   ],
+   "contradicting_engines": [],
+   "action": "watch",
+   "evidence": [
+    "engine_v5=53.9",
+    "trend_strength=covered"
+   ],
+   "data_ts": {
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -98,54 +362,18 @@
   {
    "code": "000039",
    "name": "",
-   "score": 58.3,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 8.436,
-   "ma60": 8.7942,
-   "ma120": 9.1837,
-   "ma252": 9.5717,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=68.4"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "002694",
-   "name": "",
    "score": 58.2,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "unknown",
    "expected_return_range": null,
-   "ma20": 2.6935,
-   "ma60": 2.4075,
-   "ma120": 2.3811,
-   "ma252": 3.0833,
-   "history_days": 812,
-   "history_last_date": "2026-10-26",
+   "ma20": 8.3775,
+   "ma60": 8.8111,
+   "ma120": 9.1319,
+   "ma252": 9.5757,
+   "history_days": 813,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5"
@@ -156,10 +384,10 @@
     "engine_v5=68.3"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -168,20 +396,20 @@
    ]
   },
   {
-   "code": "000028",
+   "code": "603868",
    "name": "",
-   "score": 57.2,
+   "score": 58.1,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "unknown",
    "expected_return_range": null,
-   "ma20": 20.0955,
-   "ma60": 20.1613,
-   "ma120": 20.394,
-   "ma252": 21.5635,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
+   "ma20": 31.844,
+   "ma60": 31.0588,
+   "ma120": 31.9957,
+   "ma252": 33.5989,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5"
@@ -189,157 +417,13 @@
    "contradicting_engines": [],
    "action": "watch",
    "evidence": [
-    "engine_v5=66.0"
+    "engine_v5=68.1"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "000411",
-   "name": "",
-   "score": 56.8,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 9.956,
-   "ma60": 9.8677,
-   "ma120": 9.9898,
-   "ma252": 10.7979,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=65.1"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "000063",
-   "name": "",
-   "score": 56.3,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 29.256,
-   "ma60": 32.2462,
-   "ma120": 34.5456,
-   "ma252": 36.8142,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=63.9"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "000026",
-   "name": "",
-   "score": 56.1,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 17.945,
-   "ma60": 18.7938,
-   "ma120": 19.5917,
-   "ma252": 17.5364,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=63.5"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "000400",
-   "name": "",
-   "score": 55.7,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 21.5842,
-   "ma60": 21.7211,
-   "ma120": 22.4969,
-   "ma252": 25.2135,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=62.6"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -350,18 +434,18 @@
   {
    "code": "000333",
    "name": "",
-   "score": 55.5,
+   "score": 57.8,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "up",
    "expected_return_range": null,
-   "ma20": 83.4135,
-   "ma60": 84.9433,
-   "ma120": 81.586,
-   "ma252": 77.4813,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
+   "ma20": 83.789,
+   "ma60": 84.9675,
+   "ma120": 81.7246,
+   "ma252": 77.62,
+   "history_days": 813,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5",
@@ -370,14 +454,14 @@
    "contradicting_engines": [],
    "action": "watch",
    "evidence": [
-    "engine_v5=55.3",
+    "engine_v5=58.8",
     "trend_strength=covered"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -386,20 +470,20 @@
    ]
   },
   {
-   "code": "000034",
+   "code": "000028",
    "name": "",
-   "score": 55.4,
+   "score": 56.9,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "unknown",
    "expected_return_range": null,
-   "ma20": 21.913,
-   "ma60": 23.3788,
-   "ma120": 25.1737,
-   "ma252": 26.4604,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
+   "ma20": 20.195,
+   "ma60": 20.1805,
+   "ma120": 20.3777,
+   "ma252": 21.5522,
+   "history_days": 813,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5"
@@ -407,13 +491,13 @@
    "contradicting_engines": [],
    "action": "watch",
    "evidence": [
-    "engine_v5=62.1"
+    "engine_v5=65.4"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -422,20 +506,20 @@
    ]
   },
   {
-   "code": "000403",
+   "code": "603721",
    "name": "",
-   "score": 54.4,
+   "score": 56.4,
    "model_probability": null,
    "probability_status": "uncalibrated",
    "forecast_horizon": "next_trading_day",
    "predicted_direction": "unknown",
    "expected_return_range": null,
-   "ma20": 9.7891,
-   "ma60": 10.2434,
-   "ma120": 10.5391,
-   "ma252": 12.4998,
-   "history_days": 811,
-   "history_last_date": "2026-10-26",
+   "ma20": 19.4135,
+   "ma60": 18.7745,
+   "ma120": 19.5184,
+   "ma252": 19.8311,
+   "history_days": 814,
+   "history_last_date": "2026-10-28",
    "data_quality": "sufficient",
    "supporting_engines": [
     "engine_v5"
@@ -443,49 +527,13 @@
    "contradicting_engines": [],
    "action": "watch",
    "evidence": [
-    "engine_v5=59.8"
+    "engine_v5=64.2"
    ],
    "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
-   },
-   "invalidation": [
-    "最新主快照/引擎超过 freshness 门槛",
-    "开盘跳空超过预设波动区间",
-    "资金/趋势/红队反转"
-   ]
-  },
-  {
-   "code": "002036",
-   "name": "",
-   "score": 54.0,
-   "model_probability": null,
-   "probability_status": "uncalibrated",
-   "forecast_horizon": "next_trading_day",
-   "predicted_direction": "unknown",
-   "expected_return_range": null,
-   "ma20": 5.835,
-   "ma60": 6.5152,
-   "ma120": 7.3702,
-   "ma252": 9.0331,
-   "history_days": 812,
-   "history_last_date": "2026-10-26",
-   "data_quality": "sufficient",
-   "supporting_engines": [
-    "engine_v5"
-   ],
-   "contradicting_engines": [],
-   "action": "watch",
-   "evidence": [
-    "engine_v5=59.0"
-   ],
-   "data_ts": {
-    "engine_v5": "2026-10-29T05:43:17+08:00",
-    "multidim": "2026-10-29T05:53:55+08:00",
-    "trend_strength": "2026-10-29T05:44:12+08:00",
-    "debate": "2026-10-29T06:01:41+08:00"
+    "engine_v5": "2026-10-29T08:34:35+08:00",
+    "multidim": "2026-10-29T08:49:27+08:00",
+    "trend_strength": "2026-10-29T08:35:43+08:00",
+    "debate": "2026-10-29T09:06:49+08:00"
    },
    "invalidation": [
     "最新主快照/引擎超过 freshness 门槛",
@@ -507,8 +555,8 @@
    "global_index_avg_pct": 1.433,
    "breadth_pct": 55.39
   },
-  "evidence_ts": "2026-10-29T01:02:20.026075+08:00",
-  "global_ts": "2026-10-29T05:37:14+08:00",
+  "evidence_ts": "2026-10-29T05:39:37.049002+08:00",
+  "global_ts": "2026-10-29T05:43:50+08:00",
   "method": "启发式方向概率，不是已完成样本外校准的确定预测; 已联动 cycle_deep 周期综合分",
   "change_conditions": [
    "A股主要指数转为同步下跌且上涨家数快速收窄 → 下调 up 概率",
@@ -519,14 +567,14 @@
   "cycle_deep_bias": "中性"
  },
  "evidence": {
-  "latest_ts": "2026-10-29T01:02:20.026075+08:00",
-  "market_now_ts": "2026-10-29T01:24:49+08:00",
-  "global_ts": "2026-10-29T05:37:14+08:00",
-  "engine_ts": "2026-10-29T05:43:17+08:00",
-  "trend_ts": "2026-10-29T05:44:12+08:00",
-  "debate_ts": "2026-10-29T06:01:41+08:00",
+  "latest_ts": "2026-10-29T05:39:37.049002+08:00",
+  "market_now_ts": "2026-10-29T05:51:52+08:00",
+  "global_ts": "2026-10-29T05:43:50+08:00",
+  "engine_ts": "2026-10-29T08:34:35+08:00",
+  "trend_ts": "2026-10-29T08:35:43+08:00",
+  "debate_ts": "2026-10-29T09:06:49+08:00",
   "cycle_deep_ts": null,
-  "manifest_ts": "2026-10-29T05:36:52+08:00"
+  "manifest_ts": "2026-10-29T06:01:52+08:00"
  },
  "meta": {
   "today": "today_action 只有在 market_snapshot 与 engines 均 fresh 时才允许 candidate；否则强制 watch_stale_data",

@@ -1,37 +1,11 @@
 {
- "ts": "2026-10-29T06:01:41+08:00",
+ "ts": "2026-10-29T09:06:49+08:00",
  "engine": "recent_mainlines.py",
  "window_days": 30,
  "history_days_available": 1,
  "status": "sample_insufficient",
  "mainlines": [],
  "daily": [
-  {
-   "date": "2026-09-09",
-   "premarket": null,
-   "close": null,
-   "source": {
-    "premarket": null,
-    "close": null
-   },
-   "actual_time": {
-    "premarket": null,
-    "close": null
-   },
-   "premarket_status": "missing",
-   "mainlines": [],
-   "market_summary": {
-    "index": "sh000001",
-    "close": 3951.51,
-    "change_pct": 0.28,
-    "volume": 517504311.0,
-    "source": "data/index_kline.json",
-    "scope": "大A指数总结，不含个股推荐验证",
-    "ma20": 3936.38,
-    "bias_ma20_pct": 0.38,
-    "market_mainline": "指数站上MA20且当日走强"
-   }
-  },
   {
    "date": "2026-09-10",
    "premarket": null,
@@ -778,14 +752,14 @@
    "premarket": null,
    "close": null,
    "source": {
-    "premarket": "data/premarket_picks.json",
+    "premarket": null,
     "close": null
    },
    "actual_time": {
-    "premarket": "2026-10-28T10:19:06+08:00",
+    "premarket": null,
     "close": null
    },
-   "premarket_status": "rejected_not_before_09:15",
+   "premarket_status": "missing",
    "mainlines": [],
    "market_summary": {
     "index": "sh000001",
@@ -798,6 +772,1786 @@
     "bias_ma20_pct": -2.21,
     "market_mainline": "指数仍在MA20下方"
    }
+  },
+  {
+   "date": "2026-10-29",
+   "premarket": {
+    "date": "2026-10-29",
+    "source": "data/premarket_picks.json",
+    "time": "2026-10-29T08:28:43+08:00",
+    "session": "premarket",
+    "gate": {
+     "state": "defensive",
+     "reason": "全球情绪 -17.6 (偏空) — 建议空仓/轻仓; 仍给出候选, 单票试错、严设止损",
+     "pos_cap": 0.1
+    },
+    "tiers": {
+     "A_buy": [],
+     "B_watch": [
+      {
+       "code": "601808",
+       "name": "",
+       "price": 12.41,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.889999999999997,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        12.22,
+        12.47
+       ],
+       "stop": 11.85,
+       "target": 13.15,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 76.0,
+        "资金面": 50,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 76.0",
+        "资金面": "无资金流数据",
+        "高低位": "20日位100% 60日位100% 乖离+9.2% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 11.85"
+       ],
+       "decision_quote": null,
+       "engine_price": 12.41,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "600461",
+       "name": "",
+       "price": 9.1,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.889999999999997,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        8.96,
+        9.15
+       ],
+       "stop": 8.69,
+       "target": 9.65,
+       "risk_reward": 1.09,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 75.9,
+        "资金面": 50,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 75.9",
+        "资金面": "无资金流数据",
+        "高低位": "20日位100% 60日位100% 乖离+8.5% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 8.69"
+       ],
+       "decision_quote": null,
+       "engine_price": 9.1,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "600295",
+       "name": "",
+       "price": 13.81,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.889999999999997,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        13.6,
+        13.88
+       ],
+       "stop": 13.19,
+       "target": 14.64,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 75.9,
+        "资金面": 50,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 75.9",
+        "资金面": "无资金流数据",
+        "高低位": "20日位100% 60日位81% 乖离+9.1% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 13.19"
+       ],
+       "decision_quote": null,
+       "engine_price": 13.81,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "688039",
+       "name": "",
+       "price": 36.14,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        35.6,
+        36.32
+       ],
+       "stop": 34.51,
+       "target": 38.31,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 66.5,
+        "资金面": 50,
+        "高低位": 45.3,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 66.5",
+        "资金面": "无资金流数据",
+        "高低位": "20日位73% 60日位65% 乖离+3.8% 位置73%",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 34.51"
+       ],
+       "decision_quote": null,
+       "engine_price": 36.14,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "600028",
+       "name": "",
+       "price": 5.41,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        5.33,
+        5.44
+       ],
+       "stop": 5.17,
+       "target": 5.73,
+       "risk_reward": 1.07,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 75.6,
+        "资金面": 50,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 75.6",
+        "资金面": "无资金流数据",
+        "高低位": "20日位100% 60日位100% 乖离+10.4% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 5.17"
+       ],
+       "decision_quote": null,
+       "engine_price": 5.41,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "002181",
+       "name": "",
+       "price": 10.19,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        10.04,
+        10.24
+       ],
+       "stop": 9.73,
+       "target": 10.8,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 51.6,
+        "资金面": 50,
+        "高低位": 53.5,
+        "基本面": 50,
+        "板块面": 72.5,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 51.6",
+        "资金面": "无资金流数据",
+        "高低位": "20日位33% 60日位50% 乖离-1.1% 位置33%",
+        "基本面": "无快照",
+        "板块面": "板块[大众出版] 强度+2.81%",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 9.73"
+       ],
+       "decision_quote": null,
+       "engine_price": 10.19,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "600237",
+       "name": "",
+       "price": 8.21,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        8.09,
+        8.25
+       ],
+       "stop": 7.84,
+       "target": 8.7,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 44.2,
+        "资金面": 50,
+        "高低位": 52.2,
+        "基本面": 50,
+        "板块面": 89.8,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 44.2",
+        "资金面": "无资金流数据",
+        "高低位": "20日位39% 60日位43% 乖离-0.6% 位置39%",
+        "基本面": "无快照",
+        "板块面": "板块[元件] 强度+4.97%",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 7.84"
+       ],
+       "decision_quote": null,
+       "engine_price": 8.21,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "300473",
+       "name": "",
+       "price": 35.89,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        35.35,
+        36.07
+       ],
+       "stop": 34.27,
+       "target": 38.04,
+       "risk_reward": 1.09,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 51.8,
+        "资金面": 50,
+        "高低位": 70,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 51.8",
+        "资金面": "无资金流数据",
+        "高低位": "20日位25% 60日位82% 乖离-1.5% 低位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 34.27"
+       ],
+       "decision_quote": null,
+       "engine_price": 35.89,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "605378",
+       "name": "",
+       "price": 17.18,
+       "score": 28.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.86,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        16.92,
+        17.27
+       ],
+       "stop": 16.41,
+       "target": 18.21,
+       "risk_reward": 1.09,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 51.7,
+        "资金面": 50,
+        "高低位": 70,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 51.7",
+        "资金面": "无资金流数据",
+        "高低位": "20日位16% 60日位41% 乖离-4.0% 低位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 16.41"
+       ],
+       "decision_quote": null,
+       "engine_price": 17.18,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "603669",
+       "name": "",
+       "price": 7.03,
+       "score": 28.8,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.8,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        6.92,
+        7.07
+       ],
+       "stop": 6.71,
+       "target": 7.45,
+       "risk_reward": 1.06,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 6.71"
+       ],
+       "decision_quote": null,
+       "engine_price": 7.03,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "000928",
+       "name": "",
+       "price": 3423.94,
+       "score": 28.8,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.83,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        3372.58,
+        3441.06
+       ],
+       "stop": 3269.86,
+       "target": 3629.38,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 76.8,
+        "资金面": 47.0,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 76.8",
+        "资金面": "5日主力+0.27亿 (+0.27%市值) 净流入2/5天",
+        "高低位": "20日位100% 60日位87% 乖离+3.7% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 3269.86"
+       ],
+       "decision_quote": null,
+       "engine_price": 3423.94,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      },
+      {
+       "code": "300031",
+       "name": "",
+       "price": 20.0,
+       "score": 28.8,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 16.83,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        19.7,
+        20.1
+       ],
+       "stop": 19.1,
+       "target": 21.2,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 75.1,
+        "资金面": 50,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 75.1",
+        "资金面": "无资金流数据",
+        "高低位": "20日位100% 60日位100% 乖离+10.6% 高位区",
+        "基本面": "无快照",
+        "板块面": "板块[传媒] 无强度/资金数据",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 19.10"
+       ],
+       "decision_quote": null,
+       "engine_price": 20.0,
+       "history": {
+        "ma20": null,
+        "ma60": null,
+        "ma120": null,
+        "ma252": null,
+        "length": null,
+        "last_date": null,
+        "conflicting_rows": null
+       },
+       "buyable": null,
+       "buyability_reason": "行情快照缺失或过期，不能确认开盘可成交",
+       "missing_evidence": [
+        "independent_engine_count",
+        "quote_snapshot",
+        "not_buyable_now",
+        "history_20d",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "B"
+      }
+     ],
+     "C_avoid": [
+      {
+       "code": "000333",
+       "name": "",
+       "price": 85.91,
+       "score": 53.8,
+       "parts": {
+        "resonance": 24,
+        "engine_avg": 17.849999999999998,
+        "valuation": 0,
+        "position": 0,
+        "flow": 12
+       },
+       "sources": [
+        "engine_v5",
+        "flow_div_buy"
+       ],
+       "entry_zone": [
+        84.62,
+        86.34
+       ],
+       "stop": 82.04,
+       "target": 91.06,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 82.04",
+        "2 个引擎共振提名 (engine_v5/flow_div_buy)",
+        "资金吸筹背离"
+       ],
+       "decision_quote": {
+        "code": "000333",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 85.91,
+        "prev_close": 85.04,
+        "ts": "2026-10-28T16:14:15+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "ab2de990d58e25babb2b173d",
+        "session": "closed"
+       },
+       "engine_price": 85.5,
+       "history": {
+        "ma20": 83.789,
+        "ma60": 84.9675,
+        "ma120": 81.7246,
+        "ma252": 77.62,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 8
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000812",
+       "name": "",
+       "price": 3.36,
+       "score": 51.2,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 27.179999999999996,
+        "valuation": 0,
+        "position": 0,
+        "flow": 12
+       },
+       "sources": [
+        "flow_div_buy"
+       ],
+       "entry_zone": [
+        3.31,
+        3.38
+       ],
+       "stop": 3.21,
+       "target": 3.56,
+       "risk_reward": 1.06,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 3.21",
+        "资金吸筹背离"
+       ],
+       "decision_quote": {
+        "code": "000812",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 3.36,
+        "prev_close": 3.36,
+        "ts": "2026-10-28T16:14:54+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "ceefa57bb8d9ce2d90e87b30",
+        "session": "closed"
+       },
+       "engine_price": 3.64,
+       "history": {
+        "ma20": 3.584,
+        "ma60": 3.6498,
+        "ma120": 3.5854,
+        "ma252": 4.0917,
+        "length": 814,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 9
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000039",
+       "name": "中集集团",
+       "price": 8.67,
+       "score": 46.7,
+       "parts": {
+        "resonance": 24,
+        "engine_avg": 10.35,
+        "valuation": 0,
+        "position": 12.35,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5",
+        "ai_pick_v4"
+       ],
+       "entry_zone": [
+        8.54,
+        8.71
+       ],
+       "stop": 8.28,
+       "target": 9.19,
+       "risk_reward": 1.12,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": 44.4,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 8.28",
+        "2 个引擎共振提名 (engine_v5/ai_pick_v4)",
+        "20日位 44%"
+       ],
+       "decision_quote": {
+        "code": "000039",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 8.67,
+        "prev_close": 8.5,
+        "ts": "2026-10-28T16:14:45+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "5feed71c6a6ae54ad198251a",
+        "session": "closed"
+       },
+       "engine_price": 8.61,
+       "history": {
+        "ma20": 8.3775,
+        "ma60": 8.8111,
+        "ma120": 9.1319,
+        "ma252": 9.5757,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 8
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "conflicting_kline",
+        "risk_reward"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000026",
+       "name": "飞亚达",
+       "price": 18.23,
+       "score": 43.8,
+       "parts": {
+        "resonance": 24,
+        "engine_avg": 9.569999999999999,
+        "valuation": 0,
+        "position": 10.275,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5",
+        "ai_pick_v4"
+       ],
+       "entry_zone": [
+        17.96,
+        18.32
+       ],
+       "stop": 17.41,
+       "target": 19.32,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": 36.1,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 17.41",
+        "2 个引擎共振提名 (engine_v5/ai_pick_v4)",
+        "20日位 36%"
+       ],
+       "decision_quote": {
+        "code": "000026",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 18.23,
+        "prev_close": 17.35,
+        "ts": "2026-10-28T16:14:54+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "348731603e8a398a2c14d9fa",
+        "session": "closed"
+       },
+       "engine_price": 17.65,
+       "history": {
+        "ma20": 17.744,
+        "ma60": 18.8468,
+        "ma120": 19.5913,
+        "ma252": 17.5479,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 594
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "conflicting_kline",
+        "risk_reward",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000156",
+       "name": "",
+       "price": 7.52,
+       "score": 34.2,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 22.2,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        7.41,
+        7.56
+       ],
+       "stop": 7.18,
+       "target": 7.97,
+       "risk_reward": 1.08,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 7.18"
+       ],
+       "decision_quote": {
+        "code": "000156",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 7.52,
+        "prev_close": 7.51,
+        "ts": "2026-10-28T16:15:00+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "6f6de8b90764ba3fad0339a6",
+        "session": "closed"
+       },
+       "engine_price": 8.0,
+       "history": {
+        "ma20": 7.2665,
+        "ma60": 6.992,
+        "ma120": 6.8363,
+        "ma252": 7.3243,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 650
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "002694",
+       "name": "",
+       "price": 2.87,
+       "score": 32.5,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 20.49,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        2.83,
+        2.88
+       ],
+       "stop": 2.74,
+       "target": 3.04,
+       "risk_reward": 1.14,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 2.74"
+       ],
+       "decision_quote": {
+        "code": "002694",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 2.87,
+        "prev_close": 2.91,
+        "ts": "2026-10-28T16:14:45+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "3ae5f0aefcfcda378b47af81",
+        "session": "closed"
+       },
+       "engine_price": 3.03,
+       "history": {
+        "ma20": 2.739,
+        "ma60": 2.4407,
+        "ma120": 2.3777,
+        "ma252": 3.0728,
+        "length": 814,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 9
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000028",
+       "name": "",
+       "price": 20.98,
+       "score": 31.8,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 19.8,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        20.67,
+        21.08
+       ],
+       "stop": 20.04,
+       "target": 22.24,
+       "risk_reward": 1.12,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 20.04"
+       ],
+       "decision_quote": {
+        "code": "000028",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 20.98,
+        "prev_close": 20.94,
+        "ts": "2026-10-28T16:14:48+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "d460f2066f0770872eed2b6b",
+        "session": "closed"
+       },
+       "engine_price": 21.06,
+       "history": {
+        "ma20": 20.195,
+        "ma60": 20.1805,
+        "ma120": 20.3777,
+        "ma252": 21.5522,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 1
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000411",
+       "name": "",
+       "price": 10.09,
+       "score": 31.5,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 19.529999999999998,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        9.94,
+        10.14
+       ],
+       "stop": 9.64,
+       "target": 10.7,
+       "risk_reward": 1.12,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 9.64"
+       ],
+       "decision_quote": {
+        "code": "000411",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 10.09,
+        "prev_close": 10.06,
+        "ts": "2026-10-28T16:15:00+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "95dfbdb447935793a3291a17",
+        "session": "closed"
+       },
+       "engine_price": 10.52,
+       "history": {
+        "ma20": 9.961,
+        "ma60": 9.8925,
+        "ma120": 9.9874,
+        "ma252": 10.7905,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 8
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000063",
+       "name": "",
+       "price": 28.2,
+       "score": 31.2,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 19.169999999999998,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        27.78,
+        28.34
+       ],
+       "stop": 26.93,
+       "target": 29.89,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 26.93"
+       ],
+       "decision_quote": {
+        "code": "000063",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 28.2,
+        "prev_close": 28.33,
+        "ts": "2026-10-28T16:14:48+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "395e17a97c615ee3884b5f75",
+        "session": "closed"
+       },
+       "engine_price": 28.03,
+       "history": {
+        "ma20": 28.7795,
+        "ma60": 32.0473,
+        "ma120": 34.4199,
+        "ma252": 36.6296,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 628
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000400",
+       "name": "",
+       "price": 22.59,
+       "score": 30.8,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 18.78,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        22.25,
+        22.7
+       ],
+       "stop": 21.57,
+       "target": 23.95,
+       "risk_reward": 1.11,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 21.57"
+       ],
+       "decision_quote": {
+        "code": "000400",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 22.59,
+        "prev_close": 22.71,
+        "ts": "2026-10-28T16:14:45+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "cd7d69a3c554ab38e748ff90",
+        "session": "closed"
+       },
+       "engine_price": 23.09,
+       "history": {
+        "ma20": 21.8256,
+        "ma60": 21.7469,
+        "ma120": 22.4613,
+        "ma252": 25.1809,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 8
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "000403",
+       "name": "",
+       "price": 9.45,
+       "score": 29.9,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 17.939999999999998,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "engine_v5"
+       ],
+       "entry_zone": [
+        9.31,
+        9.5
+       ],
+       "stop": 9.02,
+       "target": 10.02,
+       "risk_reward": 1.08,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": null,
+       "dims_why": null,
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 9.02"
+       ],
+       "decision_quote": {
+        "code": "000403",
+        "exchange": "sz",
+        "status": "ok",
+        "price": 9.45,
+        "prev_close": 9.55,
+        "ts": "2026-10-28T16:14:30+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "e3fac48ba0c3913c5bcf8323",
+        "session": "closed"
+       },
+       "engine_price": 9.83,
+       "history": {
+        "ma20": 9.7396,
+        "ma60": 10.233,
+        "ma120": 10.4937,
+        "ma252": 12.4468,
+        "length": 813,
+        "last_date": "2026-10-28",
+        "conflicting_rows": 2400
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "conflicting_kline",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      },
+      {
+       "code": "688018",
+       "name": "",
+       "price": 142.55,
+       "score": 29.7,
+       "parts": {
+        "resonance": 12,
+        "engine_avg": 17.73,
+        "valuation": 0,
+        "position": 0,
+        "flow": 0
+       },
+       "sources": [
+        "multidim"
+       ],
+       "entry_zone": [
+        140.41,
+        143.26
+       ],
+       "stop": 136.14,
+       "target": 151.1,
+       "risk_reward": 1.1,
+       "intrinsic_value": null,
+       "value_dev_pct": null,
+       "value_tag": null,
+       "pos240_pct": null,
+       "dims": {
+        "技术面": 74.5,
+        "资金面": 72.0,
+        "高低位": 30,
+        "基本面": 50,
+        "板块面": 50,
+        "市场面": 84.7,
+        "情绪面": 56,
+        "周期面": 42,
+        "消息面": 50,
+        "海外面": 55.7
+       },
+       "dims_why": {
+        "技术面": "17指标共振 74.5",
+        "资金面": "5日主力+1.39亿 (+1.39%市值) 净流入2/5天",
+        "高低位": "20日位95% 60日位90% 乖离+9.2% 高位区",
+        "基本面": "无快照",
+        "板块面": "无行业映射",
+        "市场面": "涨4051/跌1163 上涨占比75.4% 涨停72",
+        "情绪面": "封板率—% 晋级率—% 热点主题3个",
+        "周期面": "周期综合-1.0 (中性)",
+        "消息面": "关联热点0个 主题[]",
+        "海外面": "全球情绪 +1.43% · 最相关: 恒生科技 (corr 0.62 / beta 0.35)"
+       },
+       "reasons": [
+        "⚠️ 弱市逆势标的 — 建议轻仓试错, 止损 136.14"
+       ],
+       "decision_quote": {
+        "code": "688018",
+        "exchange": "sh",
+        "status": "ok",
+        "price": 142.55,
+        "prev_close": 138.0,
+        "ts": "2026-10-28T16:14:55+08:00",
+        "source": "tencent.qt.gtimg.cn/signal_hub",
+        "snapshot_id": "b8083891f768d9da46408182",
+        "session": "closed"
+       },
+       "engine_price": 111.94,
+       "history": {
+        "ma20": 112.1715,
+        "ma60": 110.9597,
+        "ma120": 116.6052,
+        "ma252": null,
+        "length": 120,
+        "last_date": "2026-10-14",
+        "conflicting_rows": 0
+       },
+       "buyable": true,
+       "buyability_reason": "收盘/盘前行情快照有效，未标记涨停；下单前仍需盘口复核",
+       "missing_evidence": [
+        "independent_engine_count",
+        "risk_reward",
+        "stock_name",
+        "snapshot_price_deviation"
+       ],
+       "data_quality": "insufficient",
+       "weak_market": true,
+       "tier": "C"
+      }
+     ]
+    },
+    "outlook": {
+     "tomorrow": {
+      "phase": {
+       "stage": null,
+       "score": null,
+       "desc": null
+      },
+      "cycle": {
+       "index": null,
+       "date": null,
+       "bias": null,
+       "composite": null,
+       "n_days": 8576
+      },
+      "walkforward": {
+       "is": null,
+       "oos": null,
+       "decay_pct": null,
+       "verdict": null
+      },
+      "recent_winrate": {
+       "h1_bull": null,
+       "h1_bear": null,
+       "n": 64400
+      }
+     },
+     "day_after": {
+      "note": "后日展望由次日盘后的 reflect/winrate 闭环修正, 此处给基准预期",
+      "basis": "当前市场相位 + walkforward OOS 胜率"
+     }
+    }
+   },
+   "close": null,
+   "source": {
+    "premarket": "data/premarket_picks.json",
+    "close": null
+   },
+   "actual_time": {
+    "premarket": "2026-10-29T08:28:43+08:00",
+    "close": null
+   },
+   "premarket_status": "available",
+   "mainlines": [],
+   "market_summary": null
   }
  ],
  "current": [
@@ -816,34 +2570,34 @@
    "name": "公司",
    "market": "A股",
    "heat": 1.0,
-   "news_count": 17,
+   "news_count": 15,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 17 条, 多 0 / 空 0; 代表: 营收猛增61%、订单翻倍！液冷巨头维谛：大规模基建浪潮仍在加速",
-   "logic": "相关新闻 17 条, 多 0 / 空 0; 代表: 营收猛增61%、订单翻倍！液冷巨头维谛：大规模基建浪潮仍在加速"
+   "reason": "相关新闻 15 条, 多 0 / 空 0; 代表: 营收猛增61%、订单翻倍！液冷巨头维谛：大规模基建浪潮仍在加速",
+   "logic": "相关新闻 15 条, 多 0 / 空 0; 代表: 营收猛增61%、订单翻倍！液冷巨头维谛：大规模基建浪潮仍在加速"
   },
   {
    "name": "国际",
    "market": "A股",
    "heat": 1.0,
-   "news_count": 15,
+   "news_count": 14,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 15 条, 多 0 / 空 0; 代表: 美联储如期维持基准利率不变 两名票委主张加息25个基点",
-   "logic": "相关新闻 15 条, 多 0 / 空 0; 代表: 美联储如期维持基准利率不变 两名票委主张加息25个基点"
+   "reason": "相关新闻 14 条, 多 0 / 空 0; 代表: 美联储如期维持基准利率不变 两名票委主张加息25个基点",
+   "logic": "相关新闻 14 条, 多 0 / 空 0; 代表: 美联储如期维持基准利率不变 两名票委主张加息25个基点"
   },
   {
    "name": "政策",
    "market": "A股",
-   "heat": 0.62,
-   "news_count": 5,
+   "heat": 1.0,
+   "news_count": 9,
    "direction": "neutral",
    "codes": [],
    "stocks": [],
-   "reason": "相关新闻 5 条, 多 0 / 空 0; 代表: 英国财政大臣希利：我已要求英国央行研究银行的资本要求。\n\n我们将推进金融服务与市",
-   "logic": "相关新闻 5 条, 多 0 / 空 0; 代表: 英国财政大臣希利：我已要求英国央行研究银行的资本要求。\n\n我们将推进金融服务与市"
+   "reason": "相关新闻 9 条, 多 0 / 空 0; 代表: 加拿大央行行长Macklem：（针对经济的）新模型允许通胀按各个组成部分回落的方",
+   "logic": "相关新闻 9 条, 多 0 / 空 0; 代表: 加拿大央行行长Macklem：（针对经济的）新模型允许通胀按各个组成部分回落的方"
   },
   {
    "name": "汽车",
@@ -855,17 +2609,6 @@
    "stocks": [],
    "reason": "相关新闻 2 条, 多 0 / 空 0; 代表: 财联社10月29日电，福特汽车预计，2027年将因大宗商品、芯片和航运因素面临2",
    "logic": "相关新闻 2 条, 多 0 / 空 0; 代表: 财联社10月29日电，福特汽车预计，2027年将因大宗商品、芯片和航运因素面临2"
-  },
-  {
-   "name": "电子",
-   "market": "A股",
-   "heat": 0.12,
-   "news_count": 1,
-   "direction": "neutral",
-   "codes": [],
-   "stocks": [],
-   "reason": "相关新闻 1 条, 多 0 / 空 0; 代表: 据知情人士透露，迈威尔科技/美满电子洽谈收购数据中心光模块厂商Lumentum ",
-   "logic": "相关新闻 1 条, 多 0 / 空 0; 代表: 据知情人士透露，迈威尔科技/美满电子洽谈收购数据中心光模块厂商Lumentum "
   },
   {
    "name": "A股",
@@ -881,11 +2624,11 @@
  ],
  "market_window": {
   "index": "sh000001",
-  "days": 30,
-  "up_days": 15,
+  "days": 29,
+  "up_days": 14,
   "down_days": 15,
-  "avg_change_pct": -0.222,
-  "cumulative_change_pct": -6.67,
+  "avg_change_pct": -0.24,
+  "cumulative_change_pct": -6.95,
   "source": "data/index_kline.json",
   "scope": "大A指数表现；不是选股推荐的胜率"
  },

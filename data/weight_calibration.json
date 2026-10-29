@@ -1,305 +1,305 @@
 {
- "ts": "2026-10-29T06:01:25+08:00",
+ "ts": "2026-10-29T09:06:28+08:00",
  "engine": "weight_calibrator_v3 (分层 + 相对权重 + 市况适配)",
  "min_n": 5000,
  "horizons": {
   "1": {
-   "n": 64781,
-   "bull_win_rate": 45.2,
+   "n": 65521,
+   "bull_win_rate": 45.0,
    "bull_ci": [
-    44.81,
-    45.59
+    44.61,
+    45.39
    ],
-   "bear_win_rate": 54.1,
+   "bear_win_rate": 55.5,
    "bear_ci": [
-    52.0,
-    56.18
+    53.46,
+    57.52
    ],
-   "avg_ret_pct": -0.01,
-   "raw_win_rate": 45.1
+   "avg_ret_pct": -0.03,
+   "raw_win_rate": 44.9
   },
   "3": {
-   "n": 64378,
-   "bull_win_rate": 44.8,
+   "n": 64930,
+   "bull_win_rate": 44.7,
    "bull_ci": [
-    44.41,
-    45.19
+    44.31,
+    45.09
    ],
-   "bear_win_rate": 54.8,
+   "bear_win_rate": 55.0,
    "bear_ci": [
-    52.7,
-    56.88
+    52.9,
+    57.08
    ],
-   "avg_ret_pct": 0.07,
-   "raw_win_rate": 44.7
+   "avg_ret_pct": 0.06,
+   "raw_win_rate": 44.6
   },
   "5": {
-   "n": 64319,
+   "n": 64373,
    "bull_win_rate": 44.3,
    "bull_ci": [
     43.91,
     44.69
    ],
-   "bear_win_rate": 55.5,
+   "bear_win_rate": 55.3,
    "bear_ci": [
-    53.4,
-    57.58
+    53.2,
+    57.38
    ],
    "avg_ret_pct": 0.12,
    "raw_win_rate": 44.2
   },
   "10": {
-   "n": 64160,
-   "bull_win_rate": 44.0,
+   "n": 64218,
+   "bull_win_rate": 43.9,
    "bull_ci": [
-    43.61,
-    44.39
+    43.51,
+    44.29
    ],
    "bear_win_rate": 54.2,
    "bear_ci": [
-    52.09,
+    52.1,
     56.29
    ],
-   "avg_ret_pct": 0.44,
-   "raw_win_rate": 44.0
+   "avg_ret_pct": 0.38,
+   "raw_win_rate": 43.8
   }
  },
  "indicators": [
   {
    "indicator": "Donchian20",
-   "quality": 51.5,
+   "quality": 51.9,
    "n": 20513,
-   "bull_win_rate": 45.2,
+   "bull_win_rate": 45.0,
    "bull_ci": [
-    44.52,
-    45.88
+    44.32,
+    45.68
    ],
-   "bear_win_rate": 57.8,
-   "bear_n": 3745,
-   "edge": -4.8,
+   "bear_win_rate": 58.8,
+   "bear_n": 3831,
+   "edge": -5.0,
    "rel_weight": 0.5
   },
   {
-   "indicator": "UltimateOsc",
-   "quality": 51.7,
-   "n": 53922,
-   "bull_win_rate": 44.3,
+   "indicator": "Choppiness",
+   "quality": 43.9,
+   "n": 23671,
+   "bull_win_rate": 44.1,
    "bull_ci": [
-    43.88,
-    44.72
+    43.47,
+    44.73
    ],
-   "bear_win_rate": 59.1,
-   "bear_n": 5443,
-   "edge": -5.7,
-   "rel_weight": 0.32
+   "bear_win_rate": 43.6,
+   "bear_n": 601,
+   "edge": -5.9,
+   "rel_weight": 0.356
   },
   {
-   "indicator": "Choppiness",
-   "quality": 44.2,
-   "n": 23661,
-   "bull_win_rate": 44.3,
+   "indicator": "UltimateOsc",
+   "quality": 51.5,
+   "n": 54470,
+   "bull_win_rate": 43.8,
    "bull_ci": [
-    43.67,
-    44.93
+    43.38,
+    44.22
    ],
-   "bear_win_rate": 44.1,
-   "bear_n": 601,
-   "edge": -5.7,
-   "rel_weight": 0.32
+   "bear_win_rate": 59.1,
+   "bear_n": 5474,
+   "edge": -6.2,
+   "rel_weight": 0.308
   },
   {
    "indicator": "CMO",
-   "quality": 48.3,
-   "n": 55463,
-   "bull_win_rate": 44.2,
+   "quality": 49.0,
+   "n": 55746,
+   "bull_win_rate": 43.8,
    "bull_ci": [
-    43.79,
-    44.61
+    43.39,
+    44.21
    ],
-   "bear_win_rate": 52.4,
-   "bear_n": 1246,
-   "edge": -5.8,
-   "rel_weight": 0.3
+   "bear_win_rate": 54.3,
+   "bear_n": 1323,
+   "edge": -6.2,
+   "rel_weight": 0.308
   },
   {
    "indicator": "BOLL/Keltner",
-   "quality": 48.0,
-   "n": 57772,
-   "bull_win_rate": 44.1,
+   "quality": 47.7,
+   "n": 57919,
+   "bull_win_rate": 43.8,
    "bull_ci": [
-    43.7,
-    44.51
+    43.4,
+    44.2
    ],
-   "bear_win_rate": 51.9,
+   "bear_win_rate": 51.6,
    "bear_n": 1169,
-   "edge": -5.9,
-   "rel_weight": 0.28
+   "edge": -6.2,
+   "rel_weight": 0.308
   },
   {
    "indicator": "SuperTrend",
-   "quality": 50.1,
-   "n": 61211,
-   "bull_win_rate": 44.0,
+   "quality": 51.9,
+   "n": 61548,
+   "bull_win_rate": 43.7,
    "bull_ci": [
-    43.61,
-    44.39
+    43.31,
+    44.09
    ],
-   "bear_win_rate": 56.3,
-   "bear_n": 3570,
-   "edge": -6.0,
+   "bear_win_rate": 60.1,
+   "bear_n": 3973,
+   "edge": -6.3,
+   "rel_weight": 0.292
+  },
+  {
+   "indicator": "MA5/MA20",
+   "quality": 50.6,
+   "n": 60758,
+   "bull_win_rate": 43.7,
+   "bull_ci": [
+    43.31,
+    44.09
+   ],
+   "bear_win_rate": 57.5,
+   "bear_n": 3589,
+   "edge": -6.3,
+   "rel_weight": 0.292
+  },
+  {
+   "indicator": "Vortex",
+   "quality": 50.9,
+   "n": 61709,
+   "bull_win_rate": 43.6,
+   "bull_ci": [
+    43.21,
+    43.99
+   ],
+   "bear_win_rate": 58.1,
+   "bear_n": 3812,
+   "edge": -6.4,
+   "rel_weight": 0.276
+  },
+  {
+   "indicator": "VWMA",
+   "quality": 50.8,
+   "n": 62104,
+   "bull_win_rate": 43.6,
+   "bull_ci": [
+    43.21,
+    43.99
+   ],
+   "bear_win_rate": 57.9,
+   "bear_n": 3417,
+   "edge": -6.4,
+   "rel_weight": 0.276
+  },
+  {
+   "indicator": "MACD",
+   "quality": 50.5,
+   "n": 59613,
+   "bull_win_rate": 43.6,
+   "bull_ci": [
+    43.2,
+    44.0
+   ],
+   "bear_win_rate": 57.3,
+   "bear_n": 5908,
+   "edge": -6.4,
+   "rel_weight": 0.276
+  },
+  {
+   "indicator": "Pivot",
+   "quality": 49.9,
+   "n": 50791,
+   "bull_win_rate": 43.6,
+   "bull_ci": [
+    43.17,
+    44.03
+   ],
+   "bear_win_rate": 56.1,
+   "bear_n": 14730,
+   "edge": -6.4,
+   "rel_weight": 0.276
+  },
+  {
+   "indicator": "ElderForce",
+   "quality": 50.6,
+   "n": 63049,
+   "bull_win_rate": 43.5,
+   "bull_ci": [
+    43.11,
+    43.89
+   ],
+   "bear_win_rate": 57.8,
+   "bear_n": 2472,
+   "edge": -6.5,
    "rel_weight": 0.26
   },
   {
-   "indicator": "KDJ(RSV)",
-   "quality": 50.0,
-   "n": 61005,
-   "bull_win_rate": 44.0,
+   "indicator": "A/D Line",
+   "quality": 49.9,
+   "n": 57380,
+   "bull_win_rate": 43.5,
    "bull_ci": [
-    43.61,
-    44.39
+    43.09,
+    43.91
    ],
-   "bear_win_rate": 55.9,
-   "bear_n": 3776,
-   "edge": -6.0,
+   "bear_win_rate": 56.3,
+   "bear_n": 8141,
+   "edge": -6.5,
    "rel_weight": 0.26
   },
   {
    "indicator": "HullMA",
-   "quality": 49.9,
-   "n": 54257,
-   "bull_win_rate": 44.0,
+   "quality": 49.7,
+   "n": 54822,
+   "bull_win_rate": 43.5,
    "bull_ci": [
-    43.58,
-    44.42
+    43.09,
+    43.92
    ],
-   "bear_win_rate": 55.7,
-   "bear_n": 10524,
-   "edge": -6.0,
+   "bear_win_rate": 55.9,
+   "bear_n": 10699,
+   "edge": -6.5,
    "rel_weight": 0.26
   },
   {
-   "indicator": "Pivot",
-   "quality": 49.8,
-   "n": 50313,
-   "bull_win_rate": 44.0,
+   "indicator": "KDJ(RSV)",
+   "quality": 49.6,
+   "n": 61651,
+   "bull_win_rate": 43.5,
    "bull_ci": [
-    43.57,
-    44.43
+    43.11,
+    43.89
    ],
-   "bear_win_rate": 55.5,
-   "bear_n": 14468,
-   "edge": -6.0,
+   "bear_win_rate": 55.8,
+   "bear_n": 3870,
+   "edge": -6.5,
    "rel_weight": 0.26
-  },
-  {
-   "indicator": "MA5/MA20",
-   "quality": 49.0,
-   "n": 60411,
-   "bull_win_rate": 44.0,
-   "bull_ci": [
-    43.6,
-    44.4
-   ],
-   "bear_win_rate": 54.1,
-   "bear_n": 3271,
-   "edge": -6.0,
-   "rel_weight": 0.26
-  },
-  {
-   "indicator": "ElderForce",
-   "quality": 49.8,
-   "n": 62482,
-   "bull_win_rate": 43.9,
-   "bull_ci": [
-    43.51,
-    44.29
-   ],
-   "bear_win_rate": 55.7,
-   "bear_n": 2299,
-   "edge": -6.1,
-   "rel_weight": 0.24
-  },
-  {
-   "indicator": "A/D Line",
-   "quality": 49.5,
-   "n": 56931,
-   "bull_win_rate": 43.9,
-   "bull_ci": [
-    43.49,
-    44.31
-   ],
-   "bear_win_rate": 55.2,
-   "bear_n": 7850,
-   "edge": -6.1,
-   "rel_weight": 0.24
-  },
-  {
-   "indicator": "VWMA",
-   "quality": 49.5,
-   "n": 61678,
-   "bull_win_rate": 43.9,
-   "bull_ci": [
-    43.51,
-    44.29
-   ],
-   "bear_win_rate": 55.2,
-   "bear_n": 3103,
-   "edge": -6.1,
-   "rel_weight": 0.24
-  },
-  {
-   "indicator": "Vortex",
-   "quality": 49.4,
-   "n": 61323,
-   "bull_win_rate": 43.9,
-   "bull_ci": [
-    43.51,
-    44.29
-   ],
-   "bear_win_rate": 54.9,
-   "bear_n": 3458,
-   "edge": -6.1,
-   "rel_weight": 0.24
-  },
-  {
-   "indicator": "MACD",
-   "quality": 49.2,
-   "n": 59265,
-   "bull_win_rate": 43.9,
-   "bull_ci": [
-    43.5,
-    44.3
-   ],
-   "bear_win_rate": 54.5,
-   "bear_n": 5516,
-   "edge": -6.1,
-   "rel_weight": 0.24
   },
   {
    "indicator": "RSI",
-   "quality": 50.0,
-   "n": 12783,
-   "bull_win_rate": 43.2,
+   "quality": 49.8,
+   "n": 13178,
+   "bull_win_rate": 42.5,
    "bull_ci": [
-    42.34,
-    44.06
+    41.66,
+    43.35
    ],
-   "bear_win_rate": 56.7,
-   "bear_n": 20763,
-   "edge": -6.8,
+   "bear_win_rate": 57.1,
+   "bear_n": 20869,
+   "edge": -7.5,
    "rel_weight": 0.1
   }
  ],
  "market_advice": "avoid_first",
  "regime_balance": {
-  "bull_n": 62343,
-  "bear_n": 2184,
-  "bear_share_pct": 3.4
+  "bull_n": 62886,
+  "bear_n": 2302,
+  "bear_share_pct": 3.5
  },
  "findings": [
-  "1 日持有期下, 看多胜率最高的指标是 Donchian20 (45.2%, n=20513), 最低是 RSI (43.2%) — 差距 2.0 个百分点",
-  "看空胜率 54.1% vs 看多 45.2% (差 +8.9pp) → 市况适配建议: 回避优先, 买入信号需降权",
-  "注意: bear 样本仅占 3.4% (n=2184), 看空胜率 54.1% 的置信区间宽, 不宜作为强结论"
+  "1 日持有期下, 看多胜率最高的指标是 Donchian20 (45.0%, n=20513), 最低是 RSI (42.5%) — 差距 2.5 个百分点",
+  "看空胜率 55.5% vs 看多 45.0% (差 +10.5pp) → 市况适配建议: 回避优先, 买入信号需降权",
+  "注意: bear 样本仅占 3.5% (n=2302), 看空胜率 55.5% 的置信区间宽, 不宜作为强结论"
  ],
  "caveat": "权重由历史回测推导, 市场结构变化会使历史 edge 失效; 全负 edge 时保留相对权重而非归零, 避免信号系统空转。Research reference only, not investment advice."
 }
