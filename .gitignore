@@ -31,3 +31,7 @@ data/lp_sym.i4
 data/parity/.publish.lock
 data/parity/.writer.json
 data/parity/*.tmp
+
+# 本机数据软链（指向工作区外的 K 线仓），不能进版本库：
+# 它是绝对路径，在 CI/别的机器上是悬空链接，会让 GitHub Pages 的 Jekyll 构建直接崩。
+data/bulk

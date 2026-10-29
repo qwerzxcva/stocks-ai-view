@@ -1,0 +1,15 @@
+# GitHub Pages（legacy 构建）发布仓库根目录。站点本体是根目录的 index.html + *.js
+# 加 data/*.json，其余目录不必经过 Jekyll：
+# - data/lp_*.f32|i4|f4 是引擎用的二进制特征矩阵（合计 1GB+），站点从不 fetch；
+# - scripts / tests / .github 是构建与脚本，不是网页。
+# 注意：data/bulk 是本机绝对路径符号链接，已从版本库移除并写进 .gitignore——
+# 悬空链接会让 Jekyll 在 rb_check_realpath 处直接失败（2026-10-29 之前 Pages 长期红的原因）。
+exclude:
+  - .github
+  - scripts
+  - tests
+  - node_modules
+  - data/lp_feat.f32
+  - data/lp_date.i4
+  - data/lp_ret.f4
+  - data/lp_sym.i4
