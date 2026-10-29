@@ -165,7 +165,39 @@ def multi_target_sources():
         by_src.setdefault(src_rel, []).append(dst_rel)
     return {s: t for s, t in by_src.items() if len(t) > 1}
 
+def sync_sources_from_origin():
+    """把 TARGETS 的源文件对齐到 origin/main。
+
+    2026-10-29 实测的坑：本地 `data/engine_v5.json` / `data/engine_spec.json` 落后云端时，
+    publish 会把「过期产物」忠实地广播给所有端上消费方 —— 端上夹具被回写成旧版，
+    CI 的 `parity.*` 三项一起红。publish 之前先对齐，才不会把旧当真。
+    """
+    try:
+        subprocess.run(["git", "-C", ROOT, "fetch", "origin", "main", "--quiet"],
+                       check=True, capture_output=True, timeout=60)
+    except Exception as exc:  # 网络/无远端时降级：仍按本地副本发布，但要提示
+        print("[publish] 警告：git fetch 失败（%s），源产物按本地副本发布" % exc)
+        return []
+    changed = []
+    for src in sorted({s for s, _ in TARGETS}):
+        try:
+            blob = subprocess.check_output(["git", "-C", ROOT, "show", "origin/main:" + src],
+                                           stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError:
+            continue
+        path = os.path.join(ROOT, src)
+        cur = open(path, "rb").read() if os.path.exists(path) else b""
+        if blob != cur:
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as fh:
+                fh.write(blob)
+            changed.append(src)
+    if changed:
+        print("[publish] 从 origin/main 同步源产物：%s" % ", ".join(changed))
+    return changed
+
 def cmd_publish(writer, force=False):
+    sync_sources_from_origin()
     dups = duplicate_targets()
     if dups:
         print("[publish] 拒绝同步：TARGETS 里目标路径重复 → %s" % ", ".join(dups))
