@@ -828,6 +828,10 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
     # 抽样准则：优先挑「能触发条件票」的代码。below_ma60 / momentum_overheat 只在
     # 特定区间才有票（距 60 日线 -10%~-5% 或 >20%），按代码顺序抽会整批漏掉这两个指标，
     # 端上 21 票执法就永远考不到它们（2026-10-29 实测：按序抽样 6 只全部只有 17 票）。
+    # 末端新鲜度当**排序优先级**而不是硬门：硬要求「窗口末端距今 ≤7 天」会把
+    # 只有 2026-10-13 数据的那批票直接判死，样本数凑不满 6 例（实测会掉到 4 例）。
+    # 这里让新鲜的票优先入选，选不出来才退而用次新鲜的，并把 stale 天数记进产物。
+    stale_of = {}
     scored = []
     for code in sorted(data):
         rows = data[code]
@@ -836,9 +840,17 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
                                      [r[4] for r in rows], [r[5] for r in rows], None, "") or []
         except Exception:
             votes = []
-        scored.append((-len(votes), code))
+        stale = 0
+        if asof:
+            try:
+                from datetime import date as _date
+                stale = (_date.fromisoformat(asof) - _date.fromisoformat(rows[-1][0])).days
+            except ValueError:
+                stale = 0
+        stale_of[code] = stale
+        scored.append((stale, -len(votes), code))
     scored.sort()
-    picked_codes = sorted(code for _, code in scored[:samples])
+    picked_codes = sorted(code for _, _, code in scored[:samples])
     cases = []
     for code in picked_codes:
         rows = data[code]
@@ -860,6 +872,7 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
         "bars_per_case": bars,
         "snapshot": snapshot_stats(bulk_dir),
         "asof": asof or "",
+        "staleDays": {c: stale_of.get(c, 0) for c in picked_codes},
         "selection": "max_indicator_coverage",
         "note": "端上 CanonicalEngine 必须逐票复现 vote 与 strength(±0.001)，score 误差 <= 0.05",
         "cases": cases,
@@ -884,6 +897,8 @@ def verify(golden_path, bulk_dir, samples, bars):
     老黄金向量缺 bars 时才回落到 bulk_dir。
     """
     old = _load(golden_path)
+    if not old.get("cases"):
+        return False, "黄金向量没有任何用例（cases 为空）：这不是「一致」，是基准已失效"
     if old.get("cases") and all(c.get("bars") for c in old["cases"]):
         fresh_cases = []
         for c in old["cases"]:
@@ -962,6 +977,22 @@ def _load(path):
         return json.load(fh)
 
 
+def _valid_asof(text):
+    """--asof 必须是 YYYY-MM-DD。
+
+    不加这道校验时，非法值会落进后面的 `except ValueError` 被静默降级为 anchor=None，
+    于是「窗口起点 ≥ asof-400 天」与「相邻 vol ≤20 倍」两道门同时被关掉，
+    却仍把非法日期写进产物——比直接报错危险得多。
+    """
+    if not text:
+        return ""
+    try:
+        from datetime import date as _date
+        return _date.fromisoformat(text).isoformat()
+    except ValueError:
+        raise argparse.ArgumentTypeError("--asof 需要 YYYY-MM-DD，收到 %r" % text)
+
+
 def main():
     ap = argparse.ArgumentParser(description="双端算法规格与黄金向量")
     ap.add_argument("--out", help="写 engine_spec.json 的路径（写端上那份请走 scripts/sync_parity_artifacts.py publish）")
@@ -972,7 +1003,7 @@ def main():
                     help="按注册表校验 data/*.json 产物是否满足契约")
     ap.add_argument("--samples", type=int, default=6)
     ap.add_argument("--bars", type=int, default=130)
-    ap.add_argument("--asof", default="",
+    ap.add_argument("--asof", type=_valid_asof, default="",
                     help="只用到该交易日为止的 K 线（YYYY-MM-DD，排除当日盘中未完成的日线）")
     ap.add_argument("--force", action="store_true",
                     help="允许用覆盖面更小 / 更旧的快照覆盖已有黄金向量（会写进 snapshot 字段留痕）")
@@ -1035,6 +1066,12 @@ def main():
                       file=sys.stderr)
                 print("确认要用更差的快照重生成，加 --force", file=sys.stderr)
                 return 3
+        if not golden.get("cases"):
+            # 0 例夹具等于「零断言的基准」：verify 会拿空集合比空集合返回一致，
+            # CI 只查文件存在，整条 parity 执法静默失效。宁可失败也不许写。
+            print("拒绝写出 0 例黄金向量 %s：抽样门槛把候选全过滤掉了"
+                  "（检查 --samples/--bars/--asof 与分片新鲜度）" % args.golden, file=sys.stderr)
+            return 4
         os.makedirs(os.path.dirname(os.path.abspath(args.golden)) or ".", exist_ok=True)
         with open(args.golden, "w", encoding="utf-8") as fh:
             json.dump(golden, fh, ensure_ascii=False)
