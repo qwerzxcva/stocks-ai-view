@@ -623,6 +623,7 @@ jobs:
             data/shard_b.json data/shard_c.json \
             data/vango_articles.json data/training_v7.json \
             data/market_breadth_history.json data/api/market_breadth.json \
+            data/engine_manifest.json data/engine_spec.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -642,7 +643,8 @@ jobs:
             --protect data/shard_b.json --protect data/shard_c.json \
             --protect data/vango_articles.json --protect data/training_v7.json \
             --protect data/market_breadth_history.json \
-            --protect data/api/market_breadth.json
+            --protect data/api/market_breadth.json \
+            --protect data/engine_manifest.json --protect data/engine_spec.json
 
       - name: Publish to the data warehouse
         env:
