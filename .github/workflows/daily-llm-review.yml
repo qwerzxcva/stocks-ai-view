@@ -1,5 +1,5 @@
 # LLM 辅助复盘 (每日 16:15 CST)
-# LLM: GitCode 免费 AI (deepseek-ai/DeepSeek-V4-Flash, 备选 Qwen/Qwen3-30B-A3B-Instruct-2507)
+# 模型不写死：仓库变量 LLM_MODEL / LLM_MODEL_FALLBACK 可覆盖，未设时用脚本内默认。
 name: daily-llm-review
 on:
   schedule:
@@ -13,6 +13,8 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Asia/Shanghai
+      LLM_MODEL: ${{ vars.LLM_MODEL || 'deepseek-ai/DeepSeek-V4-Flash' }}
+      LLM_MODEL_FALLBACK: ${{ vars.LLM_MODEL_FALLBACK || 'Qwen/Qwen3-30B-A3B-Instruct-2507' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,7 +28,7 @@ jobs:
           python-version: '3.x'
       - name: Run hot_impact
         run: python3 scripts/hot_impact.py --out-dir data
-      - name: LLM 复盘 (GitCode 免费 AI: DeepSeek-V4-Flash, 备选 Qwen3-30B)
+      - name: LLM 复盘
         env:
           GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
         run: |
@@ -63,11 +65,11 @@ jobs:
               with urllib.request.urlopen(req, timeout=180) as r:
                   return json.loads(r.read())["choices"][0]["message"]["content"]
           try:
-              out=chat(prompt, os.environ.get("LLM_MODEL","deepseek-ai/DeepSeek-V4-Flash"))
+              out=chat(prompt, os.environ["LLM_MODEL"])
           except Exception as e:
               print("primary model failed, fallback:", str(e)[:200], flush=True)
               try:
-                  out=chat(prompt, "Qwen/Qwen3-30B-A3B-Instruct-2507")
+                  out=chat(prompt, os.environ["LLM_MODEL_FALLBACK"])
               except Exception as e2:
                   print("llm err:", str(e2)[:200], flush=True)
                   exit(0)
