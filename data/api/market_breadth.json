@@ -1,27 +1,26 @@
 {
   "latest": {
     "date": "2026-10-29",
-    "limit_up": 0,
-    "limit_down": 0,
-    "limit_up_hist": 0,
-    "limit_down_hist": 0,
-    "broken": 0,
-    "seal_rate_pct": 0.0,
-    "advance": 0,
-    "decline": 0,
-    "flat": 0,
-    "up_pct": 0.0,
-    "amount_yi": null,
+    "limit_up": 34,
+    "limit_down": 7,
+    "limit_up_hist": 48,
+    "limit_down_hist": 61,
+    "broken": 15,
+    "seal_rate_pct": 69.4,
+    "advance": 976,
+    "decline": 4294,
+    "flat": 106,
+    "up_pct": 18.2,
+    "amount_yi": 7130.1,
     "source": "market_now",
-    "recorded_at": "2026-10-29T10:36:43+08:00",
+    "recorded_at": "2026-10-29T11:19:31+08:00",
     "notes": [
       "intraday_snapshot_not_settled",
       "limit_up_from_pool_zt_count",
       "limit_down_from_pool_dt_count",
-      "seal_rate_from_zt_rate",
-      "amount_unavailable_indices_turnover_is_rate_pct"
+      "limit_up_vs_hist_divergence"
     ],
-    "revisions": 0
+    "revisions": 1
   },
   "history": [
     {
@@ -386,27 +385,26 @@
     },
     {
       "date": "2026-10-29",
-      "limit_up": 0,
-      "limit_down": 0,
-      "limit_up_hist": 0,
-      "limit_down_hist": 0,
-      "broken": 0,
-      "seal_rate_pct": 0.0,
-      "advance": 0,
-      "decline": 0,
-      "flat": 0,
-      "up_pct": 0.0,
-      "amount_yi": null,
+      "limit_up": 34,
+      "limit_down": 7,
+      "limit_up_hist": 48,
+      "limit_down_hist": 61,
+      "broken": 15,
+      "seal_rate_pct": 69.4,
+      "advance": 976,
+      "decline": 4294,
+      "flat": 106,
+      "up_pct": 18.2,
+      "amount_yi": 7130.1,
       "source": "market_now",
-      "recorded_at": "2026-10-29T10:36:43+08:00",
+      "recorded_at": "2026-10-29T11:19:31+08:00",
       "notes": [
         "intraday_snapshot_not_settled",
         "limit_up_from_pool_zt_count",
         "limit_down_from_pool_dt_count",
-        "seal_rate_from_zt_rate",
-        "amount_unavailable_indices_turnover_is_rate_pct"
+        "limit_up_vs_hist_divergence"
       ],
-      "revisions": 0
+      "revisions": 1
     }
   ],
   "coverage": {
@@ -424,6 +422,6 @@
   },
   "caliber": "涨停=主板10%/双创20%/ST5%/北交所30%；封板率=涨停/(涨停+炸板)",
   "caliber_caveat": "limit_up/limit_down are the eastmoney limit-up/limit-down pool counts (pool_zt_count/pool_dt_count) and follow the per-board rules in 'caliber'. limit_up_hist/limit_down_hist keep the older >=+10% / <=-10% histogram-bucket sum for cross-checking only: that flat threshold over-counts ChiNext/STAR names up 10-19% without a sealed limit and never sees 5% ST limit-ups (2026-10-26: hist 77 vs pool 55; 2026-10-23: 171 vs 82). Caliber switched on 2026-10-27, so the series steps down at that date - a caliber change, not a market move.",
-  "updated_at": "2026-10-29T10:36:43+08:00",
-  "revisions_total": 5
+  "updated_at": "2026-10-29T11:19:31+08:00",
+  "revisions_total": 6
 }
