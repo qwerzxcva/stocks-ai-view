@@ -43,7 +43,7 @@ jobs:
             echo "--- job $JOB ---"
             curl -sf -L -H "Authorization: Bearer $T" \
               "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/actions/jobs/$JOB/logs" \
-              | tr -d '\r' | grep -viE "^##\[group\]|^##\[endgroup\]" | tail -40 || echo "(日志取不到)"
+              | tr -d '\r' | grep -E "FAIL |WARN |结论|DIFF |不一致|error" | tail -20 || echo "(日志取不到)"
           done
 
           echo "== recent runs (10) =="
