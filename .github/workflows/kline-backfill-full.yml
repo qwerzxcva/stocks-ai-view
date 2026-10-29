@@ -68,12 +68,17 @@ jobs:
           path: kline-repo
           fetch-depth: 0
 
+      # 必须**软链**进 kline-repo 的工作树，不能 cp：cp 出来的副本写满数据，
+      # 下面的 git add 在 kline-repo 里看不到任何改动 → "no kline changes"，
+      # 整轮补数（2026-10-29 实测 5322 只 / 1702 万行 / 27 分钟）被静默丢掉。
       - name: Link kline bulk
         run: |
           mkdir -p ../stocks-data-kline/data
-          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          rm -rf ../stocks-data-kline/data/bulk
+          ln -s "$GITHUB_WORKSPACE/kline-repo/data/bulk" ../stocks-data-kline/data/bulk
           echo "bulk files: $(ls ../stocks-data-kline/data/bulk/ 2>/dev/null | wc -l)"
           du -sh ../stocks-data-kline/data/bulk/ 2>/dev/null || true
+          ls -ld ../stocks-data-kline/data/bulk
 
       - uses: actions/setup-python@v5
         with:
@@ -171,8 +176,11 @@ jobs:
           git reset --soft origin/main
           git add -A data/bulk/
           ts=$(TZ=Asia/Shanghai date '+%Y%m%d_%H%M')
+          test -s data/bulk/day_qfq_expand.csv || { echo "::error::day_qfq_expand.csv 不存在或为空，补数没落到仓库工作树"; exit 1; }
+          echo "expand rows: $(wc -l < data/bulk/day_qfq_expand.csv)  size: $(du -h data/bulk/day_qfq_expand.csv | cut -f1)"
           if git diff --quiet --cached HEAD; then
-            echo "no kline changes"
+            echo "::error::补数后 data/bulk 无改动（补数结果被丢弃），拒绝静默成功"
+            exit 1
           else
             git commit -m "kline: backfill to IPO ($ts)"
             git push origin HEAD:main || echo "::warning::K线仓 push 失败 (可能并发), 下次重试"
