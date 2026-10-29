@@ -32,6 +32,34 @@ APP = os.path.join(os.path.dirname(ROOT), "skapp-app")
 MANIFEST = os.path.join(ROOT, "data", "parity", "MANIFEST.json")
 
 SPEC_IN_APK = "engine_spec.json"
+# 逐屏清单：屏幕类 → (人话用途, 目前由哪个自动化契约把关展示数据)。
+# 第四列为 None 表示**没有**渲染数据契约——真机截图缺位时，这些屏的展示内容未被任何
+# 自动化断言覆盖，只能证明「类在包里」，不能证明「屏上数对」。宁可写明缺口，不装作覆盖。
+SCREENS = [
+    ("DecisionScreen", "决策页：仓位上限 / 风险预算 / E / 波动率闸门",
+     "UiRenderContractTest（云端真实产物）"),
+    ("EnginesScreen", "引擎页：资金流 / 盘口 / 轮动档位与状态",
+     "EngineV2ParityTest + EngineSurfaceRenderContractTest"),
+    ("SectorsScreen", "板块页：轮动强弱排序", "EngineSurfaceRenderContractTest"),
+    ("PicksScreen", "选股页：engine_v5 榜单与新鲜度", "CloudArtifactIntegrationTest"),
+    ("BoardScreen", "市场页：相位 / 情绪 / 连板", "CloudArtifactIntegrationTest"),
+    ("PoolsScreen", "池子页：候选池与命中记录", None),
+    ("DashboardScreen", "首页：数据源健康与关键数", None),
+    ("SummaryScreen", "收盘总结：复盘文本与统计", None),
+    ("MarketScreen", "行情页：指数与快照", None),
+    ("NewsScreen", "资讯页：新闻流", None),
+    ("AiScreen", "AI 页：问答与解读", None),
+    ("UnifiedAskScreen", "统一提问页：跨页问答入口", None),
+    ("RealtimeSummaryScreen", "实时摘要：盘中聚合", None),
+    ("StockDetailSheet", "个股详情弹层：K 线 / 分时 / 尾盘", None),
+    ("StockDetailCharts", "个股详情图表：K 线与均线", None),
+    ("StockDetailTail", "个股详情尾盘模块", None),
+    ("DiagScreen", "诊断页：parity / 规格 / 清单信息", None),
+    ("ThemeScreen", "主题设置", None),
+    ("HubScreen", "聚合入口页", None),
+    ("BoardRules", "连板规则说明（非独立屏）", None),
+]
+
 
 # 必须出现在 DEX 里的类型描述符（DEX 用 L…; 形式）：任何一条缺失都说明这个功能没打进包
 REQUIRED_CLASSES = [
@@ -136,6 +164,29 @@ def main():
         problems.append("DEX 缺关键类：%s" % ", ".join(missing))
     else:
         print("[apk] DEX 关键类齐全（%d 个）" % len(REQUIRED_CLASSES))
+
+    # 逐屏到达性 + 现有数据契约
+    with zipfile.ZipFile(apk) as z:
+        dex_blob = b"".join(z.read(n) for n in z.namelist() if n.endswith(".dex"))
+    missing_screens, covered = [], []
+    print("\n[apk] 逐屏清单（%d 屏）" % len(SCREENS))
+    for name, desc, contract in SCREENS:
+        present = ("Lcom/skapp/app/ui/screens/%sKt;" % name).encode() in dex_blob \
+            or ("Lcom/skapp/app/ui/screens/%s;" % name).encode() in dex_blob
+        if not present:
+            missing_screens.append(name)
+        if contract:
+            covered.append(name)
+        print("  %-22s %s  %-42s %s" % (
+            name, "在包内" if present else "缺失  ",
+            desc, ("契约：" + contract) if contract else "**无渲染契约**"))
+    if missing_screens:
+        problems.append("APK 缺屏幕类：%s" % ", ".join(missing_screens))
+
+    gap = len(SCREENS) - len(covered)
+    print("\n[apk] 数据契约覆盖 %d/%d 屏；其余 %d 屏只有「类在包内」这一层证据——"
+          "它们的展示内容需要真机截图才能验收（本环境无 root/Shizuku/无障碍）"
+          % (len(covered), len(SCREENS), gap))
 
     for n in notes:
         print("[apk] 注意：%s" % n)

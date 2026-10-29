@@ -649,6 +649,35 @@ def _reference():
     return engine_v5
 
 
+def expect_from_bars(rows):
+    """由一组 bar 算出参考实现应有的 score / votes。纯函数，供 build 与 verify 共用。"""
+    ev5 = _reference()
+    close = [r[2] for r in rows]
+    high = [r[3] for r in rows]
+    low = [r[4] for r in rows]
+    vol = [r[5] for r in rows]
+    result = ev5.score_stock(close, high, low, vol, weights=load_weights())
+    if not result:
+        return None
+    votes = ev5.build_votes(close, high, low, vol)
+    return {
+        "score": result["score"],
+        "resonance": result["resonance"],
+        "raw": result["raw"],
+        "bull": result["bull"],
+        "bear": result["bear"],
+        "neutral": result["neutral"],
+        # why 文本不进黄金向量：它是给人看的，措辞变化不该让 parity 变红
+        "votes": [{"indicator": v["indicator"], "vote": v["vote"],
+                   "strength": v["strength"]} for v in votes],
+    }
+
+
+def bars_from_json(bars):
+    """黄金向量里内嵌的 bars → _read_bars 的元组形态 (d, o, c, h, l, v)。"""
+    return [(b["d"], b.get("o"), b["c"], b["h"], b["l"], b["v"]) for b in bars]
+
+
 def build_golden(bulk_dir, samples=6, bars=130):
     """按代码排序固定抽样，用 engine_v5 生成黄金向量。"""
     ev5 = _reference()
@@ -670,29 +699,14 @@ def build_golden(bulk_dir, samples=6, bars=130):
     cases = []
     for code in sorted(data)[:samples]:
         rows = data[code]
-        close = [r[2] for r in rows]
-        high = [r[3] for r in rows]
-        low = [r[4] for r in rows]
-        vol = [r[5] for r in rows]
-        votes = ev5.build_votes(close, high, low, vol)
-        result = ev5.score_stock(close, high, low, vol, weights=load_weights())
-        if not result:
+        expect = expect_from_bars(rows)
+        if not expect:
             continue
         cases.append({
             "code": code,
             "bars": [{"d": r[0], "o": r[1], "c": r[2], "h": r[3], "l": r[4], "v": r[5]}
                      for r in rows],
-            "expect": {
-                "score": result["score"],
-                "resonance": result["resonance"],
-                "raw": result["raw"],
-                "bull": result["bull"],
-                "bear": result["bear"],
-                "neutral": result["neutral"],
-                # why 文本不进黄金向量：它是给人看的，措辞变化不该让 parity 变红
-                "votes": [{"indicator": v["indicator"], "vote": v["vote"],
-                           "strength": v["strength"]} for v in votes],
-            },
+            "expect": expect,
         })
     return {
         "spec_version": SPEC_VERSION,
@@ -716,9 +730,23 @@ def _default_bulk():
 
 
 def verify(golden_path, bulk_dir, samples, bars):
-    """重算黄金向量并与落盘文件比对，检测「参考实现改了但 golden 没更新」的漂移。"""
-    fresh = build_golden(bulk_dir, samples=len(_load(golden_path)["cases"]) or samples, bars=bars)
+    """重算黄金向量并与落盘文件比对，检测「参考实现改了但 golden 没更新」的漂移。
+
+    优先用 golden 里**内嵌**的 bars 重算：黄金向量自带 130 根 K 线，校验它就不该再依赖
+    某个时刻的 K 线分片快照。以前从分片重算，导致 CI 的分片与生成时的分片只要不一致
+    就报「漂移 72 处」——那是数据快照差异，不是参考实现漂移，属于假红。
+    老黄金向量缺 bars 时才回落到 bulk_dir。
+    """
     old = _load(golden_path)
+    if old.get("cases") and all(c.get("bars") for c in old["cases"]):
+        fresh_cases = []
+        for c in old["cases"]:
+            expect = expect_from_bars(bars_from_json(c["bars"]))
+            if expect:
+                fresh_cases.append({"code": c["code"], "bars": c["bars"], "expect": expect})
+        fresh = {"spec_version": SPEC_VERSION, "cases": fresh_cases}
+    else:
+        fresh = build_golden(bulk_dir, samples=len(old["cases"]) or samples, bars=bars)
     if fresh["spec_version"] != old.get("spec_version"):
         return False, "spec_version 不一致: %s vs %s" % (fresh["spec_version"], old.get("spec_version"))
     diffs = []

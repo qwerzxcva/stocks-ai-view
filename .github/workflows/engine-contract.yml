@@ -84,27 +84,9 @@ jobs:
       - name: Install deps
         run: pip install --quiet pandas || echo "pandas skipped (非必需)"
 
-      # 2/4 要重算黄金向量，必须有真实 K 线分片（engine_spec.py glob day_qfq_*.csv）；
-      # 分片在 t1 仓且以 .csv.gz 存储，解压到 ../stocks-data-kline/data/bulk
-      # （engine_spec._default_bulk() 的默认查找位）。
-      - name: Checkout kline repo (sparse)
-        uses: actions/checkout@v4
-        with:
-          repository: qwerzxcva/t1
-          token: ${{ secrets.GITHUB_TOKEN }}
-          sparse-checkout: |
-            data/bulk
-          sparse-checkout-cone-mode: false
-          path: kline-repo
-
-      - name: K 线分片就位（../stocks-data-kline/data/bulk）
-        run: |
-          mkdir -p ../stocks-data-kline/data
-          cp -r kline-repo/data/bulk ../stocks-data-kline/data/
-          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import ensure_bulk_uncompressed; print('uncompressed', ensure_bulk_uncompressed('../stocks-data-kline/data/bulk'))"
-          n=$(ls ../stocks-data-kline/data/bulk | grep -c day_qfq || true)
-          echo "day_qfq shards: $n"
-          test "$n" -gt 0 || { echo "::error::K 线分片为空，2/4 无法重算黄金向量"; exit 1; }
+      # 2/4 不再检出 K 线分片：黄金向量自带 130 根 K 线，engine_spec.py --verify 从内嵌 bars
+      # 重算。之前从分片重算，只要 CI 拿到的分片快照与生成时不同就报「漂移 72 处」——
+      # 那是数据快照差异，不是参考实现漂移（2026-10-29 实测的假红，见 docs §10.6）。
 
       - name: 1/4 产物契约
         run: python3 scripts/engine_spec.py --check-products
