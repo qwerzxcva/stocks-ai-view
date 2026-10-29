@@ -46,6 +46,10 @@ jobs:
               | tr -d '\r' | grep -E "FAIL |WARN |结论|DIFF |不一致|error" | tail -20 || echo "(日志取不到)"
           done
 
+          echo "== releases =="
+          api "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/releases?per_page=3" \
+            | python3 -c 'import json,sys; d=json.load(sys.stdin); [print("%-10s %-8s %s | %s" % (r.get("tag_name"), "draft" if r.get("draft") else ("pre" if r.get("prerelease") else "release"), r.get("published_at"), ", ".join(a["name"]+"("+str(a["size"])+")" for a in r.get("assets",[])))) for r in d]'
+
           echo "== recent runs (10) =="
           api "https://api.github.com/repos/jiegengxiangjianxue/skapp-app/actions/runs?per_page=10" \
             | python3 -c 'import json,sys; d=json.load(sys.stdin); print("total=%s" % d.get("total_count")); [print("%-22s %-12s %-10s %-10s %s %s" % (r["name"], r["head_branch"], r["status"], str(r["conclusion"]), r["created_at"], r["head_sha"][:8])) for r in d.get("workflow_runs", [])]'
