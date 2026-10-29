@@ -55,11 +55,10 @@ jobs:
             exit 1
           fi
 
-      # 端上仓：仅用于 2e/4 归属校验与 4/4 版本比对。取不到时**不阻断**——
-      # 云端产物与黄金向量的闸门（1/2b/2c/2d/3）不依赖它，让整个契约工作流因为
-      # 另一个仓的凭据不可用而全红，等于用无关故障掩盖真问题。
+      # 端上仓：2e/4 归属校验、4/4 版本比对、矩阵里的 10 项 parity.* 都要读它。
+      # 取不到就**硬失败**：2026-10-29 旧 secret 无读权限时，这一步 404 被
+      # continue-on-error 掩成「夹具缺失」，整片 parity.* 红而根因看不出来（docs §12.4）。
       - uses: actions/checkout@v4
-        continue-on-error: true
         with:
           repository: jiegengxiangjianxue/skapp-app
           token: ${{ secrets.GH_TOKEN }}
@@ -70,11 +69,12 @@ jobs:
       # checkout 只能落在 workspace 内，故软链到上一级。
       - name: 端上仓就位（../skapp-app）
         run: |
-          if [ -d "$GITHUB_WORKSPACE/skapp-app" ]; then
-            ln -sfn "$GITHUB_WORKSPACE/skapp-app" ../skapp-app
-          else
-            echo "::warning::端上仓不可用（凭据或无权限），2e/4 与 4/4 将跳过，其余闸门照常"
-          fi
+          test -d "$GITHUB_WORKSPACE/skapp-app/testdata/parity" || {
+            echo "::error::端上仓 skapp-app 未检出或缺 testdata/parity（查 secrets.GH_TOKEN 对 jiegengxiangjianxue/skapp-app 的读权限）"
+            exit 1
+          }
+          ln -sfn "$GITHUB_WORKSPACE/skapp-app" ../skapp-app
+          test -d ../skapp-app/testdata/parity
 
       - uses: actions/setup-python@v5
         with:
