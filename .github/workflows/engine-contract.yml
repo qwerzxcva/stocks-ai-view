@@ -88,42 +88,22 @@ jobs:
       # 重算。之前从分片重算，只要 CI 拿到的分片快照与生成时不同就报「漂移 72 处」——
       # 那是数据快照差异，不是参考实现漂移（2026-10-29 实测的假红，见 docs §10.6）。
 
-      - name: 1/4 产物契约
-        run: python3 scripts/engine_spec.py --check-products
-
-      - name: 2/4 黄金向量未漂移
-        run: |
-          test -f data/parity/golden_v5.json || { echo "::error::缺少 data/parity/golden_v5.json"; exit 1; }
-          python3 scripts/engine_spec.py --verify data/parity/golden_v5.json --samples 6 --bars 130
-
-      - name: 2b/4 状态引擎黄金向量未漂移（flow/tape/rotation/vol_target）
-        run: |
-          test -f data/parity/golden_v2.json || { echo "::error::缺少 data/parity/golden_v2.json"; exit 1; }
-          python3 scripts/engines_v2.py --verify data/parity/golden_v2.json
-
-      - name: 2c/4 21 票全量黄金向量未漂移（18 技术 + 3 外部）
-        run: |
-          test -f data/parity/golden_21.json || { echo "::error::缺少 data/parity/golden_21.json"; exit 1; }
-          python3 scripts/golden_21.py --verify data/parity/golden_21.json
-
-      - name: 2d/4 riskBudget/regime 校准参数未漂移
-        run: |
-          test -f data/risk_regime_params.json || { echo "::error::缺少 data/risk_regime_params.json"; exit 1; }
-          python3 scripts/calibrate_risk_regime.py --verify data/risk_regime_params.json
-
-      - name: 2e/4 规格与 parity 夹具的写入归属未变（唯一写入方）
-        run: |
-          test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出，2e/4 无法比对（检查 checkout 步骤与 secrets.GH_TOKEN）"; exit 1; }
-          python3 scripts/sync_parity_artifacts.py check
-
-      - name: 3/4 引擎参数清单指纹
-        run: python3 scripts/build_engine_manifest.py --check
-
-      - name: 4/4 端云版本一致
-        run: |
-          test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出，4/4 无法比对引擎版本"; exit 1; }
-          python3 scripts/verify_engine_consistency.py
-
-      - name: 语法检查（改动过的 Python）
+      # 逐项矩阵：把原来 4 个聚合步骤拆成 ~88 个独立判定（逐用例 / 逐产物 / 逐文件）。
+      # 聚合步骤的毛病是「一红全 skip，一次运行只能问出一个问题」，而且红了只知道
+      # 「vol_target 那段漂了」，不知道是哪条用例哪个字段。矩阵里每项独立，一部分红不影响
+      # 其余项出结论，失败项会逐条列出（见 docs §10.6）。
+      - name: 1/3 语法检查（scripts/ 全量编译）
         run: |
           python3 -m compileall -q scripts/ >/dev/null && echo "compileall ok"
+
+      - name: 2/3 细粒度闸门矩阵（逐用例 / 逐产物 / 逐文件）
+        run: |
+          test -f data/parity/golden_v5.json  || { echo "::error::缺少 data/parity/golden_v5.json"; exit 1; }
+          test -f data/parity/golden_v2.json  || { echo "::error::缺少 data/parity/golden_v2.json"; exit 1; }
+          test -f data/parity/golden_21.json  || { echo "::error::缺少 data/parity/golden_21.json"; exit 1; }
+          test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出（检查 checkout 步骤与 secrets.GH_TOKEN）"; exit 1; }
+          python3 scripts/parity_matrix.py
+
+      - name: 3/3 单独复述唯一写入方的整体判定
+        run: python3 scripts/sync_parity_artifacts.py check
+

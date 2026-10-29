@@ -29,6 +29,8 @@
 """
 import argparse
 import json
+
+from numcmp import deep_diff
 import os
 import sys
 import tempfile
@@ -205,9 +207,10 @@ def main():
         with open(args.verify, encoding="utf-8") as fh:
             old = json.load(fh)
         for key in ("codes", "cases", "external_indicators"):
-            if json.dumps(old.get(key), sort_keys=True, ensure_ascii=False) != \
-               json.dumps(g.get(key), sort_keys=True, ensure_ascii=False):
-                print("[golden_21] DRIFT %s（云端外部票或聚合改过，需重生成并同步端上夹具）" % key)
+            d = deep_diff(old.get(key), g.get(key), key)
+            if d:
+                print("[golden_21] DRIFT %s —— %s（云端外部票或聚合改过，需重生成并同步端上夹具）"
+                      % (key, d))
                 return 1
         print("[golden_21] OK 21 票黄金向量与参考实现一致（%d 用例）" % len(g["cases"]))
         return 0

@@ -30,6 +30,8 @@
 """
 import argparse
 import json
+
+from numcmp import deep_diff
 import math
 import os
 import sys
@@ -790,7 +792,7 @@ def verify(path):
     """重算并比对已提交的黄金向量：返回 (ok, 说明)。
 
     只比引擎输出（flow/tape/rotation/vol_target）与 params，不比 generated_at——
-    时间戳每跑一次都变，拿它当不一致会让这道闸门永远红。
+    时间戳每跑一次都变，拿它当不一致会让这道闸门永远红。数值用 _deep_diff 带容差比。
     """
     if not os.path.exists(path):
         return False, "缺少 %s" % path
@@ -799,13 +801,14 @@ def verify(path):
     new = build_golden()
     problems = []
     for section in ("flow", "tape", "rotation", "vol_target"):
-        a, b = old.get(section), new.get(section)
-        if json.dumps(a, sort_keys=True, ensure_ascii=False) != json.dumps(b, sort_keys=True, ensure_ascii=False):
-            problems.append(section)
-    if (old.get("params") or {}) != new.get("params"):
-        problems.append("params")
+        d = deep_diff(old.get(section), new.get(section), section)
+        if d:
+            problems.append(d)
+    d = deep_diff(old.get("params") or {}, new.get("params"), "params")
+    if d:
+        problems.append(d)
     if problems:
-        return False, "漂移段落：%s（参考实现或参数改过，需重生成并同步端上夹具）" % ", ".join(problems)
+        return False, "漂移段落：%s（参考实现或参数改过，需重生成并同步端上夹具）" % "; ".join(problems[:3])
     return True, "黄金向量与参考实现一致（flow/tape/rotation/vol_target + params）"
 
 

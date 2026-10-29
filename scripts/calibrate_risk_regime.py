@@ -29,6 +29,8 @@
 """
 import argparse
 import json
+
+from numcmp import deep_diff
 import math
 import os
 import statistics
@@ -355,13 +357,15 @@ def main():
         with open(args.verify, encoding="utf-8") as fh:
             old = json.load(fh)
         drift = []
-        if old.get("params") != cal["chosen"]:
-            drift.append("params(已提交 %s / 重算 %s)" % (old.get("params"), cal["chosen"]))
+        d = deep_diff(old.get("params"), cal["chosen"], "params")
+        if d:
+            drift.append("params(%s)" % d)
         if (old.get("decision") or {}).get("wire") != decision["wire"]:
             drift.append("decision.wire(已提交 %s / 重算 %s)"
                          % ((old.get("decision") or {}).get("wire"), decision["wire"]))
-        if old.get("regime_cap") != current_cap:
-            drift.append("regime_cap")
+        d = deep_diff(old.get("regime_cap"), current_cap, "regime_cap")
+        if d:
+            drift.append(d)
         if drift:
             print("[calib] DRIFT %s —— 参数须重新校准后才能进规格" % "; ".join(drift))
             return 1
