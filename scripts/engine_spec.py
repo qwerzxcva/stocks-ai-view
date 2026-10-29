@@ -804,9 +804,11 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
                 code = line.split("|", 1)[0]
                 if code and code not in codes:
                     codes.append(code)
-        if len(codes) >= samples * 8:
+        if len(codes) >= samples * 40:
             break
-    picked = codes[: max(samples * 8, samples)]
+    # 候选池从 8× 扩到 40×：8× 只有 48 只，一旦要求「窗口末端对齐最新交易日」，
+    # 48 只里常常凑不满 6 例，只能用次新鲜的票顶替，夹具末端就参差不齐。
+    picked = codes[: max(samples * 40, samples)]
     data = _read_bars(bulk_dir, picked, bars, asof=asof)
     # 只要近端连续的窗口：130 根却横跨两三年的，是分片缺血（实测 day_qfq_60 里
     # sh600030 缺 2024/2025 整段）留下的稀疏序列，均线与量能因子算出来没有意义，
