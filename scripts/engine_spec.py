@@ -38,6 +38,7 @@ import argparse
 import gzip
 import json
 import os
+import re
 import sys
 from datetime import datetime, timezone, timedelta
 
@@ -621,19 +622,71 @@ def _iter_shard_lines(name, path):
             for line in fh:
                 yield line
 
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
 def _is_shard(name):
+    """数字分片（`day_qfq_00.csv` / `day_qfq_20.csv.gz`）：唯一权威源。"""
+    return re.fullmatch(r"day_qfq_\d+\.csv(\.gz)?", name) is not None
+
+def _is_day_qfq(name):
+    """同目录下所有 day_qfq 文件：数字分片 + expand/stockdb 这类补充源。"""
     return name.startswith("day_qfq_") and (name.endswith(".csv") or name.endswith(".csv.gz"))
+
+def _normalize_volume(rows):
+    """把窗口内成交量统一到「最后一根 bar」的量纲。
+
+    实测同一只票的历史里存在 手→股（×100）切换：sh600000 到 2026-10-13 的 vol 是
+    529089，2026-10-19 起变成 54074699，价格却连续（9.61→9.78）。这类切换会让
+    量比 / 放量 / 资金类因子在切换点凭空放大 100 倍。
+
+    检测只用**原始相邻值**的比值（60~160 倍且价格连续视为 ×100 切换），
+    再按段累乘折算系数——不能拿已经修正过的值参与下一对比较，否则会级联放大。
+    """
+    n = len(rows)
+    if n < 3:
+        return rows
+    raw = [r[5] for r in rows]
+    scale = [1.0] * n
+    cur = 1.0
+    switched = False
+    for i in range(n - 1, 0, -1):
+        a, b = raw[i - 1], raw[i]
+        pct = abs(rows[i - 1][2] - rows[i][2]) / max(abs(rows[i][2]), 1e-9)
+        if a > 0 and b > 0 and pct <= 0.25:
+            ratio = a / b
+            if 60.0 <= ratio <= 160.0:
+                cur /= 100.0
+                switched = True
+            elif 1 / 160.0 <= ratio <= 1 / 60.0:
+                cur *= 100.0
+                switched = True
+        scale[i - 1] = cur
+    if not switched:
+        return rows
+    return [(r[0], r[1], r[2], r[3], r[4], r[5] * scale[idx]) for idx, r in enumerate(rows)]
 
 def _read_bars(bulk_dir, want_codes, bars, asof=""):
     """从分片读 (code → bars)。列: code|date|open|close|high|low|vol。
 
-    同一个 code 可能同时出现在分片与 `day_qfq_expand.csv`（补数脚本增量写）里，
-    所以按日期去重（后写覆盖先写）再按日期升序，避免把重复 / 乱序的行当成窗口；
-    `asof` 用来把窗口截到「最后一个已收盘交易日」，排除当日盘中未完成的日线。
+    **每只票只取一个来源文件，绝不跨文件按日期拼接。**
+
+    实测同一 code 会同时出现在多个分片里，而且各来源口径不一致：
+    sh600099 在 `day_qfq_00` 里 2026-10-12 的 vol 是 15363、在 `day_qfq_06` 同一天是
+    27943、`day_qfq_60` 在 10-14 是 3501300 量级；sz000001 在 `day_qfq_stockdb` 与分片
+    同日 OHLC 整体差 0.30。以前按日期「后写覆盖先写」拼接，窗口里会留下 70~175 倍的
+    量纲跳变，成交量类因子（量比、放量、资金）全部算错，而 verify 因为读的是同一份
+    脏数据，还是绿的——失真值被夹具锁死。
+
+    因此按 (覆盖到的最晚日期, 是否数字分片, 行数) 选一个来源，只用它的行：
+    口径内部一致优先于「行数最多」。`asof` 用来把窗口截到最后一个已收盘交易日。
     """
-    need = set(want_codes) | {"__seen__"}
-    series = {}
-    for name in sorted(f for f in os.listdir(bulk_dir) if _is_shard(f)):
+    need = set(want_codes)
+    by_source = {}
+    # 只读数字分片：expand / stockdb / extra / recent 这几类补充文件口径未经校验
+    # （实测 stockdb 同日 OHLC 整体 +0.30、expand 的 vol 是分片的 100 倍），
+    # 一旦参与候选与窗口，就会把失真值写进黄金向量，而 verify 永远绿。
+    ordered = sorted(f for f in os.listdir(bulk_dir) if _is_shard(f))
+    for name in ordered:
         for line in _iter_shard_lines(name, os.path.join(bulk_dir, name)):
             if line.startswith("#") or "|" not in line:
                 continue
@@ -641,25 +694,41 @@ def _read_bars(bulk_dir, want_codes, bars, asof=""):
             if len(parts) < 7:
                 continue
             code = parts[0]
+            if not _DATE_RE.match(parts[1]):
+                continue  # 日期列被拼坏的行（如 "2026-04-14,13.39"）整行丢弃
             if asof and parts[1] > asof:
                 continue
-            if code not in need and len(series) >= 400:
+            if code not in need and len(by_source) >= 400:
                 continue
             try:
                 row = (parts[1], float(parts[2]), float(parts[3]),
                        float(parts[4]), float(parts[5]), float(parts[6]))
             except ValueError:
                 continue
-            series.setdefault(code, []).append(row)
+            by_source.setdefault(code, {}).setdefault(name, {})[parts[1]] = row
     out = {}
-    for code in sorted(series):
-        by_date = {}
-        for r in series[code]:
-            by_date[r[0]] = r
-        rows = [by_date[d] for d in sorted(by_date)]
+    # 近端窗口起点：用来衡量「哪个来源的近期数据是连续的」。
+    # 不能只看最晚日期：实测 day_qfq_60 里 sh600017 有 2006–2023 的长历史 + 2026 的 11 根，
+    # 2024/2025 整年缺失，但它「最晚日期」比另一份连续分片更新，按日期选会得到
+    # 跨 4 年的 130 根稀疏窗口——所有均线/量能类因子直接算错。
+    try:
+        from datetime import date as _date, timedelta as _timedelta
+        anchor = _date.fromisoformat(asof) if asof else None
+    except ValueError:
+        anchor = None
+    recent_from = (anchor - _timedelta(days=400)).isoformat() if anchor else ""
+    for code in sorted(by_source):
+        best_key = None
+        best_rows = None
+        for src, rows in by_source[code].items():
+            recent = sum(1 for d in rows if d >= recent_from) if recent_from else len(rows)
+            key = (recent, max(rows), _is_shard(src), len(rows))
+            if best_key is None or key > best_key:
+                best_key, best_rows = key, rows
+        rows = [best_rows[d] for d in sorted(best_rows)]
         if len(rows) < bars + 1:
             continue
-        out[code] = rows[-bars:]
+        out[code] = _normalize_volume(rows[-bars:])
         if len(out) >= len(want_codes):
             break
     return out
@@ -726,7 +795,7 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
     ev5 = _reference()
     # 先取足够多的候选代码，再按序抽前 samples 只（保证可复现）
     codes = []
-    files = sorted(f for f in os.listdir(bulk_dir) if f.startswith("day_qfq_") and f.endswith(".csv"))
+    files = sorted(f for f in os.listdir(bulk_dir) if _is_shard(f) and f.endswith(".csv"))
     for name in files:
         with open(os.path.join(bulk_dir, name), encoding="utf-8") as fh:
             for line in fh:
@@ -739,6 +808,23 @@ def build_golden(bulk_dir, samples=6, bars=130, asof=""):
             break
     picked = codes[: max(samples * 8, samples)]
     data = _read_bars(bulk_dir, picked, bars, asof=asof)
+    # 只要近端连续的窗口：130 根却横跨两三年的，是分片缺血（实测 day_qfq_60 里
+    # sh600030 缺 2024/2025 整段）留下的稀疏序列，均线与量能因子算出来没有意义，
+    # 拿它当黄金向量会把「数据不全」固化成端上必须复现的基准。
+    if asof:
+        try:
+            from datetime import date as _date, timedelta as _timedelta
+            floor = (_date.fromisoformat(asof) - _timedelta(days=400)).isoformat()
+            data = {k: v for k, v in data.items() if v and v[0][0] >= floor}
+            # 再挡一道量纲：窗口内相邻成交量差 20 倍以上（实测 sh600665 2026-10-23→10-26
+            # 由 107770 跳到 6237146，价格却 3.09→3.08）说明这段序列单位不统一，
+            # 归一规则按 100 的幂次只能修一部分，修不干净的样本不进夹具。
+            def _clean(rows):
+                vol = [r[5] for r in rows]
+                return all(max(a, b) <= 20 * max(min(a, b), 1e-9) for a, b in zip(vol, vol[1:]))
+            data = {k: v for k, v in data.items() if _clean(v)}
+        except ValueError:
+            pass
     # 抽样准则：优先挑「能触发条件票」的代码。below_ma60 / momentum_overheat 只在
     # 特定区间才有票（距 60 日线 -10%~-5% 或 >20%），按代码顺序抽会整批漏掉这两个指标，
     # 端上 21 票执法就永远考不到它们（2026-10-29 实测：按序抽样 6 只全部只有 17 票）。
