@@ -678,6 +678,29 @@ def bars_from_json(bars):
     return [(b["d"], b.get("o"), b["c"], b["h"], b["l"], b["v"]) for b in bars]
 
 
+def snapshot_stats(bulk_dir):
+    """统计分片快照的覆盖面与新鲜度：唯一代码数、最新一根 K 线的日期。
+
+    生成黄金向量前用它挡住「拿更小 / 更旧的快照静默覆盖现有向量」这种回归。
+    2026-10-29 实测：云端 kline 仓 `487cfd0` 的 `data/bulk` 只有 1677 只（多数止于 10-13），
+    本地 59 个分片是 5365 只（止于 10-23）；用它重生成会把窗口和覆盖面一起做小。
+    """
+    codes = set()
+    max_date = ""
+    for name in sorted(f for f in os.listdir(bulk_dir)
+                       if f.startswith("day_qfq_") and f.endswith(".csv")):
+        with open(os.path.join(bulk_dir, name), encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("#") or "|" not in line:
+                    continue
+                parts = line.rstrip("\n").split("|")
+                if len(parts) < 7:
+                    continue
+                codes.add(parts[0])
+                if parts[1] > max_date:
+                    max_date = parts[1]
+    return {"codes": len(codes), "max_date": max_date}
+
 def build_golden(bulk_dir, samples=6, bars=130):
     """按代码排序固定抽样，用 engine_v5 生成黄金向量。"""
     ev5 = _reference()
@@ -715,6 +738,7 @@ def build_golden(bulk_dir, samples=6, bars=130):
         "source": "engine_v5.build_votes / score_stock",
         "generated_at": datetime.now(CST).isoformat(timespec="seconds"),
         "bars_per_case": bars,
+        "snapshot": snapshot_stats(bulk_dir),
         "note": "端上 CanonicalEngine 必须逐票复现 vote 与 strength(±0.001)，score 误差 <= 0.05",
         "cases": cases,
     }
@@ -826,6 +850,8 @@ def main():
                     help="按注册表校验 data/*.json 产物是否满足契约")
     ap.add_argument("--samples", type=int, default=6)
     ap.add_argument("--bars", type=int, default=130)
+    ap.add_argument("--force", action="store_true",
+                    help="允许用覆盖面更小 / 更旧的快照覆盖已有黄金向量（会写进 snapshot 字段留痕）")
     args = ap.parse_args()
 
     if args.check_products:
@@ -863,11 +889,35 @@ def main():
             print("K 线分片目录不存在: %r（用 --bulk 指定）" % bulk, file=sys.stderr)
             return 2
         golden = build_golden(bulk, samples=args.samples, bars=args.bars)
+        if os.path.exists(args.golden) and not args.force:
+            old = _load(args.golden)
+            snap = old.get("snapshot") or {}
+            old_max = snap.get("max_date") or max(
+                (c["bars"][-1]["d"] for c in old.get("cases", []) if c.get("bars")), default="")
+            old_codes = snap.get("codes") or 0
+            new = golden.get("snapshot") or {}
+            worse = []
+            # 绝对下限：云端产物覆盖 5308 只，分片快照少于 3000 只说明拿到的是
+            # 残缺分片（2026-10-29 实测云端 kline 仓 `data/bulk` 只有 1677 只，
+            # 用它的「最新日期更新」骗过纯日期比较，覆盖却只有 1/3）。
+            if new.get("codes", 0) < 3000:
+                worse.append("覆盖股票只有 %d 只（全市场约 5308 只，分片残缺）" % new.get("codes", 0))
+            if old_max and new.get("max_date", "") < old_max:
+                worse.append("最新 K 线 %s → %s（更旧）" % (old_max, new.get("max_date")))
+            if old_codes and new.get("codes", 0) < old_codes:
+                worse.append("覆盖股票 %d → %d（更少）" % (old_codes, new.get("codes")))
+            if worse:
+                print("拒绝覆盖 %s：新快照不如现有黄金向量 → %s" % (args.golden, "；".join(worse)),
+                      file=sys.stderr)
+                print("确认要用更差的快照重生成，加 --force", file=sys.stderr)
+                return 3
         os.makedirs(os.path.dirname(os.path.abspath(args.golden)) or ".", exist_ok=True)
         with open(args.golden, "w", encoding="utf-8") as fh:
             json.dump(golden, fh, ensure_ascii=False)
             fh.write("\n")
-        print("golden -> %s (cases=%d, bars=%d)" % (args.golden, len(golden["cases"]), args.bars))
+        snap = golden.get("snapshot") or {}
+        print("golden -> %s (cases=%d, bars=%d, snapshot=%d codes @ %s)"
+              % (args.golden, len(golden["cases"]), args.bars, snap.get("codes", 0), snap.get("max_date", "")))
         wrote = True
 
     if not wrote:
