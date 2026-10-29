@@ -1,10 +1,10 @@
 {
- "ts": "2026-10-29T23:27:32+08:00",
+ "ts": "2026-10-30T00:15:00+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 274,
  "n_scored": 274,
- "n_confirmed_divergence": 35,
+ "n_confirmed_divergence": 36,
  "n_no_flow": 0,
  "n_rejected": 0,
  "rejection_reasons": {},
@@ -12,7 +12,7 @@
   "totals": {
    "kline_days": 250208,
    "flow_days": 16440,
-   "aligned_days": 16137
+   "aligned_days": 16142
   },
   "by_code": [
    {
@@ -2569,10 +2569,10 @@
     "code": "sh603159",
     "kline_days": 814,
     "flow_days": 60,
-    "aligned_days": 54,
+    "aligned_days": 59,
     "kline_date_start": "2023-06-02",
     "kline_date_end": "2026-10-28",
-    "flow_date_start": "2026-07-30",
+    "flow_date_start": "2026-07-23",
     "flow_date_end": "2026-10-29"
    },
    {
@@ -2964,6 +2964,27 @@
    "n_flow_days": 60,
    "n_aligned_days": 59,
    "flow_date_start": "2026-07-30",
+   "flow_date_end": "2026-10-29",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-28"
+   }
+  },
+  {
+   "code": "sh603159",
+   "date": "2026-10-28",
+   "close": 20.86,
+   "score": 91.1,
+   "signal": "吸筹背离",
+   "diverge": 1,
+   "price_accel_pct": -0.3643,
+   "flow_accel_norm": 0.2483,
+   "flow_persist": 0.6,
+   "vol_compress": 0.907,
+   "n_flow_days": 60,
+   "n_aligned_days": 59,
+   "flow_date_start": "2026-07-23",
    "flow_date_end": "2026-10-29",
    "provenance": {
     "source": "本地前复权日K + 东财主力净流入",
@@ -3508,7 +3529,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-29T23:27:32+08:00"
+   "snapshot_ts": "2026-10-30T00:15:00+08:00"
   }
  }
 }
