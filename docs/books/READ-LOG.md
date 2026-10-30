@@ -50,3 +50,15 @@ sed -n '1234,1262p' $B/successful_stock_speculation_butler.txt    # 反对止损
 - Reminiscences 的 XVI 尾段、XVII、XXIII、XI 前段约 1,300 行只抽样，相关结论未进入判据表。
 - 31 本中文书**没有全文可读**（微信读书需会员且不抓正文），只能停在 B/C 级；C 级 14 本的判据全部缺原文支撑。
 - 3 本源流本里无法编码的部分（直觉/hunch、"psychological moment"、缺失成交量）已在各笔记第五节登记，未混进判据表。
+
+## 六、配套的引擎侧分析（读，不改）
+
+`ENGINE-OPTIMIZATION.md`：基于现有校准证据的 8 条改法（E1 去重 0 差异 / E2 `MIN_T` 1.5→2.5 / E3 订单流合并 /
+E4 涨停层合并 / E5 `BOOK_WEIGHT` 收紧到不可越界并写成不变量测试 / E6 三套"权重"改名 / E7 `ConnorsRSI` 补校准或降权 /
+E8 端云层集合与 `CALIB` 同步）。
+**本轮一条都没落地**：改参数需要单独授权 + 重跑 `--calibrate`，且端上已处于"暂缓推送"状态。
+
+可复算的独立性核对（2026-10-30，核对者复算）：
+- 五张校准表共 **116 行**，`|t|≥1.5` 在纯噪声下期望假阳性 **15.5** 条；Bonferroni 门槛 **3.52**；实际过线 **24/116**（limit 0/4、orderflow 3/3、reversal 16/26、structure 3/62、wyckoff 2/21）。
+- 端上 `BookSignalEngine.kt:48` 的 `CALIB` **17 条里 7 条不过 3.52**，其中 **4 条 `limit:*` 全部不过**（t=1.96~2.33），而这批正是期望收益最高的层（fwd5 1.40~1.77%）。
+- `weight_calibration.json` 的 16 个指标**没有 `t` 字段**、`edge` 全为负；`engine_weights.json` 里 `ConnorsRSI` 质量 49.5（噪声区）却拿 **权重 1.0**。
