@@ -48,8 +48,14 @@ ROOT = os.path.dirname(HERE)
 
 # 规格版本：任何会改变评分结果的定义变更都必须升版。
 # 端上启动时比对 spec_version，不一致就标「算法漂移」而不是静默用旧逻辑。
-SPEC_VERSION = "3.1.0"
+SPEC_VERSION = "3.1.1"
 SPEC_ID = "skapp-engine-spec"
+
+# 端上三层书籍信号票（反转 MTR / 涨停结构 / 订单流近似）在中枢内的权重。
+# 取 0.6 = 规格指标权重区间 [0.6, 1.5] 的下界：衍生层信息不如原始指标直接，
+# 首次接入不应压过任何一个主指标。端上 EngineChain 读 weights["book"]，
+# 缺失即 0（不计票），所以这个值必须靠云端下发，不能肇在 APK 里。
+BOOK_WEIGHT = 0.6
 
 
 def load_calibration():
@@ -583,7 +589,15 @@ def load_weights(path=None):
 def build_spec():
     """组装 spec 字典（纯函数，便于测试与 verify 比对）。"""
     device_ids = [e["id"] for e in VOTE_ENGINES if "device" in e["availability"]]
-    weights = load_weights()
+    # 三层书籍信号（反转 MTR / 涨停结构 / 订单流近似，端上 BookSignalEngine 计算）不是
+    # VOTE_ENGINES 里的技术指标，是衍生层，所以单独追加：它的权重必须由云端下发，
+    # 端上硬编码会让「调权重」与「回滚」都必须发版（事前验尸门 2026-10-30 的结论）。
+    # 不写进 data/engine_weights.json：那份文件由 weight_calibrator_v2.py 按 mean=1.0、
+    # cap[0.6,1.5] 归一，塞一个非技术票进去会破坏它的归一假设。
+    if "book" not in device_ids:
+        device_ids.append("book")
+    weights = dict(load_weights())
+    weights["book"] = BOOK_WEIGHT
     return {
         "spec_id": SPEC_ID,
         "spec_version": SPEC_VERSION,
