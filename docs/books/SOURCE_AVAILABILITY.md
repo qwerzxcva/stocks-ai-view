@@ -9,7 +9,7 @@
 |---|---|
 | 这些书有没有电子版？ | **有，31/32 本在微信读书有正版电子版**（多数标"免费/会员"，即会员可读；少数标"付费"）|
 | 能不能抓全文？ | **付费/会员书不能**。微信读书、京东读书的正文走登录态 + 分段接口 + 会员校验，抓取等于绕过付费与 DRM，属侵权，不做 |
-| 有没有能合法拿全文的？ | **有 3 本**：古登堡收录的公版英文原著，已全文落盘（见下）；archive.org 本沙箱不可达 |
+| 有没有能合法拿全文的？ | **有 3 本**：古登堡收录的公版英文原著，已全文落盘（见下）；archive.org 本沙箱不可达。**注意：3 本里只有 #27 对得上本清单书目，另 2 本是「源流对照本」（见下表的「对应书目」列），不算 33 本内的书** |
 | 那卡片怎么才会有原文依据？ | 三条路：① 公版原著（已落地）② 你把自己买的正版 EPUB/PDF 放进 `~/workspace/books/`，我写解析器读 ③ 我把书单里能对应的公版原著逐本核对 |
 
 ## 已落盘的公版全文（可引用、可核对、可分发）
@@ -110,7 +110,9 @@
 2. **可迁移的只有一条**：盈利后止损单向上跟随（`move it up as the price moves up`）——与我们已有的"加仓后止损单调上移"一致，这条可以挂 Butler 出处。
 3. **止损单聚集区是流动性池**这个机制观察，是 `structure_engine` 里 spring / 假跌破（击穿后快速收回）的早期文献依据。若要做成判据（例如"跌破前期低点后 X 根内收回"再加"距低点 ≤ 1.5×ATR"），须先回测校准，**本轮不改代码**。
 
-### 2. Selden《The Psychology of the Stock Market》（Gutenberg #75570，1909）：分仓节奏与情绪极值
+### 2. Selden《The Psychology of the Stock Market》（Gutenberg #75570，**1912**）：分仓节奏与情绪极值
+
+> 年份更正（2026-10-30 原文核对）：原书写的是 `Original publication: ... 1912`、`New York, May 28, 1912`（`psychology_of_the_stock_market_selden.txt:21,74`），此前记 1909 是错的。
 
 第七章「The Psychology of Scale Orders」给了一个具体的下单节奏（第一人称示范）：
 
@@ -120,14 +122,14 @@
 
 > ...has proved to his own satisfaction that seven points is the correct profit to take in Union Pacific, while losses should be limited to two and one-half points.
 
-7 : 2.5 = **2.8 : 1**（1910 年代的道指成分股口径，不是铁律，只作常识区间参照——与我们 2:1 的目标位设置同量级）。第八章的情绪结论：
+7 : 2.5 = **2.8 : 1**。**但这句不能给我们 2:1 背书**（2026-10-30 原文核对更正）：该段在**第五章**（`selden.txt:1201-1207`，不是第七章），且原文紧接着是 "Nothing could be more foolish than these arbitrary figures"——Selden 举它当**反面例证**，反对用固定点数设目标与止损。第八章的情绪结论：
 
 > The greatest fault of ninety-nine out of one hundred active traders is being bullish at high prices and bearish at low prices.
 
 **对我们的影响**：
 
 1. 卡片 P3 的**递减加仓**（1 : 0.6 : 0.36）与 Selden 的**等距 6 档**相反。前提不同：Selden 描述的是价值型越跌越买（无止损，靠价格低于价值兜底），我们只在盈利时加仓。所以节奏**不可移植**，但"每档 = 总跨度/档数"的比例关系可拿来校核加仓间距——我们的递减序列等效约 3 档，若改成等距 6 档，单档风险要相应降到 1/6。
-2. `market_phase` / 情绪类反向指标有了公版原文依据（"高位看多、低位看空是 99/100 交易者的通病"），这条可以标 Selden 出处，不必再写"模型蒸馏"。
+2. `market_phase` / 情绪类反向指标的原文依据**要收窄**（2026-10-30 核对）："高位看多、低位看空是 99/100 交易者的通病"确实在书里（`selden.txt:1943`），但同章 `:1387-1392` 明确否定"靠反转本身赚钱"，只允许**极值处准备反向/获利了结**这一弱用法。可以标 Selden 出处，但不许表述成"情绪反向指标有全书背书"。
 
 ### 本轮仍未打通的（如实记录）
 
