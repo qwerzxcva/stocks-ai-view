@@ -74,13 +74,29 @@ def validate(tag_fn, samples, horizon=5, min_history=120, cut_step=1,
                     for j in range(i + 1, len(pri)):
                         _add(f"{pri[i]} & {pri[j]}", fwd)
 
-    rows = []
+    # 先算出所有通过 n 门槛的键的统计量
+    stat = {}
     for k, v in buckets.items():
         if len(v) < min_n:
             continue  # n=2 的 t=26 是噪声，不能上桌
         s = stats(v)
-        if not s:
-            continue
+        if s:
+            stat[k] = s
+
+    # 组合标签若与某条单标签的 (n, avg, win_rate, t) 四项完全同值，说明这对组合
+    # 没有筛出任何子集 —— 它和那条单标签是同一个估计量，写两行只是把证据数从 1
+    # 说成 2（反转层实测：26 行里 12 行如此）。判据与依据见
+    # docs/books/ENGINE-OPTIMIZATION.md 二.1 / 二.5。
+    single_sig = {
+        (s["n"], round(s["avg"], 3), round(s["win_rate"], 1), round(s["t"], 2))
+        for k, s in stat.items() if " & " not in k
+    }
+
+    rows = []
+    for k, s in stat.items():
+        sig = (s["n"], round(s["avg"], 3), round(s["win_rate"], 1), round(s["t"], 2))
+        if " & " in k and sig in single_sig:
+            continue  # 组合没筛出子集 → 不进表
         rows.append({"signal": k, "n": s["n"], "avg_fwd": round(s["avg"], 3),
                      "win_rate": round(s["win_rate"], 1), "t": round(s["t"], 2)})
     rows.sort(key=lambda r: -abs(r["t"]))

@@ -598,7 +598,8 @@ def layer_expectancy(layer, code, min_n=100, min_t=1.5):
     }
 
 
-def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0):
+def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0,
+                     layers=("reversal", "limit", "orderflow")):
     """#24《模型理论：富致中源模型》的落地：多维打分，权重全部取自实测校准表。
 
     为什么这样打分（与书本先验的关系）：
@@ -611,9 +612,14 @@ def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0):
       没有任何一层命中可过检标签 → 返回 None（不给分，不编 0）。
 
     分数含义：50 = 无优势；>50 表示按实测该股 5 日期望为正，越大越强。
+
+    `layers` 默认取 reversal / limit / orderflow 三层 —— 与端上 `BookSignalEngine`
+    装的层集合一致，保证「同一个 code 的书籍层分数」两端同源（历史分叉：云端
+    曾默认跑 5 层、其中 10 条是负向标签，端上口径只投多头，同票可得相反结论）。
+    要看全 5 层请显式用 `confluence_score_all()`。
     """
     dims = []
-    for layer in _LAYER_FILES:
+    for layer in layers:
         e = layer_expectancy(layer, code, min_n=min_n, min_t=min_t)
         if e and e["edge_5d_pct"] is not None:
             w = min(abs(e["t"]), 4.0) / 4.0
@@ -630,7 +636,18 @@ def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0):
         "expected_5d_pct": round(exp5, 2),
         "dimensions": sorted(dims, key=lambda d: -abs(d["t"])),
         "method": "层分×|t|权重归一；无过检标签的层不参与",
+        "layers": list(layers),
     }
+
+
+def confluence_score_all(code, **kw):
+    """5 层模式（含 structure / wyckoff）：与端上 3 层口径**不同源**，仅供云端研究。
+
+    端上 `BookSignalEngine` 只装 reversal / limit / orderflow，默认的
+    `confluence_score()` 也已收窄到这三层；需要看全 5 层（含 10 条负向标签）
+    时显式调本函数。返回里的 `layers` 字段会写明用了哪几层。
+    """
+    return confluence_score(code, layers=tuple(_LAYER_FILES), **kw)
 
 
 def book_signal_context(code):

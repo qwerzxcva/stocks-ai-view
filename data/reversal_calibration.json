@@ -2,8 +2,8 @@
  "engine": "signal_validator/calibration",
  "meta": {
   "sample": 200,
-  "horizon": 5,
-  "engine": "reversal_engine/v1"
+  "engine": "reversal_engine/v1",
+  "horizon_days": 5
  },
  "table": {
   "mtr:break_up": {
@@ -13,28 +13,7 @@
    "t": 6.61,
    "edge": "trend"
   },
-  "mtr:extreme_bottom & mtr:break_up": {
-   "n": 5555,
-   "avg_fwd": 0.564,
-   "win_rate": 52.2,
-   "t": 6.61,
-   "edge": "trend"
-  },
   "mtr:pullback_down": {
-   "n": 5320,
-   "avg_fwd": 0.507,
-   "win_rate": 52.3,
-   "t": 6.6,
-   "edge": "trend"
-  },
-  "mtr:extreme_bottom & mtr:pullback_down": {
-   "n": 5320,
-   "avg_fwd": 0.507,
-   "win_rate": 52.3,
-   "t": 6.6,
-   "edge": "trend"
-  },
-  "mtr:break_up & mtr:pullback_down": {
    "n": 5320,
    "avg_fwd": 0.507,
    "win_rate": 52.3,
@@ -55,28 +34,7 @@
    "t": 4.6,
    "edge": "contrarian"
   },
-  "mtr:extreme_top & mtr:break_down": {
-   "n": 6795,
-   "avg_fwd": 0.407,
-   "win_rate": 49.2,
-   "t": 4.6,
-   "edge": "contrarian"
-  },
   "mtr:pullback_up": {
-   "n": 6591,
-   "avg_fwd": 0.395,
-   "win_rate": 49.2,
-   "t": 4.41,
-   "edge": "contrarian"
-  },
-  "mtr:extreme_top & mtr:pullback_up": {
-   "n": 6591,
-   "avg_fwd": 0.395,
-   "win_rate": 49.2,
-   "t": 4.41,
-   "edge": "contrarian"
-  },
-  "mtr:break_down & mtr:pullback_up": {
    "n": 6591,
    "avg_fwd": 0.395,
    "win_rate": 49.2,
@@ -91,27 +49,6 @@
    "edge": "contrarian"
   },
   "mtr:second_higher_low": {
-   "n": 1229,
-   "avg_fwd": 0.676,
-   "win_rate": 51.8,
-   "t": 3.85,
-   "edge": "trend"
-  },
-  "mtr:extreme_bottom & mtr:second_higher_low": {
-   "n": 1229,
-   "avg_fwd": 0.676,
-   "win_rate": 51.8,
-   "t": 3.85,
-   "edge": "trend"
-  },
-  "mtr:break_up & mtr:second_higher_low": {
-   "n": 1229,
-   "avg_fwd": 0.676,
-   "win_rate": 51.8,
-   "t": 3.85,
-   "edge": "trend"
-  },
-  "mtr:pullback_down & mtr:second_higher_low": {
    "n": 1229,
    "avg_fwd": 0.676,
    "win_rate": 51.8,
@@ -154,27 +91,6 @@
    "edge": "contrarian"
   },
   "mtr:second_lower_high": {
-   "n": 1944,
-   "avg_fwd": 0.279,
-   "win_rate": 50.1,
-   "t": 1.86,
-   "edge": "contrarian"
-  },
-  "mtr:extreme_top & mtr:second_lower_high": {
-   "n": 1944,
-   "avg_fwd": 0.279,
-   "win_rate": 50.1,
-   "t": 1.86,
-   "edge": "contrarian"
-  },
-  "mtr:break_down & mtr:second_lower_high": {
-   "n": 1944,
-   "avg_fwd": 0.279,
-   "win_rate": 50.1,
-   "t": 1.86,
-   "edge": "contrarian"
-  },
-  "mtr:pullback_up & mtr:second_lower_high": {
    "n": 1944,
    "avg_fwd": 0.279,
    "win_rate": 50.1,
