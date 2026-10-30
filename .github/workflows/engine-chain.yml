@@ -576,6 +576,21 @@ jobs:
                   print("%s unavailable:" % name, exc)
           PY
 
+      # ── 跨仓契约：skapp-app 的 eod-snapshot.yml 直接吃 data/engine/picks_latest.json ──
+      # 不 || echo 静默放行：这个文件缺一天，skapp 当日推股就回落旧产物
+      # （此前 skapp 侧吃了两周前（2026-10-15）的名单，根因就是本仓没这个产物）。
+      - name: Build picks_latest (skapp 契约形状)
+        run: |
+          set -euo pipefail
+          python3 scripts/build_picks_latest.py
+          python3 - <<'PY'
+          import json
+          d = json.load(open('data/engine/picks_latest.json', encoding='utf-8'))
+          print("picks_latest: asof=%s items=%s skipped=%s 首项=%s"
+                % (d['asof'], d['n_items'], len(d['skipped']),
+                   d['items'][0]['symbol'] if d['items'] else None))
+          PY
+
       # ── publish to the warehouse the site reads ──
       - name: Sync mirror shards (B/C 仓分片数据汇聚)
         run: |
@@ -624,6 +639,7 @@ jobs:
             data/vango_articles.json data/training_v7.json \
             data/market_breadth_history.json data/api/market_breadth.json \
             data/engine_manifest.json data/engine_spec.json \
+            data/engine/picks_latest.json \
             --user engine-bot \
             --protect data/engine_v5.json --protect data/decision.json \
             --protect data/today_picks.json --protect data/ai_pick_v4.json \
@@ -644,8 +660,8 @@ jobs:
             --protect data/vango_articles.json --protect data/training_v7.json \
             --protect data/market_breadth_history.json \
             --protect data/api/market_breadth.json \
-            --protect data/engine_manifest.json --protect data/engine_spec.json
-
+            --protect data/engine_manifest.json --protect data/engine_spec.json \
+            --protect data/engine/picks_latest.json
       - name: Publish to the data warehouse
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
