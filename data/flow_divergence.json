@@ -1,10 +1,10 @@
 {
- "ts": "2026-10-30T23:04:53+08:00",
+ "ts": "2026-10-30T23:47:44+08:00",
  "engine": "flow_divergence (自研: 资金流-价格背离)",
  "status": "ok",
  "n_scanned": 274,
  "n_scored": 274,
- "n_confirmed_divergence": 34,
+ "n_confirmed_divergence": 35,
  "n_no_flow": 0,
  "n_rejected": 0,
  "rejection_reasons": {},
@@ -2825,6 +2825,27 @@
    }
   },
   {
+   "code": "sh688169",
+   "date": "2026-10-28",
+   "close": 107.19,
+   "score": 97.6,
+   "signal": "吸筹背离",
+   "diverge": 1,
+   "price_accel_pct": -0.4049,
+   "flow_accel_norm": 0.3125,
+   "flow_persist": 0.6,
+   "vol_compress": 0.958,
+   "n_flow_days": 60,
+   "n_aligned_days": 58,
+   "flow_date_start": "2026-07-31",
+   "flow_date_end": "2026-10-30",
+   "provenance": {
+    "source": "本地前复权日K + 东财主力净流入",
+    "confidence": "observed",
+    "snapshot_ts": "2026-10-28"
+   }
+  },
+  {
    "code": "sz002625",
    "date": "2026-10-28",
    "close": 23.08,
@@ -3487,7 +3508,7 @@
   "provenance": {
    "source": "本地前复权日K + 东财/新浪主力净流入",
    "confidence": "observed",
-   "snapshot_ts": "2026-10-30T23:04:53+08:00"
+   "snapshot_ts": "2026-10-30T23:47:44+08:00"
   }
  }
 }
