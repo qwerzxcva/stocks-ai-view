@@ -30,6 +30,7 @@
 | 二 | 量价微结构（3 本） | `batch2_microstructure.md` | `wyckoff_flow_engine.py` | 部分落地（订单流缺数据） |
 | 三 | 交易管理风控（9 本） | `batch3_trade_management.md` | `trade_plan.py` | 已吸收（规则层，无需回测方向） |
 | 四 | 基本面题材主力（14 本） | `batch4_fundamental_theme.md` | `theme_engine.py` / `fundamental_filter.py` | 题材可落地、基本面不可落地 |
+| 五（2026-10-30 增补） | 反转/涨停/订单流三层 | 沿用 #3/#4/#9/#15/#29/#31 卡片 | `reversal_engine.py` / `limit_structure.py` / `orderflow_proxy.py` | **已落地并校准**，见 [../BOOK-LAYERS.md](../BOOK-LAYERS.md) |
 
 逐本明细：
 
@@ -38,18 +39,18 @@
 | 1 | 日本蜡烛图技术 | 已吸收 | structure_engine.candle_patterns() |
 | 2 | 高级趋势技术分析 | 已吸收 | price_action() 趋势三态 |
 | 3 | 高级波段技术分析 | 已吸收 | price_action() 区间/失败突破 |
-| 4 | 高级反转技术分析 | 已吸收 | 反转棒 + 位置条件（MTR 状态机待补）|
+| 4 | 高级反转技术分析 | **已落地** | `reversal_engine.mtr()` 四要件状态机（2026-10-30，26 标签校准）|
 | 5 | 零基础看懂缠论 | 已吸收 | chan_theory() |
 | 6 | 艾略特波浪理论 | 已吸收 | elliott() |
 | 7 | 量价操盘法 | 已吸收 | volume_price() 四象限 |
 | 8 | 威科夫操盘法 | 已吸收 | volume_price() + wyckoff_flow_engine 事件状态机 |
-| 9 | 订单流交易 | 蒸馏完成，**不可落地** | 需分钟/tick；`order_flow()` 返回不可用 |
+| 9 | 订单流交易 | **近似落地** | 真 Delta 仍不可得；`orderflow_proxy.py` 用收盘位置×量能代理方向 |
 | 10 | 三角洲理论 | 已吸收（低置信） | delta_windows()，带基线概率 |
 | 11 | 亚当理论 | 已吸收 | trade_plan 止损前置 |
 | 12 | 华尔街幽灵 | 已吸收 | trade_plan.time_stop / add_on / volume_alert |
 | 13 | 专业投机原理 | 已吸收 | expectancy() + 2B 标签 |
 | 14 | 澄明之境 | 已吸收 | circuit_breaker() 按胜率算熔断 |
-| 15 | 股市趋势交易大师：龙头作手 | 蒸馏完成，待数据 | 连板/封单字段缺失 |
+| 15 | 股市趋势交易大师：龙头作手 | **部分落地** | 涨停判定/连板高度可算（`limit_structure.py`）；封单字段仍缺 |
 | 16 | 龙头主力操盘术 | 蒸馏完成，待数据 | 筹码/龙虎榜全量缺 |
 | 17 | 题材逐利 | 已吸收 | theme_engine.board_stage() |
 | 18 | 财报掘金 | 蒸馏完成，**不可落地** | financial_summary 覆盖 14% |
@@ -63,9 +64,9 @@
 | 26 | 期货交易：实盘技巧 | 蒸馏完成（差异） | T+0/杠杆不可迁移到 A 股股票 |
 | 27 | 操盘作手：回忆录 | 已吸收 | trade_plan 关键点/不摊平 |
 | 28 | 短线交易大师 | 已吸收 | trade_plan 时间止损 |
-| 29 | 铁血短线 / 铁血战记 | 蒸馏完成，待数据 | 需涨停板时序/封单 |
+| 29 | 铁血短线 / 铁血战记 | **部分落地** | 首板/连板/断板可算；首次封板时间与封单仍需分钟数据 |
 | 30 | 短线英雄 | 已吸收 | trade_plan 纪律层 |
-| 31 | 擒庄秘籍 | 蒸馏完成，待数据 | 需筹码/主力行为数据 |
+| 31 | 擒庄秘籍 | **部分落地** | 涨停结构可算；筹码/龙虎榜仍缺 |
 | 32 | 证券市场技术指标百科全书 | 已吸收 | 指标去共线建议写入 batch2 卡 |
 | 33 | 实战经济学（任泽平） | 蒸馏完成（无原文，二次材料） | 只给相位口径与序列清单，不新建引擎；同层冲突以 #25 卡为准（batch4 第 10 节）|
 

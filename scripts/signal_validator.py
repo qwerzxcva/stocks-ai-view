@@ -113,8 +113,16 @@ def calibrate(rows, bullish_tags, min_n=120, min_t=1.5):
     return table
 
 
-def write_calibration(path, table, meta=None):
-    doc = {"engine": "signal_validator/calibration", "meta": meta or {}, "table": table}
+def write_calibration(path, table, meta=None, horizon=None):
+    """写校准表。
+
+    horizon 会写进 meta.horizon_days：表里只存 avg_fwd，不注明是几日口径的话，
+    下游只能靠猜（structure 旧表用的是 avg_fwd_5d 键，就是口径分叉的后果）。
+    """
+    meta = dict(meta or {})
+    if horizon is not None:
+        meta.setdefault("horizon_days", horizon)
+    doc = {"engine": "signal_validator/calibration", "meta": meta, "table": table}
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
     with open(tmp, "w") as f:
