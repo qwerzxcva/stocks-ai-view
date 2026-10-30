@@ -48,14 +48,17 @@ ROOT = os.path.dirname(HERE)
 
 # 规格版本：任何会改变评分结果的定义变更都必须升版。
 # 端上启动时比对 spec_version，不一致就标「算法漂移」而不是静默用旧逻辑。
-SPEC_VERSION = "3.1.1"
+SPEC_VERSION = "3.2.0"
 SPEC_ID = "skapp-engine-spec"
 
 # 端上三层书籍信号票（反转 MTR / 涨停结构 / 订单流近似）在中枢内的权重。
-# 取 0.6 = 规格指标权重区间 [0.6, 1.5] 的下界：衍生层信息不如原始指标直接，
-# 首次接入不应压过任何一个主指标。端上 EngineChain 读 weights["book"]，
-# 缺失即 0（不计票），所以这个值必须靠云端下发，不能肇在 APK 里。
-BOOK_WEIGHT = 0.6
+# 2026-10-30 复盘：0.6 没有校准支撑 —— weight_calibration.json 里根本没有 book
+# 这一项，0.6 只是照抄 BOLL/Keltner、Choppiness 的占位值；且按「单层票不得改变
+# 落地结论」反算，不越界需 w<=0.35，0.6 已越线。故置 0.0 = 停用投票、保留展示，
+# 待权重校准（weight_calibrator_v2）把 book 纳入后再给非零值。
+# 端上 EngineChain 读 weights["book"]，缺键或 <=0 均不计票；这里显式下发 0.0，
+# 是为了让 degraded 能报「已停用」而不是悄悄走 CanonicalEngine 的 fallback 1.0。
+BOOK_WEIGHT = 0.0
 
 
 def load_calibration():
