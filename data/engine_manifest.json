@@ -1,10 +1,10 @@
 {
   "engines": {
     "decision": {
-      "age_hours": 4.6,
+      "age_hours": 0.3,
       "baseline": {
         "cards": 12,
-        "market_regime": "range",
+        "market_regime": "bear",
         "sample_1d": 64122,
         "win_rate_1d": 45.5
       },
@@ -17,12 +17,12 @@
         "dimensions": 9
       },
       "produced_by": "scripts/decision_engine.py",
-      "sha256": "760cb9cceca5959115da70536ba1b0889fcd4d1e2b46a2a93bb192b10cb801ee",
-      "ts": "2026-10-30T15:12:32+08:00",
+      "sha256": "d18041ed45f3b882b79868436fac65999573e71b038a3a249b84c21c41525e1c",
+      "ts": "2026-10-30T22:20:16+08:00",
       "version": "decision v2"
     },
     "engine_fusion": {
-      "age_hours": 13.7,
+      "age_hours": 0.3,
       "baseline": {
         "E": -5.0,
         "agreement": 0.5
@@ -42,8 +42,8 @@
         ]
       },
       "produced_by": "scripts/engine_fusion.py",
-      "sha256": "d6d37bb0fe5bed54f5e4ed540a182dc719772f92c41134d6076fef218c127c91",
-      "ts": "2026-10-30T06:07:22",
+      "sha256": "e39683a13c7fc33442cb0785200c5322e51ca2d591cc2243fddbda9a396e2e4c",
+      "ts": "2026-10-30T22:20:48",
       "version": "engine_fusion_v1"
     },
     "engine_spec": {
@@ -65,12 +65,12 @@
         "weight_policy": "{'file': 'data/engine_weights.json', 'wr"
       },
       "produced_by": "scripts/engine_spec.py",
-      "sha256": "82185068ecbcf87e65b162966f9d97849c064d126442b67decefbd0db1544716",
+      "sha256": "d77fee2764a77667544615755544a488af826dc46d34b537e5c888dcdf1487a1",
       "ts": "",
       "version": "3.2.1"
     },
     "market_phase": {
-      "age_hours": 37.2,
+      "age_hours": 0.6,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -84,12 +84,12 @@
         "phase_labels": []
       },
       "produced_by": "scripts/phase_runner.py",
-      "sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
-      "ts": "2026-10-29T06:37:01",
+      "sha256": "fcab739b3270c0aa453f522d2c83fa55739b4300b82790125577320484eb6800",
+      "ts": "2026-10-30T22:03:08",
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 380.5,
+      "age_hours": 0.3,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -105,17 +105,17 @@
         "strategy": "B规则(低位+温和量+涨0-5%)+5日持有"
       },
       "produced_by": "scripts/strategy_card.py",
-      "sha256": "a5069c2b6f6a6ae0cb1ba2e215da6e8dbdad5b94411db4f37a3707b9f4c81d15",
-      "ts": "2026-10-14T23:23:50",
+      "sha256": "57a54d770add8d03f01c07883a3e5aa702b4c993bc3fbd801e1e8a890321bbf6",
+      "ts": "2026-10-30T22:20:47",
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 384.1,
+      "age_hours": 0.3,
       "baseline": {
-        "mean_is_win": 47.2,
-        "mean_oos_win": 48.62,
-        "n_folds_valid": 45,
-        "oos_vs_is_decay": -1.42
+        "mean_is_win": 48.36,
+        "mean_oos_win": 48.35,
+        "n_folds_valid": 46,
+        "oos_vs_is_decay": 0.01
       },
       "consumers": [
         "SignalCalibration.kt"
@@ -123,7 +123,7 @@
       "file": "data/walkforward.json",
       "max_age_hours": 168,
       "params": {
-        "end": "2026-10-14",
+        "end": "2026-10-26",
         "horizon_days": 5,
         "start": "2023-11-20",
         "step_days": 20,
@@ -131,12 +131,12 @@
         "train_days": 120
       },
       "produced_by": "scripts/walkforward.py",
-      "sha256": "74be1af291abe437e4ddfffbea1ace3597471976012f431da2c835ba2434be51",
-      "ts": "2026-10-14T19:45:52",
+      "sha256": "d4edb723126ef9d87260d73563d8ee2343d19cc1f1e0eacc0213c4663a49d705",
+      "ts": "2026-10-30T22:21:35",
       "version": "walkforward_v1"
     },
     "weight_calibration": {
-      "age_hours": 13.5,
+      "age_hours": 0.0,
       "baseline": {
         "horizon_5": {
           "avg_ret_pct": 0.12,
@@ -180,12 +180,12 @@
         "preferred_horizon": 5
       },
       "produced_by": "scripts/weight_calibrator_v3.py",
-      "sha256": "347fb28e98082eb3d6dd3c07e621c6aead43a57cd928b6a8949265b128ec7e6b",
-      "ts": "2026-10-30T06:22:54+08:00",
+      "sha256": "49bd6bc353feb0c5bee53801b53dded8acccf2099f4bf1cab8ffdf21ccb8ef18",
+      "ts": "2026-10-30T22:39:00+08:00",
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-10-30T19:51:03+08:00",
+  "generated_at": "2026-10-30T22:39:54+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }
