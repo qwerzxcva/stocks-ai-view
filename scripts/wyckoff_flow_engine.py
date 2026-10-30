@@ -307,8 +307,12 @@ def analyze(bars, code=""):
     delta = delta_windows(bars)
     target = cause_effect_target(tr, bars)
 
+    # 按事件发生顺序去重，**不能用 set**：set 的迭代顺序受 PYTHONHASHSEED 影响，
+    # 每次进程可能不同 → tags 顺序变 → SV.validate 生成的组合键 "a & b" 会时而
+    # 写成 "b & a"，同一个组合被拆成两个键（样本各减半、n 与 t 都失真）。
+    # 2026-10-30 排查 wyckoff 表「数据漂移」时定位到此处：同引擎连跑两次键集不同。
     tags = []
-    for k in {e["kind"] for e in ev if e["idx"] >= len(bars) - 20}:
+    for k in dict.fromkeys(e["kind"] for e in ev if e["idx"] >= len(bars) - 20):
         tags.append(f"wyckoff:{k}")
     tags.append(f"wyckoff:stage_{stage['stage']}")
     if delta.get("in_window"):

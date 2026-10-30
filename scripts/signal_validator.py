@@ -186,7 +186,9 @@ def calibrate(rows, bullish_tags, min_n=120, min_t=1.5,
             "t": r["t"], "edge": "trend" if same_dir else "contrarian",
         }
         entry.update(_net_fields(r["avg_fwd"], r["t"], cost_bps))
-        if require_oos:
+        # OOS 体检字段：rows 里带就透传（不论 require_oos），方便表内自查
+        # 「这条在样本外还成立吗」，也让诊断模式与严格模式共用同一张表的结构。
+        if "oos_t" in r:
             entry["oos_n"] = r["oos_n"]
             entry["oos_t"] = r["oos_t"]
             entry["oos_avg_fwd"] = r["oos_avg_fwd"]

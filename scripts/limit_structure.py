@@ -247,6 +247,8 @@ def main():
     ap.add_argument("-v", "--verbose", action="store_true")
     ap.add_argument("--validate", action="store_true")
     ap.add_argument("--calibrate", action="store_true")
+    ap.add_argument("--require-oos", dest="require_oos", action="store_true",
+                    help="严格模式：主统计只吃 in-sample，OOS 仅用于判定（涨停层实测会清空）")
     ap.add_argument("--sample", type=int, default=200)
     a = ap.parse_args()
 
@@ -274,11 +276,40 @@ def main():
         if a.validate:
             SV.print_rows(rows, 30)
         if a.calibrate:
-            table = SV.calibrate(rows, BULLISH_TAGS, min_n=100, min_t=1.5)
+            # 涨停层是样本外最脆弱的一层（实测 6 条显著标签 OOS 全部归零或反号，
+            # strong_seal 系列直接翻负），故写表时附上样本外体检字段，让人一眼
+            # 看到「这条在表外还成立吗」，而不是只在报告里留一句话。
+            #   --require-oos : 严格模式，主统计只吃 in-sample（避免训练/验证重叠）
+            #   默认         : 主统计仍为全样本，仅把 OOS 字段并上去作体检，不据此过滤
+            if a.require_oos:
+                rows = SV.validate(_tag_fn, samples, horizon=5, min_history=MIN_BARS,
+                                   cut_step=2, oos_split=0.7)
+            else:
+                seg = {r["signal"]: r for r in SV.validate(
+                    _tag_fn, samples, horizon=5, min_history=MIN_BARS,
+                    cut_step=2, oos_split=0.7)}
+                for r in rows:
+                    s = seg.get(r["signal"])
+                    if s and s.get("oos_t") is not None:
+                        r["oos_n"], r["oos_t"], r["oos_avg_fwd"] = (
+                            s["oos_n"], s["oos_t"], s["oos_avg_fwd"])
+            table = SV.calibrate(rows, BULLISH_TAGS, min_n=100, min_t=1.5,
+                                 require_oos=a.require_oos)
             p = os.path.join(DATA_DIR, "limit_calibration.json")
-            SV.write_calibration(p, table, meta={"sample": a.sample,
-                                                 "engine": "limit_structure/v1",
-                                                 "adj": "raw"}, horizon=5)
+            meta = {"sample": a.sample, "engine": "limit_structure/v1", "adj": "raw"}
+            if a.require_oos:
+                meta["require_oos"] = True
+                meta["note"] = "主统计仅 in-sample（split 0.7），oos_* 用于判定"
+            else:
+                meta["oos_diag"] = "oos_* 为样本外体检（split 0.7）；主统计仍为全样本，未据此过滤"
+                robust = [k for k, v in table.items() if v.get("oos_t") is not None
+                          and abs(v["oos_t"]) >= 1.5 and v.get("oos_avg_fwd") is not None
+                          and (v["avg_fwd"] > 0) == (v["oos_avg_fwd"] > 0)]
+                meta["oos_robust"] = f"{len(robust)}/{len(table)}"
+                if not robust:
+                    meta["oos_warning"] = ("涨停层无一条标签通过样本外检验"
+                                           "（OOS |t|<1.5 或方向翻转），建议下游降权或停用")
+            SV.write_calibration(p, table, meta=meta, horizon=5)
             print(f"校准表 → {p}（{len(table)} 个标签）")
             for k, v in sorted(table.items(), key=lambda kv: -abs(kv[1]["t"]))[:10]:
                 print(f"  {k:26} n={v['n']:>5} fwd={v['avg_fwd']:>6.2f}% t={v['t']:>5.2f} {v['edge']}")

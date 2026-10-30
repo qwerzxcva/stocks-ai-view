@@ -189,7 +189,6 @@ def candle_patterns(bars, atrv=None):
             events.append({"kind": "inverted_hammer", "dir": "bull", "strength": 0.4,
                            "src": "蜡烛图技术/倒锤", "note": "同形态在低位需次日确认"})
 
-    # 吞没
     if i >= 1:
         p = bars[i - 1]
         if (last["close"] > last["open"] and p["close"] < p["open"]
@@ -728,11 +727,16 @@ def calibrate(sample=120, horizon=5, min_n=120):
             continue
         bull = _is_bullish_key(r["signal"])
         same_dir = r["avg_fwd_5d"] > 0 if bull else r["avg_fwd_5d"] < 0
-        table[r["signal"]] = {
+        entry = {
             "n": r["n"], "avg_fwd_5d": r["avg_fwd_5d"],
             "win_rate": r["win_rate"], "t": r["t"],
             "edge": "trend" if same_dir else "contrarian",
         }
+        # 净收益字段（扣交易成本）：与 signal_validator.calibrate 同口径，
+        # 只新增字段、不覆盖 avg_fwd_5d。键名前缀补 5d，与本表既有命名对齐。
+        for _k, _v in SV._net_fields(r["avg_fwd_5d"], r["t"]).items():
+            entry[_k.replace("net_avg_fwd_", "net_avg_fwd_5d_")] = _v
+        table[r["signal"]] = entry
     return table
 
 

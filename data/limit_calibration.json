@@ -4,6 +4,9 @@
   "sample": 200,
   "engine": "limit_structure/v1",
   "adj": "raw",
+  "oos_diag": "oos_* 为样本外体检（split 0.7）；主统计仍为全样本，未据此过滤",
+  "oos_robust": "0/4",
+  "oos_warning": "涨停层无一条标签通过样本外检验（OOS |t|<1.5 或方向翻转），建议下游降权或停用",
   "horizon_days": 5
  },
  "table": {
@@ -16,7 +19,10 @@
    "net_avg_fwd_15bp": 1.625,
    "net_t_15bp": 2.13,
    "net_avg_fwd_30bp": 1.475,
-   "net_t_30bp": 1.94
+   "net_t_30bp": 1.94,
+   "oos_n": 110,
+   "oos_t": 0.04,
+   "oos_avg_fwd": 0.053
   },
   "limit:strong_seal & limit:active_5d": {
    "n": 387,
@@ -27,7 +33,10 @@
    "net_avg_fwd_15bp": 1.396,
    "net_t_15bp": 1.88,
    "net_avg_fwd_30bp": 1.246,
-   "net_t_30bp": 1.68
+   "net_t_30bp": 1.68,
+   "oos_n": 125,
+   "oos_t": -0.74,
+   "oos_avg_fwd": -0.935
   },
   "limit:first_board": {
    "n": 366,
@@ -38,7 +47,10 @@
    "net_avg_fwd_15bp": 1.25,
    "net_t_15bp": 1.75,
    "net_avg_fwd_30bp": 1.1,
-   "net_t_30bp": 1.54
+   "net_t_30bp": 1.54,
+   "oos_n": 123,
+   "oos_t": 0.12,
+   "oos_avg_fwd": 0.15
   },
   "limit:first_board & limit:strong_seal": {
    "n": 352,
@@ -49,7 +61,10 @@
    "net_avg_fwd_15bp": 1.273,
    "net_t_15bp": 1.75,
    "net_avg_fwd_30bp": 1.123,
-   "net_t_30bp": 1.55
+   "net_t_30bp": 1.55,
+   "oos_n": 119,
+   "oos_t": -0.1,
+   "oos_avg_fwd": -0.123
   }
  }
 }
