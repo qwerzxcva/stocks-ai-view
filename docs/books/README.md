@@ -32,9 +32,13 @@
 | 四 | 基本面题材主力（14 本） | `batch4_fundamental_theme.md` | `theme_engine.py` / `fundamental_filter.py` | 题材可落地、基本面不可落地 |
 | 五（2026-10-30 增补） | 反转/涨停/订单流三层 | 沿用 #3/#4/#9/#15/#29/#31 卡片 | `reversal_engine.py` / `limit_structure.py` / `orderflow_proxy.py` | **已落地并校准**，见 [../BOOK-LAYERS.md](../BOOK-LAYERS.md) |
 
-> 2026-10-30 新增两份：**[DEDUPE-MAP.md](DEDUPE-MAP.md)**（40→33 去重、同主题多手法分条、跨书冲突裁决）、
-> **[ENGINE-BACKLOG.md](ENGINE-BACKLOG.md)**（卡片→引擎待办，每条带验收标准与可复现命令）。
-> 进度台账（逐本状态 + 落点 + 验收）：`.aharou/memory/books_progress_ledger.md`。
+> 2026-10-30 新增两份（**互补薄文档，不重复主文**）：
+> **[DEDUPE-MAP.md](DEDUPE-MAP.md)** —— 去重主文见 [DEDUPE-33.md](DEDUPE-33.md)，本文只补「40→33 差 7 项但只记录 4 处」
+> 的未闭合记账 + 「冲突在引擎里现行取哪个值」；
+> **[ENGINE-BACKLOG.md](ENGINE-BACKLOG.md)** —— 优化清单主文见 [ENGINE-OPTIMIZATION.md](ENGINE-OPTIMIZATION.md)，
+> 本文只补「改完怎么算通过」（验收标准 + 可复现命令 + 数据缺口门槛）。
+> 进度台账（逐本状态 + 落点 + 验收）：`.aharou/memory/books_progress_ledger.md`；
+> 已读登记见 [READ-LOG.md](READ-LOG.md)。
 
 逐本明细：
 
