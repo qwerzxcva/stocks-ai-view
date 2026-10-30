@@ -1,7 +1,7 @@
 {
- "ts": "2026-10-30T15:01:24+08:00",
+ "ts": "2026-10-30T15:09:42+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 322,
+ "n_input": 473,
  "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
@@ -72,12 +72,100 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-10-29",
+  "trade_date": "2026-10-30",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
+  {
+   "title": "上古病毒现世,网友中熊猫烧香",
+   "source": "贴吧热议",
+   "time": "2026-10-30T15:09:35+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28368378&amp;topic_name=%E4%B8%8A%E5%8F%A4%E7%97%85%E6%AF%92%E7%8E%B0%E4%B8%96%2C%E7%BD%91%E5%8F%8B%E4%B8%AD%E7%86%8A%E7%8C%AB%E7%83%A7%E9%A6%99",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-10-30",
+    "matched_codes": []
+   }
+  },
   {
    "title": "朝鲜国防省：美韩对朝挑衅活动加剧半岛军事紧张",
    "source": "华尔街见闻",
@@ -114,7 +202,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-29",
+    "trade_date": "2026-10-30",
     "event_date": "2026-10-30",
     "matched_codes": []
    }
@@ -122,7 +210,7 @@
   {
    "title": "美国防部：美军在对伊朗军事行动中累计23人死亡",
    "source": "凤凰网",
-   "time": "2026-10-30T15:01:12+08:00",
+   "time": "2026-10-30T15:09:36+08:00",
    "url": "https://news.ifeng.com/c/8xdzM3jJzPF",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -155,60 +243,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-29",
-    "event_date": "2026-10-30",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "日本央行：将在每次会议上讨论加息必要性",
-   "source": "cls",
-   "time": "2026-10-30T14:46:08+08:00",
-   "url": "https://www.cls.cn/detail/2520435",
-   "transmission_id": "rate_hike",
-   "label": "加息/紧缩",
-   "direct_bear": [
-    {
-     "sector": "创新药",
-     "stocks": [
-      "301520"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    },
-    {
-     "sector": "保险",
-     "stocks": [
-      "601318",
-      "601601",
-      "601628",
-      "601319",
-      "601336"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-29",
+    "trade_date": "2026-10-30",
     "event_date": "2026-10-30",
     "matched_codes": []
    }
@@ -251,7 +286,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-29",
+    "trade_date": "2026-10-30",
     "event_date": "2026-10-30",
     "matched_codes": []
    }
@@ -294,7 +329,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-29",
+    "trade_date": "2026-10-30",
     "event_date": "2026-10-30",
     "matched_codes": []
    }
