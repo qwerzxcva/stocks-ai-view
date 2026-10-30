@@ -742,9 +742,22 @@ def calibrate(sample=120, horizon=5, min_n=120):
 
 def write_calibration(sample=120, out_path=None):
     table = calibrate(sample)
+    # 质量概览：这张表只设 n 门槛（无 min_t），行数变多不等于可用标签变多，
+    # 实测 108 行里 |t|<1 的占 40%，扣费后不赚钱的占一半。把统计写进表，
+    # 免得下游误把「行数多」当「信号多」。
+    quality = {
+        "total": len(table),
+        "abs_t_ge_1_5": sum(1 for v in table.values() if abs(v["t"]) >= 1.5),
+        "abs_t_lt_1": sum(1 for v in table.values() if abs(v["t"]) < 1),
+        "net_le_0_at_15bp": sum(1 for v in table.values()
+                                if v.get("net_avg_fwd_5d_15bp", 0) <= 0),
+        "min_t_used": None,
+        "hint": "下游取值请自行按 |t|>=1.5 过滤；net_le_0_at_15bp 表示扣费后无优势",
+    }
     doc = {"generated_at": datetime.now(CST).strftime("%Y-%m-%d %H:%M:%S"),
            "engine": "structure_engine/calibration",
            "horizon_days": 5, "sample_codes": sample,
+           "quality": quality,
            "note": "edge=contrarian 表示该标签在 A 股 5 日尺度上方向与书本相反",
            "table": table}
     out_path = out_path or os.path.join(DATA_DIR, "structure_calibration.json")
