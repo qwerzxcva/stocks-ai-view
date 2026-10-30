@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0d1117;
+  --panel: #151b23;
+  --bd: #242d38;
+  --fg: #d7dde3;
+  --mut: #7d8894;
+  --up: #e5484d;   /* A股红涨 */
+  --dn: #2f9e6e;   /* 绿跌 */
+  --amber: #e8a33d;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@theme {
+  --color-bg: #0d1117;
+  --color-panel: #151b23;
+  --color-bd: #242d38;
+  --color-fg: #d7dde3;
+  --color-mut: #7d8894;
+  --color-up: #e5484d;
+  --color-dn: #2f9e6e;
+  --color-amber: #e8a33d;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+body { background: var(--bg); color: var(--fg); font-family: var(--mono), "PingFang SC", "Microsoft YaHei", sans-serif; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--bd); border-radius: 4px; }
