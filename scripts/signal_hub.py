@@ -238,13 +238,14 @@ def structure_expectancy(code, min_n=120, min_t=1.5):
     for a in tags:
         if a in table:
             cands.append((a, table[a]))
-    cands = [(k, v) for k, v in cands if v["n"] >= min_n and abs(v["t"]) >= min_t]
+    cands = [(k, v) for k, v in cands if v["n"] >= min_n and abs(_net_t(v)) >= min_t]
     if not cands:
         return None
-    key, best = max(cands, key=lambda kv: abs(kv[1]["t"]))
-    return {"basis": key, "n": best["n"], "t": best["t"],
-            "edge_5d_pct": best["avg_fwd_5d"], "win_rate": best["win_rate"],
-            "edge": best["edge"], "horizon_days": _CALIB["meta"].get("horizon_days", 5)}
+    key, best = max(cands, key=lambda kv: abs(_net_t(kv[1])))
+    return {"basis": key, "n": best["n"], "t": _net_t(best),
+            "edge_5d_pct": _net_fwd(best), "win_rate": best["win_rate"],
+            "edge": best["edge"], "horizon_days": _CALIB["meta"].get("horizon_days", 5),
+            "gross_edge_5d_pct": best.get("avg_fwd_5d")}
 
 
 def v5_votes(code):
@@ -456,12 +457,14 @@ def wyckoff_expectancy(code, min_n=100, min_t=1.5):
         if a in table:
             cands.append((a, table[a]))
     cands = [(k, v) for k, v in cands
-             if v.get("n", 0) >= min_n and abs(v.get("t", 0)) >= min_t]
+             if v.get("n", 0) >= min_n and abs(_net_t(v)) >= min_t]
     if not cands:
         return None
-    key, best = max(cands, key=lambda kv: abs(kv[1]["t"]))
-    return {"basis": key, "n": best["n"], "t": best["t"], "edge_5d_pct": best["avg_fwd"],
-            "win_rate": best["win_rate"], "edge": best["edge"]}
+    key, best = max(cands, key=lambda kv: abs(_net_t(kv[1])))
+    return {"basis": key, "n": best["n"], "t": _net_t(best),
+            "edge_5d_pct": _net_fwd(best),
+            "win_rate": best["win_rate"], "edge": best["edge"],
+            "gross_edge_5d_pct": best.get("avg_fwd")}
 
 
 # ── 题材层（theme_engine.py） ──────────────────────────────────
@@ -547,6 +550,31 @@ def _fwd(v):
         return None
     return v.get("avg_fwd", v.get("avg_fwd_5d"))
 
+def _net_fwd(v):
+    """扣 15bp 往返成本后的前向收益；字段缺失或为 None 时退回毛收益。
+
+    为什么决策要用净收益：A 股 5 日尺度的边缘优势普遍在 0.2~1.8% 量级，
+    15bp 成本占比不小，毛收益为正不等于能赚钱（structure 表里一半标签
+    扣费后 <=0）。退回毛收益是为兼容未重算的旧表，不是在替它开脱。
+    """
+    if v is None:
+        return None
+    for k in ("net_avg_fwd_15bp", "net_avg_fwd_5d_15bp"):
+        x = v.get(k)
+        if x is not None:
+            return x
+    return _fwd(v)
+
+def _net_t(v):
+    """净收益的 t 值（与 _net_fwd 同口径）；缺失时退回毛 t。"""
+    if v is None:
+        return 0.0
+    for k in ("net_t_15bp", "net_t_5d_15bp"):
+        x = v.get(k)
+        if x is not None:
+            return x
+    return v.get("t", 0.0) or 0.0
+
 
 _LAYER_FILES = {
     "structure": ("structure_signals.json", "structure_calibration.json"),
@@ -586,15 +614,16 @@ def layer_expectancy(layer, code, min_n=100, min_t=1.5):
     for a in tags:
         if a in table:
             cands.append((a, table[a]))
-    cands = [(k, x) for k, x in cands if x["n"] >= min_n and abs(x["t"]) >= min_t]
+    cands = [(k, x) for k, x in cands if x["n"] >= min_n and abs(_net_t(x)) >= min_t]
     if not cands:
         return None
-    key, best = max(cands, key=lambda kv: abs(kv[1]["t"]))
+    key, best = max(cands, key=lambda kv: abs(_net_t(kv[1])))
     return {
-        "layer": layer, "basis": key, "n": best["n"], "t": best["t"],
-        "edge_5d_pct": _fwd(best), "win_rate": best["win_rate"],
+        "layer": layer, "basis": key, "n": best["n"], "t": _net_t(best),
+        "edge_5d_pct": _net_fwd(best), "win_rate": best["win_rate"],
         "edge": best["edge"],
         "horizon_days": _calib(cal_file)["meta"].get("horizon_days") or 5,
+        "gross_edge_5d_pct": _fwd(best),
     }
 
 
@@ -606,10 +635,14 @@ def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0,
       模型本身给的是「多维度综合评估」的框架，没有给权重；书本权重搬过来在 A 股
       短周期也不成立（本项目多处实测已证明方向会反）。因此维度只负责**收集证据**，
       权重与方向一律从校准表取：
-        层分值 = 该层命中的最佳标签的 5 日期望收益（%）
-        层权重 = min(|t|, 4) / 4       —— t 越大越可信，4 封顶避免单层霸榜
+        层分值 = 该层命中的最佳标签的 5 日**净**期望收益（%）（扣 15bp 往返成本）
+        层权重 = min(|t_net|, 4) / 4    —— 用净收益的 t，4 封顶避免单层霸榜
         总分   = Σ(层分 × 层权重) / Σ(层权重)，再线性映射到 0~100
       没有任何一层命中可过检标签 → 返回 None（不给分，不编 0）。
+
+    门槛与权重全用净口径：扣费后 t 跌破 1.5 的标签不参与打分（宁可不出分，
+    也不用一个扣完成本就不显著的优势去抬分）。返回里的 gross_edge_5d_pct
+    保留毛收益，便于对比“这一分里有多少是成本吃掉的”。
 
     分数含义：50 = 无优势；>50 表示按实测该股 5 日期望为正，越大越强。
 
@@ -635,7 +668,7 @@ def confluence_score(code, min_n=100, min_t=1.5, clamp_pct=3.0,
         "score": round(score, 1),
         "expected_5d_pct": round(exp5, 2),
         "dimensions": sorted(dims, key=lambda d: -abs(d["t"])),
-        "method": "层分×|t|权重归一；无过检标签的层不参与",
+        "method": "层分×|t_net|权重归一（净收益口径，扣 15bp）；无过检标签的层不参与",
         "layers": list(layers),
     }
 
