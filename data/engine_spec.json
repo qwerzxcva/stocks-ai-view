@@ -1,7 +1,7 @@
 {
   "spec_id": "skapp-engine-spec",
-  "spec_version": "3.2.0",
-  "generated_at": "2026-10-30T18:52:52+08:00",
+  "spec_version": "3.2.1",
+  "generated_at": "2026-10-30T19:42:49+08:00",
   "source": "stocks-ai-view/scripts/engine_spec.py",
   "reference_impl": "stocks-ai-view/scripts/engine_v5.py (build_votes/score_stock)",
   "aggregation": {
@@ -45,7 +45,9 @@
     "A/D Line": 1.0,
     "Pivot": 1.0,
     "VWMA": 1.0,
-    "book": 0.0
+    "book": 0.0,
+    "flow": 0.07,
+    "tape": 0.05
   },
   "weights_source": "data/engine_weights.json",
   "engines": [

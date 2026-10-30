@@ -2,8 +2,8 @@
  "engine": "signal_validator/calibration",
  "meta": {
   "sample": 200,
-  "horizon": 5,
-  "engine": "orderflow_proxy/v1"
+  "engine": "orderflow_proxy/v1",
+  "horizon_days": 5
  },
  "table": {
   "flow:delta_down": {
@@ -11,21 +11,33 @@
    "avg_fwd": 0.681,
    "win_rate": 52.7,
    "t": 7.21,
-   "edge": "contrarian"
+   "edge": "contrarian",
+   "net_avg_fwd_15bp": 0.531,
+   "net_t_15bp": 5.62,
+   "net_avg_fwd_30bp": 0.381,
+   "net_t_30bp": 4.03
   },
   "flow:imbalance_down": {
    "n": 374,
    "avg_fwd": 1.973,
    "win_rate": 59.4,
    "t": 4.76,
-   "edge": "contrarian"
+   "edge": "contrarian",
+   "net_avg_fwd_15bp": 1.823,
+   "net_t_15bp": 4.4,
+   "net_avg_fwd_30bp": 1.673,
+   "net_t_30bp": 4.04
   },
   "flow:delta_down & flow:imbalance_down": {
    "n": 272,
    "avg_fwd": 1.7,
    "win_rate": 58.8,
    "t": 3.75,
-   "edge": "contrarian"
+   "edge": "contrarian",
+   "net_avg_fwd_15bp": 1.55,
+   "net_t_15bp": 3.42,
+   "net_avg_fwd_30bp": 1.4,
+   "net_t_30bp": 3.09
   }
  }
 }

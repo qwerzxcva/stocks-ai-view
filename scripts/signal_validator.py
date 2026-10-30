@@ -43,23 +43,38 @@ def stats(xs):
 
 # ─────────────────────────── 通用检验 ───────────────────────────
 def validate(tag_fn, samples, horizon=5, min_history=120, cut_step=1,
-             combo=True, max_tags_per_bar=4, min_n=30):
+             combo=True, max_tags_per_bar=4, min_n=30, oos_split=None):
     """逐标签（含两两组合）跑前向收益。
 
     tag_fn(bars) -> list[str]；bars 已截断到 t，只能看到历史。
     samples: [(code, bars)]，bars 为按日期升序的 dict 列表（含 close）。
     cut_step: 每隔几根取一个切点；1 = 全量（慢但样本多）。
+    oos_split: None = 不分段，统计全样本（旧行为）。
+        给 0~1 间的小数（如 0.7）时，按每只票切点在时间轴上的先后，把前
+        oos_split 段当 in-sample、其余当 out-of-sample：主统计只吃 in-sample，
+        另附 `oos_n` / `oos_avg_fwd` / `oos_t` 三个字段，供
+        `calibrate(require_oos=True)` 判定信号能否外推。
+        分段会让主统计的样本量降到 oos_split 倍，故默认关闭（None）。
     """
     buckets = {}
+    oos_buckets = {}
 
-    def _add(key, v):
-        buckets.setdefault(key, []).append(v)
+    def _add(key, v, is_is=True):
+        if oos_split is None:
+            buckets.setdefault(key, []).append(v)
+        else:
+            (buckets if is_is else oos_buckets).setdefault(key, []).append(v)
 
     for code, bars in samples:
         n = len(bars)
         if n < min_history + horizon + 1:
             continue
-        for cut in range(min_history, n - horizon, max(1, cut_step)):
+        cuts = list(range(min_history, n - horizon, max(1, cut_step)))
+        if not cuts:
+            continue
+        k = max(1, int(len(cuts) * oos_split)) if oos_split else 0
+        for ci, cut in enumerate(cuts):
+            is_is = ci < k
             view = bars[:cut]
             fwd = pct(bars[cut + horizon - 1]["close"], view[-1]["close"])
             try:
@@ -67,12 +82,12 @@ def validate(tag_fn, samples, horizon=5, min_history=120, cut_step=1,
             except Exception:
                 continue  # 单点异常不能污染整张统计表
             for t in set(tags):
-                _add(t, fwd)
+                _add(t, fwd, is_is)
             if combo and len(tags) >= 2:
                 pri = list(dict.fromkeys(tags))[:max_tags_per_bar]
                 for i in range(len(pri)):
                     for j in range(i + 1, len(pri)):
-                        _add(f"{pri[i]} & {pri[j]}", fwd)
+                        _add(f"{pri[i]} & {pri[j]}", fwd, is_is)
 
     # 先算出所有通过 n 门槛的键的统计量
     stat = {}
@@ -97,8 +112,14 @@ def validate(tag_fn, samples, horizon=5, min_history=120, cut_step=1,
         sig = (s["n"], round(s["avg"], 3), round(s["win_rate"], 1), round(s["t"], 2))
         if " & " in k and sig in single_sig:
             continue  # 组合没筛出子集 → 不进表
-        rows.append({"signal": k, "n": s["n"], "avg_fwd": round(s["avg"], 3),
-                     "win_rate": round(s["win_rate"], 1), "t": round(s["t"], 2)})
+        row = {"signal": k, "n": s["n"], "avg_fwd": round(s["avg"], 3),
+               "win_rate": round(s["win_rate"], 1), "t": round(s["t"], 2)}
+        if oos_split is not None:
+            so = stats(oos_buckets.get(k) or [])
+            row["oos_n"] = so["n"] if so else 0
+            row["oos_avg_fwd"] = round(so["avg"], 3) if so else None
+            row["oos_t"] = round(so["t"], 2) if so else None
+        rows.append(row)
     rows.sort(key=lambda r: -abs(r["t"]))
     return rows
 
@@ -114,18 +135,62 @@ def is_bullish_key(key, bullish_tags):
     return any(t in bullish_tags for t in toks)
 
 
-def calibrate(rows, bullish_tags, min_n=120, min_t=1.5):
-    """把检验结果冻成校准表，并标出 trend / contrarian。"""
+def _net_fields(avg, t, cost_bps=(15, 30)):
+    """净收益字段：扣掉交易成本后的期望与 t。**不覆盖** avg_fwd / t。
+
+    为什么要单独开字段：表内 avg_fwd 全是毛收益，5 日双边成本约 0.15~0.3%，
+    会把 mtr:second_lower_high(+0.28%)这类 edge 吃掉一半以上。用净字段而不是
+    直接改 avg_fwd，是为了不动现有消费方（端上 CALIB、云端 confluence_score）。
+
+    t 反推标准误（se = |avg / t|），再算 net_t = (avg - cost) / se；t 为 0 或缺失
+    时不写 net_t（没法反推 SE，不编造数值）。
+    """
+    out = {}
+    se = abs(avg / t) if t else None
+    for bp in cost_bps:
+        cost = bp / 100.0  # bp → 百分点：15bp = 0.15%
+        out[f"net_avg_fwd_{bp}bp"] = round(avg - cost, 3)
+        if se and se > 0:
+            out[f"net_t_{bp}bp"] = round((avg - cost) / se, 2)
+    return out
+
+def calibrate(rows, bullish_tags, min_n=120, min_t=1.5,
+              require_oos=False, oos_min_t=None, cost_bps=(15, 30)):
+    """把检验结果冻成校准表，并标出 trend / contrarian。
+
+    require_oos: True 时只收「样本外同向且仍过门槛」的标签。需要 rows 由
+        `validate(..., oos_split=...)` 产出（每行带 oos_n / oos_avg_fwd / oos_t）。
+        默认 False = 旧行为（只看全样本 t）。开它会把表砍掉一大截（实测反转层
+        17 条显著里只有 7 条 OOS 稳健），故默认关、由调用方显式开。
+    cost_bps: 净收益字段的成本档（bp），默认 15/30 = 0.15%/0.30%。
+    """
     table = {}
     for r in rows:
         if r["n"] < min_n or abs(r["t"]) < min_t:
             continue
+        if require_oos:
+            oos_n = r.get("oos_n") or 0
+            oos_t = r.get("oos_t")
+            oos_avg = r.get("oos_avg_fwd")
+            if oos_n < min_n or oos_t is None or oos_avg is None:
+                continue  # 样本外样本不够，不得当“已验证”入表
+            floor = oos_min_t if oos_min_t is not None else min_t
+            if abs(oos_t) < floor:
+                continue  # 样本外不够显著
+            if (r["avg_fwd"] > 0) != (oos_avg > 0):
+                continue  # 反号：表内与表外方向相反，不得入表
         bull = is_bullish_key(r["signal"], bullish_tags)
         same_dir = r["avg_fwd"] > 0 if bull else r["avg_fwd"] < 0
-        table[r["signal"]] = {
+        entry = {
             "n": r["n"], "avg_fwd": r["avg_fwd"], "win_rate": r["win_rate"],
             "t": r["t"], "edge": "trend" if same_dir else "contrarian",
         }
+        entry.update(_net_fields(r["avg_fwd"], r["t"], cost_bps))
+        if require_oos:
+            entry["oos_n"] = r["oos_n"]
+            entry["oos_t"] = r["oos_t"]
+            entry["oos_avg_fwd"] = r["oos_avg_fwd"]
+        table[r["signal"]] = entry
     return table
 
 

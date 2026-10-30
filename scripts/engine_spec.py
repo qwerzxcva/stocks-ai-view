@@ -48,7 +48,7 @@ ROOT = os.path.dirname(HERE)
 
 # 规格版本：任何会改变评分结果的定义变更都必须升版。
 # 端上启动时比对 spec_version，不一致就标「算法漂移」而不是静默用旧逻辑。
-SPEC_VERSION = "3.2.0"
+SPEC_VERSION = "3.2.1"
 SPEC_ID = "skapp-engine-spec"
 
 # 端上三层书籍信号票（反转 MTR / 涨停结构 / 订单流近似）在中枢内的权重。
@@ -59,6 +59,17 @@ SPEC_ID = "skapp-engine-spec"
 # 端上 EngineChain 读 weights["book"]，缺键或 <=0 均不计票；这里显式下发 0.0，
 # 是为了让 degraded 能报「已停用」而不是悄悄走 CanonicalEngine 的 fallback 1.0。
 BOOK_WEIGHT = 0.0
+
+# 资金流 / 盘口两张代理票在中枢内的权重。必须与端上 `EngineChain.W_FLOW` /
+# `W_TAPE` 保持一致：这两个值原本只作用于其后的 blend 层（W_CENTRAL=0.88 /
+# 0.07 / 0.05），而中枢内因为 `spec.weights` 没有这两个键，端上
+# `CanonicalEngine` 走 `w[v.indicator] ?: 1.0` 兜底 → 两张代理票各占 1.0，
+# 等于一个完整技术指标。结果是同一份信息被双计（blend 层 7%/5% + 中枢内各 1/19.2），
+# 且实际话语权远超设计值（D 从 17.32 撑到 19.2，每个技术指标被稀释 10.9%）。
+# 2026-10-30 复盘后显式下发：键存在 → 中枢内权重服从 blend 层意图，且云端可调、
+# 也可一行关掉（设为 0 即不计票）。
+FLOW_WEIGHT = 0.07
+TAPE_WEIGHT = 0.05
 
 
 def load_calibration():
@@ -601,6 +612,11 @@ def build_spec():
         device_ids.append("book")
     weights = dict(load_weights())
     weights["book"] = BOOK_WEIGHT
+    # flow / tape：缺键时端上按 1.0 兜底（见 FLOW_WEIGHT 处的复盘注释），这里显式下发，
+    # 让中枢内权重与 blend 层一致。用 setdefault：若 engine_weights.json 里将来真有这两键，
+    # 以校准值为准。
+    weights.setdefault("flow", FLOW_WEIGHT)
+    weights.setdefault("tape", TAPE_WEIGHT)
     return {
         "spec_id": SPEC_ID,
         "spec_version": SPEC_VERSION,

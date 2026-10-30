@@ -2,9 +2,9 @@
  "engine": "signal_validator/calibration",
  "meta": {
   "sample": 200,
-  "horizon": 5,
   "engine": "limit_structure/v1",
-  "adj": "raw"
+  "adj": "raw",
+  "horizon_days": 5
  },
  "table": {
   "limit:first_board & limit:active_5d": {
@@ -12,28 +12,44 @@
    "avg_fwd": 1.775,
    "win_rate": 47.1,
    "t": 2.33,
-   "edge": "trend"
+   "edge": "trend",
+   "net_avg_fwd_15bp": 1.625,
+   "net_t_15bp": 2.13,
+   "net_avg_fwd_30bp": 1.475,
+   "net_t_30bp": 1.94
   },
   "limit:strong_seal & limit:active_5d": {
    "n": 387,
    "avg_fwd": 1.546,
    "win_rate": 45.7,
    "t": 2.08,
-   "edge": "trend"
+   "edge": "trend",
+   "net_avg_fwd_15bp": 1.396,
+   "net_t_15bp": 1.88,
+   "net_avg_fwd_30bp": 1.246,
+   "net_t_30bp": 1.68
   },
   "limit:first_board": {
    "n": 366,
    "avg_fwd": 1.4,
    "win_rate": 46.2,
    "t": 1.96,
-   "edge": "trend"
+   "edge": "trend",
+   "net_avg_fwd_15bp": 1.25,
+   "net_t_15bp": 1.75,
+   "net_avg_fwd_30bp": 1.1,
+   "net_t_30bp": 1.54
   },
   "limit:first_board & limit:strong_seal": {
    "n": 352,
    "avg_fwd": 1.423,
    "win_rate": 46.6,
    "t": 1.96,
-   "edge": "trend"
+   "edge": "trend",
+   "net_avg_fwd_15bp": 1.273,
+   "net_t_15bp": 1.75,
+   "net_avg_fwd_30bp": 1.123,
+   "net_t_30bp": 1.55
   }
  }
 }
