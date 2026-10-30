@@ -1,0 +1,31 @@
+{
+ "engine": "signal_validator/calibration",
+ "meta": {
+  "sample": 200,
+  "horizon": 5,
+  "engine": "orderflow_proxy/v1"
+ },
+ "table": {
+  "flow:delta_down": {
+   "n": 4263,
+   "avg_fwd": 0.681,
+   "win_rate": 52.7,
+   "t": 7.21,
+   "edge": "contrarian"
+  },
+  "flow:imbalance_down": {
+   "n": 374,
+   "avg_fwd": 1.973,
+   "win_rate": 59.4,
+   "t": 4.76,
+   "edge": "contrarian"
+  },
+  "flow:delta_down & flow:imbalance_down": {
+   "n": 272,
+   "avg_fwd": 1.7,
+   "win_rate": 58.8,
+   "t": 3.75,
+   "edge": "contrarian"
+  }
+ }
+}
