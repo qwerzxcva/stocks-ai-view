@@ -1,11 +1,11 @@
 {
-  "ts": "2026-10-31T13:42:52+08:00",
+  "ts": "2026-10-31T19:55:51+08:00",
   "engine": "limitup_ml_build",
-  "n_symbols": 2961,
-  "n_samples": 19962,
-  "n_positive": 93,
-  "base_rate_pct": 0.4659,
-  "feature_dim": 33,
+  "n_symbols": 2956,
+  "n_samples": 7003909,
+  "n_positive": 61766,
+  "base_rate_pct": 0.8819,
+  "feature_dim": 15,
   "label_def": "次日涨幅 >= 板块涨停阈值 且 今日未涨停",
   "zt_thresholds": {
     "main": 0.098,
@@ -14,60 +14,6 @@
   },
   "provenance": {
     "source": "bulk/day_qfq_*.csv",
-    "origin": "GitCode limitup2/build.py",
-    "minute_features": "/home/runner/work/stocks-ai-view/stocks-min-data/minute_feat.parquet"
-  },
-  "minute_feature_cols": [
-    "open_gap",
-    "intraday_ret",
-    "intraday_range",
-    "close_position",
-    "tail_strength",
-    "morning_strength",
-    "am_pm_split",
-    "max_drawdown_intraday",
-    "max_rise_intraday",
-    "vol_share_first30",
-    "vol_share_last30",
-    "vwap_dev",
-    "up_min_ratio",
-    "big_move_min_count",
-    "ret_autocorr",
-    "realized_vol",
-    "gap_fill",
-    "limitup_touch"
-  ],
-  "minute_coverage_pct": 52.1992,
-  "minute": {
-    "status": "ok",
-    "coverage_pct": 52.1992,
-    "matched_rows": 10420,
-    "n_samples": 19962,
-    "dates": [
-      20261008,
-      20261014
-    ],
-    "min_bars": 120,
-    "source": "/home/runner/work/stocks-ai-view/stocks-min-data/minute_feat.parquet",
-    "minute_col_null_pct": {
-      "open_gap": 1.6219,
-      "intraday_ret": 0.0,
-      "intraday_range": 1.6219,
-      "close_position": 0.1727,
-      "tail_strength": 0.0,
-      "morning_strength": 0.0,
-      "am_pm_split": 0.0,
-      "max_drawdown_intraday": 0.0,
-      "max_rise_intraday": 0.0,
-      "vol_share_first30": 0.0,
-      "vol_share_last30": 0.0,
-      "vwap_dev": 0.0,
-      "up_min_ratio": 0.0,
-      "big_move_min_count": 0.0,
-      "ret_autocorr": 0.2783,
-      "realized_vol": 0.0,
-      "gap_fill": 1.6219,
-      "limitup_touch": 1.6219
-    }
+    "origin": "GitCode limitup2/build.py"
   }
 }
