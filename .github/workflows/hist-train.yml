@@ -156,24 +156,35 @@ jobs:
           import json, os, sys
           m = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "feat", "minute_features_manifest.json"),
                              encoding="utf-8"))
-          y0, y1 = int(m["date_min"]) // 10000, int(m["date_max"]) // 10000
+          dmin, dmax = int(m["date_min"]), int(m["date_max"])
           n = max(1, int(os.environ["BATCH_WINDOWS"]))
           df = int(os.environ["DATE_FROM"] or 0)
           dt = int(os.environ["DATE_TO"] or 0)
-          span = max(1, y1 - y0 + 1)
-          step = max(1, (span + n - 1) // n)
+          lo_all = max(df, dmin)
+          hi_all = min(dt, dmax) if dt else dmax
+          if lo_all > hi_all:
+              sys.exit(f"✗ 日期范围为空: 数据 {dmin}~{dmax}，限制 {df or '-'}~{dt or '-'}")
+          # 按日历月等分（数据跨度可能不足 n 年，硬按自然年切会合出过少的批次）
+          months = []
+          y, mo = lo_all // 10000, lo_all // 100 % 100
+          while y * 100 + mo <= hi_all // 100:
+              months.append(y * 100 + mo)
+              mo += 1
+              if mo > 12:
+                  mo, y = 1, y + 1
+          per = max(1, (len(months) + n - 1) // n)
           wins = []
-          y = y0
-          while y <= y1:
-              ye = min(y1, y + step - 1)
-              lo = max(df, y * 10000 + 101) if df else y * 10000 + 101
-              hi = min(dt, ye * 10000 + 1231) if dt else ye * 10000 + 1231
+          for i in range(0, len(months), per):
+              c = months[i:i + per]
+              lo = max(lo_all, c[0] * 100 + 1)
+              hi = min(hi_all, c[-1] * 100 + 31)
               if lo <= hi:
-                  lab = str(y) if ye == y else f"{y}_{ye}"
+                  lab = str(c[0]) if len(c) == 1 else f"{c[0]}_{c[-1]}"
                   wins.append((lo, hi, lab))
-              y = ye + 1
           if len(wins) < 3:
               print(f"✗ 只规划出 {len(wins)} 个批次；至少需要 3 批（训练 + 留出）才能出样本外结论",
+                    file=sys.stderr)
+              print(f"  可用月份 {len(months)} 个（{months[0]}~{months[-1]}），BATCH_WINDOWS={n}",
                     file=sys.stderr)
               raise SystemExit(2)
           print("BATCH_WINS=" + ";".join(f"{lo}:{hi}:{lab}" for lo, hi, lab in wins))
