@@ -231,8 +231,7 @@ def pull_dataset(cache: str, ref: str, dataset: str, out: str,
         return [], []
     local, pulled = [], []
     for b in blobs:
-        dest = os.path.join(out, dataset, os.path.basename(b["path"])) \
-            if dataset == "minute1" else os.path.join(sub, os.path.basename(b["path"]))
+        dest = os.path.join(sub, os.path.basename(b["path"]))
         local.append(dest)
         size = b["size"]
         if size >= 0 and os.path.isfile(dest) and os.path.getsize(dest) == size:
