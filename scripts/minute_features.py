@@ -82,7 +82,7 @@ def zt_threshold(symbol: str) -> float:
 def collect_files(target: str, suffix: str = ".parquet") -> list[str]:
     t = os.path.abspath(os.path.expanduser(target))
     if os.path.isdir(t):
-        return sorted(glob.glob(os.path.join(t, suffix)))
+        return sorted(glob.glob(os.path.join(t, "*" + suffix)))
     if "*" in t:
         return sorted(glob.glob(t))
     return [t] if os.path.isfile(t) else []
