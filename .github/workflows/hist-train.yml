@@ -5,6 +5,9 @@
 # 产物: artifact hist-train-<run_id>（results.json / lp_meta.json / index.json）
 name: Hist Minute-Feature Train
 on:
+  # 分支触发用于本链路自验（workflow_dispatch 需文件先在默认分支才会注册）
+  push:
+    branches: [feat/hist-train-cloud]
   workflow_dispatch:
     inputs:
       shard_repos:
@@ -39,6 +42,12 @@ jobs:
     env:
       TZ: Asia/Shanghai
       PYTHONUNBUFFERED: "1"
+      # push 事件没有 inputs，这里统一兜底，run 步骤只读环境变量
+      DATE_FROM: ${{ inputs.date_from || '20160101' }}
+      DATE_TO: ${{ inputs.date_to || '0' }}
+      FOLDS: ${{ inputs.folds || '4' }}
+      ALLOW_INSUFFICIENT: ${{ inputs.allow_insufficient || 'false' }}
+      SHARD_REPOS: ${{ inputs.shard_repos || 'qwerzxcva/hist-feat-1,dufuwuxin/hist-feat-2,jiegengxiangjianxue/hist-feat-3' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -56,7 +65,7 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/shards"
           n=0
-          for repo in $(echo "${{ inputs.shard_repos }}" | tr ',' ' '); do
+          for repo in $(echo "$SHARD_REPOS" | tr ',' ' '); do
             [ -n "$repo" ] || continue
             dst="$RUNNER_TEMP/shards/$(echo "$repo" | tr '/' '_')"
             git clone --depth 1 --quiet "https://github.com/${repo}.git" "$dst"
@@ -130,8 +139,8 @@ jobs:
           set -euo pipefail
           python3 scripts/limitup_ml_build.py \
             --minute-features "$RUNNER_TEMP/feat/minute_features.parquet" \
-            --date-from "${{ inputs.date_from }}" \
-            --date-to "${{ inputs.date_to }}" \
+            --date-from "$DATE_FROM" \
+            --date-to "$DATE_TO" \
             --out data
           python3 - <<'PY'
           import json, sys
@@ -144,7 +153,7 @@ jobs:
           ok = m["feature_dim"] == 33 and m["n_samples"] > 0
           if not ok:
               sys.exit(f"✗ 构建结果不可用于训练: feature_dim={m['feature_dim']} n_samples={m['n_samples']}")
-          if mil.get("status") != "ok" and "${{ inputs.allow_insufficient }}" != "true":
+          if mil.get("status") != "ok" and "$ALLOW_INSUFFICIENT" != "true":
               sys.exit(f"✗ 分钟特征覆盖率 {mil.get('coverage_pct')}% < 20%，按红线不出训练结论")
           open(".build_summary", "w").write(
               f"| 指标 | 值 |\n|---|---|\n| feature_dim | {m['feature_dim']} |\n"
@@ -159,7 +168,7 @@ jobs:
           python3 scripts/limitup_ml_train.py \
             --data data \
             --out data/hist_train_results.json \
-            --folds "${{ inputs.folds }}"
+            --folds "$FOLDS"
           python3 - <<'PY'
           import json
           d = json.load(open("data/hist_train_results.json", encoding="utf-8"))
@@ -196,7 +205,7 @@ jobs:
           {
             echo "## Hist minute-feature train"
             echo "- ref: \`${{ github.ref_name }}\` run: ${{ github.run_id }}"
-            echo "- date window: ${{ inputs.date_from }} ~ ${{ inputs.date_to }} folds=${{ inputs.folds }}"
+            echo "- date window: $DATE_FROM ~ $DATE_TO folds=$FOLDS"
             echo ""
             cat .build_summary 2>/dev/null || echo "build 阶段未产出指标"
             echo ""
