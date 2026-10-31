@@ -156,7 +156,7 @@ jobs:
           import json, os, sys
           m = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "feat", "minute_features_manifest.json"),
                              encoding="utf-8"))
-          y0, y1 = m["date_min"] // 10000, m["date_max"] // 10000
+          y0, y1 = int(m["date_min"]) // 10000, int(m["date_max"]) // 10000
           n = max(1, int(os.environ["BATCH_WINDOWS"]))
           df = int(os.environ["DATE_FROM"] or 0)
           dt = int(os.environ["DATE_TO"] or 0)
