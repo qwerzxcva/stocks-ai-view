@@ -83,6 +83,11 @@ jobs:
         run: |
           python3 scripts/limitup_ml_train.py --data data --out data/minute_train_results.json
           python3 -c "import json;d=json.load(open('data/minute_train_results.json'));print('base_rate=%.4f%%'%d['base_rate_pct']);[print('  TopK=%s: precision=%.3f%% lift=%.2fx n=%d'%(k,d['picks'][k]['precision_pct'],d['picks'][k]['lift'],d['picks'][k]['n_selected'])) for k in sorted(d['picks'].keys(),key=int)]"
+      - name: Collect report artifacts
+        run: |
+          mkdir -p data/minute_artifacts
+          cp ../stocks-min-data/minute_feat.features.json data/minute_artifacts/ 2>/dev/null || true
+          cp ../stocks-min-data/pull_report.json data/minute_artifacts/ 2>/dev/null || true
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -91,8 +96,7 @@ jobs:
             data/minute_train_results.json
             data/lp_meta.json
             data/limitup_ml_model.json
-            ../stocks-min-data/minute_feat.features.json
-            ../stocks-min-data/pull_report.json
+            data/minute_artifacts/
           retention-days: 30
       - name: Commit results
         run: |
