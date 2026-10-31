@@ -1,0 +1,204 @@
+# workflows/hist-train.yml — 全史分钟特征 → 次日涨停模型（GitHub 数据仓分发版）
+# 数据源: 分片仓 qwerzxcva/hist-feat-1 + dufuwuxin/hist-feat-2 + jiegengxiangjianxue/hist-feat-3（public, 按年 parquet）
+#         日线 qwerzxcva/t1 的 data/bulk（day_qfq_60.csv.gz, 2015-12-22 起）
+# 流程: 拉分片 → 合并 → 拉日线 → limitup_ml_build.py(33 维) → limitup_ml_train.py → artifact
+# 产物: artifact hist-train-<run_id>（results.json / lp_meta.json / index.json）
+name: Hist Minute-Feature Train
+on:
+  workflow_dispatch:
+    inputs:
+      shard_repos:
+        description: "分片仓列表（owner/repo，逗号分隔）"
+        required: false
+        default: "qwerzxcva/hist-feat-1,dufuwuxin/hist-feat-2,jiegengxiangjianxue/hist-feat-3"
+      date_from:
+        description: "样本日期下界 yyyymmdd（0=不限）"
+        required: false
+        default: "20160101"
+      date_to:
+        description: "样本日期上界 yyyymmdd（0=不限）"
+        required: false
+        default: "0"
+      folds:
+        description: "walk-forward 折数"
+        required: false
+        default: "4"
+      allow_insufficient:
+        description: "分钟特征覆盖率 <20% 时仍继续训练（默认 false 直接失败）"
+        required: false
+        default: "false"
+permissions:
+  contents: read
+concurrency:
+  group: hist-train
+  cancel-in-progress: false
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    env:
+      TZ: Asia/Shanghai
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: pip install --quiet pyarrow pandas
+
+      - name: Download feature shards
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/shards"
+          n=0
+          for repo in $(echo "${{ inputs.shard_repos }}" | tr ',' ' '); do
+            [ -n "$repo" ] || continue
+            dst="$RUNNER_TEMP/shards/$(echo "$repo" | tr '/' '_')"
+            git clone --depth 1 --quiet "https://github.com/${repo}.git" "$dst"
+            cnt=$(find "$dst/feat" -name '*.parquet' 2>/dev/null | wc -l)
+            echo "  $repo: $cnt 分片 $(du -sh "$dst"/feat | cut -f1)"
+            n=$((n + cnt))
+          done
+          echo "分片合计 $n 个"
+          [ "$n" -gt 0 ] || { echo "✗ 没有任何特征分片"; exit 1; }
+
+      - name: Merge shards
+        run: |
+          python3 - <<'PY'
+          import glob, json, os, sys
+          import pyarrow as pa, pyarrow.parquet as pq
+          files = sorted(glob.glob(os.path.join(os.environ["RUNNER_TEMP"], "shards", "*", "feat", "*.parquet")))
+          if not files:
+              sys.exit("✗ 合并阶段没有输入分片")
+          out_dir = os.path.join(os.environ["RUNNER_TEMP"], "feat")
+          os.makedirs(out_dir, exist_ok=True)
+          out = os.path.join(out_dir, "minute_features.parquet")
+          writer, rows, schema = None, 0, None
+          manifest = None
+          for f in files:
+              t = pq.read_table(f)
+              if schema is None:
+                  schema = t.schema
+                  writer = pq.ParquetWriter(out, schema, compression="zstd")
+              writer.write_table(t)
+              rows += t.num_rows
+          writer.close()
+          # 列清单/口径直接取任一分片仓的 index.json，避免两份口径漂移
+          for idx in glob.glob(os.path.join(os.environ["RUNNER_TEMP"], "shards", "*", "index.json")):
+              d = json.load(open(idx, encoding="utf-8"))
+              if d.get("feature_cols"):
+                  manifest = d
+                  break
+          assert manifest, "分片仓缺 index.json（feature_cols）"
+          with open(os.path.join(out_dir, "minute_features_manifest.json"), "w", encoding="utf-8") as fh:
+              json.dump({"engine": "shard_merge", "feature_cols": manifest["feature_cols"],
+                         "feature_dim": manifest["feature_dim"], "rows": rows,
+                         "date_min": min(s["date_min"] for s in manifest["shards"]),
+                         "date_max": max(s["date_max"] for s in manifest["shards"]),
+                         "completeness": {"min_bars": 120},
+                         "provenance": manifest.get("provenance", {})}, fh, ensure_ascii=False, indent=1)
+          print(f"合并 {len(files)} 分片 → {rows:,} 行 × {manifest['feature_dim']} 维")
+          print(f"→ {out}")
+          PY
+
+      - name: Checkout daily kline (t1/data/bulk)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+
+      - name: Prepare daily bulk
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/bulk"
+          cp kline-repo/data/bulk/*.gz "$RUNNER_TEMP/bulk/"
+          cd "$RUNNER_TEMP/bulk"
+          for gz in *.gz; do gzip -dkq "$gz"; done
+          ls -la
+          echo "STOCKS_KLINE_BULK=$RUNNER_TEMP/bulk" >> "$GITHUB_ENV"
+
+      - name: Build samples (daily features + 18 minute features)
+        run: |
+          set -euo pipefail
+          python3 scripts/limitup_ml_build.py \
+            --minute-features "$RUNNER_TEMP/feat/minute_features.parquet" \
+            --date-from "${{ inputs.date_from }}" \
+            --date-to "${{ inputs.date_to }}" \
+            --out data
+          python3 - <<'PY'
+          import json, sys
+          m = json.load(open("data/lp_meta.json", encoding="utf-8"))
+          mil = m.get("minute") or {}
+          print(f"feature_dim={m['feature_dim']} samples={m['n_samples']:,} "
+                f"positive={m['n_positive']:,} base_rate={m['base_rate_pct']}%")
+          print(f"minute: status={mil.get('status')} coverage={mil.get('coverage_pct')}% "
+                f"dates={mil.get('dates')}")
+          ok = m["feature_dim"] == 33 and m["n_samples"] > 0
+          if not ok:
+              sys.exit(f"✗ 构建结果不可用于训练: feature_dim={m['feature_dim']} n_samples={m['n_samples']}")
+          if mil.get("status") != "ok" and "${{ inputs.allow_insufficient }}" != "true":
+              sys.exit(f"✗ 分钟特征覆盖率 {mil.get('coverage_pct')}% < 20%，按红线不出训练结论")
+          open(".build_summary", "w").write(
+              f"| 指标 | 值 |\n|---|---|\n| feature_dim | {m['feature_dim']} |\n"
+              f"| samples | {m['n_samples']:,} |\n| positive | {m['n_positive']:,} |\n"
+              f"| base_rate | {m['base_rate_pct']}% |\n"
+              f"| minute_coverage | {mil.get('coverage_pct')}% ({mil.get('status')}) |\n")
+          PY
+
+      - name: Train (walk-forward)
+        run: |
+          set -euo pipefail
+          python3 scripts/limitup_ml_train.py \
+            --data data \
+            --out data/hist_train_results.json \
+            --folds "${{ inputs.folds }}"
+          python3 - <<'PY'
+          import json
+          d = json.load(open("data/hist_train_results.json", encoding="utf-8"))
+          lines = [f"base_rate={d['base_rate_pct']}% n_features={d.get('n_features')}"]
+          for k in sorted(d["picks"], key=int):
+              p = d["picks"][k]
+              lines.append(f"  Top{k}: precision={p['precision_pct']}% lift={p['lift']}x "
+                           f"n={p['n_selected']}")
+          print("\n".join(lines))
+          with open(".train_summary", "w") as f:
+              f.write("```\n" + "\n".join(lines) + "\n```\n")
+          PY
+
+      - name: Collect artifacts
+        if: always()
+        run: |
+          mkdir -p out
+          cp data/hist_train_results.json data/lp_meta.json data/limitup_ml_model.json out/ 2>/dev/null || true
+          cp data/lp_syms.json out/ 2>/dev/null || true
+          cp "$RUNNER_TEMP"/shards/*/index.json out/ 2>/dev/null || true
+          ls -la out
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hist-train-${{ github.run_id }}
+          path: out/
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Hist minute-feature train"
+            echo "- ref: \`${{ github.ref_name }}\` run: ${{ github.run_id }}"
+            echo "- date window: ${{ inputs.date_from }} ~ ${{ inputs.date_to }} folds=${{ inputs.folds }}"
+            echo ""
+            cat .build_summary 2>/dev/null || echo "build 阶段未产出指标"
+            echo ""
+            cat .train_summary 2>/dev/null || echo "train 阶段未产出指标"
+          } >> "$GITHUB_STEP_SUMMARY"
