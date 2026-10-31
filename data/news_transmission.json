@@ -1,8 +1,8 @@
 {
- "ts": "2026-10-31T21:35:15+08:00",
+ "ts": "2026-11-01T04:28:54+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 478,
- "n_transmissions": 2,
+ "n_input": 475,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -79,16 +79,59 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "哥伦比亚国防部宣布对与委内瑞拉接壤边境城市实施军事管制",
+   "title": "刚果（金）埃博拉疫情已致5026人死亡",
    "source": "财联社电报",
-   "time": "2026-10-31T21:06:03+08:00",
-   "url": "https://www.cls.cn/detail/2521559",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-11-01T04:21:21+08:00",
+   "url": "https://www.cls.cn/detail/2521645",
+   "transmission_id": "epidemic",
+   "label": "疫情",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    },
     {
      "sector": "航空",
      "stocks": [
@@ -104,9 +147,189 @@
      ]
     },
     {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "孟加拉国登革热疫情持续蔓延",
+   "source": "财联社电报",
+   "time": "2026-11-01T04:21:21+08:00",
+   "url": "https://www.cls.cn/detail/2521636",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
      "sector": "旅游",
      "stocks": [
       "002627"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "孟加拉国登革热疫情持续蔓延",
+   "source": "cls",
+   "time": "2026-10-31T21:52:28+08:00",
+   "url": "https://www.cls.cn/detail/2521636",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
      ]
     }
    ],
@@ -120,10 +343,98 @@
    }
   },
   {
-   "title": "伊朗外长阿拉格齐：美国重启谈判的举措是“积极的一步”。\n\n目前没有与美国官员会面的计划。\n\n伊朗代表团将在多哈继续会谈。\n\n卡塔尔和巴基斯坦的调解人正在讨论伊朗的条件。\n\n我们要求",
-   "source": "华尔街见闻",
-   "time": "2026-10-31T21:22:38+08:00",
-   "url": "https://wallstreetcn.com/livenews/3191978",
+   "title": "刚果（金）埃博拉疫情已致5026人死亡",
+   "source": "cls",
+   "time": "2026-10-31T22:53:59+08:00",
+   "url": "https://www.cls.cn/detail/2521645",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-10-31",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "鲁比奥称特朗普尚未就针对伊朗的军事行动做出决定",
+   "source": "财联社电报",
+   "time": "2026-11-01T04:21:21+08:00",
+   "url": "https://www.cls.cn/detail/2521655",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -156,7 +467,7 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-30",
-    "event_date": "2026-10-31",
+    "event_date": "2026-11-01",
     "matched_codes": []
    }
   }
