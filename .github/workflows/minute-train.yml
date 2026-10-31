@@ -1,0 +1,114 @@
+# workflows/minute-train.yml — 分钟级数据训练链路
+# 数据源: GitCode dufuwuxin/stock-data 的 wh/minute1（分钟K）+ qwerzxcva/t1 的 data/bulk（日K）
+# 流程: 拉分钟 → 日内特征(18维) → 样本构建(33维) → walk-forward 训练
+# 说明: 公开仓 Actions 免费无限分钟；主仓为公开仓，故不占私有仓 2000 分钟额度
+name: Minute-Train Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      date_from:
+        description: "样本日期下界 yyyymmdd（含）"
+        required: false
+        default: "20261008"
+      date_to:
+        description: "样本日期上界 yyyymmdd（含）"
+        required: false
+        default: "20261014"
+permissions:
+  contents: write
+concurrency:
+  group: minute-train
+  cancel-in-progress: false
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      TZ: Asia/Shanghai
+      GITCODE_DATA_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+      DATE_FROM: ${{ inputs.date_from }}
+      DATE_TO: ${{ inputs.date_to }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout kline repo (sparse)
+        uses: actions/checkout@v4
+        with:
+          repository: qwerzxcva/t1
+          token: ${{ secrets.GH_TOKEN }}
+          sparse-checkout: |
+            data/bulk
+          path: kline-repo
+      - name: Link bulk
+        run: |
+          mkdir -p ../stocks-data-kline/data
+          cp -r kline-repo/data/bulk ../stocks-data-kline/data/ 2>/dev/null || true
+          cd ../stocks-data-kline/data/bulk
+          for gz in *.gz; do
+            [ -f "$gz" ] || continue
+            base="${gz%.gz}"
+            [ -f "$base" ] || gzip -dkq "$gz" || true
+          done
+          cd - >/dev/null
+          python3 -c "import sys; sys.path.insert(0, 'scripts'); from paths import BULK; import os; files=[f for f in os.listdir(BULK) if f.startswith('day_qfq_') and f.endswith('.csv')]; n=sum(sum(1 for _ in open(os.path.join(BULK,f))) for f in files); print(f'{len(files)} shards, {n:,} rows')"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: pip install --quiet pyarrow pandas
+      - name: Pull minute data from GitCode
+        run: |
+          python3 scripts/gitcode_data_pull.py \
+            --dataset minute1 \
+            --out ../stocks-min-data/minute1 \
+            --report ../stocks-min-data/pull_report.json
+          python3 -c "import json;r=json.load(open('../stocks-min-data/pull_report.json'));print(json.dumps(r,ensure_ascii=False)[:600])"
+      - name: Build intraday features
+        run: |
+          python3 scripts/minute_features.py \
+            --minute ../stocks-min-data/minute1 \
+            --out ../stocks-min-data/minute_feat.parquet
+      - name: Build training samples
+        run: |
+          python3 scripts/limitup_ml_build.py \
+            --minute-features ../stocks-min-data/minute_feat.parquet \
+            --date-from "$DATE_FROM" \
+            --date-to "$DATE_TO" \
+            --out data
+          python3 -c "import json;m=json.load(open('data/lp_meta.json'));print('feature_dim=%s samples=%s positive=%s coverage=%s%% status=%s'%(m['feature_dim'],m['n_samples'],m['n_positive'],(m.get('minute') or {}).get('coverage_pct'),(m.get('minute') or {}).get('status')))"
+      - name: Train model
+        run: |
+          python3 scripts/limitup_ml_train.py --data data --out data/minute_train_results.json
+          python3 -c "import json;d=json.load(open('data/minute_train_results.json'));print('base_rate=%.4f%%'%d['base_rate_pct']);[print('  TopK=%s: precision=%.3f%% lift=%.2fx n=%d'%(k,d['picks'][k]['precision_pct'],d['picks'][k]['lift'],d['picks'][k]['n_selected'])) for k in sorted(d['picks'].keys(),key=int)]"
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: minute-train-${{ github.run_id }}
+          path: |
+            data/minute_train_results.json
+            data/lp_meta.json
+            data/limitup_ml_model.json
+            ../stocks-min-data/minute_feat.features.json
+            ../stocks-min-data/pull_report.json
+          retention-days: 30
+      - name: Commit results
+        run: |
+          git config user.name "minute-train-bot"
+          git config user.email "minute-train-bot@users.noreply.github.com"
+          git add data/minute_train_results.json data/lp_meta.json || true
+          if git diff --cached --quiet; then
+            echo "no changes"
+            exit 0
+          fi
+          git commit -m "[CI] minute-train refresh ${DATE_FROM}-${DATE_TO} $(date +%Y%m%d_%H%M)"
+          for i in 1 2 3; do
+            git fetch origin main
+            git reset --soft origin/main
+            git add data/minute_train_results.json data/lp_meta.json || true
+            git commit -m "[CI] minute-train refresh ${DATE_FROM}-${DATE_TO} $(date +%Y%m%d_%H%M)" 2>/dev/null || true
+            if git push origin HEAD:main; then echo pushed; break; fi
+            sleep 10
+          done

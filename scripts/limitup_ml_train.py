@@ -90,6 +90,15 @@ def main():
     ap.add_argument("--seed", type=int, default=7)
     args = ap.parse_args()
 
+    global NF
+    meta_path = os.path.join(args.data, "lp_meta.json")
+    if os.path.exists(meta_path):
+        with open(meta_path, encoding="utf-8") as f:
+            dim = json.load(f).get("feature_dim")
+        if isinstance(dim, int) and dim > 0:
+            NF = dim
+            print(f"特征维度 {NF} (来自 lp_meta.json)")
+
     feat, lab, ret, date, sym = load(args.data)
     n = len(lab)
     if n == 0:
