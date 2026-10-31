@@ -1,8 +1,11 @@
 # workflows/hist-train.yml — 全史分钟特征 → 次日涨停模型（GitHub 数据仓分发版）
 # 数据源: 分片仓 qwerzxcva/hist-feat-1 + dufuwuxin/hist-feat-2 + jiegengxiangjianxue/hist-feat-3（public, 按年 parquet）
 #         日线 qwerzxcva/t1 的 data/bulk（day_qfq_60.csv.gz, 2015-12-22 起）
-# 流程: 拉分片 → 合并 → 拉日线 → limitup_ml_build.py(33 维) → limitup_ml_train.py → artifact
-# 产物: artifact hist-train-<run_id>（results.json / lp_meta.json / index.json）
+# 流程: 逐仓合并（合并完即删 clone）→ 按时间窗分批建样本（内存峰值只驻留一批样本数组，
+#       磁盘上保留全部批次样本目录，约等于历史样本总量）→ 分批流式多轮训练（同时做算法/引擎参数寻优）
+#       → 结果与模型落盘后，再删掉已训练完的批次目录
+# 产物: artifact hist-train-<run_id>（batch_train_results.json / limitup_ml_model.json /
+#       meta/<批次>.lp_meta.json / minute_features_manifest.json）
 name: Hist Minute-Feature Train
 on:
   # 分支触发用于本链路自验（workflow_dispatch 需文件先在默认分支才会注册）
@@ -22,10 +25,18 @@ on:
         description: "样本日期上界 yyyymmdd（0=不限）"
         required: false
         default: "0"
-      folds:
-        description: "walk-forward 折数"
+      rounds:
+        description: "多轮训练轮数"
+        required: false
+        default: "3"
+      batch_windows:
+        description: "批次数量（按时间顺序等分日期范围；先全建、再流式多轮训练、训完即删）"
         required: false
         default: "4"
+      drop_trained:
+        description: "结果/模型落盘后删除已训练完的批次样本目录（true/false）"
+        required: false
+        default: "true"
       allow_insufficient:
         description: "分钟特征覆盖率 <20% 时仍继续训练（默认 false 直接失败）"
         required: false
@@ -45,7 +56,9 @@ jobs:
       # push 事件没有 inputs，这里统一兜底，run 步骤只读环境变量
       DATE_FROM: ${{ inputs.date_from || '20160101' }}
       DATE_TO: ${{ inputs.date_to || '0' }}
-      FOLDS: ${{ inputs.folds || '4' }}
+      ROUNDS: ${{ inputs.rounds || '3' }}
+      BATCH_WINDOWS: ${{ inputs.batch_windows || '4' }}
+      DROP_TRAINED: ${{ inputs.drop_trained || 'true' }}
       ALLOW_INSUFFICIENT: ${{ inputs.allow_insufficient || 'false' }}
       SHARD_REPOS: ${{ inputs.shard_repos || 'qwerzxcva/hist-feat-1,dufuwuxin/hist-feat-2,jiegengxiangjianxue/hist-feat-3' }}
     steps:
@@ -60,59 +73,60 @@ jobs:
       - name: Install deps
         run: pip install --quiet pyarrow pandas
 
-      - name: Download feature shards
+      - name: Merge feature shards (one repo at a time)
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/shards"
-          n=0
-          for repo in $(echo "$SHARD_REPOS" | tr ',' ' '); do
-            [ -n "$repo" ] || continue
-            dst="$RUNNER_TEMP/shards/$(echo "$repo" | tr '/' '_')"
-            git clone --depth 1 --quiet "https://github.com/${repo}.git" "$dst"
-            cnt=$(find "$dst/feat" -name '*.parquet' 2>/dev/null | wc -l)
-            echo "  $repo: $cnt 分片 $(du -sh "$dst"/feat | cut -f1)"
-            n=$((n + cnt))
-          done
-          echo "分片合计 $n 个"
-          [ "$n" -gt 0 ] || { echo "✗ 没有任何特征分片"; exit 1; }
-
-      - name: Merge shards
-        run: |
           python3 - <<'PY'
-          import glob, json, os, sys
-          import pyarrow as pa, pyarrow.parquet as pq
-          files = sorted(glob.glob(os.path.join(os.environ["RUNNER_TEMP"], "shards", "*", "feat", "*.parquet")))
-          if not files:
-              sys.exit("✗ 合并阶段没有输入分片")
-          out_dir = os.path.join(os.environ["RUNNER_TEMP"], "feat")
+          import glob, json, os, shutil, subprocess, sys
+          import pyarrow.parquet as pq
+          base = os.environ["RUNNER_TEMP"]
+          out_dir = os.path.join(base, "feat")
           os.makedirs(out_dir, exist_ok=True)
           out = os.path.join(out_dir, "minute_features.parquet")
-          writer, rows, schema = None, 0, None
-          manifest = None
-          for f in files:
-              t = pq.read_table(f)
-              if schema is None:
-                  schema = t.schema
-                  writer = pq.ParquetWriter(out, schema, compression="zstd")
-              writer.write_table(t)
-              rows += t.num_rows
+          writer, rows, schema, manifest = None, 0, None, None
+          repos = [r.strip() for r in os.environ["SHARD_REPOS"].split(",") if r.strip()]
+          for repo in repos:
+              dst = os.path.join(base, "shards", repo.replace("/", "_"))
+              shutil.rmtree(dst, ignore_errors=True)
+              r = subprocess.run(["git", "clone", "--depth", "1", "--quiet",
+                                  f"https://github.com/{repo}.git", dst],
+                                 capture_output=True, text=True)
+              if r.returncode != 0:
+                  sys.exit(f"✗ clone {repo} 失败: {r.stderr.strip()[:200]}")
+              files = sorted(glob.glob(os.path.join(dst, "feat", "*.parquet")))
+              if not files:
+                  sys.exit(f"✗ {repo} 没有 feat/*.parquet")
+              for f in files:
+                  t = pq.read_table(f)
+                  if schema is None:
+                      schema = t.schema
+                      writer = pq.ParquetWriter(out, schema, compression="zstd")
+                  elif not t.schema.equals(schema):
+                      sys.exit(f"✗ {repo} 的 {os.path.basename(f)} schema 与首批不一致")
+                  writer.write_table(t)
+                  rows += t.num_rows
+              idx = os.path.join(dst, "index.json")
+              if manifest is None and os.path.exists(idx):
+                  d = json.load(open(idx, encoding="utf-8"))
+                  if d.get("feature_cols"):
+                      manifest = d
+              shutil.rmtree(dst)  # 合并完即删 clone，磁盘峰值只占一个分片仓
+              print(f"  {repo}: 累计 {rows:,} 行（clone 已删）")
+          if writer is None:
+              sys.exit("✗ 没有任何特征分片")
           writer.close()
-          # 列清单/口径直接取任一分片仓的 index.json，避免两份口径漂移
-          for idx in glob.glob(os.path.join(os.environ["RUNNER_TEMP"], "shards", "*", "index.json")):
-              d = json.load(open(idx, encoding="utf-8"))
-              if d.get("feature_cols"):
-                  manifest = d
-                  break
-          assert manifest, "分片仓缺 index.json（feature_cols）"
+          if not manifest:
+              sys.exit("✗ 分片仓缺 index.json（feature_cols）")
+          meta = {"engine": "shard_merge", "feature_cols": manifest["feature_cols"],
+                  "feature_dim": manifest["feature_dim"], "rows": rows,
+                  "date_min": min(s["date_min"] for s in manifest["shards"]),
+                  "date_max": max(s["date_max"] for s in manifest["shards"]),
+                  "completeness": {"min_bars": 120},
+                  "provenance": manifest.get("provenance", {})}
           with open(os.path.join(out_dir, "minute_features_manifest.json"), "w", encoding="utf-8") as fh:
-              json.dump({"engine": "shard_merge", "feature_cols": manifest["feature_cols"],
-                         "feature_dim": manifest["feature_dim"], "rows": rows,
-                         "date_min": min(s["date_min"] for s in manifest["shards"]),
-                         "date_max": max(s["date_max"] for s in manifest["shards"]),
-                         "completeness": {"min_bars": 120},
-                         "provenance": manifest.get("provenance", {})}, fh, ensure_ascii=False, indent=1)
-          print(f"合并 {len(files)} 分片 → {rows:,} 行 × {manifest['feature_dim']} 维")
-          print(f"→ {out}")
+              json.dump(meta, fh, ensure_ascii=False, indent=1)
+          print(f"合并 {rows:,} 行 × {manifest['feature_dim']} 维 → {out}")
+          print(f"日期范围 {meta['date_min']}~{meta['date_max']}")
           PY
 
       - name: Checkout daily kline (t1/data/bulk)
@@ -131,65 +145,126 @@ jobs:
           cp kline-repo/data/bulk/*.gz "$RUNNER_TEMP/bulk/"
           cd "$RUNNER_TEMP/bulk"
           for gz in *.gz; do gzip -dkq "$gz"; done
-          ls -la
+          rm -rf "$GITHUB_WORKSPACE/kline-repo"
+          du -sh . 
           echo "STOCKS_KLINE_BULK=$RUNNER_TEMP/bulk" >> "$GITHUB_ENV"
 
-      - name: Build samples (daily features + 18 minute features)
+      - name: Plan batch windows
         run: |
           set -euo pipefail
-          python3 scripts/limitup_ml_build.py \
-            --minute-features "$RUNNER_TEMP/feat/minute_features.parquet" \
-            --date-from "$DATE_FROM" \
-            --date-to "$DATE_TO" \
-            --out data
-          python3 - <<'PY'
-          import json, sys
-          m = json.load(open("data/lp_meta.json", encoding="utf-8"))
-          mil = m.get("minute") or {}
-          print(f"feature_dim={m['feature_dim']} samples={m['n_samples']:,} "
-                f"positive={m['n_positive']:,} base_rate={m['base_rate_pct']}%")
-          print(f"minute: status={mil.get('status')} coverage={mil.get('coverage_pct')}% "
-                f"dates={mil.get('dates')}")
-          ok = m["feature_dim"] == 33 and m["n_samples"] > 0
-          if not ok:
-              sys.exit(f"✗ 构建结果不可用于训练: feature_dim={m['feature_dim']} n_samples={m['n_samples']}")
-          if mil.get("status") != "ok" and "$ALLOW_INSUFFICIENT" != "true":
-              sys.exit(f"✗ 分钟特征覆盖率 {mil.get('coverage_pct')}% < 20%，按红线不出训练结论")
-          open(".build_summary", "w").write(
-              f"| 指标 | 值 |\n|---|---|\n| feature_dim | {m['feature_dim']} |\n"
-              f"| samples | {m['n_samples']:,} |\n| positive | {m['n_positive']:,} |\n"
-              f"| base_rate | {m['base_rate_pct']}% |\n"
-              f"| minute_coverage | {mil.get('coverage_pct')}% ({mil.get('status')}) |\n")
+          python3 - <<'PY' >> "$GITHUB_ENV"
+          import json, os, sys
+          m = json.load(open(os.path.join(os.environ["RUNNER_TEMP"], "feat", "minute_features_manifest.json"),
+                             encoding="utf-8"))
+          y0, y1 = m["date_min"] // 10000, m["date_max"] // 10000
+          n = max(1, int(os.environ["BATCH_WINDOWS"]))
+          df = int(os.environ["DATE_FROM"] or 0)
+          dt = int(os.environ["DATE_TO"] or 0)
+          span = max(1, y1 - y0 + 1)
+          step = max(1, (span + n - 1) // n)
+          wins = []
+          y = y0
+          while y <= y1:
+              ye = min(y1, y + step - 1)
+              lo = max(df, y * 10000 + 101) if df else y * 10000 + 101
+              hi = min(dt, ye * 10000 + 1231) if dt else ye * 10000 + 1231
+              if lo <= hi:
+                  lab = str(y) if ye == y else f"{y}_{ye}"
+                  wins.append((lo, hi, lab))
+              y = ye + 1
+          if len(wins) < 3:
+              print(f"✗ 只规划出 {len(wins)} 个批次；至少需要 3 批（训练 + 留出）才能出样本外结论",
+                    file=sys.stderr)
+              raise SystemExit(2)
+          print("BATCH_WINS=" + ";".join(f"{lo}:{hi}:{lab}" for lo, hi, lab in wins))
+          print(f"批次 {len(wins)} 个: " + ", ".join(f"{lab}({lo}~{hi})" for lo, hi, lab in wins),
+                file=sys.stderr, flush=True)
           PY
 
-      - name: Train (walk-forward)
+      - name: Build samples per batch
         run: |
           set -euo pipefail
-          python3 scripts/limitup_ml_train.py \
-            --data data \
-            --out data/hist_train_results.json \
-            --folds "$FOLDS"
+          IFS=';' read -ra WINS <<< "$BATCH_WINS"
+          for w in "${WINS[@]}"; do
+            IFS=':' read -r lo hi label <<< "$w"
+            echo "== 批次 $label ($lo~$hi) =="
+            python3 scripts/limitup_ml_build.py \
+              --minute-features "$RUNNER_TEMP/feat/minute_features.parquet" \
+              --date-from "$lo" --date-to "$hi" \
+              --out "data/batches/$label"
+            python3 - "$label" "$ALLOW_INSUFFICIENT" "$RUNNER_TEMP/feat/minute_features_manifest.json" <<'PY'
+          import json, sys
+          label, allow_insufficient, manifest = sys.argv[1], sys.argv[2], sys.argv[3]
+          exp = json.load(open(manifest, encoding="utf-8"))
+          # 构建侧维度 = 日线 15 维 + 分钟列数；不写死 33，分片仓 feature_cols 变了也不会误判
+          want = 15 + len(exp["feature_cols"])
+          m = json.load(open(f"data/batches/{label}/lp_meta.json", encoding="utf-8"))
+          mil = m.get("minute") or {}
+          print(f"  feature_dim={m['feature_dim']}(期望 {want}) samples={m['n_samples']:,} "
+                f"positive={m['n_positive']:,} base_rate={m['base_rate_pct']}% "
+                f"minute={mil.get('status')}({mil.get('coverage_pct')}%)")
+          if m["feature_dim"] != want or m["n_samples"] <= 0:
+              sys.exit(f"✗ 批次 {label} 不可用于训练: feature_dim={m['feature_dim']} "
+                       f"期望 {want} n_samples={m['n_samples']}")
+          if mil.get("status") != "ok" and allow_insufficient != "true":
+              sys.exit(f"✗ 批次 {label} 分钟覆盖率 {mil.get('coverage_pct')}% < 20%，按红线不出训练结论")
+          PY
+          mkdir -p data/batch_meta
+          cp "data/batches/$label/lp_meta.json" "data/batch_meta/$label.lp_meta.json"
+          done
+          cp "$RUNNER_TEMP/feat/minute_features_manifest.json" data/minute_features_manifest.json
+          rm -rf "$RUNNER_TEMP/feat"  # 样本已按批建完，合并后的分钟特征不再需要
+          du -sh data/batches/* | sort -k2
+          df -h . | tail -1
+
+      - name: Train (batched, multi-round, drop trained batches)
+        run: |
+          set -euo pipefail
+          ARGS=(--batch-dir data/batches --rounds "$ROUNDS" --out data/batch_train_results.json)
+          if [ "$DROP_TRAINED" = "true" ]; then ARGS+=(--drop-trained); fi
+          python3 scripts/limitup_ml_train_batch.py "${ARGS[@]}"
           python3 - <<'PY'
           import json
-          d = json.load(open("data/hist_train_results.json", encoding="utf-8"))
-          lines = [f"base_rate={d['base_rate_pct']}% n_features={d.get('n_features')}"]
-          for k in sorted(d["picks"], key=int):
-              p = d["picks"][k]
-              lines.append(f"  Top{k}: precision={p['precision_pct']}% lift={p['lift']}x "
-                           f"n={p['n_selected']}")
+          d = json.load(open("data/batch_train_results.json", encoding="utf-8"))
+          lines = [f"批次 {len(d['batches'])} 个（留出 {len(d['holdout_batches'])}）/ 轮数 {d['rounds']} "
+                   f"/ 采用第 {d['adopted_round']} 轮 / 特征 {d['n_features']} 维",
+                   f"扫描样本 {d['rows_scanned_total']:,}",
+                   f"留出批 {', '.join(d['holdout_batches'])} 出样本外基准次日涨停率 {d['base_rate_pct']}% "
+                   f"（{d['n_eval_rows']:,} 行 / {d['n_eval_days']} 天）"]
+          for r in d["rounds_log"]:
+              opt = r.get("algo_opt") or {}
+              chosen = opt.get("chosen") or {}
+              back = r.get("rolled_back_to_round")
+              s = r["summary"]
+              lines.append(f"  第 {r['round']} 轮留出批: lift@10={s['picks']['10']['lift']}x "
+                           f"precision@10={s['picks']['10']['precision_pct']}% "
+                           + (f"[回退到第 {back} 轮] " if back else "")
+                           + (f"寻优 lr={chosen.get('lr')} l2={chosen.get('l2')} "
+                              f"pos_w={chosen.get('pos_w')} 采纳={opt.get('adopted')}"
+                              if chosen else "未寻优"))
+          ep = d["engine_params"]
+          lines.append(f"engine_params: lr={ep['lr']} l2={ep['l2']} pos_w={ep['pos_w']} epochs={ep['epochs']} "
+                       f"max_neg={ep['max_neg']} minute={ep.get('minute_status')}")
+          lines.append(f"已删批次 {len(d['dropped_batches'])} 个" + (
+              f"，跳过 {len(d['drop_skipped'])} 个" if d["drop_skipped"] else ""))
           print("\n".join(lines))
           with open(".train_summary", "w") as f:
               f.write("```\n" + "\n".join(lines) + "\n```\n")
+          with open(".build_summary", "w") as f:
+              f.write("| 批次 | 角色 | 样本 | 正例 | 基准率 | 日期窗口 |\n|---|---|---|---|---|---|\n")
+              for b in d["batches"]:
+                  f.write(f"| {b['dir']} | {b['role']} | {b['n_samples']:,} | {b['n_positive']} "
+                          f"| {b['base_rate_pct']}% | {b['date_min']}~{b['date_max']} |\n")
           PY
 
       - name: Collect artifacts
         if: always()
         run: |
-          mkdir -p out
-          cp data/hist_train_results.json data/lp_meta.json data/limitup_ml_model.json out/ 2>/dev/null || true
-          cp data/lp_syms.json out/ 2>/dev/null || true
-          cp "$RUNNER_TEMP"/shards/*/index.json out/ 2>/dev/null || true
-          ls -la out
+          mkdir -p out/meta
+          cp data/batch_train_results.json data/limitup_ml_model.json out/ 2>/dev/null || true
+          cp data/batch_meta/*.lp_meta.json out/meta/ 2>/dev/null || true
+          cp data/minute_features_manifest.json out/ 2>/dev/null || true
+          ls -la out out/meta
 
       - name: Upload artifacts
         if: always()
@@ -203,9 +278,9 @@ jobs:
         if: always()
         run: |
           {
-            echo "## Hist minute-feature train"
+            echo "## Hist minute-feature train（分批 + 多轮）"
             echo "- ref: \`${{ github.ref_name }}\` run: ${{ github.run_id }}"
-            echo "- date window: $DATE_FROM ~ $DATE_TO folds=$FOLDS"
+            echo "- date window: $DATE_FROM ~ $DATE_TO / batches=$BATCH_WINDOWS rounds=$ROUNDS drop_trained=$DROP_TRAINED"
             echo ""
             cat .build_summary 2>/dev/null || echo "build 阶段未产出指标"
             echo ""
