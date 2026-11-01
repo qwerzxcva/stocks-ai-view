@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-01T04:36:50+08:00",
+ "ts": "2026-11-01T10:14:29+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 475,
- "n_transmissions": 5,
+ "n_input": 476,
+ "n_transmissions": 9,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,97 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "广药集团旗下达安基因基孔肯雅病毒抗原检测产品获批上市",
+   "source": "财联社电报",
+   "time": "2026-11-01T10:01:19+08:00",
+   "url": "https://www.cls.cn/detail/2521668",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "300030"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "刚果（金）埃博拉疫情已致5026人死亡",
    "source": "财联社电报",
-   "time": "2026-11-01T04:21:21+08:00",
+   "time": "2026-11-01T10:01:19+08:00",
    "url": "https://www.cls.cn/detail/2521645",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -169,7 +257,7 @@
   {
    "title": "孟加拉国登革热疫情持续蔓延",
    "source": "财联社电报",
-   "time": "2026-11-01T04:21:21+08:00",
+   "time": "2026-11-01T10:01:19+08:00",
    "url": "https://www.cls.cn/detail/2521636",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -255,59 +343,16 @@
    }
   },
   {
-   "title": "孟加拉国登革热疫情持续蔓延",
-   "source": "cls",
-   "time": "2026-10-31T21:52:28+08:00",
-   "url": "https://www.cls.cn/detail/2521636",
-   "transmission_id": "epidemic",
-   "label": "疫情",
+   "title": "二十国集团外长会未就地缘和经济安全问题达成共识",
+   "source": "财联社电报",
+   "time": "2026-11-01T10:01:19+08:00",
+   "url": "https://www.cls.cn/detail/2521665",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "300030"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
+   "direct_bull": [],
    "inverse_bull": [],
    "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002627"
-     ]
-    },
     {
      "sector": "航空",
      "stocks": [
@@ -323,102 +368,10 @@
      ]
     },
     {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306",
-      "600258"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-10-30",
-    "event_date": "2026-10-31",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "刚果（金）埃博拉疫情已致5026人死亡",
-   "source": "cls",
-   "time": "2026-10-31T22:53:59+08:00",
-   "url": "https://www.cls.cn/detail/2521645",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "300030"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
      "sector": "旅游",
      "stocks": [
       "002627"
      ]
-    },
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306",
-      "600258"
-     ]
     }
    ],
    "hedge": [],
@@ -426,15 +379,179 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-10-30",
-    "event_date": "2026-10-31",
+    "event_date": "2026-11-01",
     "matched_codes": []
    }
   },
   {
    "title": "鲁比奥称特朗普尚未就针对伊朗的军事行动做出决定",
    "source": "财联社电报",
-   "time": "2026-11-01T04:21:21+08:00",
+   "time": "2026-11-01T10:01:19+08:00",
    "url": "https://www.cls.cn/detail/2521655",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美国总统特朗普：正在了解币安的情况，不担心币安。\n\n伊朗想达成协议，正在了解情况，我们不着急。\n\n仍有一两处地点需要处理，正在关注镐山。\n\n俄乌冲突将在不久后结束。",
+   "source": "华尔街见闻",
+   "time": "2026-11-01T09:54:53+08:00",
+   "url": "https://wallstreetcn.com/livenews/3192000",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美军把未来战争交给马斯克",
+   "source": "微博热搜",
+   "time": "2026-11-01T10:04:03+08:00",
+   "url": "https://s.weibo.com/weibo?q=%23%E7%BE%8E%E5%86%9B%E6%8A%8A%E6%9C%AA%E6%9D%A5%E6%88%98%E4%BA%89%E4%BA%A4%E7%BB%99%E9%A9%AC%E6%96%AF%E5%85%8B%23&t=31&band_rank=30&Refer=top",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "德国多地抗议爆发冲突 商铺遭砸抢",
+   "source": "今日头条",
+   "time": "2026-11-01T09:49:00+08:00",
+   "url": "https://www.toutiao.com/trending/7702971241581265458/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-01",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "伊朗最高领袖穆杰塔巴下令更新军事目标库，准备应对新威胁",
+   "source": "凤凰网",
+   "time": "2026-11-01T10:01:08+08:00",
+   "url": "https://original.ifeng.com/c/8xgvWL9453N",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
