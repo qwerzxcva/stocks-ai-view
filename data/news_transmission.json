@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-02T10:29:11+08:00",
+ "ts": "2026-11-02T15:34:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 482,
- "n_transmissions": 0,
+ "n_transmissions": 1,
  "n_rules": 16,
  "rules": [
   {
@@ -77,5 +77,56 @@
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
- "transmissions": []
+ "transmissions": [
+  {
+   "title": "阿联酋ADNOC首席执行官：霍尔木兹海峡中断以来，全球库存已消耗近10亿桶。\n\n全球供应缓冲已大幅消耗。\n\n部分市场柴油库存处于35年来同期低点。\n\n中断后，航运和物流成本占每桶原",
+   "source": "华尔街见闻",
+   "time": "2026-11-02T15:34:01+08:00",
+   "url": "https://wallstreetcn.com/livenews/3192276",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688175"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "688708"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "600576",
+      "301262"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-10-30",
+    "event_date": "2026-11-02",
+    "matched_codes": []
+   }
+  }
+ ]
 }
