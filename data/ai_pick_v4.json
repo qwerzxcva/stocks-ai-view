@@ -1,93 +1,19 @@
 {
-  "ts": "2026-10-31T05:33:14+08:00",
-  "engine": "ai_pick v4 (移植自 jiegengxiangjianxue1/stocks-algo)",
-  "date": "2026-10-28",
-  "data_date": "2026-10-28",
+  "ts": "2026-11-02T10:37:46+08:00",
+  "engine": "ai_pick v4 (移植自 stocks-algo)",
+  "date": "2026-10-29",
+  "data_date": "2026-10-29",
   "stale": false,
   "provenance": {
     "source": "bulk day_qfq",
     "confidence": "high",
-    "snapshot_ts": "2026-10-31T05:33:14+08:00"
+    "snapshot_ts": "2026-11-02T10:37:46+08:00"
   },
-  "n_scanned": 274,
-  "n_candidates": 4,
-  "global": {
-    "global_score": 0.41,
-    "global_mood": "neutral",
-    "pos_weight": 0.25,
-    "suggest": "全球中性: 维持半仓纪律"
-  },
-  "adapt": {
-    "note": "无对账数据"
-  },
-  "cycle_note": "周期偏空(5/5指数): 收紧至240日位<45%",
-  "picks": [
-    {
-      "code": "000599",
-      "symbol": "sz000599",
-      "date": "2026-10-28",
-      "name": "青岛双星",
-      "price": 4.21,
-      "ret_pct": 3.44,
-      "vratio": 1.97,
-      "pos240_pct": 21.3,
-      "close_pos": 0.483,
-      "mom60_pct": -4.97,
-      "zt_genes": 0,
-      "score": 0.55,
-      "pattern_bonus": 0
-    },
-    {
-      "code": "605006",
-      "symbol": "sh605006",
-      "date": "2026-10-28",
-      "name": "山东玻纤",
-      "price": 12.8,
-      "ret_pct": 3.14,
-      "vratio": 1.52,
-      "pos240_pct": 16.2,
-      "close_pos": 0.793,
-      "mom60_pct": -7.04,
-      "zt_genes": 0,
-      "score": 0.4167,
-      "pattern_bonus": 0
-    },
-    {
-      "code": "603959",
-      "symbol": "sh603959",
-      "date": "2026-10-28",
-      "name": "ST百利",
-      "price": 3.68,
-      "ret_pct": 2.79,
-      "vratio": 1.83,
-      "pos240_pct": 9.6,
-      "close_pos": 0.478,
-      "mom60_pct": -12.8,
-      "zt_genes": 0,
-      "score": 0.3667,
-      "pattern_bonus": 0
-    },
-    {
-      "code": "000045",
-      "symbol": "sz000045",
-      "date": "2026-10-28",
-      "name": "深纺织Ａ",
-      "price": 9.29,
-      "ret_pct": 2.54,
-      "vratio": 1.58,
-      "pos240_pct": 9.5,
-      "close_pos": 0.588,
-      "mom60_pct": -15.08,
-      "zt_genes": 0,
-      "score": 0.3667,
-      "pattern_bonus": 0
-    }
-  ],
+  "n_scanned": 91,
+  "n_candidates": 0,
+  "picks": [],
+  "note": "无候选 (可能非交易日或市场不满足强市闸门)",
   "meta": {
-    "source": "bulk day_qfq_*.csv (3149 只)",
-    "formula": "量比0.20 + 60日RPS0.20 + 240日低位0.20 + 涨停基因0.15 + 收盘位置0.15 + 换手温和0.10",
-    "hard_rules": "未涨停 + 涨幅0.5-5% + 240日位<60% + 量比1.5-2.5",
-    "pattern_bonus": "停机坪/高而窄旗形+0.08, 无大幅回撤+0.04",
-    "caveat": "评分为统计排序, 非必然上涨; 不构成投资建议"
+    "source": "bulk day_qfq_*.csv"
   }
 }
