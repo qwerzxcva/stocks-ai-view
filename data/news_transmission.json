@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-03T23:37:07+08:00",
+ "ts": "2026-11-03T23:48:05+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 475,
  "n_transmissions": 9,
@@ -71,7 +71,7 @@
   }
  ],
  "flow_evidence": {
-  "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+  "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
   "trade_date": "2026-11-03",
   "status": "dated_rows_available",
   "n_dated_rows": 24
@@ -124,7 +124,7 @@
    ],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -167,7 +167,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -209,7 +209,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -218,7 +218,7 @@
   {
    "title": "巴克莱银行：维持2026年布伦特原油每桶100美元和2027年每桶85美元的预测。",
    "source": "华尔街见闻",
-   "time": "2026-11-03T23:36:51+08:00",
+   "time": "2026-11-03T23:34:31+08:00",
    "url": "https://wallstreetcn.com/livenews/3193459",
    "transmission_id": "oil_up",
    "label": "油价上涨",
@@ -251,49 +251,49 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
    }
   },
   {
-   "title": "九寨沟冲突全员失态",
+   "title": "油价上涨甲醇电混开始流行",
    "source": "微博热搜",
-   "time": "2026-11-03T23:16:26+08:00",
-   "url": "https://s.weibo.com/weibo?q=%23%E4%B9%9D%E5%AF%A8%E6%B2%9F%E5%86%B2%E7%AA%81%E5%85%A8%E5%91%98%E5%A4%B1%E6%80%81%23&t=31&band_rank=12&Refer=top",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-11-03T23:47:54+08:00",
+   "url": "https://s.weibo.com/weibo?q=%23%E6%B2%B9%E4%BB%B7%E4%B8%8A%E6%B6%A8%E7%94%B2%E9%86%87%E7%94%B5%E6%B7%B7%E5%BC%80%E5%A7%8B%E6%B5%81%E8%A1%8C%23&t=31&band_rank=10&Refer=top",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
    "direct_bull": [],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "302132"
+      "900945"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "化工",
      "stocks": [
-      "603402"
+      "603382"
      ]
     }
    ],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -302,7 +302,7 @@
   {
    "title": "俄女高官访华就日本军事化加速发声",
    "source": "今日头条",
-   "time": "2026-11-03T23:16:33+08:00",
+   "time": "2026-11-03T23:47:57+08:00",
    "url": "https://www.toutiao.com/trending/7702921083061616676/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -335,7 +335,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -344,7 +344,7 @@
   {
    "title": "期中“烤”｜战争、物价与流量：一手托起特朗普的美国播客开始冷落他",
    "source": "澎湃新闻",
-   "time": "2026-11-03T23:36:59+08:00",
+   "time": "2026-11-03T23:47:59+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34382628",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -377,7 +377,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -386,7 +386,7 @@
   {
    "title": "警方介入调查“九寨沟景区游客冲突事件”，九寨沟管理局：事发后有工作人员到场处理并报警",
    "source": "澎湃新闻",
-   "time": "2026-11-03T23:36:59+08:00",
+   "time": "2026-11-03T23:47:59+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34394511",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -419,7 +419,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
@@ -461,7 +461,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,dc_stock_rank,em_index_flow,dc_board_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-03",
     "event_date": "2026-11-03",
     "matched_codes": []
