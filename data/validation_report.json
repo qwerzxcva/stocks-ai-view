@@ -1,10 +1,10 @@
 {
-  "ts": "2026-11-03T23:32:57+08:00",
+  "ts": "2026-11-03T23:38:28+08:00",
   "engine": "numeric_validator v1",
   "n_files": 175,
-  "n_issues": 471,
+  "n_issues": 473,
   "by_severity": {
-    "critical": 394,
+    "critical": 396,
     "warning": 75,
     "info": 2
   },
@@ -35,9 +35,9 @@
     },
     {
       "file": "all_sources.json",
-      "field": "data.fund[275].field_sources.price",
+      "field": "data.fund[50].field_sources.price",
       "severity": "critical",
-      "msg": "非数值类型 str: 'jisilu_cb_adjust'"
+      "msg": "非数值类型 str: 'jisilu_cb_list_new'"
     },
     {
       "file": "engine_spec.json",
@@ -394,10 +394,22 @@
       "msg": "越界 853426504.0 不在 [0, 10000000.0]"
     },
     {
+      "file": "moneyflow.json",
+      "field": "top_inflow[1].chg_pct",
+      "severity": "critical",
+      "msg": "日涨跌幅越界 397.94 不在 [-35, 35]"
+    },
+    {
       "file": "morning_review.json",
       "field": "groups.limit_up",
       "severity": "critical",
       "msg": "非数值类型 dict: {'n': 17, 'n_up': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.59, 'rows': [{'code': '300006', 'name': '莱美药业"
+    },
+    {
+      "file": "realtime_minute.json",
+      "field": "quotes[0].chg_pct",
+      "severity": "critical",
+      "msg": "日涨跌幅越界 397.939 不在 [-35, 35]"
     },
     {
       "file": "recent_mainlines.json",
@@ -1796,18 +1808,6 @@
       "field": "data.quote[37].chg_pct",
       "severity": "critical",
       "msg": "日涨跌幅越界 128.0 不在 [-35, 35]"
-    },
-    {
-      "file": "shard_b.json",
-      "field": "data.quote[38].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -127.0 不在 [-35, 35]"
-    },
-    {
-      "file": "shard_b.json",
-      "field": "data.quote[39].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -167.0 不在 [-35, 35]"
     }
   ],
   "rules": {
