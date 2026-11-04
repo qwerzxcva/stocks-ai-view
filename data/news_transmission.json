@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-05T06:23:29+08:00",
+ "ts": "2026-11-05T06:39:39+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 478,
- "n_transmissions": 6,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,58 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "周四你需要知道的隔夜全球要闻：美众议院民主党领袖誓言将撤销特朗普关税、结束伊朗战争，油价重挫超8%；美股走势分化，大型科技股飙升，存储、光通信等AI概念下挫",
+   "source": "财联社电报",
+   "time": "2026-11-05T06:39:25+08:00",
+   "url": "https://www.cls.cn/detail/2525639",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688629"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600391"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000524"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
+    "trade_date": "2026-11-04",
+    "event_date": "2026-11-05",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "媒体评九寨沟游客冲突处理结果",
    "source": "今日头条",
-   "time": "2026-11-05T06:07:50+08:00",
+   "time": "2026-11-05T06:39:30+08:00",
    "url": "https://www.toutiao.com/trending/7704098013299393034/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -130,7 +179,7 @@
   {
    "title": "伊朗议长：美选举结果表明对战争说不",
    "source": "今日头条",
-   "time": "2026-11-05T06:07:50+08:00",
+   "time": "2026-11-05T06:39:30+08:00",
    "url": "https://www.toutiao.com/trending/7704196344864620598/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -262,91 +311,6 @@
      "sector": "旅游",
      "stocks": [
       "000524"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
-    "trade_date": "2026-11-04",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "周四你需要知道的隔夜全球要闻：美众议院民主党领袖誓言将撤销特朗普关税、结束伊朗战争，油价重挫超8%；美股走势分化，大型科技股飙升，存储、光通信等AI概念下挫",
-   "source": "cls",
-   "time": "2026-11-05T06:18:50+08:00",
-   "url": "https://www.cls.cn/detail/2525639",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688629"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600391"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000524"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
-    "trade_date": "2026-11-04",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "布伦特原油期货跌幅扩大至10%，逼近93美元。WTI原油日内跌幅达9.0%，报87.38美元/桶。",
-   "source": "wallstreetcn",
-   "time": "2026-11-05T01:41:40+08:00",
-   "url": "https://wallstreetcn.com/live/3194427",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
      ]
     }
    ],
