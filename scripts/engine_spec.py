@@ -48,7 +48,7 @@ ROOT = os.path.dirname(HERE)
 
 # 规格版本：任何会改变评分结果的定义变更都必须升版。
 # 端上启动时比对 spec_version，不一致就标「算法漂移」而不是静默用旧逻辑。
-SPEC_VERSION = "3.2.1"
+SPEC_VERSION = "3.2.2"
 SPEC_ID = "skapp-engine-spec"
 
 # 端上三层书籍信号票（反转 MTR / 涨停结构 / 订单流近似）在中枢内的权重。
@@ -70,6 +70,7 @@ BOOK_WEIGHT = 0.0
 # 也可一行关掉（设为 0 即不计票）。
 FLOW_WEIGHT = 0.07
 TAPE_WEIGHT = 0.05
+BLEND = {"central": 1.0, "flow": 0.0, "tape": 0.0}
 
 
 def load_calibration():
@@ -617,6 +618,7 @@ def build_spec():
     # 以校准值为准。
     weights.setdefault("flow", FLOW_WEIGHT)
     weights.setdefault("tape", TAPE_WEIGHT)
+    weights.setdefault("momentum_overheat", 1.0)
     return {
         "spec_id": SPEC_ID,
         "spec_version": SPEC_VERSION,
@@ -626,6 +628,7 @@ def build_spec():
         "aggregation": AGGREGATION,
         "runtime": RUNTIME,
         "weights": weights,
+        "blend": BLEND,
         "weights_source": os.path.relpath(WEIGHTS_FILE, ROOT) if weights else "equal",
         "engines": VOTE_ENGINES,
         "products": PRODUCTS,

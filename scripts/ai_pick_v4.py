@@ -191,6 +191,7 @@ def main():
                "stale": as_of is None,
                "provenance": {"source": "bulk day_qfq", "confidence": "high" if as_of else "insufficient", "snapshot_ts": now_ts},
                "n_scanned": len(feats), "n_candidates": 0, "picks": [],
+               "global": None, "adapt": None, "cycle_note": None,
                "note": "无候选 (可能非交易日或市场不满足强市闸门)",
                "meta": {"source": "bulk day_qfq_*.csv"}}
         os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
