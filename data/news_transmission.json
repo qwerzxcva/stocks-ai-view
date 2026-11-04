@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-04T23:42:13+08:00",
+ "ts": "2026-11-04T23:53:07+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 478,
- "n_transmissions": 2,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -71,7 +71,7 @@
   }
  ],
  "flow_evidence": {
-  "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+  "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
   "trade_date": "2026-11-04",
   "status": "dated_rows_available",
   "n_dated_rows": 24
@@ -81,7 +81,7 @@
   {
    "title": "媒体评九寨沟游客冲突处理结果",
    "source": "今日头条",
-   "time": "2026-11-04T23:15:50+08:00",
+   "time": "2026-11-04T23:52:59+08:00",
    "url": "https://www.toutiao.com/trending/7704098013299393034/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -121,7 +121,56 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
+    "trade_date": "2026-11-04",
+    "event_date": "2026-11-04",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "万斯谈论共和党在美国中期选举失败的原因：战争、与以色列的关系",
+   "source": "wallstreetcn",
+   "time": "2026-11-04T23:40:22+08:00",
+   "url": "https://wallstreetcn.com/live/3194377",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688629"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600391"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000524"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-04",
     "event_date": "2026-11-04",
     "matched_codes": []
@@ -170,7 +219,7 @@
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "source": "dc_stock_flow,em_fflow_rank,em_sector_flow",
     "trade_date": "2026-11-04",
     "event_date": "2026-11-04",
     "matched_codes": []
