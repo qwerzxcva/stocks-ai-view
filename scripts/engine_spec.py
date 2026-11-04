@@ -48,7 +48,7 @@ ROOT = os.path.dirname(HERE)
 
 # 规格版本：任何会改变评分结果的定义变更都必须升版。
 # 端上启动时比对 spec_version，不一致就标「算法漂移」而不是静默用旧逻辑。
-SPEC_VERSION = "3.2.2"
+SPEC_VERSION = "3.3.0"
 SPEC_ID = "skapp-engine-spec"
 
 # 端上三层书籍信号票（反转 MTR / 涨停结构 / 订单流近似）在中枢内的权重。
@@ -98,14 +98,14 @@ import limit_caliber as _LC  # noqa: E402  涨停/主板口径的唯一代码来
 
 # ── 聚合与打分（唯一来源，两端都读这里）─────────────────────────────
 AGGREGATION = {
-    "kind": "weighted_vote",
+    "kind": "family_weighted_vote",
     # score = score_center + score_scale * base * (resonance_base + resonance_span * resonance)
     "score_center": 50.0,
     "score_scale": 50.0,
     "resonance_base": 0.6,
     "resonance_span": 0.4,
-    # resonance = max(bull, bear) / (bull + bear)；无方向票时为 0
-    "resonance_kind": "directional_share",
+    # resonance = max(familyBull, familyBear) / (familyBull + familyBear)；无方向族时为 0
+    "resonance_kind": "family_directional_share",
     # 信号档：>= bullish 为多，<= bearish 为空，其余中性
     "signal_bullish": 65.0,
     "signal_bearish": 35.0,
@@ -309,6 +309,25 @@ VOTE_ENGINES = [
         "note": "端上用 snapshot 的 atLimitUp 近似，但拿不到连板数 → 不作主票",
     },
 ]
+
+# 补全所有可进入聚合的 weight_key；external 不合并为同一族。
+VOTE_ENGINES.extend([
+    {"id": "momentum_overheat", "family": "momentum", "weight_key": "momentum_overheat",
+     "availability": ["cloud", "device"], "params": {},
+     "vote_rule": "below_ma60 的过热分支 → -1", "strength_rule": "min(dev/100,0.8)"},
+    {"id": "limit_down_pool", "family": "external", "weight_key": "InDTPool",
+     "availability": ["cloud"], "params": {},
+     "vote_rule": "在跌停池 → -1", "strength_rule": "limit_pool.dt_strength"},
+    {"id": "flow", "family": "external", "weight_key": "flow",
+     "availability": ["device"], "params": {},
+     "vote_rule": "端上资金流代理票", "strength_rule": "由 flow 引擎输出"},
+    {"id": "tape", "family": "external", "weight_key": "tape",
+     "availability": ["device"], "params": {},
+     "vote_rule": "端上盘口代理票", "strength_rule": "由 tape 引擎输出"},
+    {"id": "book", "family": "external", "weight_key": "book",
+     "availability": ["device"], "params": {},
+     "vote_rule": "端上书籍衍生层；默认禁用投票", "strength_rule": "由 book 引擎输出"},
+])
 
 # ── 产物注册表（product registry）────────────────────────────────────
 # 一份数据产物的「契约」：谁写、算什么层、顶层字段、依赖、端上是否消费。
@@ -611,7 +630,11 @@ def build_spec():
     # cap[0.6,1.5] 归一，塞一个非技术票进去会破坏它的归一假设。
     if "book" not in device_ids:
         device_ids.append("book")
-    weights = dict(load_weights())
+    loaded_weights = load_weights()
+    weights = dict(loaded_weights)
+    default_weight_keys = {"book"}
+    default_weight_keys.update(key for key in ("flow", "tape", "momentum_overheat")
+                               if key not in loaded_weights)
     weights["book"] = BOOK_WEIGHT
     # flow / tape：缺键时端上按 1.0 兜底（见 FLOW_WEIGHT 处的复盘注释），这里显式下发，
     # 让中枢内权重与 blend 层一致。用 setdefault：若 engine_weights.json 里将来真有这两键，
@@ -619,6 +642,11 @@ def build_spec():
     weights.setdefault("flow", FLOW_WEIGHT)
     weights.setdefault("tape", TAPE_WEIGHT)
     weights.setdefault("momentum_overheat", 1.0)
+    for engine in VOTE_ENGINES:
+        key = engine["weight_key"]
+        if key not in weights:
+            weights[key] = 1.0
+            default_weight_keys.add(key)
     return {
         "spec_id": SPEC_ID,
         "spec_version": SPEC_VERSION,
@@ -629,7 +657,8 @@ def build_spec():
         "runtime": RUNTIME,
         "weights": weights,
         "blend": BLEND,
-        "weights_source": os.path.relpath(WEIGHTS_FILE, ROOT) if weights else "equal",
+        "weights_source": os.path.relpath(WEIGHTS_FILE, ROOT) if loaded_weights else "equal",
+        "default_weight_keys": sorted(default_weight_keys),
         "engines": VOTE_ENGINES,
         "products": PRODUCTS,
         "calibers": CALIBERS,
@@ -799,6 +828,9 @@ def expect_from_bars(rows):
         "bull": result["bull"],
         "bear": result["bear"],
         "neutral": result["neutral"],
+        "familyBull": result["familyBull"],
+        "familyBear": result["familyBear"],
+        "familyNeutral": result["familyNeutral"],
         # why 文本不进黄金向量：它是给人看的，措辞变化不该让 parity 变红
         "votes": [{"indicator": v["indicator"], "vote": v["vote"],
                    "strength": v["strength"]} for v in votes],

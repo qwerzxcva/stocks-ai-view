@@ -29,6 +29,7 @@ import argparse
 import bisect
 import pickle
 import json
+import math
 import os
 import sys
 import tempfile
@@ -40,6 +41,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 
 import indicators_ext as I
+from engine_spec import AGGREGATION, VOTE_ENGINES
 
 # 指标 → (方向判断函数, 权重)
 # 方向判断输入是指标序列与价格序列, 返回 (vote, strength, why)
@@ -130,11 +132,36 @@ def capital_flow_consistency(code, data_dir=None):
         return None
     flows = mf.get("flows") or {}
     key = next((k for k in flows if _code_match(code, k)), None)
-    if not key:
-        return None
-    rec = flows[key]
-    net = float(rec.get("net_main_wan") or 0)
-    net3 = float(rec.get("net3_wan") or 0)
+    if key:
+        rec = flows[key]
+        net = float(rec.get("net_main_wan") or 0)
+        net3 = float(rec.get("net3_wan") or 0)
+    else:
+        stocks = mf.get("stocks") or {}
+        key = next((k for k in stocks if _code_match(code, k)), None)
+        if key is None:
+            return None
+        rec = stocks[key]
+        if not rec.get("source"):
+            return None
+        try:
+            stamp = datetime.fromisoformat(mf["ts"])
+            age = (datetime.now(CST) - stamp).total_seconds()
+            if not 0 <= age <= 36 * 3600:
+                return None
+            series = rec.get("daily_series") or []
+            by_date = {str(row["date"]): float(row["main_net"]) for row in series}
+            dates = sorted(by_date)[-3:]
+            if len(dates) != 3 or dates[-1] != stamp.astimezone(CST).date().isoformat():
+                return None
+            if any(not math.isfinite(by_date[day]) for day in dates):
+                return None
+            if (datetime.fromisoformat(dates[-1]) - datetime.fromisoformat(dates[0])).days > 7:
+                return None
+            net = by_date[dates[-1]] / 10000.0
+            net3 = sum(by_date[day] for day in dates) / 10000.0
+        except (KeyError, TypeError, ValueError):
+            return None
     strength = min(abs(net3) / max(abs(net) * 5, 1e6) * 1.0, 1.0) if net else 0.0
     if net3 > 0 and net > 0:
         return (1, max(0.2, strength), f"主力净流入 {net3:+.0f}万 (3日), 当日 {net:+.0f}万 方向一致")
@@ -380,34 +407,96 @@ def build_votes(close, high, low, vol, source_info=None, code_bare=""):
     return votes
 
 
+def aggregate_votes(votes, weights, spec=None):
+    """按规格聚合有效票；不读取行情、权重文件，也不修改输入。"""
+    aggregation = AGGREGATION if spec is None else spec["aggregation"]
+    engines = VOTE_ENGINES if spec is None else spec.get("engines", [])
+    kind = aggregation["kind"]
+    if kind not in ("weighted_vote", "family_weighted_vote"):
+        raise ValueError(f"Unsupported aggregation kind: {kind}")
+    family_mode = kind == "family_weighted_vote"
+    family_by_key = {e["weight_key"]: e.get("family", "") for e in engines}
+    weights = weights or {}
+    seen = set()
+    accepted = []
+    missing = set()
+    for item in votes:
+        indicator = item.get("indicator")
+        if not isinstance(indicator, str) or not indicator:
+            continue
+        if family_mode:
+            if indicator in seen:
+                continue
+            seen.add(indicator)
+        direction, strength = item.get("vote"), item.get("strength")
+        weight = weights.get(indicator, 1.0)
+        if (direction not in (-1, 0, 1)
+                or not isinstance(strength, (int, float))
+                or not math.isfinite(strength) or not 0 <= strength <= 1
+                or not isinstance(weight, (int, float))
+                or not math.isfinite(weight) or weight <= 0):
+            continue
+        accepted.append((item, weight))
+        if indicator not in weights:
+            missing.add(indicator)
+    if not accepted:
+        return None
+
+    bull = sum(item["vote"] > 0 for item, _ in accepted)
+    bear = sum(item["vote"] < 0 for item, _ in accepted)
+    family_bull = family_bear = family_neutral = 0
+    if family_mode:
+        groups = {}
+        for item, weight in accepted:
+            indicator = item["indicator"]
+            family = family_by_key.get(indicator, "")
+            key = ("family", family) if family and family != "external" else ("indicator", indicator)
+            groups.setdefault(key, []).append((item, weight))
+        family_values = []
+        for members in groups.values():
+            family_weight = max(weight for _, weight in members)
+            # 先缩放避免多个合法大权重相加溢出；不改变加权均值。
+            denominator = sum(weight / family_weight for _, weight in members)
+            net = sum((weight / family_weight) * item["vote"] * item["strength"]
+                      for item, weight in members) / denominator
+            family_values.append((net, family_weight))
+            if net > 1e-12:
+                family_bull += 1
+            elif net < -1e-12:
+                family_bear += 1
+            else:
+                family_neutral += 1
+        scale = max(weight for _, weight in family_values)
+        base = sum((weight / scale) * net for net, weight in family_values) / sum(
+            weight / scale for _, weight in family_values)
+        directional = family_bull + family_bear
+        resonance = max(family_bull, family_bear) / directional if directional else 0.0
+    else:
+        num = sum(weight * item["vote"] * item["strength"] for item, weight in accepted)
+        den = sum(weight for _, weight in accepted)
+        base = num / den
+        directional = bull + bear
+        resonance = max(bull, bear) / directional if directional else 0.0
+    if not math.isfinite(base):
+        return None
+    factor = aggregation.get("resonance_base", 0.6) + aggregation.get("resonance_span", 0.4) * resonance
+    score = aggregation.get("score_center", 50.0) + aggregation.get("score_scale", 50.0) * base * factor
+    rounding = aggregation.get("round", {})
+    return {
+        "score": round(score, rounding.get("score", 1)),
+        "raw": round(base, 4),
+        "resonance": round(resonance, rounding.get("resonance", 3)),
+        "bull": bull, "bear": bear, "neutral": len(accepted) - bull - bear,
+        "familyBull": family_bull, "familyBear": family_bear, "familyNeutral": family_neutral,
+        "votes": [item for item, _ in accepted],
+        "missing_weight_keys": sorted(missing),
+    }
+
+
 def score_stock(close, high, low, vol, weights=None, source_info=None, code_bare=""):
     """多指标共振评分（含外部数据增强）。"""
     votes = build_votes(close, high, low, vol, source_info, code_bare)
-    if not votes:
-        return None
-    w = weights or {}
-    num = den = 0.0
-    bull = bear = 0
-    for v in votes:
-        wi = w.get(v["indicator"], 1.0)
-        num += wi * v["vote"] * v["strength"]
-        den += wi
-        if v["vote"] > 0:
-            bull += 1
-        elif v["vote"] < 0:
-            bear += 1
-    directional = bull + bear
-    resonance = (max(bull, bear) / directional) if directional else 0.0
-    base = num / den if den else 0.0                     # [-1, 1]
-    factor = 0.6 + 0.4 * resonance                       # 分歧降权
-    score = round(50 + 50 * base * factor, 1)            # 映射到 0-100
-    return {
-        "score": score,
-        "raw": round(base, 4),
-        "resonance": round(resonance, 3),
-        "bull": bull, "bear": bear, "neutral": len(votes) - directional,
-        "votes": votes,
-    }
+    return aggregate_votes(votes, weights)
 
 
 # ─── 批量: 从本地K线扫全市场 ──────────────────────────────────────
@@ -845,7 +934,7 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, ensure_ascii=False, indent=2)
 
-    print(f"\n=== TOP 10 (共振度优先, 仅新鲜K线) ===")
+    print("\n=== TOP 10 (共振度优先, 仅新鲜K线) ===")
     for r in fresh[:10]:
         print(f"  {r['code']} score={r['score']:5.1f} 共振={r['resonance']:.2f} "
               f"多{r['bull']}/空{r['bear']}/中{r['neutral']} 价={r['price']} "

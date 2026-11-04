@@ -1,16 +1,16 @@
 {
   "spec_id": "skapp-engine-spec",
-  "spec_version": "3.2.2",
-  "generated_at": "2026-11-04T02:02:59+08:00",
+  "spec_version": "3.3.0",
+  "generated_at": "2026-11-04T21:44:08+08:00",
   "source": "stocks-ai-view/scripts/engine_spec.py",
   "reference_impl": "stocks-ai-view/scripts/engine_v5.py (build_votes/score_stock)",
   "aggregation": {
-    "kind": "weighted_vote",
+    "kind": "family_weighted_vote",
     "score_center": 50.0,
     "score_scale": 50.0,
     "resonance_base": 0.6,
     "resonance_span": 0.4,
-    "resonance_kind": "directional_share",
+    "resonance_kind": "family_directional_share",
     "signal_bullish": 65.0,
     "signal_bearish": 35.0,
     "round": {
@@ -48,7 +48,12 @@
     "book": 0.0,
     "flow": 0.07,
     "tape": 0.05,
-    "momentum_overheat": 1.0
+    "momentum_overheat": 1.0,
+    "below_ma60": 1.0,
+    "SectorResonance": 1.0,
+    "CapitalFlowConsistency": 1.0,
+    "InZTPool": 1.0,
+    "InDTPool": 1.0
   },
   "blend": {
     "central": 1.0,
@@ -56,6 +61,17 @@
     "tape": 0.0
   },
   "weights_source": "data/engine_weights.json",
+  "default_weight_keys": [
+    "CapitalFlowConsistency",
+    "InDTPool",
+    "InZTPool",
+    "SectorResonance",
+    "below_ma60",
+    "book",
+    "flow",
+    "momentum_overheat",
+    "tape"
+  ],
   "engines": [
     {
       "id": "supertrend",
@@ -415,6 +431,62 @@
       "vote_rule": "在涨停池→+1（强度按连板数）；在跌停池→-1",
       "strength_rule": "min(lianban/6,1) / dt_strength",
       "note": "端上用 snapshot 的 atLimitUp 近似，但拿不到连板数 → 不作主票"
+    },
+    {
+      "id": "momentum_overheat",
+      "family": "momentum",
+      "weight_key": "momentum_overheat",
+      "availability": [
+        "cloud",
+        "device"
+      ],
+      "params": {},
+      "vote_rule": "below_ma60 的过热分支 → -1",
+      "strength_rule": "min(dev/100,0.8)"
+    },
+    {
+      "id": "limit_down_pool",
+      "family": "external",
+      "weight_key": "InDTPool",
+      "availability": [
+        "cloud"
+      ],
+      "params": {},
+      "vote_rule": "在跌停池 → -1",
+      "strength_rule": "limit_pool.dt_strength"
+    },
+    {
+      "id": "flow",
+      "family": "external",
+      "weight_key": "flow",
+      "availability": [
+        "device"
+      ],
+      "params": {},
+      "vote_rule": "端上资金流代理票",
+      "strength_rule": "由 flow 引擎输出"
+    },
+    {
+      "id": "tape",
+      "family": "external",
+      "weight_key": "tape",
+      "availability": [
+        "device"
+      ],
+      "params": {},
+      "vote_rule": "端上盘口代理票",
+      "strength_rule": "由 tape 引擎输出"
+    },
+    {
+      "id": "book",
+      "family": "external",
+      "weight_key": "book",
+      "availability": [
+        "device"
+      ],
+      "params": {},
+      "vote_rule": "端上书籍衍生层；默认禁用投票",
+      "strength_rule": "由 book 引擎输出"
     }
   ],
   "products": [
@@ -1296,12 +1368,16 @@
     "pivot",
     "vwma",
     "below_ma60",
+    "momentum_overheat",
+    "flow",
+    "tape",
     "book"
   ],
   "cloud_only_engines": [
     "sector_resonance",
     "capital_flow",
-    "limit_pool"
+    "limit_pool",
+    "limit_down_pool"
   ],
   "pipeline": [
     {

@@ -104,6 +104,12 @@ jobs:
           test -d ../skapp-app || { echo "::error::端上仓 skapp-app 未检出（检查 checkout 步骤与 secrets.GH_TOKEN）"; exit 1; }
           python3 scripts/parity_matrix.py
 
+      - name: Family aggregation and collector contract regressions
+        run: |
+          python3 -m unittest discover -s tests -p test_family_aggregation.py
+          python3 -m unittest discover -s tests -p test_ai_pick_empty_contract.py
+          python3 scripts/test_central_weight_contract.py
+
       - name: 3/3 单独复述唯一写入方的整体判定
         run: python3 scripts/sync_parity_artifacts.py check
 
