@@ -1,19 +1,19 @@
 {
   "latest": {
-    "date": "2026-11-03",
-    "limit_up": 48,
-    "limit_down": 17,
-    "limit_up_hist": 55,
-    "limit_down_hist": 124,
-    "broken": 34,
-    "seal_rate_pct": 58.5,
-    "advance": 1996,
-    "decline": 3245,
-    "flat": 135,
-    "up_pct": 37.1,
-    "amount_yi": 17034.4,
+    "date": "2026-11-04",
+    "limit_up": 118,
+    "limit_down": 10,
+    "limit_up_hist": 433,
+    "limit_down_hist": 20,
+    "broken": 33,
+    "seal_rate_pct": 78.1,
+    "advance": 4524,
+    "decline": 740,
+    "flat": 113,
+    "up_pct": 84.1,
+    "amount_yi": 20376.9,
     "source": "market_now",
-    "recorded_at": "2026-11-04T11:18:23+08:00",
+    "recorded_at": "2026-11-05T00:08:25+08:00",
     "notes": [
       "limit_up_from_pool_zt_count",
       "limit_down_from_pool_dt_count",
@@ -447,12 +447,34 @@
         "limit_up_vs_hist_divergence"
       ],
       "revisions": 0
+    },
+    {
+      "date": "2026-11-04",
+      "limit_up": 118,
+      "limit_down": 10,
+      "limit_up_hist": 433,
+      "limit_down_hist": 20,
+      "broken": 33,
+      "seal_rate_pct": 78.1,
+      "advance": 4524,
+      "decline": 740,
+      "flat": 113,
+      "up_pct": 84.1,
+      "amount_yi": 20376.9,
+      "source": "market_now",
+      "recorded_at": "2026-11-05T00:08:25+08:00",
+      "notes": [
+        "limit_up_from_pool_zt_count",
+        "limit_down_from_pool_dt_count",
+        "limit_up_vs_hist_divergence"
+      ],
+      "revisions": 0
     }
   ],
   "coverage": {
-    "days": 20,
+    "days": 21,
     "first": "2026-09-29",
-    "last": "2026-11-03",
+    "last": "2026-11-04",
     "missing": [
       "2026-10-01",
       "2026-10-02",
@@ -465,6 +487,6 @@
   },
   "caliber": "涨停=主板10%/双创20%/ST5%/北交所30%；封板率=涨停/(涨停+炸板)",
   "caliber_caveat": "limit_up/limit_down are the eastmoney limit-up/limit-down pool counts (pool_zt_count/pool_dt_count) and follow the per-board rules in 'caliber'. limit_up_hist/limit_down_hist keep the older >=+10% / <=-10% histogram-bucket sum for cross-checking only: that flat threshold over-counts ChiNext/STAR names up 10-19% without a sealed limit and never sees 5% ST limit-ups (2026-10-26: hist 77 vs pool 55; 2026-10-23: 171 vs 82). Caliber switched on 2026-10-27, so the series steps down at that date - a caliber change, not a market move.",
-  "updated_at": "2026-11-04T11:18:23+08:00",
+  "updated_at": "2026-11-05T00:08:25+08:00",
   "revisions_total": 11
 }
