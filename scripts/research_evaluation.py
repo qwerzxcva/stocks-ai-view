@@ -308,7 +308,7 @@ def validation_summary(samples: list[dict[str, Any]], signals: list[dict[str, An
             for model in ("all_valid_signals", "family_weighted_vote", "weighted_vote"):
                 labels = groups[(horizon, cost, model)]
                 result.append({"horizon": horizon, "cost_bps_per_side": float(cost), "cohort": model,
-                               "n": len(labels),
+                               "n": len(labels), "recoup_informative": float(cost) > 0,
                                "recoup_rate": statistics.mean(x["recoup"] for x in labels) if labels else None,
                                "mean_net_return": statistics.mean(x["net_return"] for x in labels) if labels else None})
     return result
@@ -356,6 +356,7 @@ def evaluate(inputs: dict[str, tuple[list[Bar | None], dict[str, Any]]], cost_bp
                 bullish = [sample["labels"][cost_key(c)] for sig, sample in valid
                            if sig["positive"][engine] and sample["labels"][cost_key(c)] is not None]
                 sensitivities[cost_key(c)] = {"n": len(labels), "positive_n": len(bullish),
+                    "recoup_informative": c > 0,
                     "recoup_rate": statistics.mean(label["recoup"] for label in labels) if labels else None,
                     "mean_net_return": statistics.mean(label["net_return"] for label in labels) if labels else None,
                     "positive_recoup_rate": statistics.mean(label["recoup"] for label in bullish) if bullish else None,
@@ -386,6 +387,8 @@ def evaluate(inputs: dict[str, tuple[list[Bar | None], dict[str, Any]]], cost_bp
         "adjustment": "all OHLC * row hfq_factor / signal-date hfq_factor; raw volume unchanged",
         "entry_rule": "next observed trading-row open; rejected rows break both history and labels",
         "horizon_rule": "22/60 observations including entry day; incomplete or gapped label is null",
+        "input_scope": "OHLCV technical votes only; external financial, moneyflow, tape and news evidence disabled; not a complete live EngineChain replay",
+        "recoup_caveat": "zero cost plus entry-day high makes recoup tautological since high >= entry open; zero-cost recoup is non-informative, not directional accuracy or profitability evidence; positive costs are hypothetical, not measured fills",
         "recoup_rule": "max adjusted future high * (1-cost) >= adjusted entry open * (1+cost)",
         "net_return_rule": "last adjusted close * (1-cost) / (entry adjusted open * (1+cost)) - 1",
         "positive_rule": "single-engine vote*strength > 0; aggregate score >= spec signal_bullish",

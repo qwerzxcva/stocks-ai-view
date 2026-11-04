@@ -129,6 +129,7 @@ class ResearchEvaluationTest(unittest.TestCase):
         summary = r.validation_summary(samples, signals)
         family = [row for row in summary if row["horizon"] == 22 and row["cohort"] == "family_weighted_vote"]
         self.assertEqual([1, 1], [row["n"] for row in family])
+        self.assertEqual([False, True], [row["recoup_informative"] for row in family])
         self.assertEqual([.1, .09], [row["mean_net_return"] for row in family])
         legacy = [row for row in summary if row["cohort"] == "weighted_vote"]
         self.assertTrue(all(row["n"] == 0 and row["recoup_rate"] is None for row in legacy))
@@ -154,6 +155,8 @@ class ResearchEvaluationTest(unittest.TestCase):
         report = r.evaluate({"A": (bars, info)})
         self.assertEqual("insufficient", report["status"])
         self.assertEqual(0, report["sample_count"])
+        self.assertIn("tautological", report["recoup_caveat"])
+        self.assertIn("technical votes only", report["input_scope"])
         self.assertIn("120 contiguous valid cnfin", report["reason"])
 
     def test_family_correlations_need_30_same_code_past_dates(self):

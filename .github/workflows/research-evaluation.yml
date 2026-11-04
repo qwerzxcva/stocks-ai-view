@@ -57,6 +57,8 @@ jobs:
           assert all(source["benchmark_approved"] for source in report["sources"].values())
           assert report["status"] in {"history_only", "insufficient"}
           assert report["marketwide_evidence"]["status"] == "insufficient"
+          assert "tautological" in report["recoup_caveat"]
+          assert all(not row["recoup_informative"] for row in report["validation_summary"] if row["cost_bps_per_side"] == 0)
           print("Historical research only; not marketwide, real holdings or capacity evidence")
           print("status:", report["status"], "sample_count:", report["sample_count"], "reason:", report["reason"])
           # An honest insufficient report is an expected artifact, not a reason to relax the source gate.
