@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-06T00:10:22+08:00",
+ "ts": "2026-11-06T06:33:27+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 476,
- "n_transmissions": 3,
+ "n_input": 480,
+ "n_transmissions": 4,
  "n_rules": 16,
  "rules": [
   {
@@ -79,163 +79,174 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "美股恐慌指数VIX波动率日内涨幅达50.0%，报24.86；标普跌超2.5%。",
+   "title": "美国总统特朗普谈俄罗斯和乌克兰：会达成重大协议。\n\n今天会见了德米特里耶夫。解决俄乌冲突将涉及的不止乌克兰。",
    "source": "华尔街见闻",
-   "time": "2026-11-05T23:41:59+08:00",
-   "url": "https://wallstreetcn.com/livenews/3195222",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
+   "time": "2026-11-06T06:12:48+08:00",
+   "url": "https://wallstreetcn.com/livenews/3195354",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "银行",
+     "sector": "军工",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "688788"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002389"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "300859"
      ]
     }
    ],
+   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
+    "event_date": "2026-11-06",
     "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+   }
   },
   {
-   "title": "纳斯达克100指数跌幅扩大至5.1%，标普跌2.8%，美股费城半导体指数跌超9.6%。",
-   "source": "华尔街见闻",
-   "time": "2026-11-05T23:41:59+08:00",
-   "url": "https://wallstreetcn.com/livenews/3195219",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
+   "title": "特朗普称俄乌冲突接近解决",
+   "source": "cls",
+   "time": "2026-11-06T06:23:14+08:00",
+   "url": "https://www.cls.cn/detail/2526799",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "银行",
+     "sector": "军工",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "688788"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002389"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "300859"
      ]
     }
    ],
+   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
+    "event_date": "2026-11-06",
     "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+   }
   },
   {
-   "title": "纳斯达克100指数跌超6%，标普跌3.7%。",
+   "title": "布伦特原油日内涨幅达5.0%，报99.47美元/桶；WTI原油日内涨幅达3.5%，报91.22美元/桶。",
    "source": "wallstreetcn",
-   "time": "2026-11-05T23:54:07+08:00",
-   "url": "https://wallstreetcn.com/live/3195235",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
+   "time": "2026-11-06T06:15:20+08:00",
+   "url": "https://wallstreetcn.com/live/3195367",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
    "direct_bull": [],
-   "inverse_bull": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空机场",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
+   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
+    "event_date": "2026-11-06",
     "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+   }
+  },
+  {
+   "title": "布伦特原油日内涨4%，现报98.41美元/桶。",
+   "source": "wallstreetcn",
+   "time": "2026-11-06T03:33:03+08:00",
+   "url": "https://wallstreetcn.com/live/3195320",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
+    "trade_date": "2026-11-05",
+    "event_date": "2026-11-06",
+    "matched_codes": []
+   }
   }
  ]
 }
