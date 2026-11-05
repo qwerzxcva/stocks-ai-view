@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-05T23:57:36+08:00",
+ "ts": "2026-11-06T00:10:22+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 476,
  "n_transmissions": 3,
@@ -71,10 +71,10 @@
   }
  ],
  "flow_evidence": {
-  "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+  "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
   "trade_date": "2026-11-05",
-  "status": "dated_rows_available",
-  "n_dated_rows": 24
+  "status": "insufficient",
+  "n_dated_rows": 0
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
@@ -124,7 +124,7 @@
    ],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
     "event_date": "2026-11-05",
     "matched_codes": []
@@ -177,7 +177,7 @@
    ],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
     "event_date": "2026-11-05",
     "matched_codes": []
@@ -230,7 +230,7 @@
    ],
    "flow_evidence": {
     "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
     "trade_date": "2026-11-05",
     "event_date": "2026-11-05",
     "matched_codes": []
