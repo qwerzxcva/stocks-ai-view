@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-05T16:06:42+08:00",
+ "ts": "2026-11-05T23:57:36+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 475,
- "n_transmissions": 5,
+ "n_input": 476,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,61 +79,12 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "特朗普中期选举失利后首次露面 承认伊朗战争拖累共和党但坚称决策正确",
-   "source": "财联社热门",
-   "time": "2026-11-05T16:06:28+08:00",
-   "url": "https://www.cls.cn/detail/2525608",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688788"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002389"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "300859"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "金价连收4000、4100美元两道大关，为何仅被视作“修复”？机构：加息预期尚未回落",
-   "source": "财联社热门",
-   "time": "2026-11-05T16:06:28+08:00",
-   "url": "https://www.cls.cn/detail/2525931",
-   "transmission_id": "rate_hike",
-   "label": "加息/紧缩",
+   "title": "美股恐慌指数VIX波动率日内涨幅达50.0%，报24.86；标普跌超2.5%。",
+   "source": "华尔街见闻",
+   "time": "2026-11-05T23:41:59+08:00",
+   "url": "https://wallstreetcn.com/livenews/3195222",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
    "direct_bear": [],
    "direct_bull": [],
    "inverse_bull": [
@@ -151,124 +102,10 @@
       "600036",
       "600000"
      ]
-    },
-    {
-     "sector": "保险",
-     "stocks": [
-      "601318",
-      "601601",
-      "601628",
-      "601319",
-      "601336"
-     ]
     }
    ],
    "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "外交部：日本“再军事化”狂飙突进 国际社会必须高度警惕",
-   "source": "财联社电报",
-   "time": "2026-11-05T15:56:32+08:00",
-   "url": "https://www.cls.cn/detail/2526156",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688788"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002389"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "300859"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "发生了什么？布伦特原油突然跳水暴跌10%",
-   "source": "财联社热门",
-   "time": "2026-11-05T16:06:28+08:00",
-   "url": "https://www.cls.cn/detail/2525588",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-05",
-    "event_date": "2026-11-05",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "日本央行公布9月政策会议纪要：委员们一致认为，央行应继续提高政策利率并调整货币宽松程度。\n\n一位委员称，货币政策所处阶段",
-   "source": "wallstreetcn",
-   "time": "2026-11-05T07:52:21+08:00",
-   "url": "https://wallstreetcn.com/live/3194563",
-   "transmission_id": "rate_cut",
-   "label": "降息/宽松",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "hedge": [
     {
      "sector": "银行",
      "stocks": [
@@ -285,14 +122,120 @@
      ]
     }
    ],
-   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-05",
     "event_date": "2026-11-05",
     "matched_codes": []
-   }
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "纳斯达克100指数跌幅扩大至5.1%，标普跌2.8%，美股费城半导体指数跌超9.6%。",
+   "source": "华尔街见闻",
+   "time": "2026-11-05T23:41:59+08:00",
+   "url": "https://wallstreetcn.com/livenews/3195219",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-05",
+    "event_date": "2026-11-05",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "纳斯达克100指数跌超6%，标普跌3.7%。",
+   "source": "wallstreetcn",
+   "time": "2026-11-05T23:54:07+08:00",
+   "url": "https://wallstreetcn.com/live/3195235",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-05",
+    "event_date": "2026-11-05",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   }
  ]
 }
