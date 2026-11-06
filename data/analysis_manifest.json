@@ -1,22 +1,16 @@
 {
- "ts": "2026-11-07T06:08:41+08:00",
+ "ts": "2026-11-07T06:31:26+08:00",
  "engine": "build_analysis_manifest.py",
  "trading_date": "20261107",
  "session_state": "unknown",
  "pipeline_status": "partial",
- "stale_count": 9,
+ "stale_count": 3,
  "missing_count": 0,
  "no_timestamp_count": 0,
  "stale_files": [
-  "overseas_linkage.json",
-  "overseas_impact.json",
   "hot_impact.json",
   "premarket_picks.json",
-  "midday_picks.json",
-  "reflect_latest.json",
-  "winrate_matrix.json",
-  "kline_sim.json",
-  "walkforward.json"
+  "midday_picks.json"
  ],
  "missing_files": [],
  "no_timestamp_files": [],
@@ -26,14 +20,14 @@
    "files": {
     "latest.json": {
      "ts": "2026-11-07T05:21:29.155865+08:00",
-     "age_hours": 0.79,
+     "age_hours": 1.17,
      "threshold_hours": 2,
      "status": "fresh",
-     "size_bytes": 80493
+     "size_bytes": 79304
     },
     "market_now.json": {
      "ts": "2026-11-07T05:22:28+08:00",
-     "age_hours": 0.77,
+     "age_hours": 1.15,
      "threshold_hours": 2,
      "status": "fresh",
      "size_bytes": 29865
@@ -41,35 +35,35 @@
    }
   },
   "global_markets": {
-   "status": "stale",
+   "status": "fresh",
    "files": {
     "global_markets.json": {
-     "ts": "2026-11-07T06:06:50+08:00",
-     "age_hours": 0.03,
+     "ts": "2026-11-07T05:59:06+08:00",
+     "age_hours": 0.54,
      "threshold_hours": 2,
      "status": "fresh",
-     "size_bytes": 12135
+     "size_bytes": 12102
     },
     "global_kline.json": {
-     "ts": "2026-11-07T06:07:12+08:00",
-     "age_hours": 0.02,
+     "ts": "2026-11-07T05:59:29+08:00",
+     "age_hours": 0.53,
      "threshold_hours": 2,
      "status": "fresh",
-     "size_bytes": 865066
+     "size_bytes": 865072
     },
     "overseas_linkage.json": {
-     "ts": "2026-11-07T01:02:35+08:00",
-     "age_hours": 5.1,
+     "ts": "2026-11-07T06:20:47+08:00",
+     "age_hours": 0.18,
      "threshold_hours": 2,
-     "status": "stale",
-     "size_bytes": 20628
+     "status": "fresh",
+     "size_bytes": 27058
     },
     "overseas_impact.json": {
-     "ts": "2026-10-16T18:23:35+08:00",
-     "age_hours": 515.75,
+     "ts": "2026-11-07T06:31:26+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 2,
-     "status": "stale",
-     "size_bytes": 7065
+     "status": "fresh",
+     "size_bytes": 11136
     }
    }
   },
@@ -77,43 +71,43 @@
    "status": "stale",
    "files": {
     "hot_news.json": {
-     "ts": "2026-11-07T06:06:41+08:00",
-     "age_hours": 0.03,
+     "ts": "2026-11-07T05:58:57+08:00",
+     "age_hours": 0.54,
      "threshold_hours": 4,
      "status": "fresh",
      "size_bytes": 121819
     },
     "news_extra.json": {
-     "ts": "2026-11-07T06:06:29+08:00",
-     "age_hours": 0.04,
+     "ts": "2026-11-07T05:58:42+08:00",
+     "age_hours": 0.55,
      "threshold_hours": 4,
      "status": "fresh",
-     "size_bytes": 66333
+     "size_bytes": 66376
     },
     "hot_themes.json": {
-     "ts": "2026-11-07T06:06:45+08:00",
-     "age_hours": 0.03,
+     "ts": "2026-11-07T05:59:01+08:00",
+     "age_hours": 0.54,
      "threshold_hours": 4,
      "status": "fresh",
      "size_bytes": 5825
     },
     "mainline.json": {
-     "ts": "2026-11-07T06:06:45+08:00",
-     "age_hours": 0.03,
+     "ts": "2026-11-07T05:59:01+08:00",
+     "age_hours": 0.54,
      "threshold_hours": 4,
      "status": "fresh",
      "size_bytes": 3849
     },
     "recent_mainlines.json": {
-     "ts": "2026-11-07T06:06:45+08:00",
-     "age_hours": 0.03,
+     "ts": "2026-11-07T06:31:12+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 4,
      "status": "fresh",
      "size_bytes": 22844
     },
     "hot_impact.json": {
      "ts": "2026-10-31T14:55:22.966438+08:00",
-     "age_hours": 159.22,
+     "age_hours": 159.6,
      "threshold_hours": 4,
      "status": "stale",
      "size_bytes": 4869
@@ -125,35 +119,35 @@
    "files": {
     "premarket_picks.json": {
      "ts": "2026-11-06T11:38:31+08:00",
-     "age_hours": 18.5,
+     "age_hours": 18.88,
      "threshold_hours": 8,
      "status": "stale",
      "size_bytes": 10255
     },
     "midday_picks.json": {
      "ts": "2026-11-06T11:39:38+08:00",
-     "age_hours": 18.48,
+     "age_hours": 18.86,
      "threshold_hours": 8,
      "status": "stale",
      "size_bytes": 1336
     },
     "ai_pick_v4.json": {
-     "ts": "2026-11-07T00:47:40+08:00",
-     "age_hours": 5.35,
+     "ts": "2026-11-07T06:09:03+08:00",
+     "age_hours": 0.37,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 524
     },
     "today_picks.json": {
-     "ts": "2026-11-07T01:16:16+08:00",
-     "age_hours": 4.87,
+     "ts": "2026-11-07T06:31:12+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 8,
      "status": "fresh",
-     "size_bytes": 48042
+     "size_bytes": 48054
     },
     "prediction_bundle.json": {
-     "ts": "2026-11-07T01:16:17+08:00",
-     "age_hours": 4.87,
+     "ts": "2026-11-07T06:31:13+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 13554
@@ -164,57 +158,57 @@
    "status": "fresh",
    "files": {
     "engine_v5.json": {
-     "ts": "2026-11-07T00:47:23+08:00",
-     "age_hours": 5.36,
+     "ts": "2026-11-07T06:08:48+08:00",
+     "age_hours": 0.38,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 243040
     },
     "multidim.json": {
-     "ts": "2026-11-07T01:11:10+08:00",
-     "age_hours": 4.96,
+     "ts": "2026-11-07T06:27:31+08:00",
+     "age_hours": 0.07,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 50174
     },
     "decision.json": {
-     "ts": "2026-11-07T01:11:11+08:00",
-     "age_hours": 4.96,
+     "ts": "2026-11-07T06:27:32+08:00",
+     "age_hours": 0.07,
      "threshold_hours": 8,
      "status": "fresh",
-     "size_bytes": 26091
+     "size_bytes": 26167
     },
     "trend_strength.json": {
-     "ts": "2026-11-07T00:49:50+08:00",
-     "age_hours": 5.31,
+     "ts": "2026-11-07T06:10:48+08:00",
+     "age_hours": 0.34,
      "threshold_hours": 8,
      "status": "fresh",
-     "size_bytes": 219264
+     "size_bytes": 219265
     },
     "auction_engine.json": {
-     "ts": "2026-11-07T01:02:17+08:00",
-     "age_hours": 5.11,
+     "ts": "2026-11-07T06:20:33+08:00",
+     "age_hours": 0.18,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 19451
     },
     "bull_bear_debate.json": {
-     "ts": "2026-11-07T01:16:16+08:00",
-     "age_hours": 4.87,
+     "ts": "2026-11-07T06:31:12+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 58400
     },
     "pool_audit.json": {
-     "ts": "2026-11-07T01:16:34+08:00",
-     "age_hours": 4.87,
+     "ts": "2026-11-07T06:31:26+08:00",
+     "age_hours": 0.0,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 5039
     },
     "horizon_features.json": {
      "ts": "2026-11-06T23:56:06.984172+08:00",
-     "age_hours": 6.21,
+     "age_hours": 6.59,
      "threshold_hours": 8,
      "status": "fresh",
      "size_bytes": 1589177
@@ -222,49 +216,49 @@
    }
   },
   "review": {
-   "status": "stale",
+   "status": "fresh",
    "files": {
     "daily_brief.json": {
      "ts": "2026-11-07T03:18:03+08:00",
-     "age_hours": 2.84,
+     "age_hours": 3.22,
      "threshold_hours": 30,
      "status": "fresh",
      "size_bytes": 5330
     },
     "ai_review.json": {
      "ts": "2026-11-07T01:17:07+08:00",
-     "age_hours": 4.86,
+     "age_hours": 5.24,
      "threshold_hours": 30,
      "status": "fresh",
      "size_bytes": 3247
     },
     "reflect_latest.json": {
-     "ts": "2026-10-17T10:58:26+08:00",
-     "age_hours": 499.17,
+     "ts": "2026-11-07T06:29:17+08:00",
+     "age_hours": 0.04,
      "threshold_hours": 30,
-     "status": "stale",
-     "size_bytes": 16203
+     "status": "fresh",
+     "size_bytes": 18251
     },
     "winrate_matrix.json": {
-     "ts": "2026-11-01T05:14:24+08:00",
-     "age_hours": 144.9,
+     "ts": "2026-11-07T06:29:18+08:00",
+     "age_hours": 0.04,
      "threshold_hours": 30,
-     "status": "stale",
-     "size_bytes": 1431
+     "status": "fresh",
+     "size_bytes": 1430
     },
     "kline_sim.json": {
-     "ts": "2026-11-01T05:14:25+08:00",
-     "age_hours": 144.9,
+     "ts": "2026-11-07T06:28:28+08:00",
+     "age_hours": 0.05,
      "threshold_hours": 30,
-     "status": "stale",
-     "size_bytes": 1791
+     "status": "fresh",
+     "size_bytes": 6572
     },
     "walkforward.json": {
-     "ts": "2026-10-14T19:45:52",
-     "age_hours": 562.38,
+     "ts": "2026-11-07T06:29:31",
+     "age_hours": 0.03,
      "threshold_hours": 30,
-     "status": "stale",
-     "size_bytes": 19780
+     "status": "fresh",
+     "size_bytes": 19527
     }
    }
   }
