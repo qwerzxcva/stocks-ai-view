@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-07T05:59:01+08:00",
+ "ts": "2026-11-07T06:06:45+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 481,
- "n_transmissions": 6,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -78,94 +78,6 @@
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
-  {
-   "title": "纳斯达克ETF看跌期权创新冠疫情以来新低。\n\n11月5日，总体期权成交量创历史新高。（彭博）",
-   "source": "wallstreetcn",
-   "time": "2026-11-07T04:15:40+08:00",
-   "url": "https://wallstreetcn.com/live/3196209",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "688298"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "603199"
-     ]
-    },
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600038"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-06",
-    "event_date": "2026-11-07",
-    "matched_codes": []
-   }
-  },
   {
    "title": "财联社11月7日电，欧洲方面坚持要求，普京必须先结束战争，然后才能讨论俄罗斯关切的问题。",
    "source": "财联社电报",
