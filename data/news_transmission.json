@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-06T23:45:18+08:00",
+ "ts": "2026-11-07T05:59:01+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 482,
- "n_transmissions": 0,
+ "n_input": 481,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -77,5 +77,336 @@
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
- "transmissions": []
+ "transmissions": [
+  {
+   "title": "纳斯达克ETF看跌期权创新冠疫情以来新低。\n\n11月5日，总体期权成交量创历史新高。（彭博）",
+   "source": "wallstreetcn",
+   "time": "2026-11-07T04:15:40+08:00",
+   "url": "https://wallstreetcn.com/live/3196209",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "688298"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603199"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600038"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "财联社11月7日电，欧洲方面坚持要求，普京必须先结束战争，然后才能讨论俄罗斯关切的问题。",
+   "source": "财联社电报",
+   "time": "2026-11-07T05:37:38+08:00",
+   "url": "https://www.cls.cn/detail/2527935",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300123"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600038"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603199"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "周五（11月6日），新兴市场ETF收涨2.2%，领跑美股大类资产类ETF，纳斯达克100 ETF涨1.4%，罗素2000指数ETF、做多美元指数、巴克莱美国可转债ETF、标普500",
+   "source": "华尔街见闻",
+   "time": "2026-11-07T05:46:51+08:00",
+   "url": "https://wallstreetcn.com/livenews/3196234",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "002207"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    },
+    {
+     "sector": "物流",
+     "stocks": [
+      "600278"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美国商品期货交易委员会（CFTC）：11月3日当周，投机者所持NYMEX WTI原油净多头头寸减少14,468手合约，至85,303手合约，创最近17周新低。\n\n所持布伦特与WTI",
+   "source": "华尔街见闻",
+   "time": "2026-11-07T05:46:51+08:00",
+   "url": "https://wallstreetcn.com/livenews/3196211",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "002207"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    },
+    {
+     "sector": "物流",
+     "stocks": [
+      "600278"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "WTI 12月原油期货收涨0.31美元，涨幅0.34%，报90.83美元/桶，本周累跌超12.76%。\n\n布伦特1月原油",
+   "source": "wallstreetcn",
+   "time": "2026-11-07T03:31:29+08:00",
+   "url": "https://wallstreetcn.com/live/3196198",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "002207"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    },
+    {
+     "sector": "物流",
+     "stocks": [
+      "600278"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "白宫经济顾问委员会（CEA）主席Phelan：不要指望强劲的美国非农就业报告会促使美联储加息。\n\n我们需要看看下一份消费",
+   "source": "wallstreetcn",
+   "time": "2026-11-07T02:27:20+08:00",
+   "url": "https://wallstreetcn.com/live/3196177",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-07",
+    "matched_codes": []
+   }
+  }
+ ]
 }
