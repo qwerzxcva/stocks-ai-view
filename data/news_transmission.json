@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-06T23:29:57+08:00",
+ "ts": "2026-11-06T23:45:18+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 482,
  "n_transmissions": 0,
@@ -71,10 +71,10 @@
   }
  ],
  "flow_evidence": {
-  "source": "dc_stock_flow,dc_stock_rank,dc_board_flow",
+  "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
   "trade_date": "2026-11-06",
-  "status": "insufficient",
-  "n_dated_rows": 0
+  "status": "dated_rows_available",
+  "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": []
