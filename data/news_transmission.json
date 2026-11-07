@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-07T10:51:02+08:00",
+ "ts": "2026-11-07T14:59:56+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 481,
- "n_transmissions": 1,
+ "n_input": 478,
+ "n_transmissions": 0,
  "n_rules": 16,
  "rules": [
   {
@@ -77,52 +77,5 @@
   "n_dated_rows": 24
  },
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
- "transmissions": [
-  {
-   "title": "科技股“痛苦”调整难阻加息预期 美联储戴利仍倾向进一步收紧政策",
-   "source": "财联社热门",
-   "time": "2026-11-07T10:50:48+08:00",
-   "url": "https://www.cls.cn/detail/2527938",
-   "transmission_id": "rate_hike",
-   "label": "加息/紧缩",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    },
-    {
-     "sector": "保险",
-     "stocks": [
-      "601318",
-      "601601",
-      "601628",
-      "601319",
-      "601336"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-06",
-    "event_date": "2026-11-07",
-    "matched_codes": []
-   }
-  }
- ]
+ "transmissions": []
 }
