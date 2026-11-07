@@ -1,7 +1,7 @@
 {
   "engines": {
     "decision": {
-      "age_hours": 0.1,
+      "age_hours": 0.2,
       "baseline": {
         "cards": 12,
         "market_regime": "bear",
@@ -17,8 +17,8 @@
         "dimensions": 9
       },
       "produced_by": "scripts/decision_engine.py",
-      "sha256": "217ffece58d1e15bbebe7ac4c90f2c92d5c41c2e5259ca1d822a64b40f3c9f1f",
-      "ts": "2026-11-07T22:59:47+08:00",
+      "sha256": "2fed6b52bd6a9025371bb0e1642898eeed4a8c56dc18c5725246932defb44d72",
+      "ts": "2026-11-07T23:36:46+08:00",
       "version": "decision v2"
     },
     "engine_fusion": {
@@ -42,8 +42,8 @@
         ]
       },
       "produced_by": "scripts/engine_fusion.py",
-      "sha256": "b686dd4a73435bb3dc57aa5d675ce130707e57270816f97574f6dccc08527c0a",
-      "ts": "2026-11-07T23:00:25",
+      "sha256": "f5c28c49a225aa4c8f90fb480ba0b2a7fe61f03dd56fc4d167cc03ef37d62b2e",
+      "ts": "2026-11-07T23:37:35",
       "version": "engine_fusion_v1"
     },
     "engine_spec": {
@@ -65,12 +65,12 @@
         "weight_policy": "{'file': 'data/engine_weights.json', 'wr"
       },
       "produced_by": "scripts/engine_spec.py",
-      "sha256": "12044607df231cfc1282d77940629c4cc292ad2cb53044e1a2c9494b5b191d75",
+      "sha256": "18e89f7bfb886e78f511d4653e904913fbdc793df07267b654c7a4fef7e725ad",
       "ts": "",
       "version": "3.3.0"
     },
     "market_phase": {
-      "age_hours": 232.5,
+      "age_hours": 0.6,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -84,12 +84,12 @@
         "phase_labels": []
       },
       "produced_by": "scripts/phase_runner.py",
-      "sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
-      "ts": "2026-10-29T06:37:01",
+      "sha256": "7391e47fe1e7997599c5fb98344aa1329616629ac03d01eb5d8787f60c3bc072",
+      "ts": "2026-11-07T23:09:29",
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 575.7,
+      "age_hours": 0.1,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -105,17 +105,17 @@
         "strategy": "B规则(低位+温和量+涨0-5%)+5日持有"
       },
       "produced_by": "scripts/strategy_card.py",
-      "sha256": "a5069c2b6f6a6ae0cb1ba2e215da6e8dbdad5b94411db4f37a3707b9f4c81d15",
-      "ts": "2026-10-14T23:23:50",
+      "sha256": "04344151ac188b78aa9075b30290440fef9aa9744f551a8b7b97075b760712e6",
+      "ts": "2026-11-07T23:37:33",
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 579.4,
+      "age_hours": 0.1,
       "baseline": {
-        "mean_is_win": 47.2,
-        "mean_oos_win": 48.62,
-        "n_folds_valid": 45,
-        "oos_vs_is_decay": -1.42
+        "mean_is_win": null,
+        "mean_oos_win": null,
+        "n_folds_valid": 0,
+        "oos_vs_is_decay": null
       },
       "consumers": [
         "SignalCalibration.kt"
@@ -123,7 +123,7 @@
       "file": "data/walkforward.json",
       "max_age_hours": 168,
       "params": {
-        "end": "2026-10-14",
+        "end": "2026-10-26",
         "horizon_days": 5,
         "start": "2023-11-20",
         "step_days": 20,
@@ -131,8 +131,8 @@
         "train_days": 120
       },
       "produced_by": "scripts/walkforward.py",
-      "sha256": "74be1af291abe437e4ddfffbea1ace3597471976012f431da2c835ba2434be51",
-      "ts": "2026-10-14T19:45:52",
+      "sha256": "df15f747a0e7be2fd19813d968a3c13372e732db51c5dc7ca9a7f2d939b5e441",
+      "ts": "2026-11-07T23:38:45",
       "version": "walkforward_v1"
     },
     "weight_calibration": {
@@ -180,12 +180,12 @@
         "preferred_horizon": 5
       },
       "produced_by": "scripts/weight_calibrator_v3.py",
-      "sha256": "f570ad1ddfdd465606fda2cdbc57609972cc67746b2d8774d89bbf879370c538",
-      "ts": "2026-11-07T23:06:50+08:00",
+      "sha256": "3cad399e4d8b0f3160aa514d48f115b611bb41cdbf57c2c30248dcc4a8f491c6",
+      "ts": "2026-11-07T23:44:36+08:00",
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-11-07T23:08:24+08:00",
+  "generated_at": "2026-11-07T23:46:28+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }
