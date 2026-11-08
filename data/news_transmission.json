@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-08T04:55:21+08:00",
+ "ts": "2026-11-08T10:28:35+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 478,
- "n_transmissions": 1,
+ "n_input": 479,
+ "n_transmissions": 2,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,58 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "战争之王，被抛弃了",
+   "source": "凤凰网",
+   "time": "2026-11-08T10:13:17+08:00",
+   "url": "https://news.ifeng.com/c/8xsWW0eoFCr",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "300123"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600038"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603199"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-08",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "美国女议员戳破美股AI泡沫",
    "source": "贴吧热议",
-   "time": "2026-11-08T04:55:13+08:00",
+   "time": "2026-11-08T10:28:28+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369406&amp;topic_name=%E7%BE%8E%E5%9B%BD%E5%A5%B3%E8%AE%AE%E5%91%98%E6%88%B3%E7%A0%B4%E7%BE%8E%E8%82%A1AI%E6%B3%A1%E6%B2%AB",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
