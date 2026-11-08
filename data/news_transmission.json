@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-08T15:20:27+08:00",
+ "ts": "2026-11-08T22:22:20+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 479,
- "n_transmissions": 4,
+ "n_input": 472,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,97 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "AI辅助设计禽流感疫苗动物实验获进展",
+   "source": "财联社电报",
+   "time": "2026-11-08T21:53:49+08:00",
+   "url": "https://www.cls.cn/detail/2528297",
+   "transmission_id": "epidemic",
+   "label": "疫情",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "688298"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603199"
+     ]
+    },
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600038"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-08",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "布伦特油价一周暴跌超16%",
    "source": "抖音热点",
-   "time": "2026-11-08T15:03:14+08:00",
+   "time": "2026-11-08T22:07:00+08:00",
    "url": "https://www.douyin.com/hot/2735292",
    "transmission_id": "oil_up",
    "label": "油价上涨",
@@ -128,58 +216,9 @@
    }
   },
   {
-   "title": "“战争之王”内塔尼亚胡被抛弃了",
-   "source": "百度热搜",
-   "time": "2026-11-08T15:20:19+08:00",
-   "url": "https://www.baidu.com/s?wd=%E2%80%9C%E6%88%98%E4%BA%89%E4%B9%8B%E7%8E%8B%E2%80%9D%E5%86%85%E5%A1%94%E5%B0%BC%E4%BA%9A%E8%83%A1%E8%A2%AB%E6%8A%9B%E5%BC%83%E4%BA%86",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "300123"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600038"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "603199"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-06",
-    "event_date": "2026-11-08",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "战争之王，被抛弃了",
    "source": "凤凰网",
-   "time": "2026-11-08T15:07:00+08:00",
+   "time": "2026-11-08T21:54:06+08:00",
    "url": "https://news.ifeng.com/c/8xsWW0eoFCr",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -228,8 +267,51 @@
   {
    "title": "美国女议员戳破美股AI泡沫",
    "source": "贴吧热议",
-   "time": "2026-11-08T15:08:44+08:00",
+   "time": "2026-11-08T22:22:13+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369406&amp;topic_name=%E7%BE%8E%E5%9B%BD%E5%A5%B3%E8%AE%AE%E5%91%98%E6%88%B3%E7%A0%B4%E7%BE%8E%E8%82%A1AI%E6%B3%A1%E6%B2%AB",
+   "transmission_id": "ai_down",
+   "label": "AI/算力下跌",
+   "direct_bear": [
+    {
+     "sector": "计算机",
+     "stocks": [
+      "002528"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-08",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "【风口研报·洞察】SpaceX星舰即将首次挑战整箭回收，复用节奏有望进一步加快，进而提速星链及太空算力星座部署，分析师看好相关配套及设备需求随之提升；美股AI泡沫目前处于什么阶段",
+   "source": "cls",
+   "time": "2026-11-08T22:14:17+08:00",
+   "url": "https://www.cls.cn/detail/2528271",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
    "direct_bear": [
