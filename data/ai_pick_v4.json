@@ -1,22 +1,138 @@
 {
-  "ts": "2026-11-08T15:56:26+08:00",
-  "engine": "ai_pick v4 (移植自 stocks-algo)",
-  "date": "2026-10-29",
-  "data_date": "2026-10-29",
+  "ts": "2026-11-10T02:01:12+08:00",
+  "engine": "ai_pick v4 (移植自 jiegengxiangjianxue1/stocks-algo)",
+  "date": "2026-11-09",
+  "data_date": "2026-11-09",
   "stale": false,
   "provenance": {
     "source": "bulk day_qfq",
     "confidence": "high",
-    "snapshot_ts": "2026-11-08T15:56:26+08:00"
+    "snapshot_ts": "2026-11-10T02:01:12+08:00"
   },
-  "n_scanned": 91,
-  "n_candidates": 0,
-  "picks": [],
-  "global": null,
-  "adapt": null,
-  "cycle_note": null,
-  "note": "无候选 (可能非交易日或市场不满足强市闸门)",
+  "n_scanned": 1121,
+  "n_candidates": 7,
+  "global": {
+    "global_score": 0.16,
+    "global_mood": "neutral",
+    "pos_weight": 0.25,
+    "suggest": "全球中性: 维持半仓纪律"
+  },
+  "adapt": {
+    "note": "无对账数据"
+  },
+  "cycle_note": "周期偏空(5/5指数): 收紧至240日位<45%",
+  "picks": [
+    {
+      "code": "002652",
+      "symbol": "sz002652",
+      "date": "2026-11-09",
+      "name": "扬子新材",
+      "price": 4.36,
+      "ret_pct": 2.11,
+      "vratio": 2.01,
+      "pos240_pct": 36.5,
+      "close_pos": 0.667,
+      "mom60_pct": 13.84,
+      "zt_genes": 3,
+      "score": 0.6643,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002825",
+      "symbol": "sz002825",
+      "date": "2026-11-09",
+      "name": "纳尔股份",
+      "price": 8.19,
+      "ret_pct": 2.5,
+      "vratio": 2.04,
+      "pos240_pct": 19.8,
+      "close_pos": 0.691,
+      "mom60_pct": -3.08,
+      "zt_genes": 0,
+      "score": 0.6214,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002516",
+      "symbol": "sz002516",
+      "date": "2026-11-09",
+      "name": "旷达科技",
+      "price": 5.5,
+      "ret_pct": 3.97,
+      "vratio": 2.06,
+      "pos240_pct": 41.4,
+      "close_pos": 0.563,
+      "mom60_pct": -3.34,
+      "zt_genes": 0,
+      "score": 0.4929,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002893",
+      "symbol": "sz002893",
+      "date": "2026-11-09",
+      "name": "京能热力",
+      "price": 10.16,
+      "ret_pct": 3.89,
+      "vratio": 1.72,
+      "pos240_pct": 29.3,
+      "close_pos": 0.722,
+      "mom60_pct": -4.06,
+      "zt_genes": 0,
+      "score": 0.4286,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002081",
+      "symbol": "sz002081",
+      "date": "2026-11-09",
+      "name": "金 螳 螂",
+      "price": 4.52,
+      "ret_pct": 1.8,
+      "vratio": 1.95,
+      "pos240_pct": 22.9,
+      "close_pos": 0.455,
+      "mom60_pct": -12.74,
+      "zt_genes": 2,
+      "score": 0.4143,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002361",
+      "symbol": "sz002361",
+      "date": "2026-11-09",
+      "name": "神剑股份",
+      "price": 9.89,
+      "ret_pct": 4.11,
+      "vratio": 1.6,
+      "pos240_pct": 11.5,
+      "close_pos": 0.042,
+      "mom60_pct": -6.7,
+      "zt_genes": 0,
+      "score": 0.3571,
+      "pattern_bonus": 0
+    },
+    {
+      "code": "002685",
+      "symbol": "sz002685",
+      "date": "2026-11-09",
+      "name": "华东重机",
+      "price": 4.69,
+      "ret_pct": 1.52,
+      "vratio": 1.84,
+      "pos240_pct": 5.5,
+      "close_pos": 0.31,
+      "mom60_pct": -13.63,
+      "zt_genes": 0,
+      "score": 0.3071,
+      "pattern_bonus": 0
+    }
+  ],
   "meta": {
-    "source": "bulk day_qfq_*.csv"
+    "source": "bulk day_qfq_*.csv (5604 只)",
+    "formula": "量比0.20 + 60日RPS0.20 + 240日低位0.20 + 涨停基因0.15 + 收盘位置0.15 + 换手温和0.10",
+    "hard_rules": "未涨停 + 涨幅0.5-5% + 240日位<60% + 量比1.5-2.5",
+    "pattern_bonus": "停机坪/高而窄旗形+0.08, 无大幅回撤+0.04",
+    "caveat": "评分为统计排序, 非必然上涨; 不构成投资建议"
   }
 }
