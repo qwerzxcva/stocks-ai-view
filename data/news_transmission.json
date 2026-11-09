@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-09T15:59:57+08:00",
+ "ts": "2026-11-10T01:55:33+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 472,
- "n_transmissions": 10,
+ "n_input": 473,
+ "n_transmissions": 7,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "病毒吧吧主喜羊羊火出圈",
+   "title": "出息了病毒吧吧主被官媒采访",
    "source": "贴吧热议",
-   "time": "2026-11-09T15:59:40+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369544&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E5%90%A7%E4%B8%BB%E5%96%9C%E7%BE%8A%E7%BE%8A%E7%81%AB%E5%87%BA%E5%9C%88",
+   "time": "2026-11-10T01:31:42+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369544&amp;topic_name=%E5%87%BA%E6%81%AF%E4%BA%86%E7%97%85%E6%AF%92%E5%90%A7%E5%90%A7%E4%B8%BB%E8%A2%AB%E5%AE%98%E5%AA%92%E9%87%87%E8%AE%BF",
    "transmission_id": "epidemic",
    "label": "疫情",
    "direct_bear": [],
@@ -162,362 +162,95 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
+    "event_date": "2026-11-10",
     "matched_codes": []
    }
   },
   {
-   "title": "特朗普称将与中俄元首在APEC讨论美伊冲突及无核化问题 外交部回应",
+   "title": "特朗普政府寻求中方协助结束美伊冲突？外交部回应",
+   "source": "财联社热门",
+   "time": "2026-11-10T01:27:43+08:00",
+   "url": "https://www.cls.cn/detail/2529178",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "301306"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "605123"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "600593"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-09",
+    "event_date": "2026-11-10",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "法国就网络攻击事件召见伊朗大使 警告将实施制裁",
    "source": "财联社电报",
-   "time": "2026-11-09T15:47:20+08:00",
-   "url": "https://www.cls.cn/detail/2528954",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-11-10T01:28:37+08:00",
+   "url": "https://www.cls.cn/detail/2529543",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
-   "direct_bull": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
-     "sector": "军工",
+     "sector": "半导体设备",
      "stocks": [
-      "301306"
+      "688801"
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
+    "event_date": "2026-11-10",
     "matched_codes": []
-   }
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   },
   {
-   "title": "特朗普称将与中俄元首在APEC讨论美伊冲突及无核化问题，外交部回应",
+   "title": "德国两年期国债收益率涨2个基点，投资者权衡股市上涨与油价下跌",
    "source": "华尔街见闻",
-   "time": "2026-11-09T15:59:35+08:00",
-   "url": "https://wallstreetcn.com/livenews/3196752",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "特朗普政府要求中国协助结束与伊朗冲突？外交部：相关方应该坚持和平选择",
-   "source": "华尔街见闻",
-   "time": "2026-11-09T15:59:35+08:00",
-   "url": "https://wallstreetcn.com/livenews/3196751",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "台退将称解放军加强对台军事布局",
-   "source": "今日头条",
-   "time": "2026-11-09T15:59:39+08:00",
-   "url": "https://www.toutiao.com/trending/7705875923618316826/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "评论员：俄乌战争短期内不会结束",
-   "source": "今日头条",
-   "time": "2026-11-09T15:59:39+08:00",
-   "url": "https://www.toutiao.com/trending/7706021375630118441/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "特朗普：若伊朗谈判取得进展，重启军事打击的可能性极低",
-   "source": "wallstreetcn",
-   "time": "2026-11-09T01:43:31+08:00",
-   "url": "https://wallstreetcn.com/live/3196502",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "伊朗革命卫队顾问：伊朗正在对缴获的美国军事装备进行逆向工程。",
-   "source": "wallstreetcn",
-   "time": "2026-11-09T01:35:27+08:00",
-   "url": "https://wallstreetcn.com/live/3196500",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "301306"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "605123"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600593"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "布伦特原油日内跌幅达2.0%，报96.35美元/桶；WTI原油日内跌幅达1.5%，报89.45美元/桶。",
-   "source": "华尔街见闻",
-   "time": "2026-11-09T15:59:35+08:00",
-   "url": "https://wallstreetcn.com/livenews/3196728",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
+   "time": "2026-11-10T01:31:26+08:00",
+   "url": "https://wallstreetcn.com/livenews/3197078",
+   "transmission_id": "oil_down",
+   "label": "油价下跌",
+   "direct_bear": [
     {
      "sector": "油服工程",
      "stocks": [
@@ -525,8 +258,8 @@
      ]
     }
    ],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "direct_bull": [],
+   "inverse_bull": [
     {
      "sector": "航空机场",
      "stocks": [
@@ -543,19 +276,20 @@
      ]
     }
    ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-09",
-    "event_date": "2026-11-09",
+    "event_date": "2026-11-10",
     "matched_codes": []
    }
   },
   {
    "title": "美国女议员戳破美股AI泡沫",
    "source": "贴吧热议",
-   "time": "2026-11-09T15:59:40+08:00",
+   "time": "2026-11-10T01:31:42+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369406&amp;topic_name=%E7%BE%8E%E5%9B%BD%E5%A5%B3%E8%AE%AE%E5%91%98%E6%88%B3%E7%A0%B4%E7%BE%8E%E8%82%A1AI%E6%B3%A1%E6%B2%AB",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
@@ -604,9 +338,80 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-09",
+    "event_date": "2026-11-10",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "夜盘期货开盘，燃料油跌超6%，SC原油跌近5%，低硫燃料油跌超4%，甲醇、液化石油气跌近4%，聚丙烯、丙烯、纯苯跌超3%",
+   "source": "wallstreetcn",
+   "time": "2026-11-09T21:00:57+08:00",
+   "url": "https://wallstreetcn.com/live/3196953",
+   "transmission_id": "oil_down",
+   "label": "油价下跌",
+   "direct_bear": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600968"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-09",
     "event_date": "2026-11-09",
     "matched_codes": []
    }
+  },
+  {
+   "title": "伊朗说美取消制裁和停止战争是谈判前提",
+   "source": "wallstreetcn",
+   "time": "2026-11-09T22:25:53+08:00",
+   "url": "https://wallstreetcn.com/live/3196995",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688801"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-09",
+    "event_date": "2026-11-09",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   }
  ]
 }
