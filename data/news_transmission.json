@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-09T10:41:55+08:00",
+ "ts": "2026-11-09T15:50:10+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 473,
- "n_transmissions": 5,
+ "n_input": 472,
+ "n_transmissions": 7,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,10 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "环球下周看点： 美国CPI与地缘风险接踵而至 AI交易能否走出抛售阴霾？",
-   "source": "财联社热门",
-   "time": "2026-11-09T10:20:36+08:00",
-   "url": "https://www.cls.cn/detail/2528161",
+   "title": "特朗普称将与中俄元首在APEC讨论美伊冲突及无核化问题 外交部回应",
+   "source": "财联社电报",
+   "time": "2026-11-09T15:49:55+08:00",
+   "url": "https://www.cls.cn/detail/2528954",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -90,9 +90,7 @@
     {
      "sector": "军工",
      "stocks": [
-      "301306",
-      "301313",
-      "000026"
+      "301306"
      ]
     }
    ],
@@ -130,60 +128,95 @@
    }
   },
   {
-   "title": "美国女议员戳破美股AI泡沫",
-   "source": "贴吧热议",
-   "time": "2026-11-09T10:22:00+08:00",
-   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369406&amp;topic_name=%E7%BE%8E%E5%9B%BD%E5%A5%B3%E8%AE%AE%E5%91%98%E6%88%B3%E7%A0%B4%E7%BE%8E%E8%82%A1AI%E6%B3%A1%E6%B2%AB",
-   "transmission_id": "ai_down",
-   "label": "AI/算力下跌",
-   "direct_bear": [
+   "title": "特朗普称将与中俄元首在APEC讨论美伊冲突及无核化问题，外交部回应",
+   "source": "华尔街见闻",
+   "time": "2026-11-09T15:29:11+08:00",
+   "url": "https://wallstreetcn.com/livenews/3196752",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
     {
-     "sector": "算力",
+     "sector": "军工",
      "stocks": [
-      "603131",
-      "688385"
+      "301306"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "605123"
      ]
     },
     {
-     "sector": "计算机",
+     "sector": "旅游",
      "stocks": [
-      "003004"
+      "600593"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-09",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "特朗普政府要求中国协助结束与伊朗冲突？外交部：相关方应该坚持和平选择",
+   "source": "华尔街见闻",
+   "time": "2026-11-09T15:29:11+08:00",
+   "url": "https://wallstreetcn.com/livenews/3196751",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "301306"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "605123"
      ]
     },
     {
-     "sector": "软件",
+     "sector": "旅游",
      "stocks": [
-      "300624"
+      "600593"
      ]
     }
    ],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "AI应用",
-     "stocks": [
-      "300624"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
+   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
@@ -204,9 +237,7 @@
     {
      "sector": "军工",
      "stocks": [
-      "301306",
-      "301313",
-      "000026"
+      "301306"
      ]
     }
    ],
@@ -255,9 +286,7 @@
     {
      "sector": "军工",
      "stocks": [
-      "301306",
-      "301313",
-      "000026"
+      "301306"
      ]
     }
    ],
@@ -295,32 +324,103 @@
    }
   },
   {
-   "title": "商务部回应“美首次以涉古巴为由制裁中企”：敦促美方尽快纠正错误做法",
-   "source": "wallstreetcn",
-   "time": "2026-11-07T09:20:18+08:00",
-   "url": "https://wallstreetcn.com/live/3196294",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
+   "title": "布伦特原油日内跌幅达2.0%，报96.35美元/桶；WTI原油日内跌幅达1.5%，报89.45美元/桶。",
+   "source": "华尔街见闻",
+   "time": "2026-11-09T15:29:11+08:00",
+   "url": "https://wallstreetcn.com/livenews/3196728",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "半导体设备",
+     "sector": "油服工程",
      "stocks": [
-      "688801"
+      "600968"
      ]
     }
    ],
-   "inverse_bear": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-06",
-    "event_date": "2026-11-07",
+    "event_date": "2026-11-09",
     "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+   }
+  },
+  {
+   "title": "美国女议员戳破美股AI泡沫",
+   "source": "贴吧热议",
+   "time": "2026-11-09T15:34:04+08:00",
+   "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369406&amp;topic_name=%E7%BE%8E%E5%9B%BD%E5%A5%B3%E8%AE%AE%E5%91%98%E6%88%B3%E7%A0%B4%E7%BE%8E%E8%82%A1AI%E6%B3%A1%E6%B2%AB",
+   "transmission_id": "ai_down",
+   "label": "AI/算力下跌",
+   "direct_bear": [
+    {
+     "sector": "算力",
+     "stocks": [
+      "002565",
+      "688385"
+     ]
+    },
+    {
+     "sector": "计算机",
+     "stocks": [
+      "003004"
+     ]
+    },
+    {
+     "sector": "软件",
+     "stocks": [
+      "688326"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-06",
+    "event_date": "2026-11-09",
+    "matched_codes": []
+   }
   }
  ]
 }
