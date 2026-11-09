@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-11-09T05:06:38+08:00",
+    "ts": "2026-11-09T10:20:59+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8585,
+    "n_days": 8586,
     "span": [
       "1990-12-19",
-      "2026-11-06"
+      "2026-11-09"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-11-09T05:06:38+08:00"
+    "rebuilt_at": "2026-11-09T10:20:59+08:00"
   },
   "status": {
-    "date": "2026-11-06",
-    "close": 3649.18,
-    "ma5": 3654.28,
-    "ma20": 3693.3,
-    "ma60": 3841.35,
+    "date": "2026-11-09",
+    "close": 3671.86,
+    "ma5": 3661.04,
+    "ma20": 3687.03,
+    "ma60": 3836.88,
     "ma_bull": false,
-    "macd_hist": 10.38,
+    "macd_hist": 14.34,
     "macd_bull": true,
-    "rsi": 41.4,
-    "momentum_20d_pct": -3.9,
+    "rsi": 43.6,
+    "momentum_20d_pct": -3.39,
     "phase": "downtrend",
-    "volume_ratio": 0.87
+    "volume_ratio": 0.41
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 203,
+      "n_days": 204,
       "open": 3986.97,
-      "close": 3649.18,
+      "close": 3671.86,
       "high": 4258.86,
       "low": 3574.27,
-      "chg_pct": -8.05,
+      "chg_pct": -7.48,
       "amplitude_pct": 19.15,
-      "turnover_yi": 1225.5,
+      "turnover_yi": 1227.4,
       "candles": {
-        "yang": 117,
+        "yang": 118,
         "yin": 86,
         "cross": 0
       },
       "max_drawdown_pct": -16.07,
       "first_date": "2026-01-05",
-      "last_date": "2026-11-06"
+      "last_date": "2026-11-09"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -2.47
+        "Q4": -2.16
       },
       "months_covered": 10
     }
@@ -1348,7 +1348,7 @@
         "2026",
         "2005"
       ],
-      "avg_chg": -0.69,
+      "avg_chg": -0.63,
       "best": [
         "2015",
         9.41
@@ -1388,7 +1388,7 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 12.08,
+      "chg_pct": 13.32,
       "position": "库存周期中性",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
@@ -1447,496 +1447,460 @@
     "sample_span_years": 36
   },
   "demand_shift": {
-    "source_ts": "2026-11-09T05:06:35+08:00",
+    "source_ts": "2026-11-09T10:20:54+08:00",
     "source": "eastmoney_push2his_clist",
     "industry_top": [
       {
-        "name": "视频媒体",
-        "chg_pct": 6.25,
-        "up_n": 1,
+        "name": "其他数字媒体",
+        "chg_pct": 7.34,
+        "up_n": 2,
         "down_n": 0,
-        "leader": "芒果超媒",
-        "main_net_inflow_yi": -0.82,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 0.41,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "种子",
-        "chg_pct": 4.64,
-        "up_n": 10,
+        "name": "文字媒体",
+        "chg_pct": 6.16,
+        "up_n": 2,
         "down_n": 0,
-        "leader": "万向德农",
-        "main_net_inflow_yi": 2.84,
+        "leader": "中文在线",
+        "main_net_inflow_yi": 4.58,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "院线",
+        "chg_pct": 5.28,
+        "up_n": 4,
+        "down_n": 0,
+        "leader": "幸福蓝海",
+        "main_net_inflow_yi": 0.76,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "航天装备Ⅲ",
+        "chg_pct": 5.16,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "中国卫星",
+        "main_net_inflow_yi": 7.69,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "航天装备Ⅱ",
+        "chg_pct": 5.16,
+        "up_n": 9,
+        "down_n": 0,
+        "leader": "中国卫星",
+        "main_net_inflow_yi": 7.69,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "焦炭Ⅲ",
+        "chg_pct": 4.64,
+        "up_n": 7,
+        "down_n": 0,
+        "leader": "安泰集团",
+        "main_net_inflow_yi": 1.7,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "焦炭Ⅱ",
+        "chg_pct": 4.64,
+        "up_n": 7,
+        "down_n": 0,
+        "leader": "安泰集团",
+        "main_net_inflow_yi": 1.7,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
         "name": "卫浴电器",
-        "chg_pct": 3.46,
+        "chg_pct": 4.58,
         "up_n": 2,
         "down_n": 1,
         "leader": "日出东方",
-        "main_net_inflow_yi": 1.57,
+        "main_net_inflow_yi": 0.41,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "其他养殖",
-        "chg_pct": 3.18,
-        "up_n": 1,
-        "down_n": 2,
-        "leader": "天山生物",
-        "main_net_inflow_yi": 0.3,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "电信运营商",
-        "chg_pct": 2.87,
-        "up_n": 3,
-        "down_n": 0,
-        "leader": "中国电信",
-        "main_net_inflow_yi": 4.05,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "种植业",
-        "chg_pct": 2.72,
-        "up_n": 16,
-        "down_n": 5,
-        "leader": "万向德农",
-        "main_net_inflow_yi": 3.23,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "纺织鞋类制造",
-        "chg_pct": 2.69,
+        "name": "视频媒体",
+        "chg_pct": 4.57,
         "up_n": 1,
         "down_n": 0,
-        "leader": "华利集团",
-        "main_net_inflow_yi": -0.02,
+        "leader": "芒果超媒",
+        "main_net_inflow_yi": -0.08,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "医美服务",
-        "chg_pct": 2.64,
-        "up_n": 2,
+        "name": "通信线缆及配套",
+        "chg_pct": 3.96,
+        "up_n": 14,
         "down_n": 0,
-        "leader": "朗姿股份",
-        "main_net_inflow_yi": 0.21,
+        "leader": "长飞光纤",
+        "main_net_inflow_yi": 8.23,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "教育运营及其他",
-        "chg_pct": 2.15,
-        "up_n": 2,
+        "name": "其他通信设备",
+        "chg_pct": 3.86,
+        "up_n": 13,
         "down_n": 0,
-        "leader": "ST豆神",
-        "main_net_inflow_yi": -0.05,
+        "leader": "东方通信",
+        "main_net_inflow_yi": 1.84,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "其他能源发电",
-        "chg_pct": 1.96,
-        "up_n": 1,
-        "down_n": 0,
-        "leader": "顺发恒能",
-        "main_net_inflow_yi": 0.19,
+        "name": "影视院线",
+        "chg_pct": 3.69,
+        "up_n": 17,
+        "down_n": 1,
+        "leader": "上海电影",
+        "main_net_inflow_yi": 4.16,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "其他种植业",
-        "chg_pct": 1.65,
-        "up_n": 3,
-        "down_n": 2,
-        "leader": "新赛股份",
-        "main_net_inflow_yi": 0.07,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "光伏电池组件",
-        "chg_pct": 1.46,
-        "up_n": 10,
-        "down_n": 12,
-        "leader": "时创能源",
-        "main_net_inflow_yi": -2.08,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "水力发电",
-        "chg_pct": 1.46,
-        "up_n": 9,
-        "down_n": 2,
-        "leader": "华能水电",
-        "main_net_inflow_yi": 6.33,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "高速公路",
-        "chg_pct": 1.2,
+        "name": "数字媒体",
+        "chg_pct": 3.67,
         "up_n": 15,
-        "down_n": 3,
-        "leader": "龙江交通",
-        "main_net_inflow_yi": 3.99,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "农业综合Ⅲ",
-        "chg_pct": 1.17,
-        "up_n": 2,
         "down_n": 0,
-        "leader": "润农节水",
-        "main_net_inflow_yi": 0.09,
+        "leader": "凡拓数创",
+        "main_net_inflow_yi": 9.27,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "农业综合Ⅱ",
-        "chg_pct": 1.17,
-        "up_n": 2,
+        "name": "机器人",
+        "chg_pct": 3.67,
+        "up_n": 22,
         "down_n": 0,
-        "leader": "润农节水",
-        "main_net_inflow_yi": 0.09,
+        "leader": "宇树科技-W",
+        "main_net_inflow_yi": 5.94,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "农商行Ⅲ",
-        "chg_pct": 1.16,
-        "up_n": 9,
-        "down_n": 0,
-        "leader": "沪农商行",
-        "main_net_inflow_yi": 0.49,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "粘胶",
-        "chg_pct": 1.16,
-        "up_n": 3,
-        "down_n": 0,
-        "leader": "吉林化纤",
-        "main_net_inflow_yi": -0.32,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "风力发电",
-        "chg_pct": 1.12,
-        "up_n": 7,
-        "down_n": 6,
-        "leader": "新能股份",
-        "main_net_inflow_yi": 0.04,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "国有大型银行Ⅲ",
-        "chg_pct": 1.04,
+        "name": "胶黏剂及胶带",
+        "chg_pct": 3.47,
         "up_n": 6,
         "down_n": 0,
-        "leader": "建设银行",
-        "main_net_inflow_yi": 5.09,
+        "leader": "晶华新材",
+        "main_net_inflow_yi": 0.88,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "印制电路板",
+        "chg_pct": 3.47,
+        "up_n": 48,
+        "down_n": 0,
+        "leader": "世运电路",
+        "main_net_inflow_yi": 23.42,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "稀土",
+        "chg_pct": 3.43,
+        "up_n": 3,
+        "down_n": 0,
+        "leader": "中稀有色",
+        "main_net_inflow_yi": 0.9,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "汽车综合服务",
+        "chg_pct": 3.43,
+        "up_n": 1,
+        "down_n": 2,
+        "leader": "阿尔特",
+        "main_net_inflow_yi": -0.09,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "涂料",
+        "chg_pct": 3.36,
+        "up_n": 1,
+        "down_n": 1,
+        "leader": "*ST亚士",
+        "main_net_inflow_yi": -0.01,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "通信网络设备及器件",
+        "chg_pct": 3.29,
+        "up_n": 38,
+        "down_n": 0,
+        "leader": "烽火通信",
+        "main_net_inflow_yi": 29.07,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
       }
     ],
     "industry_n": 20,
     "concept_top": [
       {
-        "name": "昨日打二板以上表现",
-        "chg_pct": 10.03,
-        "up_n": 4,
-        "down_n": 0,
-        "leader": "永臻股份",
+        "name": "昨日首板",
+        "chg_pct": 5.71,
+        "up_n": 15,
+        "down_n": 1,
+        "leader": "东方新能",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "昨日连板_含一字",
-        "chg_pct": 2.11,
-        "up_n": 10,
-        "down_n": 12,
-        "leader": "永臻股份",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "转基因",
-        "chg_pct": 1.54,
-        "up_n": 12,
-        "down_n": 7,
-        "leader": "万向德农",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "昨日连板",
-        "chg_pct": 1.39,
-        "up_n": 6,
-        "down_n": 10,
-        "leader": "贝特利",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "粮食概念",
-        "chg_pct": 1.32,
-        "up_n": 19,
-        "down_n": 17,
-        "leader": "万向德农",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "可燃冰",
-        "chg_pct": 0.78,
-        "up_n": 4,
-        "down_n": 5,
-        "leader": "鲁阳节能",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "农业种植",
-        "chg_pct": 0.31,
-        "up_n": 31,
-        "down_n": 51,
-        "leader": "万向德农",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "红利破净股",
-        "chg_pct": 0.29,
-        "up_n": 27,
-        "down_n": 17,
-        "leader": "雅戈尔",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "证金持股",
-        "chg_pct": 0.27,
-        "up_n": 22,
-        "down_n": 13,
-        "leader": "国电电力",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "红利股",
-        "chg_pct": 0.19,
-        "up_n": 53,
-        "down_n": 45,
-        "leader": "鲁阳节能",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "草甘膦",
-        "chg_pct": 0.18,
-        "up_n": 5,
-        "down_n": 8,
-        "leader": "红太阳",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "水产概念",
-        "chg_pct": 0.15,
-        "up_n": 6,
-        "down_n": 11,
-        "leader": "东方海洋",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "昨日涨停_含一字",
-        "chg_pct": 0.12,
-        "up_n": 32,
-        "down_n": 54,
-        "leader": "永臻股份",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "价值股",
-        "chg_pct": 0.1,
-        "up_n": 55,
-        "down_n": 42,
-        "leader": "中国电信",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "绿色电力",
-        "chg_pct": 0.09,
-        "up_n": 75,
-        "down_n": 93,
-        "leader": "新能股份",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "农村电商",
-        "chg_pct": 0.06,
-        "up_n": 4,
-        "down_n": 4,
-        "leader": "芒果超媒",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
-      },
-      {
-        "name": "智能电视",
-        "chg_pct": -0.02,
-        "up_n": 4,
-        "down_n": 8,
-        "leader": "康冠科技",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
         "name": "昨日涨停",
-        "chg_pct": -0.04,
-        "up_n": 29,
-        "down_n": 52,
-        "leader": "南侨食品",
+        "chg_pct": 5.12,
+        "up_n": 25,
+        "down_n": 5,
+        "leader": "东方新能",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "ST股",
-        "chg_pct": -0.06,
-        "up_n": 80,
-        "down_n": 108,
-        "leader": "ST亚光",
+        "name": "昨日涨停_含一字",
+        "chg_pct": 4.81,
+        "up_n": 26,
+        "down_n": 6,
+        "leader": "东方新能",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
       },
       {
-        "name": "大盘价值",
-        "chg_pct": -0.1,
-        "up_n": 40,
-        "down_n": 35,
-        "leader": "沪农商行",
+        "name": "AI视频",
+        "chg_pct": 4.34,
+        "up_n": 27,
+        "down_n": 1,
+        "leader": "万兴科技",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-09T05:06:35+08:00"
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "6G概念",
+        "chg_pct": 3.94,
+        "up_n": 46,
+        "down_n": 4,
+        "leader": "信维通信",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "东方财富热股",
+        "chg_pct": 3.76,
+        "up_n": 78,
+        "down_n": 20,
+        "leader": "东方新能",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "题材股",
+        "chg_pct": 3.72,
+        "up_n": 33,
+        "down_n": 9,
+        "leader": "闽发铝业",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "空间站概念",
+        "chg_pct": 3.55,
+        "up_n": 22,
+        "down_n": 2,
+        "leader": "中国卫星",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "卫星互联网",
+        "chg_pct": 3.49,
+        "up_n": 97,
+        "down_n": 6,
+        "leader": "信维通信",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "纳米银",
+        "chg_pct": 3.29,
+        "up_n": 9,
+        "down_n": 1,
+        "leader": "西部材料",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "毫米波概念",
+        "chg_pct": 3.1,
+        "up_n": 52,
+        "down_n": 4,
+        "leader": "信维通信",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "昨日高换手",
+        "chg_pct": 3.03,
+        "up_n": 61,
+        "down_n": 18,
+        "leader": "顺灏股份",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "Kimi概念",
+        "chg_pct": 3.02,
+        "up_n": 15,
+        "down_n": 2,
+        "leader": "万兴科技",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "昨日连板_含一字",
+        "chg_pct": 2.91,
+        "up_n": 7,
+        "down_n": 5,
+        "leader": "闽发铝业",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "商业航天",
+        "chg_pct": 2.9,
+        "up_n": 294,
+        "down_n": 29,
+        "leader": "西部材料",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "F5G概念",
+        "chg_pct": 2.89,
+        "up_n": 26,
+        "down_n": 0,
+        "leader": "烽火通信",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "UWB概念",
+        "chg_pct": 2.83,
+        "up_n": 16,
+        "down_n": 2,
+        "leader": "信维通信",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "光通信模块",
+        "chg_pct": 2.83,
+        "up_n": 119,
+        "down_n": 5,
+        "leader": "世运电路",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "影视概念",
+        "chg_pct": 2.77,
+        "up_n": 54,
+        "down_n": 6,
+        "leader": "文投控股",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
+      },
+      {
+        "name": "昨日连板",
+        "chg_pct": 2.77,
+        "up_n": 4,
+        "down_n": 4,
+        "leader": "新亚制程",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-09T10:20:54+08:00"
       }
     ],
     "concept_n": 20,
     "concentration": {
-      "top5_avg_chg": 4.08,
-      "sample_avg_chg": 2.26,
-      "spread": 1.82,
-      "interpretation": "主题集中行情 (头部板块显著强于平均)"
+      "top5_avg_chg": 5.82,
+      "sample_avg_chg": 4.34,
+      "spread": 1.48,
+      "interpretation": "结构性分化"
     }
   },
   "stocks": [
     {
+      "code": "603533",
+      "name": "",
+      "industry": "文字媒体",
+      "chg_pct": 2.86,
+      "leader": "中文在线",
+      "main_net_inflow_yi": 4.58,
+      "source": "eastmoney_push2his_clist",
+      "source_ts": "2026-11-09T10:20:54+08:00",
+      "reason": "当前周期需求迁移行业成分股",
+      "algorithm": "cycle_pool_v2_industry_members",
+      "price": 30.96,
+      "turnover": 9.74,
+      "pe": -481.79,
+      "mktcap_yi": 135.88,
+      "pb": 6.02,
+      "quote_time": "20261109102055"
+    },
+    {
       "code": "002543",
       "name": "",
       "industry": "卫浴电器",
-      "chg_pct": -0.44,
+      "chg_pct": 3.94,
       "leader": "日出东方",
-      "main_net_inflow_yi": 1.57,
+      "main_net_inflow_yi": 0.41,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-09T05:06:35+08:00",
+      "source_ts": "2026-11-09T10:20:54+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 6.85,
-      "turnover": 1.89,
-      "pe": -21.43,
-      "mktcap_yi": 45.29,
-      "pb": 1.1,
-      "quote_time": "20261106161439"
+      "price": 7.12,
+      "turnover": 1.36,
+      "pe": -22.27,
+      "mktcap_yi": 47.08,
+      "pb": 1.14,
+      "quote_time": "20261109102057"
     },
     {
       "code": "603551",
       "name": "",
       "industry": "卫浴电器",
-      "chg_pct": 0.79,
+      "chg_pct": -0.22,
       "leader": "日出东方",
-      "main_net_inflow_yi": 1.57,
+      "main_net_inflow_yi": 0.41,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-09T05:06:35+08:00",
+      "source_ts": "2026-11-09T10:20:54+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 8.9,
-      "turnover": 0.59,
-      "pe": 13.83,
-      "mktcap_yi": 33.93,
+      "price": 8.88,
+      "turnover": 0.14,
+      "pe": 13.8,
+      "mktcap_yi": 33.85,
       "pb": 2.81,
-      "quote_time": "20261106161443"
-    },
-    {
-      "code": "601728",
-      "name": "",
-      "industry": "电信运营商",
-      "chg_pct": 4.22,
-      "leader": "中国电信",
-      "main_net_inflow_yi": 4.05,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-09T05:06:35+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 6.91,
-      "turnover": 0.22,
-      "pe": 22.09,
-      "mktcap_yi": 5364.21,
-      "pb": 1.36,
-      "quote_time": "20261106161457"
-    },
-    {
-      "code": "600941",
-      "name": "",
-      "industry": "电信运营商",
-      "chg_pct": 3.24,
-      "leader": "中国电信",
-      "main_net_inflow_yi": 4.05,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-09T05:06:35+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 103.49,
-      "turnover": 1.94,
-      "pe": 17.55,
-      "mktcap_yi": 934.27,
-      "pb": 1.61,
-      "quote_time": "20261106161448"
-    },
-    {
-      "code": "600050",
-      "name": "",
-      "industry": "电信运营商",
-      "chg_pct": 1.13,
-      "leader": "中国电信",
-      "main_net_inflow_yi": 4.05,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-09T05:06:35+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 4.47,
-      "turnover": 0.5,
-      "pe": 22.7,
-      "mktcap_yi": 1385.27,
-      "pb": 0.81,
-      "quote_time": "20261106161450"
+      "quote_time": "20261109102048"
     }
   ],
   "stocks_meta": {
-    "n": 5,
-    "enriched": 5,
+    "n": 3,
+    "enriched": 3,
     "status": "ok",
     "reason": null
   }
