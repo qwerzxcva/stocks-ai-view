@@ -1,11 +1,11 @@
 {
-  "ts": "2026-11-10T02:22:05+08:00",
+  "ts": "2026-11-10T08:37:36+08:00",
   "engine": "numeric_validator v1",
-  "n_files": 179,
-  "n_issues": 437,
+  "n_files": 180,
+  "n_issues": 466,
   "by_severity": {
-    "critical": 350,
-    "warning": 86,
+    "critical": 389,
+    "warning": 76,
     "info": 1
   },
   "issues": [
@@ -17,639 +17,255 @@
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[8].pe",
-      "severity": "warning",
-      "msg": "越界 -14349.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[8].field_sources.price",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'em_push2his_clist'"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[32].field_sources.price",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'em_push2his_clist'"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[41].field_sources.price",
+      "field": "data.quote[24].field_sources.price",
       "severity": "critical",
       "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[253].chg_pct",
+      "field": "data.quote[44].field_sources.price",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -52.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[255].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[256].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 85.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[260].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -71.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[261].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -82.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[262].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 149.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[263].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 42.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[266].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 49.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[267].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -92.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[268].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 73.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[275].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -70.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[276].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 73.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[277].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -44.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[279].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -76.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[280].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -65.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[282].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -66.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[287].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 135.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[291].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -143.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[294].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 91.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[295].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 101.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[296].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 91.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[297].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[298].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 115.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[299].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[300].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -152.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[302].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 93.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[303].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 62.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[306].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 38.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[307].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 37.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[315].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -43.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[322].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 49.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[323].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -45.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[324].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -57.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[328].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -61.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[329].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -45.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[330].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 97.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[339].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 106.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[340].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 198.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[344].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -49.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[346].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -44.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[347].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 204.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[371].price",
+      "field": "data.quote[272].price",
       "severity": "critical",
       "msg": "越界 128561.34 不在 [0.0001, 100000]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[449].chg_pct",
+      "field": "data.quote[353].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -426.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -52.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[450].chg_pct",
+      "field": "data.quote[355].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -1873.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[451].chg_pct",
+      "field": "data.quote[356].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -600.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 85.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[452].chg_pct",
+      "field": "data.quote[360].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 1008.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -71.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[453].chg_pct",
+      "field": "data.quote[361].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 2000.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -82.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[454].chg_pct",
+      "field": "data.quote[362].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 591.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 149.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[455].chg_pct",
+      "field": "data.quote[363].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 278.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 42.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[456].chg_pct",
+      "field": "data.quote[366].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 994.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 49.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[457].pe",
-      "severity": "warning",
-      "msg": "越界 -31124.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[457].chg_pct",
+      "field": "data.quote[367].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -259.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -92.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[458].chg_pct",
+      "field": "data.quote[368].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -463.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 73.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[459].chg_pct",
+      "field": "data.quote[375].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 904.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -70.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[460].chg_pct",
+      "field": "data.quote[376].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 225.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 73.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[461].chg_pct",
+      "field": "data.quote[377].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 199.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -44.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[462].chg_pct",
+      "field": "data.quote[379].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 830.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -76.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[463].chg_pct",
+      "field": "data.quote[380].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -405.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -65.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[464].pe",
-      "severity": "warning",
-      "msg": "越界 747321.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[464].chg_pct",
+      "field": "data.quote[382].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 590.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -66.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[465].chg_pct",
+      "field": "data.quote[387].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 1275.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 135.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[466].chg_pct",
+      "field": "data.quote[393].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -117.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 91.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[467].pe",
-      "severity": "warning",
-      "msg": "越界 280264.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[467].chg_pct",
+      "field": "data.quote[394].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 500.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 101.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[468].pe",
-      "severity": "warning",
-      "msg": "越界 -69968.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[468].chg_pct",
+      "field": "data.quote[395].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -151.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 91.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[469].pe",
-      "severity": "warning",
-      "msg": "越界 -12415.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[469].chg_pct",
+      "field": "data.quote[396].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 164.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[470].chg_pct",
+      "field": "data.quote[397].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -148.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 115.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[471].chg_pct",
+      "field": "data.quote[398].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 217.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 108.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[472].chg_pct",
+      "field": "data.quote[399].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -866.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -152.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[473].pe",
-      "severity": "warning",
-      "msg": "越界 -39521.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[473].chg_pct",
+      "field": "data.quote[401].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 1000.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 93.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[474].chg_pct",
+      "field": "data.quote[402].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -228.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 62.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[475].chg_pct",
+      "field": "data.quote[405].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 565.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 38.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[477].chg_pct",
+      "field": "data.quote[406].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 87.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 37.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[478].chg_pct",
+      "field": "data.quote[415].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 294.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -43.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[480].pe",
-      "severity": "warning",
-      "msg": "越界 -18520.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[480].chg_pct",
+      "field": "data.quote[422].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -121.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 49.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[481].chg_pct",
+      "field": "data.quote[423].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 1005.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -45.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[482].chg_pct",
+      "field": "data.quote[424].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 595.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -57.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[483].chg_pct",
+      "field": "data.quote[428].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 698.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -61.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[484].pe",
-      "severity": "warning",
-      "msg": "越界 -23061.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[484].chg_pct",
+      "field": "data.quote[429].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -146.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -45.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[485].chg_pct",
+      "field": "data.quote[430].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 996.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 97.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[486].chg_pct",
+      "field": "data.quote[439].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 904.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 106.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[487].chg_pct",
+      "field": "data.quote[440].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -651.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 198.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[488].pe",
-      "severity": "warning",
-      "msg": "越界 -28805.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[488].chg_pct",
+      "field": "data.quote[445].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 1434.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 -44.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
-      "field": "data.quote[489].chg_pct",
+      "field": "data.quote[446].chg_pct",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -237.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[490].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 471.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[491].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 151.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[492].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -130.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[493].pe",
-      "severity": "warning",
-      "msg": "越界 373958.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[493].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 147.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[494].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 577.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[495].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -1110.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[496].pe",
-      "severity": "warning",
-      "msg": "越界 -11122.0 不在 [-10000, 100000]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[496].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 260.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[497].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -181.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[498].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 917.0 不在 [-35, 35]"
-    },
-    {
-      "file": "all_sources.json",
-      "field": "data.quote[499].chg_pct",
-      "severity": "critical",
-      "msg": "日涨跌幅越界 -225.0 不在 [-35, 35]"
+      "msg": "日涨跌幅越界 204.0 不在 [-35, 35]"
     },
     {
       "file": "all_sources.json",
@@ -671,7 +287,7 @@
     },
     {
       "file": "all_sources.json",
-      "field": "data.fund[170].field_sources.price",
+      "field": "data.fund[190].field_sources.price",
       "severity": "critical",
       "msg": "非数值类型 str: 'jisilu_cb_list_new'"
     },
@@ -1037,99 +653,9 @@
     },
     {
       "file": "recent_mainlines.json",
-      "field": "daily[6].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-14', 'source': 'data/review_history.jsonl', 'time': '2026-10-14T17:20:31+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[6].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[6].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-14T17:20:31+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[7].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-15', 'source': 'data/review_history.jsonl', 'time': '2026-10-15T19:37:35+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[7].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[7].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-15T19:37:35+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[8].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-16', 'source': 'data/review_history.jsonl', 'time': '2026-10-16T23:05:52+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[8].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[8].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-16T23:05:52+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[9].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-17', 'source': 'data/review_history.jsonl', 'time': '2026-10-17T22:57:25+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[9].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[9].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-17T22:57:25+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[10].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-18', 'source': 'data/review_history.jsonl', 'time': '2026-10-18T23:58:13+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[10].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[10].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-18T23:58:13+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
       "field": "daily[11].close",
       "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-19', 'source': 'data/review_history.jsonl', 'time': '2026-10-19T23:19:30+08:00', 'summary'"
+      "msg": "非数值类型 dict: {'date': '2026-10-14', 'source': 'data/review_history.jsonl', 'time': '2026-10-14T15:48:04+08:00', 'summary'"
     },
     {
       "file": "recent_mainlines.json",
@@ -1141,673 +667,1147 @@
       "file": "recent_mainlines.json",
       "field": "daily[11].actual_time.close",
       "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-19T23:19:30+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[12].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-20', 'source': 'data/review_history.jsonl', 'time': '2026-10-20T22:12:45+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[12].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[12].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-20T22:12:45+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[13].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-21', 'source': 'data/review_history.jsonl', 'time': '2026-10-21T22:29:20+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[13].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[13].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-21T22:29:20+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[14].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-22', 'source': 'data/review_history.jsonl', 'time': '2026-10-22T22:40:31+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[14].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[14].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-22T22:40:31+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[15].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-23', 'source': 'data/review_history.jsonl', 'time': '2026-10-23T23:52:37+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[15].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[15].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-23T23:52:37+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[16].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-24', 'source': 'data/review_history.jsonl', 'time': '2026-10-24T22:17:28+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[16].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[16].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-24T22:17:28+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[17].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-25', 'source': 'data/review_history.jsonl', 'time': '2026-10-25T23:34:35+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[17].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[17].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-25T23:34:35+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[18].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-26', 'source': 'data/review_history.jsonl', 'time': '2026-10-26T23:06:29+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[18].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[18].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-26T23:06:29+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[19].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-27', 'source': 'data/review_history.jsonl', 'time': '2026-10-27T23:29:26+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[19].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[19].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-27T23:29:26+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[20].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-28', 'source': 'data/review_history.jsonl', 'time': '2026-10-28T23:53:12+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[20].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[20].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-28T23:53:12+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[21].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-29', 'source': 'data/review_history.jsonl', 'time': '2026-10-29T23:46:19+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[21].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[21].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-29T23:46:19+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[22].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-10-30', 'source': 'data/review_history.jsonl', 'time': '2026-10-30T23:21:02+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[22].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[22].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-10-30T23:21:02+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[26].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-11-05', 'source': 'data/review_history.jsonl', 'time': '2026-11-05T16:56:12+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[26].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[26].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-11-05T16:56:12+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[27].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-11-06', 'source': 'data/review_history.jsonl', 'time': '2026-11-06T23:55:27+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[27].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[27].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-11-06T23:55:27+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[28].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-11-07', 'source': 'data/review_history.jsonl', 'time': '2026-11-07T23:44:55+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[28].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[28].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-11-07T23:44:55+08:00'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[29].close",
-      "severity": "critical",
-      "msg": "非数值类型 dict: {'date': '2026-11-08', 'source': 'data/review_history.jsonl', 'time': '2026-11-08T16:19:59+08:00', 'summary'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[29].source.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'data/review_history.jsonl'"
-    },
-    {
-      "file": "recent_mainlines.json",
-      "field": "daily[29].actual_time.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: '2026-11-08T16:19:59+08:00'"
+      "msg": "非数值类型 str: '2026-10-14T15:48:04+08:00'"
     },
     {
       "file": "shard_a.json",
-      "field": "data.fund[190].field_sources.price",
+      "field": "data.fund[170].field_sources.price",
       "severity": "critical",
       "msg": "非数值类型 str: 'jisilu_cb_list_new'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[22].price",
+      "file": "shard_a.json",
+      "field": "data.kline[0].field_sources.close",
       "severity": "critical",
-      "msg": "越界 129248.19 不在 [0.0001, 100000]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[100].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[1].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -285.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[101].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[2].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -239.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[102].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[3].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -256.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[103].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[4].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -90.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[104].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[5].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -498.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[105].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[6].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -293.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[106].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[7].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -410.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[107].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[8].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -80.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[108].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[9].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -215.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[109].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[10].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -161.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[111].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[11].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -103.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[114].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[12].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 37.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[115].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[13].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -224.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[116].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[14].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -86.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[117].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[15].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -136.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[118].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[16].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -409.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[120].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[17].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -169.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[121].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[18].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -155.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[122].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[19].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -135.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[123].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[20].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -228.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[124].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[21].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -249.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[126].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[22].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 40.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[127].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[23].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -124.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[128].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[24].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -97.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[129].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[25].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -126.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[130].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[26].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -128.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[131].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[27].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -193.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[134].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[28].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -72.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[135].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[29].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -235.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[136].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[30].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -212.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[138].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[31].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -137.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[139].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[32].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -172.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[140].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[33].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -176.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[141].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[34].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -106.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[142].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[35].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -119.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[143].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[36].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -117.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[144].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[37].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 105.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[145].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[38].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -166.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[146].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[39].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 69.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[147].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[40].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 90.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[148].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[41].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -179.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[149].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[42].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -183.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[150].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[43].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -131.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[151].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[44].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -117.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[152].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[45].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -152.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[153].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[46].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -321.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[154].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[47].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -225.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[155].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[48].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -123.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[156].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[49].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -107.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[157].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[50].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -96.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[158].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[51].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -107.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[159].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[52].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -222.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[160].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[53].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -216.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[161].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[54].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -201.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[162].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[55].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -147.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[163].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[56].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -160.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[164].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[57].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -251.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[165].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[58].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -390.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[166].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[59].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -389.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[167].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[60].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -397.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[168].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[61].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -389.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[169].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[62].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -433.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[170].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[63].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -396.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
     },
     {
-      "file": "shard_b.json",
-      "field": "data.quote[171].chg_pct",
+      "file": "shard_a.json",
+      "field": "data.kline[64].field_sources.close",
       "severity": "critical",
-      "msg": "日涨跌幅越界 -258.0 不在 [-35, 35]"
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[65].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[66].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[67].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[68].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[69].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[70].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[71].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[72].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[73].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[74].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[75].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[76].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[77].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[78].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[79].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[80].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[81].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[82].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[83].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[84].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[85].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[86].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[87].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[88].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[89].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[90].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[91].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[92].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[93].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[94].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[95].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[96].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[97].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[98].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[99].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[100].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[101].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[102].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[103].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[104].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[105].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[106].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[107].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[108].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[109].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[110].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[111].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[112].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[113].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[114].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[115].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[116].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[117].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[118].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[119].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[120].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[121].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[122].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[123].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[124].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[125].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[126].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[127].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[128].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[129].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[130].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[131].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[132].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[133].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[134].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[135].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[136].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[137].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[138].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[139].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[140].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[141].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[142].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[143].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[144].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[145].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[146].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[147].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[148].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[149].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[150].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[151].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[152].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[153].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[154].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[155].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[156].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[157].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[158].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[159].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[160].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[161].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[162].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[163].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[164].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[165].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[166].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[167].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[168].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[169].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[170].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[171].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[172].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[173].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[174].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[175].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[176].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[177].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[178].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[179].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[180].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[181].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[182].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[183].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[184].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[185].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[186].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[187].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
+    },
+    {
+      "file": "shard_a.json",
+      "field": "data.kline[188].field_sources.close",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'tencent_kline'"
     }
   ],
   "rules": {
