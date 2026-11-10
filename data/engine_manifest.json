@@ -17,8 +17,8 @@
         "dimensions": 9
       },
       "produced_by": "scripts/decision_engine.py",
-      "sha256": "18ffbfbcfe526b692a2340b2542b9d43013276bc687e8122d3a5c12d97cbd0f1",
-      "ts": "2026-11-11T02:02:23+08:00",
+      "sha256": "2fbfe5a80376b459b62ebe3def16cef4facdf1de89c0b89bd3eface0756697c5",
+      "ts": "2026-11-11T06:57:56+08:00",
       "version": "decision v2"
     },
     "engine_fusion": {
@@ -42,8 +42,8 @@
         ]
       },
       "produced_by": "scripts/engine_fusion.py",
-      "sha256": "987cd847b53f7cca843ffbf840289f9beaf4a91110ff683ea6540490fd67b780",
-      "ts": "2026-11-11T02:04:01",
+      "sha256": "ba886e3310114febce94e947cceebbc1cbc294cd786108bd31b49107f0884e49",
+      "ts": "2026-11-11T06:59:36",
       "version": "engine_fusion_v1"
     },
     "engine_spec": {
@@ -65,12 +65,12 @@
         "weight_policy": "{'file': 'data/engine_weights.json', 'wr"
       },
       "produced_by": "scripts/engine_spec.py",
-      "sha256": "feb3930404093fb6ba3c10a86aac6314000a987b251bc1f11af2f21c22833c8e",
+      "sha256": "a49b52f11323e9bddd5e0fde6bb9064a11280d911f784bd73db4e159b3ee4843",
       "ts": "",
       "version": "3.3.0"
     },
     "market_phase": {
-      "age_hours": 307.6,
+      "age_hours": 0.8,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -84,12 +84,12 @@
         "phase_labels": []
       },
       "produced_by": "scripts/phase_runner.py",
-      "sha256": "e85e55b5193bdd969be8f0cd7257af6b574ca692db58ae0da690a292335a2065",
-      "ts": "2026-10-29T06:37:01",
+      "sha256": "28823f03cfd27a6a3123c5e52dfa5381db120915a2cc27d0bc6736c6728a4882",
+      "ts": "2026-11-11T06:22:45",
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 650.9,
+      "age_hours": 0.2,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -105,17 +105,17 @@
         "strategy": "B规则(低位+温和量+涨0-5%)+5日持有"
       },
       "produced_by": "scripts/strategy_card.py",
-      "sha256": "a5069c2b6f6a6ae0cb1ba2e215da6e8dbdad5b94411db4f37a3707b9f4c81d15",
-      "ts": "2026-10-14T23:23:50",
+      "sha256": "e79600e72604732bf86e3958b7827cc9900d656364ef8981d8ed3365641c17fa",
+      "ts": "2026-11-11T06:59:33",
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 654.5,
+      "age_hours": 0.1,
       "baseline": {
-        "mean_is_win": 47.2,
-        "mean_oos_win": 48.62,
-        "n_folds_valid": 45,
-        "oos_vs_is_decay": -1.42
+        "mean_is_win": 48.36,
+        "mean_oos_win": 48.54,
+        "n_folds_valid": 46,
+        "oos_vs_is_decay": -0.18
       },
       "consumers": [
         "SignalCalibration.kt"
@@ -123,7 +123,7 @@
       "file": "data/walkforward.json",
       "max_age_hours": 168,
       "params": {
-        "end": "2026-10-14",
+        "end": "2026-10-26",
         "horizon_days": 5,
         "start": "2023-11-20",
         "step_days": 20,
@@ -131,8 +131,8 @@
         "train_days": 120
       },
       "produced_by": "scripts/walkforward.py",
-      "sha256": "74be1af291abe437e4ddfffbea1ace3597471976012f431da2c835ba2434be51",
-      "ts": "2026-10-14T19:45:52",
+      "sha256": "b5f4a2b54c18a96a7bf0d6e487f0f40f69c270102940b4afe943e61f4d27853d",
+      "ts": "2026-11-11T07:02:00",
       "version": "walkforward_v1"
     },
     "weight_calibration": {
@@ -180,12 +180,12 @@
         "preferred_horizon": 5
       },
       "produced_by": "scripts/weight_calibrator_v3.py",
-      "sha256": "f35ded13a5c0d5d7a9a4fad45034a5469e7eafd2f55df63a0a0d45ccafcf3710",
-      "ts": "2026-11-11T02:13:10+08:00",
+      "sha256": "0cc5b3cd44d338794a7e449e9d759930d6c22921d3da62667cbb8e8e1466c971",
+      "ts": "2026-11-11T07:07:55+08:00",
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-11-11T02:15:30+08:00",
+  "generated_at": "2026-11-11T07:09:55+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }
