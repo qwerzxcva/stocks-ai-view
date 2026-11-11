@@ -1,31 +1,31 @@
 {
   "meta": {
     "source": "腾讯证券 kline/kline 指数全史 + 东财 push2his clist 板块",
-    "ts": "2026-11-11T06:22:31+08:00",
+    "ts": "2026-11-11T10:46:55+08:00",
     "index": "sh000001",
     "index_name": "上证指数",
-    "n_days": 8587,
+    "n_days": 8588,
     "span": [
       "1990-12-19",
-      "2026-11-10"
+      "2026-11-11"
     ],
     "version": "v2",
     "dims": "yearly_kline/annual_rotation/cycle_law/demand_shift/five_dim",
-    "rebuilt_at": "2026-11-11T06:22:31+08:00"
+    "rebuilt_at": "2026-11-11T10:46:55+08:00"
   },
   "status": {
-    "date": "2026-11-10",
-    "close": 3663.72,
-    "ma5": 3669.95,
-    "ma20": 3679.62,
-    "ma60": 3831.65,
+    "date": "2026-11-11",
+    "close": 3657.38,
+    "ma5": 3664.2,
+    "ma20": 3674.13,
+    "ma60": 3827.04,
     "ma_bull": false,
-    "macd_hist": 15.21,
+    "macd_hist": 15.99,
     "macd_bull": true,
-    "rsi": 44.7,
-    "momentum_20d_pct": -2.75,
+    "rsi": 49.9,
+    "momentum_20d_pct": -1.35,
     "phase": "downtrend",
-    "volume_ratio": 0.82
+    "volume_ratio": 0.5
   },
   "yearly_kline": {
     "1991": {
@@ -659,22 +659,22 @@
       "last_date": "2025-12-31"
     },
     "2026": {
-      "n_days": 205,
+      "n_days": 206,
       "open": 3986.97,
-      "close": 3663.72,
+      "close": 3657.38,
       "high": 4258.86,
       "low": 3574.27,
-      "chg_pct": -7.69,
+      "chg_pct": -7.85,
       "amplitude_pct": 19.15,
-      "turnover_yi": 1233.8,
+      "turnover_yi": 1235.9,
       "candles": {
-        "yang": 118,
+        "yang": 119,
         "yin": 87,
         "cross": 0
       },
       "max_drawdown_pct": -16.07,
       "first_date": "2026-01-05",
-      "last_date": "2026-11-10"
+      "last_date": "2026-11-11"
     }
   },
   "annual_rotation": {
@@ -1286,7 +1286,7 @@
         "Q1": -2.71,
         "Q2": 1.74,
         "Q3": -2.0,
-        "Q4": -2.27
+        "Q4": -2.35
       },
       "months_covered": 10
     }
@@ -1348,7 +1348,7 @@
         "2026",
         "2005"
       ],
-      "avg_chg": -0.65,
+      "avg_chg": -0.67,
       "best": [
         "2015",
         9.41
@@ -1388,8 +1388,8 @@
   "cycle_law": {
     "kitchin_inventory_40m": {
       "window_months": 40,
-      "chg_pct": 14.57,
-      "position": "库存周期中性",
+      "chg_pct": 16.08,
+      "position": "补库存/上行",
       "note": "基钦周期≈40个月, 用近820个交易日累计收益近似"
     },
     "juglar_capex_9y": {
@@ -1447,532 +1447,478 @@
     "sample_span_years": 36
   },
   "demand_shift": {
-    "source_ts": "2026-11-11T06:22:28+08:00",
+    "source_ts": "2026-11-11T10:46:52+08:00",
     "source": "eastmoney_push2his_clist",
     "industry_top": [
       {
         "name": "其他数字媒体",
-        "chg_pct": 9.8,
+        "chg_pct": 6.67,
         "up_n": 2,
         "down_n": 0,
         "leader": "风语筑",
-        "main_net_inflow_yi": 2.23,
+        "main_net_inflow_yi": 1.75,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
-        "name": "文字媒体",
-        "chg_pct": 9.03,
+        "name": "其他能源发电",
+        "chg_pct": 5.19,
         "up_n": 2,
         "down_n": 0,
-        "leader": "掌阅科技",
-        "main_net_inflow_yi": 10.63,
+        "leader": "顺发恒能",
+        "main_net_inflow_yi": 0.46,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "影视动漫制作",
-        "chg_pct": 8.03,
-        "up_n": 14,
-        "down_n": 0,
-        "leader": "慈文传媒",
-        "main_net_inflow_yi": 14.22,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "影视院线",
-        "chg_pct": 7.05,
-        "up_n": 17,
-        "down_n": 1,
-        "leader": "慈文传媒",
-        "main_net_inflow_yi": 14.65,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "其他黑色家电",
-        "chg_pct": 6.42,
-        "up_n": 5,
-        "down_n": 0,
-        "leader": "创维数字",
-        "main_net_inflow_yi": 1.08,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "其他家电Ⅲ",
-        "chg_pct": 5.18,
-        "up_n": 3,
-        "down_n": 0,
-        "leader": "奥佳华",
-        "main_net_inflow_yi": 0.59,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "其他家电Ⅱ",
-        "chg_pct": 5.18,
-        "up_n": 3,
-        "down_n": 0,
-        "leader": "奥佳华",
-        "main_net_inflow_yi": 0.59,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
         "name": "汽车综合服务",
-        "chg_pct": 5.04,
+        "chg_pct": 4.21,
         "up_n": 3,
         "down_n": 0,
         "leader": "阿尔特",
-        "main_net_inflow_yi": 0.52,
+        "main_net_inflow_yi": 0.24,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "数字媒体",
-        "chg_pct": 4.84,
-        "up_n": 14,
-        "down_n": 1,
-        "leader": "掌阅科技",
-        "main_net_inflow_yi": 13.8,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "钨",
-        "chg_pct": 4.73,
-        "up_n": 4,
-        "down_n": 0,
-        "leader": "中钨高新",
-        "main_net_inflow_yi": 5.46,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "传媒",
-        "chg_pct": 4.53,
-        "up_n": 123,
-        "down_n": 5,
-        "leader": "文投控股",
-        "main_net_inflow_yi": 46.88,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "营销代理",
-        "chg_pct": 4.46,
-        "up_n": 27,
-        "down_n": 0,
-        "leader": "纵横通信",
-        "main_net_inflow_yi": 13.22,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "消费电子零部件及组装",
-        "chg_pct": 4.44,
-        "up_n": 87,
-        "down_n": 1,
-        "leader": "瀛通通讯",
-        "main_net_inflow_yi": 21.37,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "LED",
-        "chg_pct": 4.43,
-        "up_n": 28,
-        "down_n": 1,
-        "leader": "华体科技",
-        "main_net_inflow_yi": 1.25,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "广告营销",
-        "chg_pct": 4.4,
-        "up_n": 30,
-        "down_n": 0,
-        "leader": "纵横通信",
-        "main_net_inflow_yi": 14.29,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "游戏Ⅲ",
-        "chg_pct": 4.39,
-        "up_n": 24,
-        "down_n": 0,
-        "leader": "文投控股",
-        "main_net_inflow_yi": 1.96,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "游戏Ⅱ",
-        "chg_pct": 4.39,
-        "up_n": 24,
-        "down_n": 0,
-        "leader": "文投控股",
-        "main_net_inflow_yi": 1.96,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
         "name": "机器人",
-        "chg_pct": 4.36,
+        "chg_pct": 3.44,
         "up_n": 22,
         "down_n": 0,
-        "leader": "亿嘉和",
-        "main_net_inflow_yi": 3.84,
+        "leader": "江苏北人",
+        "main_net_inflow_yi": 3.91,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
-        "name": "黑色家电",
-        "chg_pct": 4.32,
-        "up_n": 8,
-        "down_n": 1,
-        "leader": "创维数字",
-        "main_net_inflow_yi": 1.12,
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "燃料电池",
-        "chg_pct": 4.3,
+        "name": "长材",
+        "chg_pct": 3.28,
         "up_n": 1,
         "down_n": 0,
-        "leader": "亿华通-U",
-        "main_net_inflow_yi": -0.0,
+        "leader": "三钢闽光",
+        "main_net_inflow_yi": 0.51,
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "综合包装",
+        "chg_pct": 3.2,
+        "up_n": 5,
+        "down_n": 1,
+        "leader": "康欣新材",
+        "main_net_inflow_yi": 0.27,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "卫浴电器",
+        "chg_pct": 3.13,
+        "up_n": 1,
+        "down_n": 2,
+        "leader": "日出东方",
+        "main_net_inflow_yi": 0.41,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "通信网络设备及器件",
+        "chg_pct": 2.43,
+        "up_n": 30,
+        "down_n": 8,
+        "leader": "宇特光电",
+        "main_net_inflow_yi": 45.14,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "燃气Ⅲ",
+        "chg_pct": 2.4,
+        "up_n": 27,
+        "down_n": 4,
+        "leader": "胜通能源",
+        "main_net_inflow_yi": 1.24,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "燃气Ⅱ",
+        "chg_pct": 2.4,
+        "up_n": 27,
+        "down_n": 4,
+        "leader": "胜通能源",
+        "main_net_inflow_yi": 1.24,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "玻璃制造",
+        "chg_pct": 2.29,
+        "up_n": 5,
+        "down_n": 2,
+        "leader": "凯盛新能",
+        "main_net_inflow_yi": 1.12,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "钛白粉",
+        "chg_pct": 2.11,
+        "up_n": 5,
+        "down_n": 1,
+        "leader": "金浦钛业",
+        "main_net_inflow_yi": 0.42,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "通信线缆及配套",
+        "chg_pct": 2.11,
+        "up_n": 12,
+        "down_n": 2,
+        "leader": "华脉科技",
+        "main_net_inflow_yi": 2.03,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "印刷包装机械",
+        "chg_pct": 2.05,
+        "up_n": 10,
+        "down_n": 2,
+        "leader": "达 意 隆",
+        "main_net_inflow_yi": 0.51,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "视频媒体",
+        "chg_pct": 1.91,
+        "up_n": 1,
+        "down_n": 0,
+        "leader": "芒果超媒",
+        "main_net_inflow_yi": 0.62,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "家纺",
+        "chg_pct": 1.9,
+        "up_n": 5,
+        "down_n": 1,
+        "leader": "梦洁股份",
+        "main_net_inflow_yi": 0.14,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "涤纶",
+        "chg_pct": 1.89,
+        "up_n": 8,
+        "down_n": 1,
+        "leader": "尤夫股份",
+        "main_net_inflow_yi": 0.43,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "汽车服务",
+        "chg_pct": 1.87,
+        "up_n": 6,
+        "down_n": 2,
+        "leader": "阿尔特",
+        "main_net_inflow_yi": 0.27,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "自动化设备",
+        "chg_pct": 1.72,
+        "up_n": 78,
+        "down_n": 18,
+        "leader": "江苏北人",
+        "main_net_inflow_yi": 5.34,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "会展服务",
+        "chg_pct": 1.71,
+        "up_n": 2,
+        "down_n": 1,
+        "leader": "米奥会展",
+        "main_net_inflow_yi": 0.15,
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
       }
     ],
     "industry_n": 20,
     "concept_top": [
       {
-        "name": "历史新高",
-        "chg_pct": 6.73,
-        "up_n": 4,
-        "down_n": 1,
-        "leader": "光洋股份",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "智能音箱",
-        "chg_pct": 6.11,
-        "up_n": 19,
-        "down_n": 0,
-        "leader": "创维数字",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
         "name": "昨日连板_含一字",
-        "chg_pct": 5.95,
-        "up_n": 7,
-        "down_n": 2,
-        "leader": "东方新能",
+        "chg_pct": 3.84,
+        "up_n": 15,
+        "down_n": 4,
+        "leader": "日出东方",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "昨日打二板以上表现",
-        "chg_pct": 5.72,
-        "up_n": 3,
-        "down_n": 0,
-        "leader": "闽发铝业",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "电子后视镜",
-        "chg_pct": 5.6,
-        "up_n": 26,
-        "down_n": 0,
-        "leader": "联创电子",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "短剧互动游戏",
-        "chg_pct": 5.48,
-        "up_n": 47,
-        "down_n": 3,
-        "leader": "文投控股",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "影视概念",
-        "chg_pct": 5.03,
-        "up_n": 61,
-        "down_n": 3,
-        "leader": "文投控股",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "混合现实",
-        "chg_pct": 4.97,
-        "up_n": 34,
-        "down_n": 0,
-        "leader": "风语筑",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "裸眼3D",
-        "chg_pct": 4.85,
-        "up_n": 24,
-        "down_n": 0,
-        "leader": "风语筑",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "昨日涨停_含一字",
-        "chg_pct": 4.84,
-        "up_n": 51,
-        "down_n": 6,
-        "leader": "东方新能",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
         "name": "昨日连板",
-        "chg_pct": 4.78,
-        "up_n": 5,
-        "down_n": 2,
-        "leader": "大东方",
+        "chg_pct": 3.45,
+        "up_n": 13,
+        "down_n": 4,
+        "leader": "锋龙股份",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
-        "name": "昨日涨停",
-        "chg_pct": 4.73,
-        "up_n": 48,
-        "down_n": 6,
-        "leader": "泰尔股份",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "题材股",
-        "chg_pct": 4.69,
-        "up_n": 42,
-        "down_n": 9,
-        "leader": "东方新能",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "AI视频",
-        "chg_pct": 4.6,
-        "up_n": 26,
-        "down_n": 2,
-        "leader": "新炬网络",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "全息技术",
-        "chg_pct": 4.57,
-        "up_n": 11,
-        "down_n": 0,
-        "leader": "风语筑",
-        "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
-      },
-      {
-        "name": "AI眼镜",
-        "chg_pct": 4.55,
-        "up_n": 137,
-        "down_n": 6,
+        "name": "历史新高",
+        "chg_pct": 2.28,
+        "up_n": 7,
+        "down_n": 3,
         "leader": "光洋股份",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
-        "name": "AI语料",
-        "chg_pct": 4.54,
-        "up_n": 37,
-        "down_n": 1,
-        "leader": "慈文传媒",
+        "name": "昨日涨停_含一字",
+        "chg_pct": 2.26,
+        "up_n": 63,
+        "down_n": 32,
+        "leader": "达 意 隆",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
-        "name": "快手概念",
-        "chg_pct": 4.52,
-        "up_n": 34,
+        "name": "昨日打二板以上表现",
+        "chg_pct": 2.2,
+        "up_n": 4,
         "down_n": 2,
         "leader": "日出东方",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "机器人执行器",
+        "chg_pct": 2.19,
+        "up_n": 35,
+        "down_n": 5,
+        "leader": "日发精机",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "减速器",
+        "chg_pct": 2.16,
+        "up_n": 68,
+        "down_n": 24,
+        "leader": "日发精机",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "轮毂电机",
+        "chg_pct": 2.08,
+        "up_n": 8,
+        "down_n": 1,
+        "leader": "兆丰股份",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "昨日涨停",
+        "chg_pct": 2.07,
+        "up_n": 60,
+        "down_n": 32,
+        "leader": "达 意 隆",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
         "name": "昨日首板",
-        "chg_pct": 4.5,
-        "up_n": 38,
-        "down_n": 3,
-        "leader": "泰尔股份",
+        "chg_pct": 1.91,
+        "up_n": 42,
+        "down_n": 21,
+        "leader": "达 意 隆",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "全息技术",
+        "chg_pct": 1.75,
+        "up_n": 6,
+        "down_n": 5,
+        "leader": "风语筑",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "噪声防治",
+        "chg_pct": 1.68,
+        "up_n": 5,
+        "down_n": 3,
+        "leader": "德尔股份",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "F5G概念",
+        "chg_pct": 1.66,
+        "up_n": 20,
+        "down_n": 6,
+        "leader": "华脉科技",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "CPO概念",
+        "chg_pct": 1.59,
+        "up_n": 68,
+        "down_n": 31,
+        "leader": "剑桥科技",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "微盘精选",
+        "chg_pct": 1.55,
+        "up_n": 36,
+        "down_n": 0,
+        "leader": "优德精密",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "电子后视镜",
+        "chg_pct": 1.47,
+        "up_n": 20,
+        "down_n": 5,
+        "leader": "路畅科技",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "汽车一体化压铸",
+        "chg_pct": 1.43,
+        "up_n": 21,
+        "down_n": 8,
+        "leader": "泰瑞机器",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
       },
       {
         "name": "东方财富热股",
-        "chg_pct": 4.23,
-        "up_n": 83,
-        "down_n": 16,
-        "leader": "东方新能",
+        "chg_pct": 1.4,
+        "up_n": 59,
+        "down_n": 41,
+        "leader": "达 意 隆",
         "source": "eastmoney_push2his_clist",
-        "source_ts": "2026-11-11T06:22:28+08:00"
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "微盘股",
+        "chg_pct": 1.4,
+        "up_n": 365,
+        "down_n": 30,
+        "leader": "星光股份",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
+      },
+      {
+        "name": "机器视觉",
+        "chg_pct": 1.39,
+        "up_n": 74,
+        "down_n": 25,
+        "leader": "汉王科技",
+        "source": "eastmoney_push2his_clist",
+        "source_ts": "2026-11-11T10:46:52+08:00"
       }
     ],
     "concept_n": 20,
     "concentration": {
-      "top5_avg_chg": 8.07,
-      "sample_avg_chg": 5.47,
-      "spread": 2.6,
+      "top5_avg_chg": 4.56,
+      "sample_avg_chg": 2.8,
+      "spread": 1.76,
       "interpretation": "主题集中行情 (头部板块显著强于平均)"
     }
   },
   "stocks": [
     {
-      "code": "000892",
+      "code": "603607",
       "name": "",
-      "industry": "影视动漫制作",
-      "chg_pct": 5.91,
-      "leader": "慈文传媒",
-      "main_net_inflow_yi": 14.22,
+      "industry": "综合包装",
+      "chg_pct": 0.91,
+      "leader": "康欣新材",
+      "main_net_inflow_yi": 0.27,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
+      "source_ts": "2026-11-11T10:46:52+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 5.02,
-      "turnover": 21.32,
-      "pe": -12.82,
-      "mktcap_yi": 35.68,
-      "pb": 10.02,
-      "quote_time": "20261110161500"
+      "price": 18.9,
+      "turnover": 0.97,
+      "pe": 34.02,
+      "mktcap_yi": 33.74,
+      "pb": 3.31,
+      "quote_time": "20261111104652"
     },
     {
-      "code": "000802",
+      "code": "603022",
       "name": "",
-      "industry": "影视动漫制作",
-      "chg_pct": 5.54,
-      "leader": "慈文传媒",
-      "main_net_inflow_yi": 14.22,
+      "industry": "综合包装",
+      "chg_pct": 1.46,
+      "leader": "康欣新材",
+      "main_net_inflow_yi": 0.27,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
+      "source_ts": "2026-11-11T10:46:52+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 4.0,
-      "turnover": 10.93,
-      "pe": -16.99,
-      "mktcap_yi": 28.62,
-      "pb": 5.07,
-      "quote_time": "20261110161436"
+      "price": 8.35,
+      "turnover": 0.94,
+      "pe": 26.03,
+      "mktcap_yi": 16.7,
+      "pb": 1.95,
+      "quote_time": "20261111104650"
     },
     {
-      "code": "600088",
+      "code": "002543",
       "name": "",
-      "industry": "影视动漫制作",
-      "chg_pct": 4.49,
-      "leader": "慈文传媒",
-      "main_net_inflow_yi": 14.22,
+      "industry": "卫浴电器",
+      "chg_pct": -0.42,
+      "leader": "日出东方",
+      "main_net_inflow_yi": 0.41,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
+      "source_ts": "2026-11-11T10:46:52+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 13.72,
-      "turnover": 5.05,
-      "pe": -213.39,
-      "mktcap_yi": 54.57,
-      "pb": 4.45,
-      "quote_time": "20261110161456"
+      "price": 7.17,
+      "turnover": 0.9,
+      "pe": -22.43,
+      "mktcap_yi": 47.41,
+      "pb": 1.15,
+      "quote_time": "20261111104648"
     },
     {
-      "code": "000681",
+      "code": "603551",
       "name": "",
-      "industry": "数字媒体",
-      "chg_pct": 4.04,
-      "leader": "掌阅科技",
-      "main_net_inflow_yi": 13.8,
+      "industry": "卫浴电器",
+      "chg_pct": -0.11,
+      "leader": "日出东方",
+      "main_net_inflow_yi": 0.41,
       "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
+      "source_ts": "2026-11-11T10:46:52+08:00",
       "reason": "当前周期需求迁移行业成分股",
       "algorithm": "cycle_pool_v2_industry_members",
-      "price": 16.75,
-      "turnover": 5.69,
-      "pe": 149.49,
-      "mktcap_yi": 113.25,
-      "pb": 3.24,
-      "quote_time": "20261110161421"
-    },
-    {
-      "code": "603258",
-      "name": "",
-      "industry": "传媒",
-      "chg_pct": 4.06,
-      "leader": "文投控股",
-      "main_net_inflow_yi": 46.88,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 16.65,
-      "turnover": 11.81,
-      "pe": -13.85,
-      "mktcap_yi": 40.18,
-      "pb": 2.18,
-      "quote_time": "20261110161431"
-    },
-    {
-      "code": "000665",
-      "name": "",
-      "industry": "传媒",
-      "chg_pct": 3.73,
-      "leader": "文投控股",
-      "main_net_inflow_yi": 46.88,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 4.17,
-      "turnover": 2.18,
-      "pe": -4.34,
-      "mktcap_yi": 47.42,
-      "pb": 1.62,
-      "quote_time": "20261110161500"
-    },
-    {
-      "code": "002354",
-      "name": "",
-      "industry": "传媒",
-      "chg_pct": 5.07,
-      "leader": "文投控股",
-      "main_net_inflow_yi": 46.88,
-      "source": "eastmoney_push2his_clist",
-      "source_ts": "2026-11-11T06:22:28+08:00",
-      "reason": "当前周期需求迁移行业成分股",
-      "algorithm": "cycle_pool_v2_industry_members",
-      "price": 8.5,
-      "turnover": 21.86,
-      "pe": -345.65,
-      "mktcap_yi": 138.29,
-      "pb": 8.11,
-      "quote_time": "20261110161457"
+      "price": 8.89,
+      "turnover": 0.14,
+      "pe": 13.77,
+      "mktcap_yi": 33.78,
+      "pb": 2.8,
+      "quote_time": "20261111104652"
     }
   ],
   "stocks_meta": {
-    "n": 7,
-    "enriched": 7,
+    "n": 4,
+    "enriched": 4,
     "status": "ok",
     "reason": null
   }
