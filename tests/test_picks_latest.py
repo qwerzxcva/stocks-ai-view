@@ -11,7 +11,7 @@
 import os
 import sys
 import unittest
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(HERE), "scripts"))
@@ -65,10 +65,49 @@ class AsofTest(unittest.TestCase):
         self.assertEqual(
             BPL.pick_asof(["2026-10-28", "2026-10-29"], "2026-10-30"), "2026-10-29")
 
-    def test_fallback_to_file_date_without_item_dates(self):
+    def test_missing_item_dates_stay_unknown(self):
         doc = {"date": "2026-10-30", "picks": {"signals": [{"code": "002590"}]}}
         out = BPL.build(doc, now=datetime(2026, 10, 30, 15, 32, tzinfo=CST))
-        self.assertEqual(out["asof"], "2026-10-30")
+        self.assertIsNone(out["asof"])
+        self.assertTrue(out["stale"])
+        self.assertEqual(out["status"], "insufficient_data")
+
+    def test_generated_today_does_not_refresh_old_evidence(self):
+        doc = {"date": "2026-11-11", "picks": {"signals": [
+            {"code": "600001", "date": "2026-10-29", "score": 1.0}]}}
+        out = BPL.build(doc, now=datetime(2026, 11, 11, 17, tzinfo=CST))
+        self.assertEqual(out["asof"], "2026-10-29")
+        self.assertEqual(out["data_age_days"], 13)
+        self.assertTrue(out["stale"])
+        self.assertEqual(out["usage"], "historical_only")
+
+    def test_invalid_future_and_mixed_old_dates_are_not_current(self):
+        for dates in (("2026-11-12",), ("2026-02-30",),
+                      ("2026-11-11", "2026-10-29"), ("2026-11-11", None)):
+            with self.subTest(dates=dates):
+                doc = {"picks": {"signals": [
+                    {"code": "600001", "date": d} for d in dates]}}
+                out = BPL.build(doc, now=datetime(2026, 11, 11, 17, tzinfo=CST))
+                self.assertTrue(out["stale"])
+
+    def test_weekend_archive_is_not_a_live_recommendation(self):
+        doc = {"picks": {"signals": [{"code": "600001", "date": "2026-11-06"}]}}
+        out = BPL.build(doc, now=datetime(2026, 11, 8, 10, tzinfo=CST))
+        self.assertFalse(out["stale"])
+        self.assertEqual(out["status"], "candidate_archive")
+        self.assertEqual(out["usage"], "archive_not_live_recommendation")
+
+    def test_cli_does_not_overwrite_last_artifact_with_old_evidence(self):
+        import json
+        import tempfile
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as directory:
+            src, dst = Path(directory) / "source.json", Path(directory) / "output.json"
+            src.write_text(json.dumps({"date": "2099-01-01", "picks": {"signals": [
+                {"code": "600001", "date": "2000-01-01"}]}}))
+            dst.write_text("previous artifact")
+            self.assertEqual(BPL.main(["--src", str(src), "--out", str(dst)]), 1)
+            self.assertEqual(dst.read_text(), "previous artifact")
 
 
 class BuildShapeTest(unittest.TestCase):
@@ -98,6 +137,14 @@ class BuildShapeTest(unittest.TestCase):
         item = BPL.build(doc)["items"][0]
         self.assertIsNone(item["score"])
         self.assertIsNone(item["price"])
+
+    def test_nonfinite_and_boolean_numbers_stay_null(self):
+        for value in (float("nan"), float("inf"), -float("inf"), True):
+            with self.subTest(value=value):
+                doc = {"picks": {"signals": [{"code": "600001", "score": value, "price": value}]}}
+                item = BPL.build(doc)["items"][0]
+                self.assertIsNone(item["score"])
+                self.assertIsNone(item["price"])
 
     def test_limit_and_empty_source(self):
         doc = {"date": "2026-10-30", "picks": {"signals": [

@@ -40,11 +40,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 import tempfile
 from collections import Counter
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 CST = timezone(timedelta(hours=8))
 
@@ -99,7 +100,7 @@ def pick_asof(dates: list[str], fallback: str) -> str:
 
 def _num(value):
     """缺数据保持 null，不拿 0 冒充。"""
-    if isinstance(value, (int, float)):
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value):
         return value
     return None
 
@@ -134,10 +135,27 @@ def build(doc: dict, limit: int = 30, now: datetime | None = None) -> dict:
         item["rank"] = rank
 
     stamp = (now or datetime.now(CST)).astimezone(CST).isoformat(timespec="seconds")
-    fallback = str(doc.get("date") or stamp[:10])[:10]
+    dates = []
+    for item in items:
+        try:
+            parsed = date.fromisoformat(item["date"] or "")
+            if parsed.isoformat() != item["date"]:
+                raise ValueError("noncanonical date")
+            dates.append(parsed)
+        except ValueError:
+            item["date"] = None
+    today = date.fromisoformat(stamp[:10])
+    age_days = (today - min(dates)).days if dates else None
+    stale = (len(dates) != len(items) or not items or any(d > today for d in dates)
+             or age_days is None or age_days > 4)
     return {
         "source": "today_picks_v5/signals",
-        "asof": pick_asof([it["date"] for it in items], fallback),
+        "asof": pick_asof([d.isoformat() for d in dates], "") or None,
+        "stale": stale,
+        "status": "insufficient_data" if stale else "candidate_archive",
+        "data_age_days": age_days,
+        "max_data_age_days": 4,
+        "usage": "historical_only" if stale else "archive_not_live_recommendation",
         "generated_at": stamp,
         "n_items": len(items),
         "skipped": skipped,
@@ -151,7 +169,7 @@ def write_json(path: str, payload: dict) -> int:
     fd, tmp = tempfile.mkstemp(dir=os.path.dirname(os.path.abspath(path)), suffix=".tmp")
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"))
+            json.dump(payload, handle, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
         os.replace(tmp, path)
     except BaseException:
         if os.path.exists(tmp):
@@ -179,6 +197,10 @@ def main(argv: list[str] | None = None) -> int:
     if not payload["items"]:
         print("::error::%s 里没有可用的 picks.signals（源文件 date=%s），拒绝产空名单"
               % (args.src, doc.get("date")))
+        return 1
+
+    if payload["stale"]:
+        print("::error::推荐依据过期、未知或来自未来；拒绝发布为新推荐 (asof=%s)" % payload["asof"])
         return 1
 
     for row in payload["skipped"]:
