@@ -1,10 +1,10 @@
 {
   "engines": {
     "decision": {
-      "age_hours": 0.2,
+      "age_hours": 0.0,
       "baseline": {
         "cards": 12,
-        "market_regime": "bull",
+        "market_regime": "range",
         "sample_1d": 64122,
         "win_rate_1d": 45.5
       },
@@ -17,12 +17,12 @@
         "dimensions": 9
       },
       "produced_by": "scripts/decision_engine.py",
-      "sha256": "2fbfe5a80376b459b62ebe3def16cef4facdf1de89c0b89bd3eface0756697c5",
-      "ts": "2026-11-11T06:57:56+08:00",
+      "sha256": "7458277fba7d55d313ac7b4e68c9a0aa3d464109e20c35dbd81eb8da1495cbd1",
+      "ts": "2026-11-11T11:07:59+08:00",
       "version": "decision v2"
     },
     "engine_fusion": {
-      "age_hours": 0.2,
+      "age_hours": 4.2,
       "baseline": {
         "E": -5.0,
         "agreement": 0.5
@@ -70,7 +70,7 @@
       "version": "3.3.0"
     },
     "market_phase": {
-      "age_hours": 312.6,
+      "age_hours": 316.6,
       "baseline": {
         "n_daily": 0,
         "n_phases": 90
@@ -89,7 +89,7 @@
       "version": "market_phase_v1"
     },
     "strategy_card": {
-      "age_hours": 655.8,
+      "age_hours": 659.8,
       "baseline": {
         "alpha_pp": 6.7,
         "baseline_5d": 48.8,
@@ -110,7 +110,7 @@
       "version": "strategy_card_v1"
     },
     "walkforward": {
-      "age_hours": 659.4,
+      "age_hours": 663.4,
       "baseline": {
         "mean_is_win": 47.2,
         "mean_oos_win": 48.62,
@@ -136,7 +136,7 @@
       "version": "walkforward_v1"
     },
     "weight_calibration": {
-      "age_hours": 0.0,
+      "age_hours": 4.0,
       "baseline": {
         "horizon_5": {
           "avg_ret_pct": 0.03,
@@ -185,7 +185,7 @@
       "version": "weight_calibrator_v3"
     }
   },
-  "generated_at": "2026-11-11T07:10:15+08:00",
+  "generated_at": "2026-11-11T11:10:18+08:00",
   "generator": "scripts/build_engine_manifest.py",
   "schema": 1
 }
