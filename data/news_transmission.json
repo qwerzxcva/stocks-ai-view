@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-11T10:50:28+08:00",
+ "ts": "2026-11-11T15:41:30+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 476,
- "n_transmissions": 7,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "出息了病毒吧吧主被官媒采访",
    "source": "贴吧热议",
-   "time": "2026-11-11T10:37:56+08:00",
+   "time": "2026-11-11T15:20:00+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28369544&amp;topic_name=%E5%87%BA%E6%81%AF%E4%BA%86%E7%97%85%E6%AF%92%E5%90%A7%E5%90%A7%E4%B8%BB%E8%A2%AB%E5%AE%98%E5%AA%92%E9%87%87%E8%AE%BF",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -144,7 +144,7 @@
       "603885",
       "600115",
       "002928",
-      "603261"
+      "688685"
      ]
     },
     {
@@ -169,18 +169,11 @@
   {
    "title": "【早报】深夜巨震，美股、原油、黄金全线下挫；美联储加息押注升温，美债遭遇抛售潮；Anthropic IPO有新进展",
    "source": "财联社热门",
-   "time": "2026-11-11T10:26:23+08:00",
+   "time": "2026-11-11T15:13:42+08:00",
    "url": "https://www.cls.cn/detail/2530870",
    "transmission_id": "rate_hike",
    "label": "加息/紧缩",
-   "direct_bear": [
-    {
-     "sector": "新能源",
-     "stocks": [
-      "301636"
-     ]
-    }
-   ],
+   "direct_bear": [],
    "direct_bull": [],
    "inverse_bull": [
     {
@@ -222,54 +215,19 @@
   {
    "title": "美国务卿：经济施压效果显著 没必要对伊朗开展大规模军事行动",
    "source": "财联社热门",
-   "time": "2026-11-11T10:26:23+08:00",
+   "time": "2026-11-11T15:13:42+08:00",
    "url": "https://www.cls.cn/detail/2530790",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "direct_bull": [
     {
-     "sector": "航空",
+     "sector": "军工",
      "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "603261"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000888"
+      "301302"
      ]
     }
    ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-10",
-    "event_date": "2026-11-11",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "释新闻｜美国“战争部长”遭弹劾：哪八项指控？下台可能性有多大？",
-   "source": "澎湃新闻",
-   "time": "2026-11-11T10:50:21+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34443239",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [],
    "inverse_bull": [],
    "inverse_bear": [
     {
@@ -284,7 +242,7 @@
       "603885",
       "600115",
       "002928",
-      "603261"
+      "688685"
      ]
     },
     {
@@ -306,12 +264,19 @@
   {
    "title": "俄军高层：乌领导层不愿结束战争，因为这是他们的主要收入来源",
    "source": "凤凰网",
-   "time": "2026-11-11T10:33:11+08:00",
+   "time": "2026-11-11T15:19:59+08:00",
    "url": "https://original.ifeng.com/c/8xxTb4BiskB",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "301302"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
@@ -326,7 +291,7 @@
       "603885",
       "600115",
       "002928",
-      "603261"
+      "688685"
      ]
     },
     {
@@ -336,6 +301,52 @@
      ]
     }
    ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-10",
+    "event_date": "2026-11-11",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "渣打：美联储加息50基点的情境有所增强 但还不能下定论",
+   "source": "wallstreetcn",
+   "time": "2026-11-11T12:02:25+08:00",
+   "url": "https://wallstreetcn.com/live/3198105",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -353,7 +364,14 @@
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "301302"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
@@ -368,56 +386,13 @@
       "603885",
       "600115",
       "002928",
-      "603261"
+      "688685"
      ]
     },
     {
      "sector": "旅游",
      "stocks": [
       "000888"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-10",
-    "event_date": "2026-11-11",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "财联社11月11日电，布伦特原油期货涨幅扩大至1%，报92.411美元/桶。",
-   "source": "财联社电报",
-   "time": "2026-11-11T10:50:13+08:00",
-   "url": "https://www.cls.cn/detail/2531080",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "002554"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
      ]
     }
    ],
