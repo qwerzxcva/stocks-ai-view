@@ -585,16 +585,20 @@ def load_klines(bulk_dir, limit=None):
                 parts = rest.split("|") if "|" in rest else rest.split(",")
                 if len(parts) < 6:
                     continue
+                if code not in data and limit and len(data) >= limit:
+                    continue
                 try:
-                    data.setdefault(code, []).append(
-                        [parts[0], float(parts[1]), float(parts[2]),
-                         float(parts[3]), float(parts[4]), float(parts[5])])
+                    row = [parts[0], float(parts[1]), float(parts[2]),
+                           float(parts[3]), float(parts[4]), float(parts[5])]
                 except ValueError:
                     continue
-        if limit and len(data) >= limit:
-            break
+                rows = data.setdefault(code, {})
+                previous = rows.get(row[0])
+                if previous is not None and previous != row:
+                    raise ValueError(f"Conflicting OHLCV for {code} on {row[0]} in {p}")
+                rows[row[0]] = row
     for c in data:
-        data[c].sort(key=lambda b: b[0])
+        data[c] = [data[c][date] for date in sorted(data[c])]
 
     # 因子表覆盖的 code: 原始价 × 因子 = 真 qfq
     # 因子表有两种形式: 逐日展开 / 跳变点表 (factors_all.json 用后者)。
