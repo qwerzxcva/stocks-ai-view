@@ -35,7 +35,11 @@ def get_universe() -> list[str]:
         with open(path, encoding="utf-8") as stream:
             codes = json.load(stream)
         if codes:
-            return codes
+            a_shares = [code for code in codes
+                        if not isinstance(code, str) or not re.fullmatch(r"(?:sz200|sh900)\d{3}", code)]
+            if len(a_shares) != len(codes):
+                print(f"excluded {len(codes) - len(a_shares)} B-share symbols outside A-share scope")
+            return a_shares
     bulk = os.path.join(DATA, "bulk")
     return sorted({name[8:-4] for name in os.listdir(bulk)
                    if name.startswith("day_qfq_") and name.endswith(".csv")}) if os.path.isdir(bulk) else []
