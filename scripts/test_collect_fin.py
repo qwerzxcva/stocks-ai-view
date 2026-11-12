@@ -6,6 +6,7 @@ import json
 import tempfile
 import unittest
 from datetime import datetime
+from http.client import IncompleteRead
 from pathlib import Path
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
@@ -201,6 +202,22 @@ class CollectFinTest(unittest.TestCase):
                 self.assertEqual(fin.get_universe(), ["sh600519", "sz002242", "sh000001"])
             with self.assertRaises(ValueError):
                 fin.normalize_code("sh000001")
+
+    def test_incomplete_http_retries_and_terminal_failure_is_nonzero(self):
+        fake = FakeHTTP([financial()], [])
+        with patch.object(fin.urllib.request, "urlopen", side_effect=[IncompleteRead(b"partial"),
+                          fake(fin.urllib.request.Request("https://example.invalid/?reportName=RPT_LICO_FN_CPD&pageNumber=1&pageSize=500&sortColumns=REPORTDATE"), 60),
+                          fake(fin.urllib.request.Request("https://example.invalid/?reportName=RPT_SHAREBONUS_DET&pageNumber=1&pageSize=500&sortColumns=REPORT_DATE"), 60)]), \
+                patch.object(fin.time, "sleep"):
+            rows = fin.fetch_fin_batch(["sh600519"], retries=2, now=NOW)
+        self.assertEqual(rows["sh600519"][0]["eps"], 3.2)
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.object(fin, "FIN_DIR", directory), \
+                patch.object(fin.urllib.request, "urlopen", side_effect=IncompleteRead(b"partial")) as transport, \
+                patch.object(fin.time, "sleep"):
+            self.assertEqual(fin.main(["--codes", "sh600519"]), 1)
+            self.assertEqual(transport.call_count, 3)
+            self.assertEqual(list(Path(directory).iterdir()), [])
 
     def test_zero_universe_and_limit(self):
         with patch.object(fin, "get_universe", return_value=[]):

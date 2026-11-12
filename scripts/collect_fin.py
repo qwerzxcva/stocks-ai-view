@@ -19,6 +19,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timedelta, timezone
+from http.client import HTTPException
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CST = timezone(timedelta(hours=8))
@@ -108,7 +109,7 @@ def fetch_pages(name: str, date_field: str, bare: list[str], now: datetime,
                 with urllib.request.urlopen(request, timeout=60) as response:
                     payload = json.loads(response.read().decode("utf-8"))
                 break
-            except (OSError, urllib.error.URLError, json.JSONDecodeError):
+            except (OSError, urllib.error.URLError, HTTPException, json.JSONDecodeError):
                 if attempt + 1 == retries:
                     raise
                 time.sleep(2 ** attempt)
@@ -339,7 +340,7 @@ def main(argv: list[str] | None = None):
                 if rows:
                     save_stock(FIN_DIR, code, rows)
                     written += 1
-        except (OSError, ValueError, TypeError) as error:
+        except (OSError, ValueError, TypeError, HTTPException) as error:
             failed = True
             print(f"batch {offset // args.batch + 1} failed: {error}", file=sys.stderr)
     print(f"collected {written}/{len(universe)} stocks; recent eight completed report periods")
