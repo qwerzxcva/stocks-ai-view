@@ -36,7 +36,7 @@ def get_universe() -> list[str]:
             codes = json.load(stream)
         if codes:
             a_shares = [code for code in codes
-                        if not isinstance(code, str) or not re.fullmatch(r"(?:sz200|sh900)\d{3}", code)]
+                        if not isinstance(code, str) or not re.fullmatch(r"sz200\d{3}|sh900\d{3}|sz201872", code)]
             if len(a_shares) != len(codes):
                 print(f"excluded {len(codes) - len(a_shares)} B-share symbols outside A-share scope")
             return a_shares

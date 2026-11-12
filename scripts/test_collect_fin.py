@@ -196,7 +196,7 @@ class CollectFinTest(unittest.TestCase):
     def test_default_a_share_universe_excludes_only_b_shares(self):
         with tempfile.TemporaryDirectory() as directory:
             (Path(directory) / "lp_syms.json").write_text(json.dumps(
-                ["sh600519", "sz002242", "sz200011", "sh900901", "sh000001"]))
+                ["sh600519", "sz002242", "sz200011", "sh900901", "sz201872", "sh000001"]))
             with patch.object(fin, "DATA", directory):
                 self.assertEqual(fin.get_universe(), ["sh600519", "sz002242", "sh000001"])
             with self.assertRaises(ValueError):
