@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-13T15:58:48+08:00",
+ "ts": "2026-11-13T23:44:44+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 455,
- "n_transmissions": 4,
+ "n_input": 454,
+ "n_transmissions": 7,
  "n_rules": 16,
  "rules": [
   {
@@ -79,160 +79,162 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "伊朗再次打击美军在中东军事设施",
-   "source": "今日头条",
-   "time": "2026-11-13T15:58:39+08:00",
-   "url": "https://www.toutiao.com/trending/7707474373690835482/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688636"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000610",
-      "600088"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "日本为何无法成为一流军事强国",
-   "source": "今日头条",
-   "time": "2026-11-13T15:58:39+08:00",
-   "url": "https://www.toutiao.com/trending/7707539951511932457/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688636"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000610",
-      "600088"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "Jefferies：黄仁勋辞任推升地缘风险，维持对中国半导体生产设备的买入，但不涉及人工智能实验室或GPU企业。",
-   "source": "wallstreetcn",
-   "time": "2026-11-13T08:45:50+08:00",
-   "url": "https://wallstreetcn.com/live/3199435",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688636"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000610",
-      "600088"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "商品期货收盘，集运欧线主力合约涨超5%，燃料油、丙烯、LU燃油、乙二醇、原油涨超4%。沪银跌超4%，钯、烧碱、沪金跌超2%。",
+   "title": "纳斯达克100指数跌超1%，标普跌0.4%，半导体指数下跌将近4%。英伟达跌2.3%，Cerebras涨幅收窄至11.3%，谷歌A涨1.1%，AMD跌7.6%，CoreWeave跌",
    "source": "华尔街见闻",
-   "time": "2026-11-13T15:47:39+08:00",
-   "url": "https://wallstreetcn.com/livenews/3199627",
+   "time": "2026-11-13T23:19:38+08:00",
+   "url": "https://wallstreetcn.com/livenews/3199872",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "美股盘初，半导体指数跌1%。\n\n英伟达涨1.5%，Ceberas Systems涨16.7%——创8月份以来最大盘中涨幅，谷歌A涨1.3%，AMD、CoreWeave跌3.4%，N",
+   "source": "华尔街见闻",
+   "time": "2026-11-13T23:19:38+08:00",
+   "url": "https://wallstreetcn.com/livenews/3199862",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "纳斯达克100指数跌超1%，标普跌0.4%，半导体指数下跌将近4%。英伟达跌2.3%，Cerebras涨幅收窄至11.3",
+   "source": "wallstreetcn",
+   "time": "2026-11-13T22:59:31+08:00",
+   "url": "https://wallstreetcn.com/live/3199872",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "布伦特原油期货价格涨超1%",
+   "source": "财联社电报",
+   "time": "2026-11-13T23:29:21+08:00",
+   "url": "https://www.cls.cn/detail/2534232",
    "transmission_id": "oil_up",
    "label": "油价上涨",
    "direct_bear": [],
@@ -263,6 +265,121 @@
     }
    ],
    "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "10月末社融、M2增速均超7% 专家：年内降息降准可能性下降",
+   "source": "华尔街见闻",
+   "time": "2026-11-13T23:19:38+08:00",
+   "url": "https://wallstreetcn.com/livenews/3199857",
+   "transmission_id": "rate_cut",
+   "label": "降息/宽松",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "夜盘期货开盘，原油涨逾2%，燃油、焦煤、PVC、甲醇、丙烯、沥青、纯苯、沪锡、聚丙烯、塑料、低硫燃油涨逾1%；烧碱跌逾2",
+   "source": "wallstreetcn",
+   "time": "2026-11-13T21:00:33+08:00",
+   "url": "https://wallstreetcn.com/live/3199817",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600583"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-13",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美股半导体板块跌幅扩大：费城半导体指数跌6% AMD跌10%",
+   "source": "cls",
+   "time": "2026-11-13T23:38:09+08:00",
+   "url": "https://www.cls.cn/detail/2534268",
+   "transmission_id": "semi_down",
+   "label": "半导体下跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
