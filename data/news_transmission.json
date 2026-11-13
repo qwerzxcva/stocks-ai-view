@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-13T23:49:57+08:00",
+ "ts": "2026-11-14T06:22:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 454,
+ "n_input": 452,
  "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
@@ -79,250 +79,127 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "纳斯达克100指数跌超1%，标普跌0.4%，半导体指数下跌将近4%。英伟达跌2.3%，Cerebras涨幅收窄至11.3%，谷歌A涨1.1%，AMD跌7.6%，CoreWeave跌",
-   "source": "华尔街见闻",
-   "time": "2026-11-13T23:49:41+08:00",
-   "url": "https://wallstreetcn.com/livenews/3199872",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "纳斯达克100指数跌超1%，标普跌0.4%，半导体指数下跌将近4%。英伟达跌2.3%，Cerebras涨幅收窄至11.3",
-   "source": "wallstreetcn",
-   "time": "2026-11-13T22:59:31+08:00",
-   "url": "https://wallstreetcn.com/live/3199872",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "布伦特原油期货价格涨超1%",
+   "title": "桑坦德上调美联储加息预期 料12月和明年3月各加息25个基点",
    "source": "财联社电报",
-   "time": "2026-11-13T23:29:21+08:00",
-   "url": "https://www.cls.cn/detail/2534232",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "600583"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "机构：油价已基本消化战争溢价，即便达成协议，布伦特仍有望维持90美元以上",
-   "source": "华尔街见闻",
-   "time": "2026-11-13T23:49:41+08:00",
-   "url": "https://wallstreetcn.com/livenews/3199888",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "600583"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "夜盘期货开盘，原油涨逾2%，燃油、焦煤、PVC、甲醇、丙烯、沥青、纯苯、沪锡、聚丙烯、塑料、低硫燃油涨逾1%；烧碱跌逾2",
-   "source": "wallstreetcn",
-   "time": "2026-11-13T21:00:33+08:00",
-   "url": "https://wallstreetcn.com/live/3199817",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "600583"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "美股半导体板块跌幅扩大：费城半导体指数跌6% AMD跌10%",
-   "source": "cls",
-   "time": "2026-11-13T23:38:09+08:00",
-   "url": "https://www.cls.cn/detail/2534268",
-   "transmission_id": "semi_down",
-   "label": "半导体下跌",
+   "time": "2026-11-14T06:00:53+08:00",
+   "url": "https://www.cls.cn/detail/2534326",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
    "direct_bear": [],
    "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-14",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "英国海事机构：美伊冲突相关海上安全事件增至163起",
+   "source": "财联社电报",
+   "time": "2026-11-14T06:00:53+08:00",
+   "url": "https://www.cls.cn/detail/2534323",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688636"
+     ]
+    }
+   ],
    "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610",
+      "600088"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-14",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "纳斯达克100 ETF美股盘后跌0.7%，道富银行SPDR标普500 ETF跌0.4%。\n\n航空股盘后普跌，美联航跌1.2%，Jetblue跌2.4%，美国航空公司跌1.7%。\n\n",
+   "source": "华尔街见闻",
+   "time": "2026-11-14T06:22:01+08:00",
+   "url": "https://wallstreetcn.com/livenews/3200017",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
    "inverse_bear": [],
    "hedge": [
     {
@@ -345,7 +222,150 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-13",
-    "event_date": "2026-11-13",
+    "event_date": "2026-11-14",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "纳斯达克100 ETF美股盘后跌0.7%，道富银行SPDR标普500 ETF跌0.4%。\n\n航空股盘后普跌，美联航跌1.",
+   "source": "wallstreetcn",
+   "time": "2026-11-14T05:06:42+08:00",
+   "url": "https://wallstreetcn.com/live/3200017",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-14",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "桑坦德上调美联储加息预期，料12月和明年3月各加息25个基点",
+   "source": "wallstreetcn",
+   "time": "2026-11-14T03:51:27+08:00",
+   "url": "https://wallstreetcn.com/live/3199988",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-14",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "洲际交易所（ICE）：11月10日当周，投机者所持ICE布伦特原油净多头头寸减少48,110手合约，至133,860手合",
+   "source": "wallstreetcn",
+   "time": "2026-11-14T02:45:59+08:00",
+   "url": "https://wallstreetcn.com/live/3199967",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600583"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-14",
     "matched_codes": []
    }
   }
