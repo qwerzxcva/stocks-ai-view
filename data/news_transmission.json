@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-15T05:25:47+08:00",
+ "ts": "2026-11-15T10:37:19+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 438,
- "n_transmissions": 8,
+ "n_input": 457,
+ "n_transmissions": 9,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,60 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "英国央行首席经济学家：明年或需进一步加息 伊朗冲突结束可能性极低",
+   "title": "航行警告！渤海海峡黄海北部执行军事任务",
    "source": "财联社电报",
-   "time": "2026-11-15T04:55:40+08:00",
-   "url": "https://www.cls.cn/detail/2534537",
+   "time": "2026-11-15T10:26:28+08:00",
+   "url": "https://www.cls.cn/detail/2534598",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688636"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610",
+      "600088"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-15",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "以军称打死哈马斯下属军事组织高级成员",
+   "source": "财联社电报",
+   "time": "2026-11-15T10:26:28+08:00",
+   "url": "https://www.cls.cn/detail/2534590",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -131,7 +181,7 @@
   {
    "title": "报道：特朗普考虑暂缓对伊朗军事打击",
    "source": "华尔街见闻",
-   "time": "2026-11-15T04:56:37+08:00",
+   "time": "2026-11-15T10:27:45+08:00",
    "url": "https://wallstreetcn.com/livenews/3200128",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -179,10 +229,60 @@
    }
   },
   {
-   "title": "美财长承认移居军事基地，斥责《华尔街日报》泄露住址信息",
-   "source": "华尔街见闻",
-   "time": "2026-11-15T04:56:37+08:00",
-   "url": "https://wallstreetcn.com/livenews/3200111",
+   "title": "乌克兰一夜向俄罗斯发射近 1200 架无人机，创下冲突以来最大规模袭击之一，释放了什么信号？",
+   "source": "知乎热榜",
+   "time": "2026-11-15T10:26:46+08:00",
+   "url": "https://www.zhihu.com/question/2104984568293848683",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688636"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610",
+      "600088"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-13",
+    "event_date": "2026-11-15",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美财长贝森特承认移居军事基地",
+   "source": "今日头条",
+   "time": "2026-11-15T10:37:05+08:00",
+   "url": "https://www.toutiao.com/trending/7707769000180941363/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -424,49 +524,6 @@
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-13",
     "event_date": "2026-11-14",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "财联社11月14日电，布伦特原油暗盘日内跌超0.8%失守破94美元/桶。",
-   "source": "财联社电报",
-   "time": "2026-11-15T04:55:40+08:00",
-   "url": "https://www.cls.cn/detail/2534557",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "600583"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-13",
-    "event_date": "2026-11-15",
     "matched_codes": []
    }
   }
