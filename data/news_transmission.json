@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-17T17:06:51+08:00",
+ "ts": "2026-11-18T02:05:31+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 458,
- "n_transmissions": 6,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,59 +79,94 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "智飞生物：全资子公司智飞龙科马研发的冻干重组呼吸道合胞病毒蛋白疫苗（CHO细胞）临床试验申请获国家药监局受理。",
+   "title": "标普跌幅收窄至1.1%，纳斯达克100指数跌1.2%。",
    "source": "wallstreetcn",
-   "time": "2026-11-17T16:56:27+08:00",
-   "url": "https://wallstreetcn.com/live/3201167",
-   "transmission_id": "epidemic",
-   "label": "疫情",
+   "time": "2026-11-18T00:02:01+08:00",
+   "url": "https://wallstreetcn.com/live/3201414",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-17",
+    "event_date": "2026-11-18",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "美国第三艘航母抵达中东 美伊冲突再现升级风险",
+   "source": "财联社热门",
+   "time": "2026-11-18T02:05:16+08:00",
+   "url": "https://www.cls.cn/detail/2536565",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
    "direct_bull": [
     {
-     "sector": "医药",
+     "sector": "军工",
      "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
+      "688629"
      ]
     },
     {
-     "sector": "医疗器械",
+     "sector": "黄金",
      "stocks": [
-      "300677"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
+      "600711"
      ]
     }
    ],
    "inverse_bull": [],
    "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002627"
-     ]
-    },
     {
      "sector": "航空",
      "stocks": [
@@ -148,66 +183,13 @@
      ]
     },
     {
-     "sector": "餐饮",
+     "sector": "旅游",
      "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306",
-      "600258"
+      "002627"
      ]
     }
    ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "分析师：AI泡沫破裂黄金或迎超级牛市",
-   "source": "今日头条",
-   "time": "2026-11-17T17:06:43+08:00",
-   "url": "https://www.toutiao.com/trending/7708999250151080457/",
-   "transmission_id": "ai_down",
-   "label": "AI/算力下跌",
-   "direct_bear": [
-    {
-     "sector": "计算机",
-     "stocks": [
-      "301391",
-      "600770"
-     ]
-    },
-    {
-     "sector": "软件",
-     "stocks": [
-      "688244"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [],
    "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    },
     {
      "sector": "黄金",
      "stocks": [
@@ -219,186 +201,71 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
+    "event_date": "2026-11-18",
     "matched_codes": []
    }
   },
   {
-   "title": "李彦宏谈AI泡沫",
-   "source": "百度热搜",
-   "time": "2026-11-17T17:06:44+08:00",
-   "url": "https://www.baidu.com/s?wd=%E6%9D%8E%E5%BD%A6%E5%AE%8F%E8%B0%88AI%E6%B3%A1%E6%B2%AB",
-   "transmission_id": "ai_down",
-   "label": "AI/算力下跌",
-   "direct_bear": [
-    {
-     "sector": "计算机",
-     "stocks": [
-      "301391",
-      "600770"
-     ]
-    },
-    {
-     "sector": "软件",
-     "stocks": [
-      "688244"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "600711"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "外交部：美方滥用出口管制措施，中方将坚决维护自身正当权益",
-   "source": "wallstreetcn",
-   "time": "2026-11-17T15:33:29+08:00",
-   "url": "https://wallstreetcn.com/live/3201108",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
+   "title": "财联社11月18日电，美国众议院民主党领袖Jeffries表示，将在新一届国会初期推动结束伊朗战争。",
+   "source": "财联社电报",
+   "time": "2026-11-18T02:05:17+08:00",
+   "url": "https://www.cls.cn/detail/2537213",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "半导体设备",
+     "sector": "军工",
      "stocks": [
-      "688372",
-      "300786"
+      "688629"
      ]
     },
     {
-     "sector": "自主可控",
+     "sector": "黄金",
      "stocks": [
-      "688981"
+      "600711"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "商品期货收盘，燃料油主力合约跌超6%，原油跌6%，沥青、LU燃油跌超5%，纯苯跌超4%。碳酸锂涨超5%。",
-   "source": "wallstreetcn",
-   "time": "2026-11-17T15:00:36+08:00",
-   "url": "https://wallstreetcn.com/live/3201080",
-   "transmission_id": "oil_down",
-   "label": "油价下跌",
-   "direct_bear": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "油服工程",
+     "sector": "航空",
      "stocks": [
-      "600339"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945"
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "603261"
      ]
     },
     {
-     "sector": "化工",
+     "sector": "旅游",
      "stocks": [
-      "603078",
-      "002584",
-      "300905"
+      "002627"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [],
+   "hedge": [
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
+    "event_date": "2026-11-18",
     "matched_codes": []
    }
-  },
-  {
-   "title": "外交部：美方滥用出口管制措施 中方将坚决维护自身正当权益",
-   "source": "wallstreetcn",
-   "time": "2026-11-17T15:21:09+08:00",
-   "url": "https://wallstreetcn.com/live/3201100",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688372",
-      "300786"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "688981"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-17",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   }
  ]
 }
