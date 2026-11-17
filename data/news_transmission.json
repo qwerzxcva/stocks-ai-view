@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-18T02:05:31+08:00",
+ "ts": "2026-11-18T02:33:26+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 458,
- "n_transmissions": 3,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -146,7 +146,7 @@
   {
    "title": "美国第三艘航母抵达中东 美伊冲突再现升级风险",
    "source": "财联社热门",
-   "time": "2026-11-18T02:05:16+08:00",
+   "time": "2026-11-18T02:04:33+08:00",
    "url": "https://www.cls.cn/detail/2536565",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -208,7 +208,7 @@
   {
    "title": "财联社11月18日电，美国众议院民主党领袖Jeffries表示，将在新一届国会初期推动结束伊朗战争。",
    "source": "财联社电报",
-   "time": "2026-11-18T02:05:17+08:00",
+   "time": "2026-11-18T02:04:17+08:00",
    "url": "https://www.cls.cn/detail/2537213",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -266,6 +266,76 @@
     "event_date": "2026-11-18",
     "matched_codes": []
    }
+  },
+  {
+   "title": "英伟达董事会新设委员会 监督国家安全政策、出口管制合规等事务",
+   "source": "华尔街见闻",
+   "time": "2026-11-18T02:14:26+08:00",
+   "url": "https://wallstreetcn.com/livenews/3201457",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688372",
+      "300786"
+     ]
+    },
+    {
+     "sector": "自主可控",
+     "stocks": [
+      "688981"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-17",
+    "event_date": "2026-11-18",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "英国制裁8家参与以色列定居点建设的公司",
+   "source": "cls",
+   "time": "2026-11-18T02:30:27+08:00",
+   "url": "https://www.cls.cn/detail/2537230",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688372",
+      "300786"
+     ]
+    },
+    {
+     "sector": "自主可控",
+     "stocks": [
+      "688981"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-17",
+    "event_date": "2026-11-18",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   }
  ]
 }
