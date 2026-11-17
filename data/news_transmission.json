@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-18T02:33:26+08:00",
+ "ts": "2026-11-18T07:45:31+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 458,
- "n_transmissions": 5,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,10 +79,85 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "标普跌幅收窄至1.1%，纳斯达克100指数跌1.2%。",
+   "title": "美股收盘：标普、纳指四连跌 芯片股反弹费半指数尾盘转涨",
+   "source": "财联社热门",
+   "time": "2026-11-18T07:26:44+08:00",
+   "url": "https://www.cls.cn/detail/2537268",
+   "transmission_id": "semi_down",
+   "label": "半导体下跌",
+   "direct_bear": [
+    {
+     "sector": "半导体",
+     "stocks": [
+      "688372",
+      "300346",
+      "300721",
+      "301209",
+      "300786",
+      "301392"
+     ]
+    },
+    {
+     "sector": "集成电路",
+     "stocks": [
+      "688372"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688372",
+      "300786"
+     ]
+    },
+    {
+     "sector": "半导体材料",
+     "stocks": [
+      "688372",
+      "300721"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-17",
+    "event_date": "2026-11-18",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "道指狂泄千点，跌幅扩大至1.9%，标普跌1.5%，纳指跌1.3%，纳斯达克100指数跌1.4%，半导体指数跌2.2%，银",
    "source": "wallstreetcn",
-   "time": "2026-11-18T00:02:01+08:00",
-   "url": "https://wallstreetcn.com/live/3201414",
+   "time": "2026-11-18T04:04:50+08:00",
+   "url": "https://wallstreetcn.com/live/3201495",
    "transmission_id": "market_broad_down",
    "label": "大盘普跌",
    "direct_bear": [],
@@ -144,154 +219,47 @@
    "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   },
   {
-   "title": "美国第三艘航母抵达中东 美伊冲突再现升级风险",
-   "source": "财联社热门",
-   "time": "2026-11-18T02:04:33+08:00",
-   "url": "https://www.cls.cn/detail/2536565",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "WTI 12月原油期货收涨0.29美元，涨幅0.34%，报86.01美元/桶。\n\n布伦特1月原油期货收涨0.70美元，涨",
+   "source": "wallstreetcn",
+   "time": "2026-11-18T03:31:07+08:00",
+   "url": "https://wallstreetcn.com/live/3201485",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
    "direct_bear": [],
    "direct_bull": [
     {
-     "sector": "军工",
+     "sector": "油服工程",
      "stocks": [
-      "688629"
-     ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "600711"
+      "600339"
      ]
     }
    ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "航空",
+     "sector": "航空机场",
      "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "603261"
+      "900945"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "化工",
      "stocks": [
-      "002627"
+      "603078",
+      "002584",
+      "300905"
      ]
     }
    ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "600711"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-18",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "财联社11月18日电，美国众议院民主党领袖Jeffries表示，将在新一届国会初期推动结束伊朗战争。",
-   "source": "财联社电报",
-   "time": "2026-11-18T02:04:17+08:00",
-   "url": "https://www.cls.cn/detail/2537213",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688629"
-     ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "600711"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "603261"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "002627"
-     ]
-    }
-   ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "600711"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-18",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "英伟达董事会新设委员会 监督国家安全政策、出口管制合规等事务",
-   "source": "华尔街见闻",
-   "time": "2026-11-18T02:14:26+08:00",
-   "url": "https://wallstreetcn.com/livenews/3201457",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688372",
-      "300786"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "688981"
-     ]
-    }
-   ],
-   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -299,43 +267,7 @@
     "trade_date": "2026-11-17",
     "event_date": "2026-11-18",
     "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
-  },
-  {
-   "title": "英国制裁8家参与以色列定居点建设的公司",
-   "source": "cls",
-   "time": "2026-11-18T02:30:27+08:00",
-   "url": "https://www.cls.cn/detail/2537230",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "半导体设备",
-     "stocks": [
-      "688372",
-      "300786"
-     ]
-    },
-    {
-     "sector": "自主可控",
-     "stocks": [
-      "688981"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-17",
-    "event_date": "2026-11-18",
-    "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+   }
   }
  ]
 }
