@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-17T08:48:27+08:00",
+ "ts": "2026-11-17T16:56:28+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 456,
- "n_transmissions": 2,
+ "n_input": 458,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -79,38 +79,203 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "3D复原俄乌战争前线情况",
-   "source": "B站热搜",
-   "time": "2026-11-17T08:48:16+08:00",
-   "url": "https://search.bilibili.com/all?keyword=3D%E5%A4%8D%E5%8E%9F%E4%BF%84%E4%B9%8C%E6%88%98%E4%BA%89%E5%89%8D%E7%BA%BF%E6%83%85%E5%86%B5",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "title": "欧股主要股指开盘普跌",
+   "source": "财联社电报",
+   "time": "2026-11-17T16:29:32+08:00",
+   "url": "https://www.cls.cn/detail/2536612",
+   "transmission_id": "market_broad_down",
+   "label": "大盘普跌",
    "direct_bear": [],
    "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "inverse_bull": [
     {
-     "sector": "航空",
+     "sector": "银行",
      "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-16",
+    "event_date": "2026-11-17",
+    "matched_codes": []
+   },
+   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+  },
+  {
+   "title": "李彦宏谈AI泡沫",
+   "source": "百度热搜",
+   "time": "2026-11-17T16:45:53+08:00",
+   "url": "https://www.baidu.com/s?wd=%E6%9D%8E%E5%BD%A6%E5%AE%8F%E8%B0%88AI%E6%B3%A1%E6%B2%AB",
+   "transmission_id": "ai_down",
+   "label": "AI/算力下跌",
+   "direct_bear": [
+    {
+     "sector": "计算机",
+     "stocks": [
+      "301391",
+      "600770"
+     ]
+    },
+    {
+     "sector": "软件",
+     "stocks": [
+      "688244"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "600711"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-16",
+    "event_date": "2026-11-17",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "外交部：美方滥用出口管制措施，中方将坚决维护自身正当权益",
+   "source": "wallstreetcn",
+   "time": "2026-11-17T15:33:29+08:00",
+   "url": "https://wallstreetcn.com/live/3201108",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "688372",
+      "300786"
+     ]
+    },
+    {
+     "sector": "自主可控",
+     "stocks": [
+      "688981"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-16",
+    "event_date": "2026-11-17",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "商品期货收盘，燃料油主力合约跌超6%，原油跌6%，沥青、LU燃油跌超5%，纯苯跌超4%。碳酸锂涨超5%。",
+   "source": "wallstreetcn",
+   "time": "2026-11-17T15:00:36+08:00",
+   "url": "https://wallstreetcn.com/live/3201080",
+   "transmission_id": "oil_down",
+   "label": "油价下跌",
+   "direct_bear": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600339"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
       "601021",
       "000099",
       "600221",
       "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "603128"
+      "900945"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "化工",
      "stocks": [
-      "000524"
+      "603078",
+      "002584",
+      "300905"
      ]
     }
    ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -121,38 +286,30 @@
    }
   },
   {
-   "title": "万斯：不会让伊朗战争演变为长达两年的军事投入",
+   "title": "外交部：美方滥用出口管制措施 中方将坚决维护自身正当权益",
    "source": "wallstreetcn",
-   "time": "2026-11-17T03:45:04+08:00",
-   "url": "https://wallstreetcn.com/live/3200818",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-11-17T15:21:09+08:00",
+   "url": "https://wallstreetcn.com/live/3201100",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
    "direct_bear": [],
    "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "inverse_bull": [
     {
-     "sector": "航空",
+     "sector": "半导体设备",
      "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "603128"
+      "688372",
+      "300786"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "自主可控",
      "stocks": [
-      "000524"
+      "688981"
      ]
     }
    ],
+   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
@@ -160,7 +317,8 @@
     "trade_date": "2026-11-16",
     "event_date": "2026-11-17",
     "matched_codes": []
-   }
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
   }
  ]
 }
