@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-19T16:32:44+08:00",
+ "ts": "2026-11-19T16:43:12+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 461,
- "n_transmissions": 5,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -72,7 +72,7 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-11-18",
+  "trade_date": "2026-11-19",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
@@ -81,7 +81,7 @@
   {
    "title": "美联储纪要释放加息信号 戴利强调审慎紧缩的重要性",
    "source": "财联社热门",
-   "time": "2026-11-19T16:05:32+08:00",
+   "time": "2026-11-19T16:42:59+08:00",
    "url": "https://www.cls.cn/detail/2538408",
    "transmission_id": "rate_hike",
    "label": "加息/紧缩",
@@ -119,187 +119,15 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-18",
-    "event_date": "2026-11-19",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "财联社11月19日电，法国将禽流感警报级别提高至最高级别。",
-   "source": "财联社电报",
-   "time": "2026-11-19T16:05:32+08:00",
-   "url": "https://www.cls.cn/detail/2538955",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "688755"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002625"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306",
-      "600258"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-18",
-    "event_date": "2026-11-19",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "澳洲矿业股普跌，追随隔夜黄金、铜价格下跌的表现。\n\n澳大利亚悉尼上市的必和必拓一度跌4.4%，力拓跌3.3%，Sandf",
-   "source": "wallstreetcn",
-   "time": "2026-11-19T07:25:05+08:00",
-   "url": "https://wallstreetcn.com/live/3202233",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-18",
-    "event_date": "2026-11-19",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "委内瑞拉同美国签署协议恢复军事技术合作",
-   "source": "wallstreetcn",
-   "time": "2026-11-19T07:40:52+08:00",
-   "url": "https://wallstreetcn.com/live/3202238",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002625"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-18",
+    "trade_date": "2026-11-19",
     "event_date": "2026-11-19",
     "matched_codes": []
    }
   },
   {
    "title": "三星高管回应AI泡沫争议：新云厂商风险有限 AI投资源于真实需求",
-   "source": "cls",
-   "time": "2026-11-19T16:10:47+08:00",
+   "source": "财联社电报",
+   "time": "2026-11-19T16:35:33+08:00",
    "url": "https://www.cls.cn/detail/2538992",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
@@ -335,7 +163,43 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-18",
+    "trade_date": "2026-11-19",
+    "event_date": "2026-11-19",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "委内瑞拉同美国签署协议恢复军事技术合作",
+   "source": "wallstreetcn",
+   "time": "2026-11-19T07:40:52+08:00",
+   "url": "https://wallstreetcn.com/live/3202238",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002625"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-19",
     "event_date": "2026-11-19",
     "matched_codes": []
    }
