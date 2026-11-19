@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-19T16:43:12+08:00",
+ "ts": "2026-11-20T01:38:24+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 461,
+ "n_input": 457,
  "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
@@ -79,100 +79,93 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "美联储纪要释放加息信号 戴利强调审慎紧缩的重要性",
-   "source": "财联社热门",
-   "time": "2026-11-19T16:42:59+08:00",
-   "url": "https://www.cls.cn/detail/2538408",
-   "transmission_id": "rate_hike",
-   "label": "加息/紧缩",
+   "title": "流感来了别当感冒治",
+   "source": "百度热搜",
+   "time": "2026-11-20T01:28:02+08:00",
+   "url": "https://www.baidu.com/s?wd=%E6%B5%81%E6%84%9F%E6%9D%A5%E4%BA%86%E5%88%AB%E5%BD%93%E6%84%9F%E5%86%92%E6%B2%BB",
+   "transmission_id": "epidemic",
+   "label": "疫情",
    "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
+   "direct_bull": [
     {
-     "sector": "银行",
+     "sector": "医药",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
      ]
     },
     {
-     "sector": "保险",
+     "sector": "医疗器械",
      "stocks": [
-      "601318",
-      "601601",
-      "601628",
-      "601319",
-      "601336"
+      "688755"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
      ]
     }
    ],
-   "inverse_bear": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002625"
+     ]
+    },
+    {
+     "sector": "餐饮",
+     "stocks": [
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
+     ]
+    }
+   ],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-19",
-    "event_date": "2026-11-19",
+    "event_date": "2026-11-20",
     "matched_codes": []
    }
   },
   {
-   "title": "三星高管回应AI泡沫争议：新云厂商风险有限 AI投资源于真实需求",
-   "source": "财联社电报",
-   "time": "2026-11-19T16:35:33+08:00",
-   "url": "https://www.cls.cn/detail/2538992",
-   "transmission_id": "ai_down",
-   "label": "AI/算力下跌",
-   "direct_bear": [
-    {
-     "sector": "软件",
-     "stocks": [
-      "300311",
-      "301095"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-19",
-    "event_date": "2026-11-19",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "委内瑞拉同美国签署协议恢复军事技术合作",
-   "source": "wallstreetcn",
-   "time": "2026-11-19T07:40:52+08:00",
-   "url": "https://wallstreetcn.com/live/3202238",
+   "title": "中俄美元首发表和平宣言，三国元首重申核战争打不赢也打不得，哪些信息值得重点关注？",
+   "source": "知乎热榜",
+   "time": "2026-11-20T01:27:45+08:00",
+   "url": "https://www.zhihu.com/question/2106822157141534109",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -192,6 +185,49 @@
       "600115",
       "002928",
       "002625"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-19",
+    "event_date": "2026-11-20",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "夜盘期货开盘，原油涨逾3%，沥青涨逾2%，焦煤、PTA、低硫燃油、纯苯、瓶片涨逾1%；沪锡、沪镍、沪铜跌逾1%。",
+   "source": "wallstreetcn",
+   "time": "2026-11-19T21:00:05+08:00",
+   "url": "https://wallstreetcn.com/live/3202597",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "600968"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
      ]
     }
    ],
