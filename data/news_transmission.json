@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-20T16:29:00+08:00",
+ "ts": "2026-11-21T01:02:37+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 458,
- "n_transmissions": 2,
+ "n_transmissions": 5,
  "n_rules": 16,
  "rules": [
   {
@@ -79,63 +79,178 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "欧洲主要股指开盘普跌",
+   "title": "沙特联军称对胡塞武装目标实施军事打击",
    "source": "财联社电报",
-   "time": "2026-11-20T16:12:42+08:00",
-   "url": "https://www.cls.cn/detail/2540101",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
+   "time": "2026-11-21T00:40:52+08:00",
+   "url": "https://www.cls.cn/detail/2540619",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
    "direct_bull": [],
-   "inverse_bull": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
      ]
     }
    ],
-   "inverse_bear": [],
-   "hedge": [
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-21",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "中美两军举行海上军事安全磋商机制工作小组会议和年度会晤",
+   "source": "澎湃新闻",
+   "time": "2026-11-21T01:02:30+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34520931",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
      ]
     }
    ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-21",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "不装了，法国挑明自己在乌克兰的军事存在，意欲何为？",
+   "source": "凤凰网",
+   "time": "2026-11-21T01:02:31+08:00",
+   "url": "https://original.ifeng.com/c/8yDDi8mmKsb",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-21",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美国财政部长贝森特：我们将继续施压伊朗伊斯兰革命卫队，直至其准备好达成协议。\n\n昨晚是冲突爆发以来通过霍尔木兹海峡的原油",
+   "source": "wallstreetcn",
+   "time": "2026-11-20T23:31:30+08:00",
+   "url": "https://wallstreetcn.com/live/3203457",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    }
+   ],
+   "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
     "event_date": "2026-11-20",
     "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
+   }
   },
   {
-   "title": "特朗普告诉欧洲，普京希望结束战争。（AXIOS）",
-   "source": "wallstreetcn",
-   "time": "2026-11-20T09:33:46+08:00",
-   "url": "https://wallstreetcn.com/live/3202931",
+   "title": "沙特联军称对胡塞武装目标实施军事打击",
+   "source": "cls",
+   "time": "2026-11-20T23:55:19+08:00",
+   "url": "https://www.cls.cn/detail/2540619",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
