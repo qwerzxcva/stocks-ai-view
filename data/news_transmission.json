@@ -1,7 +1,7 @@
 {
- "ts": "2026-11-22T00:14:50+08:00",
+ "ts": "2026-11-22T06:00:54+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 456,
+ "n_input": 427,
  "n_transmissions": 7,
  "n_rules": 16,
  "rules": [
@@ -81,7 +81,7 @@
   {
    "title": "来得早，爬得快！流感季来袭，药店货架有哪些变化？ | 一线",
    "source": "财联社热门",
-   "time": "2026-11-21T23:44:54+08:00",
+   "time": "2026-11-22T05:40:26+08:00",
    "url": "https://www.cls.cn/detail/2540815",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -163,21 +163,64 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
-    "event_date": "2026-11-21",
+    "event_date": "2026-11-22",
     "matched_codes": []
    }
   },
   {
-   "title": "欧盟再对乌提供10亿欧元军事支持",
+   "title": "刚果（金）本轮埃博拉疫情死亡病例超5600例",
    "source": "财联社电报",
-   "time": "2026-11-21T23:50:47+08:00",
-   "url": "https://www.cls.cn/detail/2540829",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
+   "time": "2026-11-22T05:51:22+08:00",
+   "url": "https://www.cls.cn/detail/2540853",
+   "transmission_id": "epidemic",
+   "label": "疫情",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "医药",
+     "stocks": [
+      "688137",
+      "688278",
+      "688806",
+      "300633",
+      "002030",
+      "688253",
+      "300760",
+      "920344",
+      "603087",
+      "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "688253"
+     ]
+    },
+    {
+     "sector": "疫苗",
+     "stocks": [
+      "920575",
+      "301207",
+      "688276",
+      "300142",
+      "300841",
+      "300122",
+      "002007",
+      "300601",
+      "688739",
+      "688185"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    },
     {
      "sector": "航空",
      "stocks": [
@@ -194,9 +237,13 @@
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "餐饮",
      "stocks": [
-      "000610"
+      "000721",
+      "002186",
+      "605108",
+      "002306",
+      "600258"
      ]
     }
    ],
@@ -205,15 +252,15 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
-    "event_date": "2026-11-21",
+    "event_date": "2026-11-22",
     "matched_codes": []
    }
   },
   {
-   "title": "2名在华日本人发生冲突1人死亡",
-   "source": "微博热搜",
-   "time": "2026-11-22T00:12:25+08:00",
-   "url": "https://s.weibo.com/weibo?q=%232%E5%90%8D%E5%9C%A8%E5%8D%8E%E6%97%A5%E6%9C%AC%E4%BA%BA%E5%8F%91%E7%94%9F%E5%86%B2%E7%AA%811%E4%BA%BA%E6%AD%BB%E4%BA%A1%23&t=31&band_rank=1&Refer=top",
+   "title": "欧盟再对乌提供10亿欧元军事支持",
+   "source": "财联社电报",
+   "time": "2026-11-22T05:51:22+08:00",
+   "url": "https://www.cls.cn/detail/2540829",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -252,52 +299,10 @@
    }
   },
   {
-   "title": "两名日本人在上海发生冲突致一人死亡",
-   "source": "今日头条",
-   "time": "2026-11-21T23:44:42+08:00",
-   "url": "https://www.toutiao.com/trending/7710601674980593171/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "600009"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "000610"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-20",
-    "event_date": "2026-11-21",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "2名日本人在上海发生冲突 1人死亡",
-   "source": "百度热搜",
-   "time": "2026-11-22T00:14:42+08:00",
-   "url": "https://www.baidu.com/s?wd=2%E5%90%8D%E6%97%A5%E6%9C%AC%E4%BA%BA%E5%9C%A8%E4%B8%8A%E6%B5%B7%E5%8F%91%E7%94%9F%E5%86%B2%E7%AA%81+1%E4%BA%BA%E6%AD%BB%E4%BA%A1",
+   "title": "2名在华日本人发生冲突1人死亡",
+   "source": "微博热搜",
+   "time": "2026-11-22T05:54:47+08:00",
+   "url": "https://s.weibo.com/weibo?q=%232%E5%90%8D%E5%9C%A8%E5%8D%8E%E6%97%A5%E6%9C%AC%E4%BA%BA%E5%8F%91%E7%94%9F%E5%86%B2%E7%AA%811%E4%BA%BA%E6%AD%BB%E4%BA%A1%23&t=31&band_rank=12&Refer=top",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -338,7 +343,7 @@
   {
    "title": "两名俄罗斯人冒充乌情报局长，与OpenAI高管大谈提供军事AI",
    "source": "凤凰网",
-   "time": "2026-11-22T00:14:44+08:00",
+   "time": "2026-11-22T05:45:07+08:00",
    "url": "https://news.ifeng.com/c/8yERcDbJu27",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -378,9 +383,51 @@
    }
   },
   {
+   "title": "欧盟再对乌提供10亿欧元军事支持",
+   "source": "cls",
+   "time": "2026-11-21T20:32:00+08:00",
+   "url": "https://www.cls.cn/detail/2540829",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-21",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "美股收盘：AI交易遭遇猛烈抛售 纳指重挫5% 费半跌两位数 英伟达狂泻14%",
    "source": "财联社热门",
-   "time": "2026-11-21T23:44:54+08:00",
+   "time": "2026-11-22T05:40:26+08:00",
    "url": "https://www.cls.cn/detail/2540700",
    "transmission_id": "semi_down",
    "label": "半导体下跌",
@@ -409,7 +456,7 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
-    "event_date": "2026-11-21",
+    "event_date": "2026-11-22",
     "matched_codes": []
    }
   }
