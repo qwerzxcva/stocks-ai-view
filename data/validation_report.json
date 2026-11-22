@@ -1,10 +1,10 @@
 {
-  "ts": "2026-11-22T06:14:03+08:00",
+  "ts": "2026-11-22T11:04:35+08:00",
   "engine": "numeric_validator v1",
   "n_files": 181,
-  "n_issues": 543,
+  "n_issues": 548,
   "by_severity": {
-    "critical": 461,
+    "critical": 466,
     "warning": 80,
     "info": 2
   },
@@ -14,6 +14,36 @@
       "field": "morning_summary.limit_up",
       "severity": "critical",
       "msg": "非数值类型 dict: {'n': 17, 'hit_rate_pct': 100.0, 'avg_ret_pct': 10.59}"
+    },
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[14].field_sources.price",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
+    },
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[22].field_sources.price",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'em_push2his_clist'"
+    },
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[34].field_sources.price",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
+    },
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[73].field_sources.price",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
+    },
+    {
+      "file": "all_sources.json",
+      "field": "data.quote[97].field_sources.price",
+      "severity": "critical",
+      "msg": "非数值类型 str: 'em_push2his_etf_onsite'"
     },
     {
       "file": "all_sources.json",
@@ -35,9 +65,9 @@
     },
     {
       "file": "all_sources.json",
-      "field": "data.fund[255].field_sources.price",
+      "field": "data.fund[211].field_sources.price",
       "severity": "critical",
-      "msg": "非数值类型 str: 'jisilu_cb_adjust'"
+      "msg": "非数值类型 str: 'jisilu_cb_list_new'"
     },
     {
       "file": "engine_spec.json",
@@ -848,12 +878,6 @@
       "field": "daily[29].actual_time.close",
       "severity": "critical",
       "msg": "非数值类型 str: '2026-11-11T17:28:54+08:00'"
-    },
-    {
-      "file": "shard_a.json",
-      "field": "data.fund[191].field_sources.price",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'jisilu_cb_list_new'"
     },
     {
       "file": "shard_a.json",
@@ -1782,30 +1806,6 @@
     {
       "file": "shard_a.json",
       "field": "data.kline[154].field_sources.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'tencent_kline'"
-    },
-    {
-      "file": "shard_a.json",
-      "field": "data.kline[155].field_sources.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'tencent_kline'"
-    },
-    {
-      "file": "shard_a.json",
-      "field": "data.kline[156].field_sources.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'tencent_kline'"
-    },
-    {
-      "file": "shard_a.json",
-      "field": "data.kline[157].field_sources.close",
-      "severity": "critical",
-      "msg": "非数值类型 str: 'tencent_kline'"
-    },
-    {
-      "file": "shard_a.json",
-      "field": "data.kline[158].field_sources.close",
       "severity": "critical",
       "msg": "非数值类型 str: 'tencent_kline'"
     }
