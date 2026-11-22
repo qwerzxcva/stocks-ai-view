@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-23T06:18:21+08:00",
+ "ts": "2026-11-23T06:28:03+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 457,
- "n_transmissions": 8,
+ "n_transmissions": 9,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "来得早，爬得快！流感季来袭，药店货架有哪些变化？ | 一线",
    "source": "财联社热门",
-   "time": "2026-11-23T05:52:18+08:00",
+   "time": "2026-11-23T06:27:50+08:00",
    "url": "https://www.cls.cn/detail/2540815",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -306,7 +306,7 @@
   {
    "title": "美国总统特朗普：整个中期选举过程“很奇怪”，中期选举后油价下跌，这难道不奇怪吗？",
    "source": "华尔街见闻",
-   "time": "2026-11-23T06:18:08+08:00",
+   "time": "2026-11-23T06:14:02+08:00",
    "url": "https://wallstreetcn.com/livenews/3203769",
    "transmission_id": "oil_down",
    "label": "油价下跌",
@@ -355,7 +355,7 @@
   {
    "title": "银行股领跌沙特股市，交易员计入地缘政治风险",
    "source": "华尔街见闻",
-   "time": "2026-11-23T06:18:08+08:00",
+   "time": "2026-11-23T06:14:02+08:00",
    "url": "https://wallstreetcn.com/livenews/3203752",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -397,7 +397,7 @@
   {
    "title": "《学习时报》刊文梳理“伪史论”传播路径：算法机制放大高冲突、高争议内容",
    "source": "澎湃新闻",
-   "time": "2026-11-23T06:18:14+08:00",
+   "time": "2026-11-23T06:27:57+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34533204",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -433,6 +433,53 @@
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
     "event_date": "2026-11-23",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "美国财长贝森特警告美联储过度紧缩风险 指出金融体系出现脆弱迹象",
+   "source": "wallstreetcn",
+   "time": "2026-11-22T23:38:00+08:00",
+   "url": "https://wallstreetcn.com/live/3203774",
+   "transmission_id": "rate_hike",
+   "label": "加息/紧缩",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    },
+    {
+     "sector": "保险",
+     "stocks": [
+      "601318",
+      "601601",
+      "601628",
+      "601319",
+      "601336",
+      "601857"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-22",
     "matched_codes": []
    }
   },
