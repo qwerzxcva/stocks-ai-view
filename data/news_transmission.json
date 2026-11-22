@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-22T23:45:51+08:00",
+ "ts": "2026-11-23T00:13:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 457,
- "n_transmissions": 5,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "来得早，爬得快！流感季来袭，药店货架有哪些变化？ | 一线",
    "source": "财联社热门",
-   "time": "2026-11-22T23:45:37+08:00",
+   "time": "2026-11-22T23:51:42+08:00",
    "url": "https://www.cls.cn/detail/2540815",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -170,7 +170,7 @@
   {
    "title": "今年流感季优势毒株快速切换",
    "source": "财联社电报",
-   "time": "2026-11-22T23:22:08+08:00",
+   "time": "2026-11-22T23:52:09+08:00",
    "url": "https://www.cls.cn/detail/2541009",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -259,7 +259,7 @@
   {
    "title": "银行股领跌沙特股市，交易员计入地缘政治风险",
    "source": "华尔街见闻",
-   "time": "2026-11-22T23:45:38+08:00",
+   "time": "2026-11-23T00:13:00+08:00",
    "url": "https://wallstreetcn.com/livenews/3203752",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -294,15 +294,57 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-20",
-    "event_date": "2026-11-22",
+    "event_date": "2026-11-23",
     "matched_codes": []
    }
   },
   {
    "title": "《学习时报》刊文梳理“伪史论”传播路径：算法机制放大高冲突、高争议内容",
    "source": "澎湃新闻",
-   "time": "2026-11-22T23:45:44+08:00",
+   "time": "2026-11-23T00:13:08+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34533204",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "600009"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "000610"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-20",
+    "event_date": "2026-11-23",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "银行股领跌沙特股市，交易员计入地缘政治风险",
+   "source": "wallstreetcn",
+   "time": "2026-11-22T20:43:27+08:00",
+   "url": "https://wallstreetcn.com/live/3203752",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
