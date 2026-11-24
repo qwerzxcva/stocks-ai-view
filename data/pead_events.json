@@ -1,5 +1,5 @@
 {
-  "ts": "2026-11-23T05:39:54+08:00",
+  "ts": "2026-11-24T10:51:05+08:00",
   "engine": "pead_engine",
   "coverage": {
     "n_fin_symbols": 4028,
@@ -14375,87 +14375,17 @@
       "car_5d": 0.031056,
       "car_10d": 0.018634,
       "car_20d": null
-    },
-    {
-      "symbol": "sz001399",
-      "announce_date": "2026-08-25",
-      "eps": 0.28,
-      "sue": -0.0233,
-      "n_quarters": 12,
-      "car_5d": 0.034956,
-      "car_10d": -0.007522,
-      "car_20d": -0.055752
-    },
-    {
-      "symbol": "sz200019",
-      "announce_date": "2026-08-25",
-      "eps": 0.0971,
-      "sue": -1.4844,
-      "n_quarters": 93,
-      "car_5d": 0.0,
-      "car_10d": -0.00627,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200037",
-      "announce_date": "2026-08-25",
-      "eps": 0.0329,
-      "sue": 0.9061,
-      "n_quarters": 96,
-      "car_5d": -0.018182,
-      "car_10d": -0.031818,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200055",
-      "announce_date": "2026-08-25",
-      "eps": 0.0508,
-      "sue": 0.1712,
-      "n_quarters": 95,
-      "car_5d": 0.0,
-      "car_10d": -0.007353,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200056",
-      "announce_date": "2026-08-25",
-      "eps": -0.23,
-      "sue": -0.0784,
-      "n_quarters": 96,
-      "car_5d": 0.0,
-      "car_10d": -0.019231,
-      "car_20d": 0.019231
-    },
-    {
-      "symbol": "sz200429",
-      "announce_date": "2026-08-25",
-      "eps": 0.41,
-      "sue": -1.1103,
-      "n_quarters": 96,
-      "car_5d": -0.002141,
-      "car_10d": 0.006424,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200541",
-      "announce_date": "2026-08-25",
-      "eps": 0.0272,
-      "sue": -0.743,
-      "n_quarters": 97,
-      "car_5d": -0.005376,
-      "car_10d": -0.026882,
-      "car_20d": null
     }
   ],
   "events_window": {
     "max_age_days": 90,
-    "cutoff": "2026-08-25",
+    "cutoff": "2026-08-26",
     "n_total": 1451,
-    "n_output": 1436,
+    "n_output": 1429,
     "order": "announce_date desc"
   },
   "warnings": [
-    "events 只输出最近 90 天公告的 1436 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
+    "events 只输出最近 90 天公告的 1429 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
   ],
   "provenance": {
     "source": "data/fin/*.json (财报) + data/bulk/day_qfq_*.csv (价格)",
