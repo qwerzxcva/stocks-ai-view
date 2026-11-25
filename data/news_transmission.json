@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-25T17:47:26+08:00",
+ "ts": "2026-11-26T03:37:51+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
- "n_input": 366,
- "n_transmissions": 6,
+ "n_input": 367,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,98 +79,9 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "三种流感毒株叠加来袭",
-   "source": "百度热搜",
-   "time": "2026-11-25T17:25:06+08:00",
-   "url": "https://www.baidu.com/s?wd=%E4%B8%89%E7%A7%8D%E6%B5%81%E6%84%9F%E6%AF%92%E6%A0%AA%E5%8F%A0%E5%8A%A0%E6%9D%A5%E8%A2%AD",
-   "transmission_id": "epidemic",
-   "label": "疫情",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "医药",
-     "stocks": [
-      "688137",
-      "688278",
-      "688806",
-      "300633",
-      "002030",
-      "688253",
-      "300760",
-      "920344",
-      "603087",
-      "600713"
-     ]
-    },
-    {
-     "sector": "医疗器械",
-     "stocks": [
-      "300430"
-     ]
-    },
-    {
-     "sector": "疫苗",
-     "stocks": [
-      "920575",
-      "301207",
-      "688276",
-      "300142",
-      "300841",
-      "300122",
-      "002007",
-      "300601",
-      "688739",
-      "688185"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "旅游",
-     "stocks": [
-      "600576",
-      "600088"
-     ]
-    },
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002651"
-     ]
-    },
-    {
-     "sector": "餐饮",
-     "stocks": [
-      "000721",
-      "002186",
-      "605108",
-      "002306"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
-    "event_date": "2026-11-25",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-25T17:20:12+08:00",
+   "time": "2026-11-26T03:12:31+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -252,115 +163,9 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-25",
-    "event_date": "2026-11-25",
+    "event_date": "2026-11-26",
     "matched_codes": []
    }
-  },
-  {
-   "title": "美股半导体股盘前普跌 AMD跌近5%、英伟达跌超4%",
-   "source": "财联社电报",
-   "time": "2026-11-25T17:18:05+08:00",
-   "url": "https://www.cls.cn/detail/2544209",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
-    "event_date": "2026-11-25",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
-  },
-  {
-   "title": "美股存储股盘前普跌 闪迪、美光科技跌超4%",
-   "source": "财联社电报",
-   "time": "2026-11-25T17:18:05+08:00",
-   "url": "https://www.cls.cn/detail/2544199",
-   "transmission_id": "market_broad_down",
-   "label": "大盘普跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [
-    {
-     "sector": "银行",
-     "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
-    "event_date": "2026-11-25",
-    "matched_codes": []
-   },
-   "note": "普跌时资金流向低估值防御; 逆势活跃的板块 (如 PCB/白酒) 是当日主线"
   },
   {
    "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
@@ -412,45 +217,51 @@
    }
   },
   {
-   "title": "俄军舰在利比亚遭乌无人艇袭击，战火外溢对俄乌冲突有何影响？",
-   "source": "澎湃新闻",
-   "time": "2026-11-25T17:47:19+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34549314",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
+   "title": "黄仁勋回归能否拯救美国AI泡沫",
+   "source": "B站热搜",
+   "time": "2026-11-26T03:10:58+08:00",
+   "url": "https://search.bilibili.com/all?keyword=%E9%BB%84%E4%BB%81%E5%8B%8B%E5%9B%9E%E5%BD%92%E8%83%BD%E5%90%A6%E6%8B%AF%E6%95%91%E7%BE%8E%E5%9B%BDAI%E6%B3%A1%E6%B2%AB",
+   "transmission_id": "ai_down",
+   "label": "AI/算力下跌",
+   "direct_bear": [
     {
-     "sector": "航空",
+     "sector": "计算机",
      "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928",
-      "002651"
+      "002197"
      ]
     },
     {
-     "sector": "旅游",
+     "sector": "软件",
      "stocks": [
-      "600576",
-      "600088"
+      "300556"
      ]
     }
    ],
-   "hedge": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [],
+   "hedge": [
+    {
+     "sector": "银行",
+     "stocks": [
+      "601328",
+      "601398",
+      "601288",
+      "601988",
+      "601939",
+      "601658",
+      "601166",
+      "601916",
+      "600036",
+      "600000"
+     ]
+    }
+   ],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-25",
-    "event_date": "2026-11-25",
+    "event_date": "2026-11-26",
     "matched_codes": []
    }
   }
