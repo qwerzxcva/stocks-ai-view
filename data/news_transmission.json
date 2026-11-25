@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-25T05:01:28+08:00",
+ "ts": "2026-11-25T09:16:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 369,
- "n_transmissions": 4,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,9 +79,64 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
+   "source": "华尔街见闻",
+   "time": "2026-11-24T14:12:01+08:00",
+   "url": "https://wallstreetcn.com/livenews/3204697",
+   "transmission_id": "oil_down",
+   "label": "油价下跌",
+   "direct_bear": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "300164"
+     ]
+    }
+   ],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "航空机场",
+     "stocks": [
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
+     ]
+    },
+    {
+     "sector": "物流",
+     "stocks": [
+      "002611"
+     ]
+    },
+    {
+     "sector": "化工",
+     "stocks": [
+      "002206"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-24",
+    "event_date": "2026-11-24",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-25T04:39:38+08:00",
+   "time": "2026-11-25T09:15:39+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -105,7 +160,7 @@
     {
      "sector": "医疗器械",
      "stocks": [
-      "688253"
+      "300942"
      ]
     },
     {
@@ -129,7 +184,7 @@
     {
      "sector": "旅游",
      "stocks": [
-      "600576"
+      "000524"
      ]
     },
     {
@@ -153,7 +208,8 @@
       "000721",
       "002186",
       "605108",
-      "002306"
+      "002306",
+      "000428"
      ]
     }
    ],
@@ -167,10 +223,10 @@
    }
   },
   {
-   "title": "战火外溢对俄乌冲突有何影响",
-   "source": "今日头条",
-   "time": "2026-11-25T04:35:11+08:00",
-   "url": "https://www.toutiao.com/trending/7711742024348601875/",
+   "title": "俄军舰在利比亚遭乌无人艇袭击，战火外溢对俄乌冲突有何影响？",
+   "source": "澎湃新闻",
+   "time": "2026-11-25T09:15:39+08:00",
+   "url": "https://www.thepaper.cn/newsDetail_forward_34549314",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -178,7 +234,7 @@
     {
      "sector": "军工",
      "stocks": [
-      "688629"
+      "688175"
      ]
     }
    ],
@@ -202,7 +258,7 @@
     {
      "sector": "旅游",
      "stocks": [
-      "600576"
+      "000524"
      ]
     }
    ],
@@ -212,78 +268,6 @@
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-24",
     "event_date": "2026-11-25",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "布伦特原油涨幅扩大至2%",
-   "source": "财联社电报",
-   "time": "2026-11-25T04:46:07+08:00",
-   "url": "https://www.cls.cn/detail/2543467",
-   "transmission_id": "oil_up",
-   "label": "油价上涨",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-24",
-    "event_date": "2026-11-25",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
-   "source": "华尔街见闻",
-   "time": "2026-11-24T14:12:01+08:00",
-   "url": "https://wallstreetcn.com/livenews/3204697",
-   "transmission_id": "oil_down",
-   "label": "油价下跌",
-   "direct_bear": [],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-24",
-    "event_date": "2026-11-24",
     "matched_codes": []
    }
   }
