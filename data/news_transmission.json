@@ -1,5 +1,5 @@
 {
- "ts": "2026-11-26T17:17:48+08:00",
+ "ts": "2026-11-26T17:26:36+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 367,
  "n_transmissions": 5,
@@ -72,7 +72,7 @@
  ],
  "flow_evidence": {
   "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-  "trade_date": "2026-11-25",
+  "trade_date": "2026-11-26",
   "status": "dated_rows_available",
   "n_dated_rows": 24
  },
@@ -128,7 +128,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
+    "trade_date": "2026-11-26",
     "event_date": "2026-11-24",
     "matched_codes": []
    }
@@ -136,7 +136,7 @@
   {
    "title": "俄乌冲突是否会蔓延到全球",
    "source": "今日头条",
-   "time": "2026-11-26T17:17:39+08:00",
+   "time": "2026-11-26T17:11:58+08:00",
    "url": "https://www.toutiao.com/trending/7712028038036196906/",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
@@ -189,7 +189,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
+    "trade_date": "2026-11-26",
     "event_date": "2026-11-26",
     "matched_codes": []
    }
@@ -197,7 +197,7 @@
   {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-26T17:17:41+08:00",
+   "time": "2026-11-26T17:12:05+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -270,7 +270,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
+    "trade_date": "2026-11-26",
     "event_date": "2026-11-26",
     "matched_codes": []
    }
@@ -278,7 +278,7 @@
   {
    "title": "黄仁勋回归能否拯救美国AI泡沫",
    "source": "B站热搜",
-   "time": "2026-11-26T16:51:06+08:00",
+   "time": "2026-11-26T17:26:26+08:00",
    "url": "https://search.bilibili.com/all?keyword=%E9%BB%84%E4%BB%81%E5%8B%8B%E5%9B%9E%E5%BD%92%E8%83%BD%E5%90%A6%E6%8B%AF%E6%95%91%E7%BE%8E%E5%9B%BDAI%E6%B3%A1%E6%B2%AB",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
@@ -287,6 +287,16 @@
      "sector": "计算机",
      "stocks": [
       "300324"
+     ],
+     "behavior": [
+      {
+       "code": "300324",
+       "label": "坏消息洗盘嫌疑",
+       "evidence": "主力净占比 23.32%",
+       "source": "em_fflow_rank",
+       "trade_date": "2026-11-26",
+       "snapshot_ts": "2026-11-26T15:34:36+08:00"
+      }
      ]
     },
     {
@@ -323,17 +333,19 @@
     }
    ],
    "flow_evidence": {
-    "status": "insufficient",
+    "status": "matched",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
+    "trade_date": "2026-11-26",
     "event_date": "2026-11-26",
-    "matched_codes": []
+    "matched_codes": [
+     "300324"
+    ]
    }
   },
   {
    "title": "欧方将玉沙集团移出欧盟涉俄出口管制制裁清单，商务部：欢迎",
    "source": "澎湃新闻",
-   "time": "2026-11-26T17:17:42+08:00",
+   "time": "2026-11-26T17:26:30+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34563211",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -352,7 +364,7 @@
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-25",
+    "trade_date": "2026-11-26",
     "event_date": "2026-11-26",
     "matched_codes": []
    },
