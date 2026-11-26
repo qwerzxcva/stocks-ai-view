@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-26T17:26:36+08:00",
+ "ts": "2026-11-27T03:08:08+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 367,
- "n_transmissions": 5,
+ "n_transmissions": 6,
  "n_rules": 16,
  "rules": [
   {
@@ -79,6 +79,128 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
+   "title": "财联社11月26日电，美国据悉将推迟针对欧洲军事存在的改革。",
+   "source": "财联社电报",
+   "time": "2026-11-27T02:53:56+08:00",
+   "url": "https://www.cls.cn/detail/2545928",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688629"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "000603"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603099"
+     ]
+    }
+   ],
+   "hedge": [
+    {
+     "sector": "黄金",
+     "stocks": [
+      "000603"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-26",
+    "event_date": "2026-11-27",
+    "matched_codes": []
+   }
+  },
+  {
+   "title": "财联社11月26日电，特朗普表示，乌克兰与俄罗斯达成协议的可能性很大。希望看到俄罗斯总统普京撤回其在欧洲各地的一切军事行动。",
+   "source": "财联社电报",
+   "time": "2026-11-27T02:53:56+08:00",
+   "url": "https://www.cls.cn/detail/2545911",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688629"
+     ]
+    },
+    {
+     "sector": "黄金",
+     "stocks": [
+      "000603"
+     ]
+    }
+   ],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "603099"
+     ]
+    }
+   ],
+   "hedge": [
+    {
+     "sector": "黄金",
+     "stocks": [
+      "000603"
+     ]
+    }
+   ],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-26",
+    "event_date": "2026-11-27",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
    "source": "华尔街见闻",
    "time": "2026-11-24T14:12:01+08:00",
@@ -134,70 +256,9 @@
    }
   },
   {
-   "title": "俄乌冲突是否会蔓延到全球",
-   "source": "今日头条",
-   "time": "2026-11-26T17:11:58+08:00",
-   "url": "https://www.toutiao.com/trending/7712028038036196906/",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688629"
-     ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "000603"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "603099"
-     ]
-    }
-   ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "000603"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-26",
-    "event_date": "2026-11-26",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-26T17:12:05+08:00",
+   "time": "2026-11-27T02:56:19+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -271,45 +332,21 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-26",
-    "event_date": "2026-11-26",
+    "event_date": "2026-11-27",
     "matched_codes": []
    }
   },
   {
-   "title": "黄仁勋回归能否拯救美国AI泡沫",
-   "source": "B站热搜",
-   "time": "2026-11-26T17:26:26+08:00",
-   "url": "https://search.bilibili.com/all?keyword=%E9%BB%84%E4%BB%81%E5%8B%8B%E5%9B%9E%E5%BD%92%E8%83%BD%E5%90%A6%E6%8B%AF%E6%95%91%E7%BE%8E%E5%9B%BDAI%E6%B3%A1%E6%B2%AB",
-   "transmission_id": "ai_down",
-   "label": "AI/算力下跌",
-   "direct_bear": [
-    {
-     "sector": "计算机",
-     "stocks": [
-      "300324"
-     ],
-     "behavior": [
-      {
-       "code": "300324",
-       "label": "坏消息洗盘嫌疑",
-       "evidence": "主力净占比 23.32%",
-       "source": "em_fflow_rank",
-       "trade_date": "2026-11-26",
-       "snapshot_ts": "2026-11-26T15:34:36+08:00"
-      }
-     ]
-    },
-    {
-     "sector": "软件",
-     "stocks": [
-      "301041"
-     ]
-    }
-   ],
+   "title": "这次不一样？施罗德投资：美联储或因美股暴跌转向宽松 但反弹恐难持续",
+   "source": "财联社热门",
+   "time": "2026-11-27T02:50:33+08:00",
+   "url": "https://www.cls.cn/detail/2545777",
+   "transmission_id": "rate_cut",
+   "label": "降息/宽松",
+   "direct_bear": [],
    "direct_bull": [],
    "inverse_bull": [],
-   "inverse_bear": [],
-   "hedge": [
+   "inverse_bear": [
     {
      "sector": "银行",
      "stocks": [
@@ -324,28 +361,21 @@
       "600036",
       "600000"
      ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "000603"
-     ]
     }
    ],
+   "hedge": [],
    "flow_evidence": {
-    "status": "matched",
+    "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-26",
-    "event_date": "2026-11-26",
-    "matched_codes": [
-     "300324"
-    ]
+    "event_date": "2026-11-27",
+    "matched_codes": []
    }
   },
   {
    "title": "欧方将玉沙集团移出欧盟涉俄出口管制制裁清单，商务部：欢迎",
    "source": "澎湃新闻",
-   "time": "2026-11-26T17:26:30+08:00",
+   "time": "2026-11-27T03:08:02+08:00",
    "url": "https://www.thepaper.cn/newsDetail_forward_34563211",
    "transmission_id": "export_control",
    "label": "出口管制/制裁",
@@ -365,7 +395,7 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-26",
-    "event_date": "2026-11-26",
+    "event_date": "2026-11-27",
     "matched_codes": []
    },
    "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
