@@ -1,12 +1,12 @@
 {
-  "asof": "2026-11-25T08:29:15+00:00",
+  "asof": "2026-11-26T08:13:04+00:00",
   "generated_by": "build_good_stock_pool.py",
   "schema_version": 1,
   "source_status": {
     "ai_picks": {
       "file": "ai_picks.json",
       "status": "ok",
-      "asof": "2026-11-25T05:45:07+00:00"
+      "asof": "2026-11-26T01:00:35+00:00"
     },
     "today_picks": {
       "file": "today_picks.json",
@@ -16,12 +16,12 @@
     "lowpool": {
       "file": "lowpool.json",
       "status": "ok",
-      "asof": "2026-11-25T01:24:09+00:00"
+      "asof": "2026-11-26T01:00:21+00:00"
     },
     "sector_pool": {
       "file": "sector_pool.json",
       "status": "ok",
-      "asof": "2026-11-25T01:23:49+00:00"
+      "asof": "2026-11-26T00:59:58+00:00"
     },
     "valuation": {
       "file": "valuation.json",
@@ -37,257 +37,401 @@
       "sector_pool",
       "valuation"
     ],
-    "asof": "2026-11-25T08:29:15+00:00"
+    "asof": "2026-11-26T08:13:04+00:00"
   },
   "inputs": {
     "candidate_count": 137,
-    "sector_context_count": 41,
+    "sector_context_count": 65,
     "sector_context": [
       {
-        "sector": "数字媒体",
+        "sector": "渔业",
+        "tier": "tier1",
+        "leader": "好当家",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "医药商业",
         "tier": "tier2",
-        "leader": "国脉文化",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "ST海王",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "电视广播Ⅱ",
-        "tier": "tier3",
-        "leader": "电广传媒",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "sector": "酒店餐饮",
+        "tier": "tier2",
+        "leader": "同庆楼",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "教育",
+        "sector": "非白酒",
+        "tier": "tier2",
+        "leader": "青岛啤酒",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "国有大型银行Ⅱ",
+        "tier": "tier2",
+        "leader": "交通银行",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "饮料乳品",
         "tier": "tier3",
-        "leader": "创业黑马",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "欢乐家",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "白酒Ⅱ",
+        "tier": "tier3",
+        "leader": "山西汾酒",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "中药Ⅱ",
+        "tier": "tier3",
+        "leader": "桂林三金",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
         "sector": "旅游及景区",
         "tier": "tier3",
-        "leader": "岭南控股",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "祥源文旅",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "航运港口",
+        "sector": "一般零售",
         "tier": "tier3",
-        "leader": "招商轮船",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "中央商场",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "股份制银行Ⅱ",
+        "tier": "tier3",
+        "leader": "兴业银行",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "煤炭开采",
+        "tier": "tier3",
+        "leader": "淮北矿业",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "白色家电",
+        "tier": "tier3",
+        "leader": "长虹美菱",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "食品加工",
+        "tier": "tier3",
+        "leader": "ST龙大",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "化学制药",
+        "tier": "tier3",
+        "leader": "康芝药业",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "保险Ⅱ",
+        "tier": "tier3",
+        "leader": "中国平安",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "普钢",
+        "tier": "tier3",
+        "leader": "重庆钢铁",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "农商行Ⅱ",
+        "tier": "tier3",
+        "leader": "常熟银行",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "调味发酵品Ⅱ",
+        "tier": "tier3",
+        "leader": "恒顺醋业",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "房屋建设Ⅱ",
+        "tier": "tier3",
+        "leader": "ST龙元",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "轨交设备Ⅱ",
+        "tier": "tier3",
+        "leader": "*ST天宜",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "休闲食品",
+        "tier": "tier3",
+        "leader": "桂发祥",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "城商行Ⅱ",
+        "tier": "tier3",
+        "leader": "郑州银行",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "出版",
+        "tier": "tier3",
+        "leader": "龙版传媒",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "造纸",
+        "tier": "tier3",
+        "leader": "青山纸业",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "特钢Ⅱ",
+        "tier": "tier3",
+        "leader": "中信特钢",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "小家电",
+        "tier": "tier3",
+        "leader": "北鼎股份",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "教育",
+        "tier": "tier3",
+        "leader": "*ST开元",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "炼化及贸易",
+        "tier": "tier3",
+        "leader": "岳阳兴长",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "电力",
+        "tier": "tier3",
+        "leader": "新筑股份",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
         "sector": "航空机场",
         "tier": "tier3",
         "leader": "海航控股",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "化妆品",
-        "tier": "tier3",
-        "leader": "上海家化",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "个护用品",
-        "tier": "tier3",
-        "leader": "登康口腔",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "环保设备Ⅱ",
-        "tier": "tier3",
-        "leader": "法尔胜",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "环境治理",
-        "tier": "tier3",
-        "leader": "*ST启环",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "炼化及贸易",
-        "tier": "tier3",
-        "leader": "宇新股份",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "油服工程",
-        "tier": "tier3",
-        "leader": "潜能恒信",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
         "sector": "焦炭Ⅱ",
         "tier": "tier3",
-        "leader": "安泰集团",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "陕西黑猫",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "煤炭开采",
+        "sector": "物流",
         "tier": "tier3",
-        "leader": "昊华能源",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "*ST瑞茂",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "摩托车及其他",
+        "sector": "燃气Ⅱ",
         "tier": "tier3",
-        "leader": "征和工业",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "德龙汇能",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "农商行Ⅱ",
+        "sector": "化妆品",
         "tier": "tier3",
-        "leader": "沪农商行",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "福瑞达",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "城商行Ⅱ",
+        "sector": "铁路公路",
         "tier": "tier3",
-        "leader": "XD南京银",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "海汽集团",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "股份制银行Ⅱ",
+        "sector": "专业连锁Ⅱ",
         "tier": "tier3",
-        "leader": "浦发银行",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "国有大型银行Ⅱ",
-        "tier": "tier3",
-        "leader": "交通银行",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "出版",
-        "tier": "tier3",
-        "leader": "皖新传媒",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "影视院线",
-        "tier": "tier3",
-        "leader": "横店影视",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "广告营销",
-        "tier": "tier3",
-        "leader": "元隆雅图",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "游戏Ⅱ",
-        "tier": "tier3",
-        "leader": "文投控股",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "军工电子Ⅱ",
-        "tier": "tier3",
-        "leader": "高凌信息",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "航海装备Ⅱ",
-        "tier": "tier3",
-        "leader": "天海防务",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "地面兵装Ⅱ",
-        "tier": "tier3",
-        "leader": "银河电子",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "航空装备Ⅱ",
-        "tier": "tier3",
-        "leader": "利君股份",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "航天装备Ⅱ",
-        "tier": "tier3",
-        "leader": "中国卫通",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "电网设备",
-        "tier": "tier3",
-        "leader": "未来电器",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "电池",
-        "tier": "tier3",
-        "leader": "理奇智能",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "风电设备",
-        "tier": "tier3",
-        "leader": "广大特材",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "光伏设备",
-        "tier": "tier3",
-        "leader": "大全能源",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "其他电源设备Ⅱ",
-        "tier": "tier3",
-        "leader": "动力源",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "电机Ⅱ",
-        "tier": "tier3",
-        "leader": "凯中精密",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "工程咨询服务Ⅱ",
-        "tier": "tier3",
-        "leader": "招标股份",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "专业工程",
-        "tier": "tier3",
-        "leader": "镇海股份",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "华致酒行",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
         "sector": "基础建设",
         "tier": "tier3",
-        "leader": "汇通集团",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "*ST东珠",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "装修装饰Ⅱ",
+        "sector": "水泥",
         "tier": "tier3",
-        "leader": "全筑股份",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "海螺水泥",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
-        "sector": "房屋建设Ⅱ",
+        "sector": "种植业",
         "tier": "tier3",
-        "leader": "重庆建工",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "leader": "北大荒",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "饲料",
+        "tier": "tier3",
+        "leader": "金新农",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "生物制品",
+        "tier": "tier3",
+        "leader": "金迪克",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "纺织制造",
+        "tier": "tier3",
+        "leader": "万事利",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "航海装备Ⅱ",
+        "tier": "tier3",
+        "leader": "国瑞科技",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "油服工程",
+        "tier": "tier3",
+        "leader": "*ST准油",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "个护用品",
+        "tier": "tier_down",
+        "leader": "中顺洁柔",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "工业金属",
+        "tier": "tier_down",
+        "leader": "*ST利源",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "医疗服务",
+        "tier": "tier_down",
+        "leader": "ST中珠",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "环境治理",
+        "tier": "tier_down",
+        "leader": "*ST启环",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "黑色家电",
+        "tier": "tier_down",
+        "leader": "四川长虹",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "农产品加工",
+        "tier": "tier_down",
+        "leader": "永顺泰",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "电视广播Ⅱ",
+        "tier": "tier_down",
+        "leader": "广电网络",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "通信设备",
+        "tier": "tier_down",
+        "leader": "天孚通信",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "互联网电商",
+        "tier": "tier_down",
+        "leader": "丽人丽妆",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "工程机械",
+        "tier": "tier_down",
+        "leader": "邵阳液压",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "化学纤维",
+        "tier": "tier_down",
+        "leader": "ST海龙",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "航空装备Ⅱ",
+        "tier": "tier_down",
+        "leader": "利君股份",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "游戏Ⅱ",
+        "tier": "tier_down",
+        "leader": "大晟文化",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "贸易Ⅱ",
+        "tier": "tier_down",
+        "leader": "苏美达",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "家居用品",
+        "tier": "tier_down",
+        "leader": "*ST华鹏",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "饰品",
+        "tier": "tier_down",
+        "leader": "曼卡龙",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "专业工程",
+        "tier": "tier_down",
+        "leader": "森特股份",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "广告营销",
+        "tier": "tier_down",
+        "leader": "ST华扬",
+        "asof": "2026-11-26T00:59:58+00:00"
+      },
+      {
+        "sector": "摩托车及其他",
+        "tier": "tier_down",
+        "leader": "征和工业",
+        "asof": "2026-11-26T00:59:58+00:00"
       },
       {
         "sector": "装修建材",
-        "tier": "tier3",
-        "leader": "瑞泰科技",
-        "asof": "2026-11-25T01:23:49+00:00"
-      },
-      {
-        "sector": "玻璃玻纤",
-        "tier": "tier3",
-        "leader": "金晶科技",
-        "asof": "2026-11-25T01:23:49+00:00"
+        "tier": "tier_down",
+        "leader": "兔 宝 宝",
+        "asof": "2026-11-26T00:59:58+00:00"
       }
     ]
   },
@@ -297,7 +441,7 @@
   "insufficient": [
     {
       "code": null,
-      "name": "国脉文化",
+      "name": "好当家",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -307,7 +451,7 @@
     },
     {
       "code": null,
-      "name": "电广传媒",
+      "name": "ST海王",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -317,7 +461,7 @@
     },
     {
       "code": null,
-      "name": "创业黑马",
+      "name": "同庆楼",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -327,147 +471,7 @@
     },
     {
       "code": null,
-      "name": "岭南控股",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "招商轮船",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "海航控股",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "上海家化",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "登康口腔",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "法尔胜",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "*ST启环",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "宇新股份",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "潜能恒信",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "安泰集团",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "昊华能源",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "征和工业",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "沪农商行",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "XD南京银",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "浦发银行",
+      "name": "青岛啤酒",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -487,7 +491,7 @@
     },
     {
       "code": null,
-      "name": "皖新传媒",
+      "name": "欢乐家",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -497,7 +501,7 @@
     },
     {
       "code": null,
-      "name": "横店影视",
+      "name": "山西汾酒",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -507,7 +511,7 @@
     },
     {
       "code": null,
-      "name": "元隆雅图",
+      "name": "桂林三金",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -517,7 +521,7 @@
     },
     {
       "code": null,
-      "name": "文投控股",
+      "name": "祥源文旅",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -527,7 +531,7 @@
     },
     {
       "code": null,
-      "name": "高凌信息",
+      "name": "中央商场",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -537,7 +541,7 @@
     },
     {
       "code": null,
-      "name": "天海防务",
+      "name": "兴业银行",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -547,7 +551,437 @@
     },
     {
       "code": null,
-      "name": "银河电子",
+      "name": "淮北矿业",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "长虹美菱",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "ST龙大",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "康芝药业",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "中国平安",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "重庆钢铁",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "常熟银行",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "恒顺醋业",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "ST龙元",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST天宜",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "桂发祥",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "郑州银行",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "龙版传媒",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "青山纸业",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "中信特钢",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "北鼎股份",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST开元",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "岳阳兴长",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "新筑股份",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "海航控股",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "陕西黑猫",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST瑞茂",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "德龙汇能",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "福瑞达",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "海汽集团",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "华致酒行",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST东珠",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "海螺水泥",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "北大荒",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "金新农",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "金迪克",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "万事利",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "国瑞科技",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST准油",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST利源",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "ST中珠",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "*ST启环",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "四川长虹",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "永顺泰",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "广电网络",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "天孚通信",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "丽人丽妆",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "邵阳液压",
+      "source_pool": "sector_pool",
+      "status": "insufficient_data",
+      "missing_fields": [
+        "leader.stock_code"
+      ],
+      "reason": "sector_record_has_no_stock_code"
+    },
+    {
+      "code": null,
+      "name": "ST海龙",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -567,7 +1001,7 @@
     },
     {
       "code": null,
-      "name": "中国卫通",
+      "name": "大晟文化",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -577,7 +1011,7 @@
     },
     {
       "code": null,
-      "name": "未来电器",
+      "name": "苏美达",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -587,7 +1021,7 @@
     },
     {
       "code": null,
-      "name": "理奇智能",
+      "name": "*ST华鹏",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -597,7 +1031,7 @@
     },
     {
       "code": null,
-      "name": "广大特材",
+      "name": "曼卡龙",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -607,7 +1041,7 @@
     },
     {
       "code": null,
-      "name": "大全能源",
+      "name": "森特股份",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -617,7 +1051,7 @@
     },
     {
       "code": null,
-      "name": "动力源",
+      "name": "ST华扬",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -627,7 +1061,7 @@
     },
     {
       "code": null,
-      "name": "凯中精密",
+      "name": "征和工业",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -637,67 +1071,7 @@
     },
     {
       "code": null,
-      "name": "招标股份",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "镇海股份",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "汇通集团",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "全筑股份",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "重庆建工",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "瑞泰科技",
-      "source_pool": "sector_pool",
-      "status": "insufficient_data",
-      "missing_fields": [
-        "leader.stock_code"
-      ],
-      "reason": "sector_record_has_no_stock_code"
-    },
-    {
-      "code": null,
-      "name": "金晶科技",
+      "name": "兔 宝 宝",
       "source_pool": "sector_pool",
       "status": "insufficient_data",
       "missing_fields": [
@@ -762,7 +1136,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -836,7 +1210,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -910,7 +1284,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -984,7 +1358,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1058,7 +1432,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1132,7 +1506,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1206,7 +1580,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1280,7 +1654,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1354,7 +1728,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1428,7 +1802,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1502,7 +1876,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1576,7 +1950,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1650,7 +2024,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1724,7 +2098,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1798,7 +2172,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1872,7 +2246,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -1944,7 +2318,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2018,7 +2392,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2089,7 +2463,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2163,7 +2537,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2237,7 +2611,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2309,7 +2683,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2381,7 +2755,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2454,7 +2828,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2526,7 +2900,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2588,7 +2962,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2652,7 +3026,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2716,7 +3090,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2780,7 +3154,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2844,7 +3218,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2906,7 +3280,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -2970,7 +3344,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3043,7 +3417,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3115,7 +3489,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3187,7 +3561,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3260,7 +3634,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3332,7 +3706,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3407,7 +3781,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3480,7 +3854,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3551,7 +3925,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3624,7 +3998,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3695,7 +4069,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3770,7 +4144,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3843,7 +4217,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3915,7 +4289,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -3989,7 +4363,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4061,7 +4435,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4135,7 +4509,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4207,7 +4581,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4279,7 +4653,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4353,7 +4727,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4428,7 +4802,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4502,7 +4876,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4573,7 +4947,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4644,7 +5018,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4718,7 +5092,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4788,7 +5162,7 @@
           "today_picks"
         ],
         "snapshot_ts": "2026-11-11T09:28:54+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "input_status": "stale",
@@ -4813,7 +5187,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002766",
         "name": "索菱股份",
@@ -4834,7 +5208,7 @@
       },
       "quote": {
         "price": 3.99,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -33.9
@@ -4857,8 +5231,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -4902,12 +5276,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -4934,7 +5308,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz200539",
         "name": "粤电力Ｂ",
@@ -4955,7 +5329,7 @@
       },
       "quote": {
         "price": 1.84,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 41451.94
@@ -4980,8 +5354,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5025,12 +5399,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5057,7 +5431,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz003032",
         "name": "传智教育",
@@ -5078,7 +5452,7 @@
       },
       "quote": {
         "price": 8.76,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -71.71
@@ -5101,8 +5475,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5146,12 +5520,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5178,7 +5552,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600860",
         "name": "京城股份",
@@ -5199,7 +5573,7 @@
       },
       "quote": {
         "price": 7.41,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -41.0
@@ -5222,8 +5596,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5267,12 +5641,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5299,7 +5673,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300470",
         "name": "中密控股",
@@ -5320,7 +5694,7 @@
       },
       "quote": {
         "price": 26.74,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 17.32
@@ -5345,8 +5719,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5390,12 +5764,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5422,7 +5796,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603508",
         "name": "思维列控",
@@ -5443,7 +5817,7 @@
       },
       "quote": {
         "price": 20.56,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 13.9
@@ -5468,8 +5842,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5513,12 +5887,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5545,7 +5919,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300036",
         "name": "超图软件",
@@ -5566,7 +5940,7 @@
       },
       "quote": {
         "price": 10.21,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -54.4
@@ -5589,8 +5963,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5634,12 +6008,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5666,7 +6040,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300682",
         "name": "朗新科技",
@@ -5688,7 +6062,7 @@
       },
       "quote": {
         "price": 8.81,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -92.23
@@ -5711,8 +6085,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5756,12 +6130,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5788,7 +6162,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603568",
         "name": "伟明环保",
@@ -5809,7 +6183,7 @@
       },
       "quote": {
         "price": 13.21,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 16.01
@@ -5834,8 +6208,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -5879,12 +6253,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -5911,7 +6285,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603281",
         "name": "江瀚新材",
@@ -5932,7 +6306,7 @@
       },
       "quote": {
         "price": 18.08,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 25.06
@@ -5957,8 +6331,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6002,12 +6376,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6034,7 +6408,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300003",
         "name": "乐普医疗",
@@ -6055,7 +6429,7 @@
       },
       "quote": {
         "price": 11.44,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 27.97
@@ -6080,8 +6454,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6125,12 +6499,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6157,7 +6531,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603317",
         "name": "天味食品",
@@ -6178,7 +6552,7 @@
       },
       "quote": {
         "price": 12.57,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 17.81
@@ -6203,8 +6577,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6248,12 +6622,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6280,7 +6654,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300769",
         "name": "德方纳米",
@@ -6301,7 +6675,7 @@
       },
       "quote": {
         "price": 39.2,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 480.59
@@ -6326,8 +6700,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6371,12 +6745,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6403,7 +6777,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002256",
         "name": "兆新股份",
@@ -6424,7 +6798,7 @@
       },
       "quote": {
         "price": 3.16,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 151.63
@@ -6449,8 +6823,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6494,12 +6868,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6526,7 +6900,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300450",
         "name": "先导智能",
@@ -6548,7 +6922,7 @@
       },
       "quote": {
         "price": 32.28,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 35.36
@@ -6573,8 +6947,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6618,12 +6992,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6650,7 +7024,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300654",
         "name": "世纪天鸿",
@@ -6672,7 +7046,7 @@
       },
       "quote": {
         "price": 9.5,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 161.9
@@ -6697,8 +7071,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6742,12 +7116,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6774,7 +7148,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300882",
         "name": "万胜智能",
@@ -6795,7 +7169,7 @@
       },
       "quote": {
         "price": 13.03,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 50.06
@@ -6820,8 +7194,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6865,12 +7239,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -6897,7 +7271,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300772",
         "name": "运达股份",
@@ -6918,7 +7292,7 @@
       },
       "quote": {
         "price": 8.91,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -145.95
@@ -6941,8 +7315,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -6986,12 +7360,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7018,7 +7392,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603567",
         "name": "珍宝岛",
@@ -7039,7 +7413,7 @@
       },
       "quote": {
         "price": 5.22,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -3.17
@@ -7062,8 +7436,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -7107,12 +7481,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7139,7 +7513,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002250",
         "name": "联化科技",
@@ -7160,7 +7534,7 @@
       },
       "quote": {
         "price": 14.04,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 25.51
@@ -7185,8 +7559,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -7230,12 +7604,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7262,7 +7636,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002459",
         "name": "晶澳科技",
@@ -7283,7 +7657,7 @@
       },
       "quote": {
         "price": 6.62,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -4.79
@@ -7306,8 +7680,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -7351,12 +7725,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7383,7 +7757,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000023",
         "name": "",
@@ -7404,7 +7778,7 @@
       },
       "quote": {
         "price": 1.72,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 0
@@ -7417,8 +7791,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "source_fields_by_pool": {
@@ -7460,12 +7834,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7492,7 +7866,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000013",
         "name": "",
@@ -7513,7 +7887,7 @@
       },
       "quote": {
         "price": 2.47,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 0
@@ -7526,8 +7900,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "source_fields_by_pool": {
@@ -7569,12 +7943,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7601,7 +7975,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh601218",
         "name": "吉鑫科技",
@@ -7622,7 +7996,7 @@
       },
       "quote": {
         "price": 4.96,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 32.64
@@ -7647,8 +8021,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -7692,12 +8066,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7724,7 +8098,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000406",
         "name": "",
@@ -7745,7 +8119,7 @@
       },
       "quote": {
         "price": 10.12,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 0
@@ -7758,8 +8132,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "source_fields_by_pool": {
@@ -7801,12 +8175,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7833,7 +8207,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300850",
         "name": "新强联",
@@ -7854,7 +8228,7 @@
       },
       "quote": {
         "price": 24.5,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 16.06
@@ -7879,8 +8253,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -7924,12 +8298,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -7956,7 +8330,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603187",
         "name": "海容冷链",
@@ -7978,7 +8352,7 @@
       },
       "quote": {
         "price": 10.77,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 12.97
@@ -8003,8 +8377,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8048,12 +8422,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8080,7 +8454,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000625",
         "name": "长安汽车",
@@ -8101,7 +8475,7 @@
       },
       "quote": {
         "price": 7.06,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 27.02
@@ -8126,8 +8500,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8171,12 +8545,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8203,7 +8577,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002121",
         "name": "科陆电子",
@@ -8224,7 +8598,7 @@
       },
       "quote": {
         "price": 4.16,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -12.72
@@ -8247,8 +8621,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8292,12 +8666,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8324,7 +8698,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000800",
         "name": "一汽解放",
@@ -8345,7 +8719,7 @@
       },
       "quote": {
         "price": 5.84,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 28.56
@@ -8370,8 +8744,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8415,12 +8789,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8445,9 +8819,10 @@
       "is_st": false,
       "risk_note": null,
       "source_pools": [
-        "lowpool"
+        "lowpool",
+        "sector_pool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002511",
         "name": "中顺洁柔",
@@ -8468,7 +8843,7 @@
       },
       "quote": {
         "price": 6.91,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 22.96
@@ -8491,19 +8866,38 @@
       "technical": {},
       "provenance": {
         "source": [
-          "lowpool"
+          "lowpool",
+          "sector_pool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
-      "valuation_asof": "2026-10-15T00:13:07+00:00",
       "source_fields_by_pool": {
+        "sector_pool": {
+          "sector": "个护用品",
+          "code": "pt01801981",
+          "score": -2.07,
+          "avg_chg_1d": -2.07,
+          "chg_5d": -5.05,
+          "chg_20d": -9.07,
+          "leader": "中顺洁柔",
+          "leader_pct": 0.97,
+          "level": -0.11,
+          "_sector_tier": "tier_down"
+        },
         "valuation": {
           "status": "stale",
           "asof": "2026-10-15T00:13:07+00:00"
         }
       },
+      "sector_context": [
+        {
+          "sector": "个护用品",
+          "tier": "tier_down"
+        }
+      ],
+      "valuation_asof": "2026-10-15T00:13:07+00:00",
       "engine": {
         "score": 0,
         "grade": "F",
@@ -8538,12 +8932,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8570,7 +8964,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz001289",
         "name": "龙源电力",
@@ -8592,7 +8986,7 @@
       },
       "quote": {
         "price": 15.03,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 35.5
@@ -8617,8 +9011,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8662,12 +9056,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8694,7 +9088,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000859",
         "name": "国风新材",
@@ -8715,7 +9109,7 @@
       },
       "quote": {
         "price": 8.69,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -120.42
@@ -8738,8 +9132,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8783,12 +9177,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8815,7 +9209,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300815",
         "name": "玉禾田",
@@ -8836,7 +9230,7 @@
       },
       "quote": {
         "price": 14.65,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 11.25
@@ -8861,8 +9255,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -8906,12 +9300,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -8938,7 +9332,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002970",
         "name": "锐明技术",
@@ -8959,7 +9353,7 @@
       },
       "quote": {
         "price": 41.17,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 26.63
@@ -8984,8 +9378,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9029,12 +9423,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9061,7 +9455,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600480",
         "name": "凌云股份",
@@ -9082,7 +9476,7 @@
       },
       "quote": {
         "price": 7.62,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 13.44
@@ -9107,8 +9501,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9152,12 +9546,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9184,7 +9578,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002615",
         "name": "哈尔斯",
@@ -9205,7 +9599,7 @@
       },
       "quote": {
         "price": 6.16,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 130.05
@@ -9230,8 +9624,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9275,12 +9669,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9307,7 +9701,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh601865",
         "name": "福莱特",
@@ -9328,7 +9722,7 @@
       },
       "quote": {
         "price": 9.15,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 61.13
@@ -9353,8 +9747,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9398,12 +9792,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9430,7 +9824,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz301069",
         "name": "凯盛新材",
@@ -9451,7 +9845,7 @@
       },
       "quote": {
         "price": 15.85,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 54.67
@@ -9476,8 +9870,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9521,12 +9915,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9553,7 +9947,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000937",
         "name": "冀中能源",
@@ -9574,7 +9968,7 @@
       },
       "quote": {
         "price": 4.42,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 32.73
@@ -9597,8 +9991,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9642,12 +10036,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9674,7 +10068,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300972",
         "name": "万辰集团",
@@ -9696,7 +10090,7 @@
       },
       "quote": {
         "price": 160.97,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 15.49
@@ -9721,8 +10115,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9766,12 +10160,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9798,7 +10192,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600469",
         "name": "风神股份",
@@ -9818,7 +10212,7 @@
       },
       "quote": {
         "price": 4.95,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 18.51
@@ -9843,8 +10237,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -9888,12 +10282,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -9920,7 +10314,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000723",
         "name": "美锦能源",
@@ -9941,7 +10335,7 @@
       },
       "quote": {
         "price": 3.51,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -14.8
@@ -9964,8 +10358,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10009,12 +10403,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10041,7 +10435,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh601311",
         "name": "骆驼股份",
@@ -10062,7 +10456,7 @@
       },
       "quote": {
         "price": 7.33,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 14.88
@@ -10087,8 +10481,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10132,12 +10526,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10164,7 +10558,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600197",
         "name": "伊力特",
@@ -10185,7 +10579,7 @@
       },
       "quote": {
         "price": 9.3,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 32.57
@@ -10210,8 +10604,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10255,12 +10649,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10287,7 +10681,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000981",
         "name": "山子高科",
@@ -10307,7 +10701,7 @@
       },
       "quote": {
         "price": 2.6,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 30.9
@@ -10332,8 +10726,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10377,12 +10771,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10409,7 +10803,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603011",
         "name": "合锻智能",
@@ -10429,7 +10823,7 @@
       },
       "quote": {
         "price": 21.05,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -35.32
@@ -10452,8 +10846,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10497,12 +10891,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10529,7 +10923,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300564",
         "name": "筑博设计",
@@ -10551,7 +10945,7 @@
       },
       "quote": {
         "price": 12.31,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 47.5
@@ -10576,8 +10970,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10621,12 +11015,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10653,7 +11047,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002255",
         "name": "海陆重工",
@@ -10673,7 +11067,7 @@
       },
       "quote": {
         "price": 7.38,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 16.02
@@ -10698,8 +11092,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10743,12 +11137,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10775,7 +11169,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002111",
         "name": "威海广泰",
@@ -10795,7 +11189,7 @@
       },
       "quote": {
         "price": 9.14,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 23.9
@@ -10820,8 +11214,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10865,12 +11259,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -10897,7 +11291,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002083",
         "name": "孚日股份",
@@ -10918,7 +11312,7 @@
       },
       "quote": {
         "price": 9.59,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 15.79
@@ -10943,8 +11337,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -10988,12 +11382,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11020,7 +11414,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002019",
         "name": "亿帆医药",
@@ -11041,7 +11435,7 @@
       },
       "quote": {
         "price": 9.43,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 38.49
@@ -11066,8 +11460,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11111,12 +11505,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11143,7 +11537,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz301278",
         "name": "快可电子",
@@ -11165,7 +11559,7 @@
       },
       "quote": {
         "price": 27.83,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 116.16
@@ -11190,8 +11584,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11235,12 +11629,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11267,7 +11661,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz301636",
         "name": "泽润新能",
@@ -11288,7 +11682,7 @@
       },
       "quote": {
         "price": 40.56,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -204.39
@@ -11311,8 +11705,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11356,12 +11750,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11388,7 +11782,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600535",
         "name": "天士力",
@@ -11410,7 +11804,7 @@
       },
       "quote": {
         "price": 14.06,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 17.38
@@ -11435,8 +11829,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11480,12 +11874,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11512,7 +11906,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600273",
         "name": "嘉化能源",
@@ -11534,7 +11928,7 @@
       },
       "quote": {
         "price": 6.3,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 13.28
@@ -11559,8 +11953,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11604,12 +11998,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11636,7 +12030,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300602",
         "name": "飞荣达",
@@ -11656,7 +12050,7 @@
       },
       "quote": {
         "price": 31.39,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 41.33
@@ -11681,8 +12075,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11726,12 +12120,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11758,7 +12152,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600076",
         "name": "康欣新材",
@@ -11777,7 +12171,7 @@
       },
       "quote": {
         "price": 2.1,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -7.42
@@ -11800,8 +12194,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11845,12 +12239,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11877,7 +12271,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002033",
         "name": "丽江股份",
@@ -11897,7 +12291,7 @@
       },
       "quote": {
         "price": 8.29,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 17.99
@@ -11922,8 +12316,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -11967,12 +12361,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -11999,7 +12393,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz301632",
         "name": "广东建科",
@@ -12018,7 +12412,7 @@
       },
       "quote": {
         "price": 12.83,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 46.96
@@ -12043,8 +12437,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12088,12 +12482,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12120,7 +12514,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002739",
         "name": "儒意电影",
@@ -12141,7 +12535,7 @@
       },
       "quote": {
         "price": 8.45,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -101.69
@@ -12164,8 +12558,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12209,12 +12603,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12241,7 +12635,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300683",
         "name": "海特生物",
@@ -12262,7 +12656,7 @@
       },
       "quote": {
         "price": 24.86,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -12.18
@@ -12285,8 +12679,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12330,12 +12724,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12362,7 +12756,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002984",
         "name": "森麒麟",
@@ -12382,7 +12776,7 @@
       },
       "quote": {
         "price": 12.9,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 15.42
@@ -12407,8 +12801,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12452,12 +12846,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12484,7 +12878,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600761",
         "name": "安徽合力",
@@ -12504,7 +12898,7 @@
       },
       "quote": {
         "price": 14.97,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 12.51
@@ -12529,8 +12923,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12574,12 +12968,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12606,7 +13000,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002182",
         "name": "宝武镁业",
@@ -12628,7 +13022,7 @@
       },
       "quote": {
         "price": 11.12,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -109.76
@@ -12651,8 +13045,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12696,12 +13090,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12728,7 +13122,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002160",
         "name": "常铝股份",
@@ -12749,7 +13143,7 @@
       },
       "quote": {
         "price": 3.85,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 57.89
@@ -12774,8 +13168,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12819,12 +13213,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12851,7 +13245,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000600",
         "name": "建投能源",
@@ -12871,7 +13265,7 @@
       },
       "quote": {
         "price": 7.21,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 8.34
@@ -12896,8 +13290,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -12941,12 +13335,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -12973,7 +13367,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz301004",
         "name": "嘉益股份",
@@ -12993,7 +13387,7 @@
       },
       "quote": {
         "price": 31.05,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 16.15
@@ -13018,8 +13412,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13063,12 +13457,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13095,7 +13489,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600345",
         "name": "长江通信",
@@ -13115,7 +13509,7 @@
       },
       "quote": {
         "price": 43.66,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 21.36
@@ -13140,8 +13534,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13185,12 +13579,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13217,7 +13611,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh600267",
         "name": "海正药业",
@@ -13238,7 +13632,7 @@
       },
       "quote": {
         "price": 11.57,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 15.75
@@ -13263,8 +13657,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13308,12 +13702,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13340,7 +13734,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002391",
         "name": "长青股份",
@@ -13361,7 +13755,7 @@
       },
       "quote": {
         "price": 5.14,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 64.69
@@ -13386,8 +13780,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13431,12 +13825,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13463,7 +13857,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300035",
         "name": "中科电气",
@@ -13482,7 +13876,7 @@
       },
       "quote": {
         "price": 12.0,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 25.38
@@ -13507,8 +13901,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13552,12 +13946,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13584,7 +13978,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000412",
         "name": "",
@@ -13604,7 +13998,7 @@
       },
       "quote": {
         "price": 2.89,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 0
@@ -13617,8 +14011,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "source_fields_by_pool": {
@@ -13660,12 +14054,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13692,7 +14086,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz001225",
         "name": "和泰机电",
@@ -13712,7 +14106,7 @@
       },
       "quote": {
         "price": 28.13,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 112.63
@@ -13737,8 +14131,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13782,12 +14176,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13814,7 +14208,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz002368",
         "name": "太极股份",
@@ -13834,7 +14228,7 @@
       },
       "quote": {
         "price": 12.14,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": -6.96
@@ -13857,8 +14251,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -13902,12 +14296,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -13934,7 +14328,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz300492",
         "name": "华图山鼎",
@@ -13954,7 +14348,7 @@
       },
       "quote": {
         "price": 19.6,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 93.48
@@ -13979,8 +14373,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -14024,12 +14418,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -14056,7 +14450,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh601198",
         "name": "东兴证券",
@@ -14076,7 +14470,7 @@
       },
       "quote": {
         "price": 13.06,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 18.29
@@ -14099,8 +14493,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -14144,12 +14538,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -14176,7 +14570,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh605099",
         "name": "共创草坪",
@@ -14196,7 +14590,7 @@
       },
       "quote": {
         "price": 26.43,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 15.95
@@ -14221,8 +14615,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -14266,12 +14660,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -14298,7 +14692,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sh603217",
         "name": "元利科技",
@@ -14318,7 +14712,7 @@
       },
       "quote": {
         "price": 24.07,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 23.29
@@ -14343,8 +14737,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "valuation_asof": "2026-10-15T00:13:07+00:00",
@@ -14388,12 +14782,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -14420,7 +14814,7 @@
       "source_pools": [
         "lowpool"
       ],
-      "source_asof": "2026-11-25T01:24:09+00:00",
+      "source_asof": "2026-11-26T01:00:21+00:00",
       "source_fields": {
         "code": "sz000046",
         "name": "",
@@ -14440,7 +14834,7 @@
       },
       "quote": {
         "price": 0.38,
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "fundamentals": {
         "pe": 0
@@ -14453,8 +14847,8 @@
         "source": [
           "lowpool"
         ],
-        "snapshot_ts": "2026-11-25T01:24:09+00:00",
-        "asof": "2026-11-25T08:29:15+00:00"
+        "snapshot_ts": "2026-11-26T01:00:21+00:00",
+        "asof": "2026-11-26T08:13:04+00:00"
       },
       "adjustment": {},
       "source_fields_by_pool": {
@@ -14496,12 +14890,12 @@
           "source": [
             "lowpool"
           ],
-          "snapshot_ts": "2026-11-25T01:24:09+00:00",
+          "snapshot_ts": "2026-11-26T01:00:21+00:00",
           "freshness_ok": true,
           "adjustment_safe_for_long_term": false,
           "source_conflict": false
         },
-        "asof": "2026-11-25T01:24:09+00:00"
+        "asof": "2026-11-26T01:00:21+00:00"
       },
       "status": "insufficient_data",
       "missing_fields": [
@@ -14533,10 +14927,10 @@
     "eligible": 0,
     "watch": 0,
     "reject": 0,
-    "insufficient": 178,
+    "insufficient": 201,
     "candidate_count": 137,
     "eligible_count": 0,
-    "insufficient_count": 178
+    "insufficient_count": 201
   },
   "pool_type": "analysis"
 }
