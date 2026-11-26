@@ -1,5 +1,5 @@
 {
-  "ts": "2026-11-25T08:31:14+08:00",
+  "ts": "2026-11-26T08:06:39+08:00",
   "engine": "pead_engine",
   "coverage": {
     "n_fin_symbols": 4028,
@@ -14265,57 +14265,17 @@
       "car_5d": 0.011364,
       "car_10d": 0.018939,
       "car_20d": 0.022727
-    },
-    {
-      "symbol": "sh600682",
-      "announce_date": "2026-08-27 00:00:00",
-      "eps": 0.03,
-      "sue": 0.0215,
-      "n_quarters": 103,
-      "car_5d": 0.013962,
-      "car_10d": -0.020942,
-      "car_20d": 0.041885
-    },
-    {
-      "symbol": "sz001232",
-      "announce_date": "2026-08-27",
-      "eps": 2.06,
-      "sue": 1.0086,
-      "n_quarters": 12,
-      "car_5d": 0.068814,
-      "car_10d": 0.026909,
-      "car_20d": 0.023823
-    },
-    {
-      "symbol": "sz200058",
-      "announce_date": "2026-08-27",
-      "eps": 0.0425,
-      "sue": 0.0448,
-      "n_quarters": 96,
-      "car_5d": 0.0,
-      "car_10d": 0.031447,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200505",
-      "announce_date": "2026-08-27",
-      "eps": 0.01,
-      "sue": -0.0737,
-      "n_quarters": 93,
-      "car_5d": 0.0,
-      "car_10d": -0.036269,
-      "car_20d": null
     }
   ],
   "events_window": {
     "max_age_days": 90,
-    "cutoff": "2026-08-27",
+    "cutoff": "2026-08-28",
     "n_total": 1451,
-    "n_output": 1422,
+    "n_output": 1418,
     "order": "announce_date desc"
   },
   "warnings": [
-    "events 只输出最近 90 天公告的 1422 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
+    "events 只输出最近 90 天公告的 1418 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
   ],
   "provenance": {
     "source": "data/fin/*.json (财报) + data/bulk/day_qfq_*.csv (价格)",
