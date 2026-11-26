@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-26T03:42:41+08:00",
+ "ts": "2026-11-26T08:50:39+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 367,
- "n_transmissions": 3,
+ "n_transmissions": 4,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-26T03:42:34+08:00",
+   "time": "2026-11-26T08:50:32+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -168,6 +168,49 @@
    }
   },
   {
+   "title": "北部湾部分海域进行军事训练 禁止船舶驶入",
+   "source": "财联社电报",
+   "time": "2026-11-26T08:24:35+08:00",
+   "url": "https://www.cls.cn/detail/2544808",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [],
+   "inverse_bear": [
+    {
+     "sector": "航空",
+     "stocks": [
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "002651"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "600576",
+      "600088"
+     ]
+    }
+   ],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-25",
+    "event_date": "2026-11-26",
+    "matched_codes": []
+   }
+  },
+  {
    "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
    "source": "华尔街见闻",
    "time": "2026-11-24T14:12:01+08:00",
@@ -219,7 +262,7 @@
   {
    "title": "黄仁勋回归能否拯救美国AI泡沫",
    "source": "B站热搜",
-   "time": "2026-11-26T03:42:31+08:00",
+   "time": "2026-11-26T08:50:29+08:00",
    "url": "https://search.bilibili.com/all?keyword=%E9%BB%84%E4%BB%81%E5%8B%8B%E5%9B%9E%E5%BD%92%E8%83%BD%E5%90%A6%E6%8B%AF%E6%95%91%E7%BE%8E%E5%9B%BDAI%E6%B3%A1%E6%B2%AB",
    "transmission_id": "ai_down",
    "label": "AI/算力下跌",
