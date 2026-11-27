@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-27T17:39:31+08:00",
+ "ts": "2026-11-28T03:11:35+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 368,
- "n_transmissions": 3,
+ "n_transmissions": 4,
  "n_rules": 16,
  "rules": [
   {
@@ -81,7 +81,7 @@
   {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-27T17:22:26+08:00",
+   "time": "2026-11-28T02:53:57+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -162,15 +162,15 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-27",
-    "event_date": "2026-11-27",
+    "event_date": "2026-11-28",
     "matched_codes": []
    }
   },
   {
-   "title": "扎哈罗娃称日本打着幌子加快军事建设",
-   "source": "今日头条",
-   "time": "2026-11-27T17:21:18+08:00",
-   "url": "https://www.toutiao.com/trending/7712753398290235913/",
+   "title": "意大利外长：乌在利比亚军事行动未事先通报盟友",
+   "source": "财联社电报",
+   "time": "2026-11-28T02:46:51+08:00",
+   "url": "https://www.cls.cn/detail/2547072",
    "transmission_id": "geopolitics",
    "label": "地缘冲突",
    "direct_bear": [],
@@ -211,18 +211,48 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-27",
-    "event_date": "2026-11-27",
+    "event_date": "2026-11-28",
     "matched_codes": []
    }
   },
   {
-   "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
+   "title": "财联社11月28日电，法国加入荷兰行列，反对美国拟议的出口管制措施。",
+   "source": "财联社电报",
+   "time": "2026-11-28T02:46:51+08:00",
+   "url": "https://www.cls.cn/detail/2547110",
+   "transmission_id": "export_control",
+   "label": "出口管制/制裁",
+   "direct_bear": [],
+   "direct_bull": [],
+   "inverse_bull": [
+    {
+     "sector": "半导体设备",
+     "stocks": [
+      "301660",
+      "300820"
+     ]
+    }
+   ],
+   "inverse_bear": [],
+   "hedge": [],
+   "flow_evidence": {
+    "status": "insufficient",
+    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
+    "trade_date": "2026-11-27",
+    "event_date": "2026-11-28",
+    "matched_codes": []
+   },
+   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+  },
+  {
+   "title": "洲际交易所（ICE）：11月24日当周，投机者所持布伦特原油净多头头寸减少3,722手合约，至129,913手合约。\n\nICE柴油净多头头寸减少2,435手合约，至48,176手合",
    "source": "华尔街见闻",
-   "time": "2026-11-24T14:12:01+08:00",
-   "url": "https://wallstreetcn.com/livenews/3204697",
-   "transmission_id": "oil_down",
-   "label": "油价下跌",
-   "direct_bear": [
+   "time": "2026-11-28T03:11:23+08:00",
+   "url": "https://wallstreetcn.com/livenews/3207247",
+   "transmission_id": "oil_up",
+   "label": "油价上涨",
+   "direct_bear": [],
+   "direct_bull": [
     {
      "sector": "油服工程",
      "stocks": [
@@ -230,8 +260,8 @@
      ]
     }
    ],
-   "direct_bull": [],
-   "inverse_bull": [
+   "inverse_bull": [],
+   "inverse_bear": [
     {
      "sector": "航空机场",
      "stocks": [
@@ -248,13 +278,12 @@
      ]
     }
    ],
-   "inverse_bear": [],
    "hedge": [],
    "flow_evidence": {
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-27",
-    "event_date": "2026-11-24",
+    "event_date": "2026-11-28",
     "matched_codes": []
    }
   }
