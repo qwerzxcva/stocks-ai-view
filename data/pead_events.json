@@ -1,5 +1,5 @@
 {
-  "ts": "2026-11-26T08:06:39+08:00",
+  "ts": "2026-11-27T08:28:10+08:00",
   "engine": "pead_engine",
   "coverage": {
     "n_fin_symbols": 4028,
@@ -14205,77 +14205,17 @@
       "car_5d": 0.007365,
       "car_10d": -0.003156,
       "car_20d": null
-    },
-    {
-      "symbol": "sz000016",
-      "announce_date": "2026-08-28 00:00:00",
-      "eps": -0.0718,
-      "sue": 0.0014,
-      "n_quarters": 102,
-      "car_5d": 0.0,
-      "car_10d": 0.0,
-      "car_20d": 0.0
-    },
-    {
-      "symbol": "sh688981",
-      "announce_date": "2026-08-28",
-      "eps": 0.56,
-      "sue": 1.8724,
-      "n_quarters": 38,
-      "car_5d": 0.001827,
-      "car_10d": -0.037655,
-      "car_20d": -0.067286
-    },
-    {
-      "symbol": "sz001237",
-      "announce_date": "2026-08-28",
-      "eps": 1.55,
-      "sue": -0.1836,
-      "n_quarters": 8,
-      "car_5d": 0.003082,
-      "car_10d": -0.016567,
-      "car_20d": -0.068388
-    },
-    {
-      "symbol": "sz200012",
-      "announce_date": "2026-08-28",
-      "eps": -0.14,
-      "sue": -1.2173,
-      "n_quarters": 98,
-      "car_5d": -0.023256,
-      "car_10d": -0.015504,
-      "car_20d": 0.0
-    },
-    {
-      "symbol": "sz200016",
-      "announce_date": "2026-08-28",
-      "eps": -0.0718,
-      "sue": 0.0657,
-      "n_quarters": 96,
-      "car_5d": 0.014286,
-      "car_10d": null,
-      "car_20d": null
-    },
-    {
-      "symbol": "sz200030",
-      "announce_date": "2026-08-28",
-      "eps": 0.1093,
-      "sue": -1.9581,
-      "n_quarters": 95,
-      "car_5d": 0.011364,
-      "car_10d": 0.018939,
-      "car_20d": 0.022727
     }
   ],
   "events_window": {
     "max_age_days": 90,
-    "cutoff": "2026-08-28",
+    "cutoff": "2026-08-29",
     "n_total": 1451,
-    "n_output": 1418,
+    "n_output": 1412,
     "order": "announce_date desc"
   },
   "warnings": [
-    "events 只输出最近 90 天公告的 1418 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
+    "events 只输出最近 90 天公告的 1412 条（全量 1451 条）；更早的公告漂移窗口已走完，保留在 coverage/deciles 统计里但不逐条输出"
   ],
   "provenance": {
     "source": "data/fin/*.json (财报) + data/bulk/day_qfq_*.csv (价格)",
