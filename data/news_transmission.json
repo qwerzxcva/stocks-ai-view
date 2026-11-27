@@ -1,8 +1,8 @@
 {
- "ts": "2026-11-27T09:02:01+08:00",
+ "ts": "2026-11-27T17:33:14+08:00",
  "engine": "news_transmission v1 (消息传导: 坏消息利好谁)",
  "n_input": 368,
- "n_transmissions": 5,
+ "n_transmissions": 3,
  "n_rules": 16,
  "rules": [
   {
@@ -79,125 +79,9 @@
  "caveat": "传导关系是规则先验, 非实证; 行为标签要求新闻与资金同交易日, 缺失不判定。Research reference only, not investment advice.",
  "transmissions": [
   {
-   "title": "特朗普称与北约秘书长讨论美在欧军事部署问题",
-   "source": "财联社电报",
-   "time": "2026-11-27T08:51:02+08:00",
-   "url": "https://www.cls.cn/detail/2546038",
-   "transmission_id": "geopolitics",
-   "label": "地缘冲突",
-   "direct_bear": [],
-   "direct_bull": [
-    {
-     "sector": "军工",
-     "stocks": [
-      "688629"
-     ]
-    },
-    {
-     "sector": "黄金",
-     "stocks": [
-      "000603"
-     ]
-    }
-   ],
-   "inverse_bull": [],
-   "inverse_bear": [
-    {
-     "sector": "航空",
-     "stocks": [
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945",
-      "600029",
-      "603885",
-      "600115",
-      "002928"
-     ]
-    },
-    {
-     "sector": "旅游",
-     "stocks": [
-      "603099"
-     ]
-    }
-   ],
-   "hedge": [
-    {
-     "sector": "黄金",
-     "stocks": [
-      "000603"
-     ]
-    }
-   ],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-26",
-    "event_date": "2026-11-27",
-    "matched_codes": []
-   }
-  },
-  {
-   "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
-   "source": "华尔街见闻",
-   "time": "2026-11-24T14:12:01+08:00",
-   "url": "https://wallstreetcn.com/livenews/3204697",
-   "transmission_id": "oil_down",
-   "label": "油价下跌",
-   "direct_bear": [
-    {
-     "sector": "油服工程",
-     "stocks": [
-      "603619"
-     ]
-    }
-   ],
-   "direct_bull": [],
-   "inverse_bull": [
-    {
-     "sector": "航空机场",
-     "stocks": [
-      "600004",
-      "600009",
-      "600515",
-      "000089",
-      "600897",
-      "601021",
-      "000099",
-      "600221",
-      "601111",
-      "900945"
-     ]
-    },
-    {
-     "sector": "物流",
-     "stocks": [
-      "600180"
-     ]
-    },
-    {
-     "sector": "化工",
-     "stocks": [
-      "000912"
-     ]
-    }
-   ],
-   "inverse_bear": [],
-   "hedge": [],
-   "flow_evidence": {
-    "status": "insufficient",
-    "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
-    "trade_date": "2026-11-26",
-    "event_date": "2026-11-24",
-    "matched_codes": []
-   }
-  },
-  {
    "title": "病毒吧曝假deepseek藏银狐木马",
    "source": "贴吧热议",
-   "time": "2026-11-27T08:44:52+08:00",
+   "time": "2026-11-27T17:22:26+08:00",
    "url": "https://tieba.baidu.com/hottopic/browse/hottopic?topic_id=28370146&amp;topic_name=%E7%97%85%E6%AF%92%E5%90%A7%E6%9B%9D%E5%81%87deepseek%E8%97%8F%E9%93%B6%E7%8B%90%E6%9C%A8%E9%A9%AC",
    "transmission_id": "epidemic",
    "label": "疫情",
@@ -216,6 +100,12 @@
       "920344",
       "603087",
       "600713"
+     ]
+    },
+    {
+     "sector": "医疗器械",
+     "stocks": [
+      "688677"
      ]
     },
     {
@@ -239,7 +129,7 @@
     {
      "sector": "旅游",
      "stocks": [
-      "603099"
+      "002627"
      ]
     },
     {
@@ -253,7 +143,8 @@
       "600029",
       "603885",
       "600115",
-      "002928"
+      "002928",
+      "300395"
      ]
     },
     {
@@ -276,29 +167,42 @@
    }
   },
   {
-   "title": "这次不一样？施罗德投资：美联储或因美股暴跌转向宽松 但反弹恐难持续",
-   "source": "财联社热门",
-   "time": "2026-11-27T08:45:48+08:00",
-   "url": "https://www.cls.cn/detail/2545777",
-   "transmission_id": "rate_cut",
-   "label": "降息/宽松",
+   "title": "扎哈罗娃称日本打着幌子加快军事建设",
+   "source": "今日头条",
+   "time": "2026-11-27T17:21:18+08:00",
+   "url": "https://www.toutiao.com/trending/7712753398290235913/",
+   "transmission_id": "geopolitics",
+   "label": "地缘冲突",
    "direct_bear": [],
-   "direct_bull": [],
+   "direct_bull": [
+    {
+     "sector": "军工",
+     "stocks": [
+      "688788"
+     ]
+    }
+   ],
    "inverse_bull": [],
    "inverse_bear": [
     {
-     "sector": "银行",
+     "sector": "航空",
      "stocks": [
-      "601328",
-      "601398",
-      "601288",
-      "601988",
-      "601939",
-      "601658",
-      "601166",
-      "601916",
-      "600036",
-      "600000"
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945",
+      "600029",
+      "603885",
+      "600115",
+      "002928",
+      "300395"
+     ]
+    },
+    {
+     "sector": "旅游",
+     "stocks": [
+      "002627"
      ]
     }
    ],
@@ -312,19 +216,35 @@
    }
   },
   {
-   "title": "欧方将玉沙集团移出欧盟涉俄出口管制制裁清单，商务部：欢迎",
-   "source": "澎湃新闻",
-   "time": "2026-11-27T09:01:54+08:00",
-   "url": "https://www.thepaper.cn/newsDetail_forward_34563211",
-   "transmission_id": "export_control",
-   "label": "出口管制/制裁",
-   "direct_bear": [],
+   "title": "油价下跌缓解通胀担忧 美国国债价格上涨",
+   "source": "华尔街见闻",
+   "time": "2026-11-24T14:12:01+08:00",
+   "url": "https://wallstreetcn.com/livenews/3204697",
+   "transmission_id": "oil_down",
+   "label": "油价下跌",
+   "direct_bear": [
+    {
+     "sector": "油服工程",
+     "stocks": [
+      "002629"
+     ]
+    }
+   ],
    "direct_bull": [],
    "inverse_bull": [
     {
-     "sector": "半导体设备",
+     "sector": "航空机场",
      "stocks": [
-      "688820"
+      "600004",
+      "600009",
+      "600515",
+      "000089",
+      "600897",
+      "601021",
+      "000099",
+      "600221",
+      "601111",
+      "900945"
      ]
     }
    ],
@@ -334,10 +254,9 @@
     "status": "insufficient",
     "source": "dc_stock_flow,em_fflow_rank,em_index_flow,em_sector_flow",
     "trade_date": "2026-11-26",
-    "event_date": "2026-11-27",
+    "event_date": "2026-11-24",
     "matched_codes": []
-   },
-   "note": "制裁对本土供应链是国产替代逻辑, 双向: 依赖进口的环节 bear"
+   }
   }
  ]
 }
